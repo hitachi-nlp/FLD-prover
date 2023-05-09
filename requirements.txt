@@ -1,3 +1,4 @@
-
 # transformers latest version is required.
 git+https://github.com/huggingface/transformers
+
+logger_setup@git+https://github.com/HonoMi/python-logger-setup.git@master
