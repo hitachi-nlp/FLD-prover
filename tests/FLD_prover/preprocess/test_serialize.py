@@ -19,23 +19,52 @@ def test_serialize_example():
         assert serialized_example.input_text == gold_example.input_text
         assert serialized_example.output_text == gold_example.output_text
 
-    example = DeductionExample(**{
-        'hypothesis': 'this is the hypothesis',
-        'context': 'sent1: this is sentence1 sent2: this is sentence2 sent3: this is sentence3',
-        'proofs': [
-            'sent1 & sent2 -> int1: the conclusion of sentence1 and sentence2; sent3 & int1 -> int2: the conclusion of int1 and sent3;'
-        ],
-        'proof_stance': 'UNKNOWN',
-        'answer': 'Unknown',
-    })
+    hypothesis = 'this is the hypothesis'
+    context = 'sent1: this is sentence1 sent2: this is sentence2 sent3: this is sentence3'
+    proof = 'sent1 & sent2 -> int1: the conclusion of sentence1 and sentence2; sent3 & int1 -> int2: the conclusion of int1 and sent3;'
 
     test_one_example(
-        example,
-        SerializedDeductionExample(**{
-            'input_text': example.context,
-            'output_text': example.hypothesis,
+        DeductionExample.parse_obj({
+            'hypothesis': hypothesis,
+            'context': context,
+            'proofs': [proof],
+            'proof_stance': 'PROOF',
+            'answer': 'True',
+        }),
+        SerializedDeductionExample.parse_obj({
+            'input_text': f'$hypothesis$ = {hypothesis} ; $context$ = {context} ; $proof$ = ',
+            'output_text': proof + ' __PROVED__',
         })
     )
+
+    test_one_example(
+        DeductionExample.parse_obj({
+            'hypothesis': hypothesis,
+            'context': context,
+            'proofs': [proof],
+            'proof_stance': 'DISPROOF',
+            'answer': 'False',
+        }),
+        SerializedDeductionExample.parse_obj({
+            'input_text': f'$hypothesis$ = {hypothesis} ; $context$ = {context} ; $proof$ = ',
+            'output_text': proof + ' __DISPROVED__',
+        })
+    )
+
+    test_one_example(
+        DeductionExample.parse_obj({
+            'hypothesis': hypothesis,
+            'context': context,
+            'proofs': [proof],
+            'proof_stance': 'UNKNOWN',
+            'answer': 'Unknown',
+        }),
+        SerializedDeductionExample.parse_obj({
+            'input_text': f'$hypothesis$ = {hypothesis} ; $context$ = {context} ; $proof$ = ',
+            'output_text': '__UNKNOWN__',
+        })
+    )
+
 
 
 if __name__ == '__main__':
