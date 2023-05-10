@@ -6,6 +6,7 @@ OUTPUT_DIR=./outputs/01.run_FLD.sh/2023-05-09
 TRAIN_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 VALID_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 TEST_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
+MAX_SAMPLES=100
 
 SOURCE_PREFIX="Let's think step-by-step following the rigid formal logic:"
 
@@ -22,6 +23,9 @@ python ./run_FLD.py \
     --validation_file "${VALID_JSONL}" \
     --test_file "${TEST_JSONL}" \
     --file_type "json" \
+    --max_train_samples ${MAX_SAMPLES} \
+    --max_eval_samples ${MAX_SAMPLES} \
+    --max_predict_samples ${MAX_SAMPLES} \
     --source_prefix "${SOURCE_PREFIX}: " \
     --output_dir "${OUTPUT_DIR}" \
     --overwrite_output_dir \

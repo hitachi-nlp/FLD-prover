@@ -549,7 +549,6 @@ def main():
     def preprocess_function(examples: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
         # remove pairs where at least one record is None
         from FLD_prover.preprocess import preprocess_examples
-
         examples = preprocess_examples(examples)
 
         inputs, targets = [], []
