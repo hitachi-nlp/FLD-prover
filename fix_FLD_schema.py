@@ -32,7 +32,7 @@ def main(input_path, output_path):
         for line in open(input_path):
             instance = json.loads(line.rstrip())
             for key, type_ in schema_conversion.items():
-                instance[key] = type_(key)
+                instance[key] = type_(instance[key])
             f_out.write(json.dumps(instance) + '\n')
 
 
