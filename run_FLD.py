@@ -22,7 +22,7 @@ import logging
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Dict, List, Any
 
 import datasets
 import evaluate
@@ -135,11 +135,11 @@ class DataTrainingArguments:
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
     text_column: Optional[str] = field(
-        default=None,
+        default='input_text',
         metadata={"help": "The name of the column in the datasets containing the full texts (for summarization)."},
     )
     summary_column: Optional[str] = field(
-        default=None,
+        default='output_text',
         metadata={"help": "The name of the column in the datasets containing the summaries (for summarization)."},
     )
     train_file: Optional[str] = field(
@@ -516,23 +516,25 @@ def main():
         model.config.forced_bos_token_id = forced_bos_token_id
 
     # Get the column names for input/target.
-    dataset_columns = summarization_name_mapping.get(data_args.dataset_name, None)
-    if data_args.text_column is None:
-        text_column = dataset_columns[0] if dataset_columns is not None else column_names[0]
-    else:
-        text_column = data_args.text_column
-        if text_column not in column_names:
-            raise ValueError(
-                f"--text_column' value '{data_args.text_column}' needs to be one of: {', '.join(column_names)}"
-            )
-    if data_args.summary_column is None:
-        summary_column = dataset_columns[1] if dataset_columns is not None else column_names[1]
-    else:
-        summary_column = data_args.summary_column
-        if summary_column not in column_names:
-            raise ValueError(
-                f"--summary_column' value '{data_args.summary_column}' needs to be one of: {', '.join(column_names)}"
-            )
+    # dataset_columns = summarization_name_mapping.get(data_args.dataset_name, None)
+    # if data_args.text_column is None:
+    #     text_column = dataset_columns[0] if dataset_columns is not None else column_names[0]
+    # else:
+    #     text_column = data_args.text_column
+    #     if text_column not in column_names:
+    #         raise ValueError(
+    #             f"--text_column' value '{data_args.text_column}' needs to be one of: {', '.join(column_names)}"
+    #         )
+    # if data_args.summary_column is None:
+    #     summary_column = dataset_columns[1] if dataset_columns is not None else column_names[1]
+    # else:
+    #     summary_column = data_args.summary_column
+    #     if summary_column not in column_names:
+    #         raise ValueError(
+    #             f"--summary_column' value '{data_args.summary_column}' needs to be one of: {', '.join(column_names)}"
+    #         )
+    text_column = data_args.text_column
+    summary_column = data_args.summary_column
 
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
@@ -544,8 +546,11 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def preprocess_function(examples):
+    def preprocess_function(examples: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
         # remove pairs where at least one record is None
+        from FLD_prover.preprocess import preprocess_examples
+
+        examples = preprocess_examples(examples)
 
         inputs, targets = [], []
         for i in range(len(examples[text_column])):

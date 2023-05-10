@@ -24,8 +24,6 @@ python ./run_FLD.py \
     --file_type "json" \
     --source_prefix "${SOURCE_PREFIX}: " \
     --output_dir "${OUTPUT_DIR}" \
-    --text_column "context" \
-    --summary_column "hypothesis" \
     --overwrite_output_dir \
     --remove_unused_columns=false \
     --per_device_train_batch_size=4 \
