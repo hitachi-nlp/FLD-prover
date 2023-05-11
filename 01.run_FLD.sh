@@ -7,7 +7,7 @@ TRAIN_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 VALID_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 TEST_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 MAX_SAMPLES=100
-EPOCHS=10
+EPOCHS=100
 BATCH_SIZE=4
 
 SOURCE_PREFIX="Let's think step-by-step following the rigid formal logic:"
