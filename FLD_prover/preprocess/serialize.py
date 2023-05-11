@@ -3,7 +3,7 @@ from copy import deepcopy
 import re
 import random
 
-from FLD_prover.stance_indication import add_stance_markers, StanceMarker
+from stance_indication import add_stance_markers, StanceMarker
 from FLD_prover.schema import DeductionExample, SerializedDeductionStep
 
 

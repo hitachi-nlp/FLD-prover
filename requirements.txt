@@ -13,6 +13,12 @@ torch >= 1.3
 evaluate
 ete3==3.1.2
 
+# requirements imported from NLProofS
+pypdf3
+sklearn
+strsimpy
+git+https://github.com/google-research/bleurt.git
+
 # others
 pydantic
 logger_setup@git+https://github.com/HonoMi/python-logger-setup.git@master

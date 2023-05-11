@@ -269,7 +269,7 @@ def _add_final_reference_to_proofs(ex: Example) -> Example:
 
 
 def _add_random_proof_for_unknown(ex: Example, step_from_special_sentence=True) -> Example:
-    from src.prover.proof import SENT_IDENT  # XXX do not move to the top to avoid circular imports
+    from evaluate.proof import SENT_IDENT  # XXX do not move to the top to avoid circular imports
 
     ex = deepcopy(ex)
 
