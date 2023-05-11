@@ -50,6 +50,7 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
+from logger_setup import setup as setup_logger
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -322,11 +323,12 @@ def main():
     # send_example_telemetry("run_summarization", model_args, data_args)
 
     # Setup logging
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(sys.stdout)],
-    )
+    # logging.basicConfig(
+    #     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    #     datefmt="%m/%d/%Y %H:%M:%S",
+    #     handlers=[logging.StreamHandler(sys.stdout)],
+    # )
+    setup_logger(do_stderr=True, level=logging.INFO)
 
     if training_args.should_log:
         # The default of training_args.log_level is passive, so we set log level at info here to have that default.
@@ -548,14 +550,19 @@ def main():
 
     def preprocess_function(examples: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
         # remove pairs where at least one record is None
-        from FLD_prover.preprocess import preprocess_examples
-        examples = preprocess_examples(examples)
+        from FLD_prover.preprocess import run_FLD_preprocess_examples
+        examples = run_FLD_preprocess_examples(examples)
 
         inputs, targets = [], []
         for i in range(len(examples[text_column])):
-            if examples[text_column][i] and examples[summary_column][i]:
-                inputs.append(examples[text_column][i])
-                targets.append(examples[summary_column][i])
+            text = examples[text_column][i]
+            summary = examples[summary_column][i]
+            if text and summary:
+                inputs.append(text)
+                targets.append(summary)
+                logger.info('----------------------------- example-%d -----------------------------', i)
+                logger.info('text    : "%s"', text)
+                logger.info('summary : "%s"', text)
 
         inputs = [prefix + inp for inp in inputs]
         model_inputs = tokenizer(inputs, max_length=data_args.max_source_length, padding=padding, truncation=True)

@@ -24,6 +24,6 @@ class DeductionExample(BaseModel):
     negative_answer: Optional[str] = None
 
 
-class SerializedDeductionExample(BaseModel):
-    input_text: str
-    output_text: Optional[str] = None
+class SerializedDeductionStep(BaseModel):
+    input: str
+    next_step: Optional[str] = None
