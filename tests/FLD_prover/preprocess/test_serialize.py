@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 from pprint import pprint
 
-from FLD_prover.preprocess.serialize import serialize_example
+from FLD_prover.preprocess import serialize
 from FLD_prover.schema import DeductionExample, SerializedDeductionStep
 
 
@@ -14,7 +14,7 @@ def test_serialize_example():
 
         print('\n------------    input_example   ------------')
         pprint(input_example.dict())
-        serialized_example = serialize_example(input_example, **kwargs)
+        serialized_example = serialize(input_example, **kwargs)
 
         print('\n------------ serialized_example ------------')
         pprint(serialized_example.dict())

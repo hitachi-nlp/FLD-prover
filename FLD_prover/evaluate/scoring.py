@@ -7,7 +7,7 @@ import logging
 
 from common import calc_F
 from proof_common import extract_assumptions, get_node_type, NodeType, extract_idents
-from stance_indication import delete_stance_markers
+from stance_indication import delete_stance_markers, get_stance_markers, StanceMarker
 from FLD_prover.proof import InvalidProof
 from strsimpy.normalized_levenshtein import NormalizedLevenshtein
 from proof_common import (
@@ -66,6 +66,29 @@ def calc_max_pooling_similarity_batch(golds: List[str], preds: List[str]) -> Lis
     rouge_sims = calc_rouge_batch(golds, preds)
 
     return [max(lev_sims[i], bleurt_sims[i], rouge_sims[i]) for i in range(0, len(golds))]
+
+
+def calc_accuracy(proof_gold_text: str,
+                  proof_pred_text: str,
+                  no_similarity_threshold=True,
+                  allowed_additional_proof_steps=0,
+                  zero_one: bool = True) -> float:
+    gold_labels = get_stance_markers(proof_gold_text)
+    pred_labels = get_stance_markers(proof_pred_text)
+    if set(gold_labels) != set(pred_labels):
+        return 0.0
+
+    if gold_labels == set([StanceMarker.UNKNOWN]):
+        return 1.0
+    else:
+        proof_score = calc_score(
+            delete_stance_markers(proof_gold_text).rstrip(' '),
+            delete_stance_markers(proof_pred_text).rstrip(' '),
+            no_similarity_threshold=no_similarity_threshold,
+            allowed_additional_proof_steps=allowed_additional_proof_steps,
+            zero_one=zero_one,
+        )
+        return proof_score
 
 
 def calc_score(proof_gold_text: str,

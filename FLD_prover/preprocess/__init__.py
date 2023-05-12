@@ -1,1 +1,1 @@
-from .adaptor import run_FLD_preprocess_examples
+from .serialize import serialize

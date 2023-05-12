@@ -22,3 +22,4 @@ git+https://github.com/google-research/bleurt.git
 # others
 pydantic
 logger_setup@git+https://github.com/HonoMi/python-logger-setup.git@master
+script_engine@git+https://github.com/HonoMi/script-engine.git@master

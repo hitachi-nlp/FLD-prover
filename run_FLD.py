@@ -22,8 +22,9 @@ import logging
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Any
+from typing import Optional, Dict, List, Any, Union, Tuple, Any
 
+import torch
 import datasets
 import evaluate
 import nltk  # Here to have a nice missing dependency error message early on
@@ -51,6 +52,15 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
+
+from FLD_prover.adaptors.run_FLD import (
+    StepWiseGenerationTrainer,
+    preprocess_examples_train,
+    preprocess_examples_eval,
+)
+from FLD_prover.evaluate.scoring import calc_accuracy
+from FLD_prover.proof import InvalidProof, InvalidProofStep
+from stance_indication import get_stance_markers
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -328,6 +338,7 @@ def main():
     #     datefmt="%m/%d/%Y %H:%M:%S",
     #     handlers=[logging.StreamHandler(sys.stdout)],
     # )
+    logging.getLogger().handlers.clear()  # remove handler automatically added
     setup_logger(do_stderr=True, level=logging.INFO)
 
     if training_args.should_log:
@@ -548,27 +559,27 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def preprocess_function(examples: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
-        # remove pairs where at least one record is None
-        from FLD_prover.preprocess import run_FLD_preprocess_examples
-        examples = run_FLD_preprocess_examples(examples)
-
-        inputs, targets = [], []
-        for i in range(len(examples[text_column])):
-            text = examples[text_column][i]
-            summary = examples[summary_column][i]
+    def extract_inputs_targets(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str]]:
+        logger.info('')
+        logger.info('----------------------------- extract_inputs_targets() -----------------------------')
+        inputs: List[str] = []
+        targets: List[str] = []
+        for i_example in range(len(examples[text_column])):
+            text = examples[text_column][i_example]
+            summary = examples[summary_column][i_example]
             if text and summary:
                 inputs.append(text)
                 targets.append(summary)
-                logger.info('----------------------------- example-%d -----------------------------', i)
-                logger.info('text    : "%s"', text)
-                logger.info('summary : "%s"', text)
+                logger.info('text    [%d] : "%s"', i_example, text)
+                logger.info('summary [%d] : "%s"', i_example, summary)
+        return inputs, targets
 
-        inputs = [prefix + inp for inp in inputs]
-        model_inputs = tokenizer(inputs, max_length=data_args.max_source_length, padding=padding, truncation=True)
+    def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
+        return tokenizer(inputs, max_length=max_length, padding=padding, truncation=True)
 
+    def prepare_model_targets(targets: List[str], max_length: int) -> Dict[str, List[Any]]:
         # Tokenize targets with the `text_target` keyword argument
-        labels = tokenizer(text_target=targets, max_length=max_target_length, padding=padding, truncation=True)
+        labels = tokenizer(text_target=targets, max_length=max_length, padding=padding, truncation=True)
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
         # padding in the loss.
@@ -577,7 +588,27 @@ def main():
                 [(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]
             ]
 
-        model_inputs["labels"] = labels["input_ids"]
+        return labels
+
+    def preprocess_function(examples: Dict[str, List[Any]],
+                            split: str,
+                            max_source_length: int,
+                            max_target_length: int) -> Dict[str, List[Any]]:
+        if split == 'train':
+            examples = preprocess_examples_train(examples)
+        elif split == 'eval':
+            examples = preprocess_examples_eval(examples)
+        else:
+            raise ValueError()
+
+        inputs, targets = extract_inputs_targets(examples)
+        inputs = [prefix + inp for inp in inputs]
+
+        model_inputs = prepare_model_inputs(inputs, max_source_length)
+
+        model_targets = prepare_model_targets(targets, max_target_length)
+        model_inputs["labels"] = model_targets["input_ids"]
+
         return model_inputs
 
     if training_args.do_train:
@@ -594,7 +625,10 @@ def main():
         #         load_from_cache_file=not data_args.overwrite_cache,
         #         desc="Running tokenizer on train dataset",
         #     )
-        train_dataset.set_transform(preprocess_function)
+        train_dataset.set_transform(
+            lambda examples: preprocess_function(examples, 'train',
+                                                 max_source_length=data_args.max_source_length,
+                                                 max_target_length=data_args.max_target_length))
 
     if training_args.do_eval:
         max_target_length = data_args.val_max_target_length
@@ -611,7 +645,10 @@ def main():
         #         load_from_cache_file=not data_args.overwrite_cache,
         #         desc="Running tokenizer on validation dataset",
         #     )
-        eval_dataset.set_transform(preprocess_function)
+        eval_dataset.set_transform(
+            lambda examples: preprocess_function(examples, 'eval',
+                                                 max_source_length=data_args.max_source_length,
+                                                 max_target_length=data_args.max_target_length * 20))
 
     if training_args.do_predict:
         max_target_length = data_args.val_max_target_length
@@ -628,7 +665,10 @@ def main():
         #         load_from_cache_file=not data_args.overwrite_cache,
         #         desc="Running tokenizer on prediction dataset",
         #     )
-        predict_dataset.set_transform(preprocess_function)
+        predict_dataset.set_transform(
+            lambda examples: preprocess_function(examples, 'eval',
+                                                 max_source_length=data_args.max_source_length,
+                                                 max_target_length=data_args.max_target_length * 20))
 
     # Data collator
     label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
@@ -652,7 +692,21 @@ def main():
 
         return preds, labels
 
-    def compute_metrics(eval_preds):
+    def compute_rouges(preds,
+                       decoded_preds: List[str],
+                       decoded_labels: List[str]) -> Dict[str, Any]:
+        # Some simple post-processing
+        _decoded_preds, _decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+        result = metric.compute(predictions=_decoded_preds, references=_decoded_labels, use_stemmer=True)
+        result = {k: round(v * 100, 4) for k, v in result.items()}
+        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+        result["gen_len"] = np.mean(prediction_lens)
+        return result
+
+    def compute_metrics(eval_preds) -> Dict[str, Any]:
+        logger.info('')
+        logger.info('--------------------------- compute_metrics() ----------------------------')
+
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
@@ -662,13 +716,21 @@ def main():
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
-        # Some simple post-processing
-        decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+        for i_example, (decoded_pred, decoded_label) in enumerate(zip(decoded_preds, decoded_labels)):
+            logger.info('decoded_pred  [%d] : "%s"', i_example, decoded_pred)
+            logger.info('decoded_label [%d] : "%s"', i_example, decoded_label)
 
-        result = metric.compute(predictions=decoded_preds, references=decoded_labels, use_stemmer=True)
-        result = {k: round(v * 100, 4) for k, v in result.items()}
-        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-        result["gen_len"] = np.mean(prediction_lens)
+        result = compute_rouges(preds, decoded_preds, decoded_labels)
+
+        proof_accs = []
+        for proof_gt, proof_pred in zip(decoded_labels, decoded_preds):
+            try:
+                proof_accs.append(calc_accuracy(proof_gt, proof_pred))
+            except (InvalidProof, InvalidProofStep) as e:
+                logger.warning('could not calculate the accuracy due to the following error. will score as 0.0:\n%s', str(e))
+                proof_accs.append(0.0)
+        result["zero_one_accuracy"] = np.mean(proof_accs)
+
         return result
 
     # Override the decoding parameters of Seq2SeqTrainer
@@ -684,14 +746,17 @@ def main():
     # Initialize our Trainer
     if training_args.remove_unused_columns:
         raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augumentation.')
-    trainer = Seq2SeqTrainer(
+    # trainer = Seq2SeqTrainer(
+    trainer = StepWiseGenerationTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
-        tokenizer=tokenizer,
         data_collator=data_collator,
+        tokenizer=tokenizer,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
+        texts_to_inputs_func=lambda texts: prepare_model_inputs(texts, data_args.max_source_length),
+        is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
     )
 
     # Training

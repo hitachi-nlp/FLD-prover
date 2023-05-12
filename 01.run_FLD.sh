@@ -1,16 +1,18 @@
 #!/bin/bash
 
 MODEL_NAME_OR_PATH=t5-base
-OUTPUT_DIR=./outputs/01.run_FLD.sh/2023-05-11
+OUTPUT_DIR=./outputs/01.run_FLD.sh/2023-05-12
 
 TRAIN_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 VALID_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 TEST_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
-MAX_SAMPLES=100
-EPOCHS=100
+MAX_SAMPLES=10
+EPOCHS=500
 BATCH_SIZE=4
+DO_TRAIN="--do_train"
+# DO_TRAIN=""
 
-SOURCE_PREFIX="Let's think step-by-step following the rigid formal logic:"
+SOURCE_PREFIX="Let's think step-by-step following the rigid formal logic"
 
 if [ ! -e "${OUTPUT_DIR}" ]; then
     mkdir -p ${OUTPUT_DIR}
@@ -19,7 +21,7 @@ fi
 
 python ./run_FLD.py \
     --model_name_or_path "${MODEL_NAME_OR_PATH}" \
-    --do_train \
+    ${DO_TRAIN} \
     --do_eval \
     --train_file "${TRAIN_JSONL}" \
     --validation_file "${VALID_JSONL}" \
@@ -33,8 +35,9 @@ python ./run_FLD.py \
     --max_source_length 1500\
     --max_target_length 100\
     --output_dir "${OUTPUT_DIR}" \
+    --logging_dir "${OUTPUT_DIR}/tensorboard_logs" \
     --overwrite_output_dir \
     --remove_unused_columns=false \
     --per_device_train_batch_size=${BATCH_SIZE} \
     --per_device_eval_batch_size=${BATCH_SIZE} \
-    --predict_with_generate 1>${OUTPUT_DIR}/log.txt 2>&1
+    --predict_with_generate

@@ -7,7 +7,7 @@ from stance_indication import add_stance_markers, StanceMarker
 from FLD_prover.schema import DeductionExample, SerializedDeductionStep
 
 
-def serialize_example(
+def serialize(
     example: DeductionExample,
     stepwise=True,
 ) -> SerializedDeductionStep:
