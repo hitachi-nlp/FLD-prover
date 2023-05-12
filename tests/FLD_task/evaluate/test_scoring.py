@@ -1,7 +1,7 @@
 import math
 import re
 
-from FLD_prover.evaluate.scoring import calc_score
+from FLD_task.evaluate.scoring import calc_score
 from common import calc_F
 from logger_setup import setup as setup_logger
 

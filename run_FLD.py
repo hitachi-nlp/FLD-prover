@@ -53,15 +53,14 @@ from transformers.utils import check_min_version, is_offline_mode, send_example_
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
 
-from FLD_prover.adaptors.run_FLD import (
+from FLD_task.evaluate.scoring import calc_accuracy
+from FLD_task.proof import InvalidProof, InvalidProofStep
+from stance_indication import get_stance_markers
+from FLD_prover import (
     StepWiseGenerationTrainer,
     preprocess_examples_train,
     preprocess_examples_eval,
 )
-from FLD_prover.evaluate.scoring import calc_accuracy
-from FLD_prover.proof import InvalidProof, InvalidProofStep
-from stance_indication import get_stance_markers
-
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.29.0.dev0")

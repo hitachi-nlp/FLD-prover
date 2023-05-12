@@ -1,5 +1,5 @@
 from typing import List
-from FLD_prover.evaluate.scoring import (
+from FLD_task.evaluate.scoring import (
     calc_levenstein_similarity_batch,
     calc_rouge_batch,
     calc_bleurt_similarity_batch,

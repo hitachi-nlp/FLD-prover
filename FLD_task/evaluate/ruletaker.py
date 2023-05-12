@@ -15,7 +15,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 from rouge_score import rouge_scorer
-from FLD_prover.proof import prettify_proof_text, InvalidProof
+from FLD_task.proof import prettify_proof_text, InvalidProof
 from common import (
     int2answer,
     answer2int,

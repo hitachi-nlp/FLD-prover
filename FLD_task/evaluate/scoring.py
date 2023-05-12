@@ -8,7 +8,7 @@ import logging
 from common import calc_F
 from proof_common import extract_assumptions, get_node_type, NodeType, extract_idents
 from stance_indication import delete_stance_markers, get_stance_markers, StanceMarker
-from FLD_prover.proof import InvalidProof
+from FLD_task.proof import InvalidProof
 from strsimpy.normalized_levenshtein import NormalizedLevenshtein
 from proof_common import (
     get_node_type,

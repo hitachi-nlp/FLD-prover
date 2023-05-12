@@ -1,8 +1,8 @@
 from typing import Dict, Any, List
 from pprint import pprint
 
-from FLD_prover.preprocess import serialize
-from FLD_prover.schema import DeductionExample, SerializedDeductionStep
+from FLD_task.preprocess import serialize
+from FLD_task.schema import DeductionExample, SerializedDeductionStep
 
 
 def test_serialize_example():

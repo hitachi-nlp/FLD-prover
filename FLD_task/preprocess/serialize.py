@@ -4,7 +4,7 @@ import re
 import random
 
 from stance_indication import add_stance_markers, StanceMarker
-from FLD_prover.schema import DeductionExample, SerializedDeductionStep
+from FLD_task.schema import DeductionExample, SerializedDeductionStep
 
 
 def serialize(

@@ -18,27 +18,29 @@
 
 
 # 開発
-* リファクタリング
+
+## 学習
+* ./01.train.py
+* settings -> setting
+* [done] losses Noneになる
+* [done] tensorboard
+
+## [pending] 予測
+
+## [done] 評価
+
+## (最後)
+* common.pyなどをライブラリに仕舞う
+* ライブラリを分ける．
+    - FLD_task
+    - FLD_prover
+* (最後) CoT prompt -> どういう形式にするか？
+    - promptに柔軟性を与えたい．
+        * serialize.py のフォーマットを変える．
+            * common.pyなどに影響がある可能性がある．よって，最後にする．
+
+## done
+* [done] リファクタリング
     * FLD_task
     * FLD_prover
-* 機能の完成
-    - 学習
-        * ./NLProofS/10.train.py
-            * negative_proof_sampling
-            * multitask (dataset_1_name)
-            * epoch
-            * num_val_steps
-        * ./NLProofS/experimental_settings.py
-        * [done] losses Noneになる
-        * [done] tensorboard
-    - [pending] 予測
-    - [done] 評価
-* (最後)
-    * common.pyなどをライブラリに仕舞う
-    * ライブラリを分ける．
-        - FLD_task
-        - FLD_prover
-    * (最後) CoT prompt -> どういう形式にするか？
-        - promptに柔軟性を与えたい．
-            * serialize.py のフォーマットを変える．
-                * common.pyなどに影響がある可能性がある．よって，最後にする．
+
