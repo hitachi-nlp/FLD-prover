@@ -1,3 +1,4 @@
+from enum import Enum
 from copy import deepcopy
 from typing import Dict, List, Any, Optional
 from typing import TypedDict
@@ -27,3 +28,15 @@ class DeductionExample(BaseModel):
 class SerializedDeductionStep(BaseModel):
     input: str
     next_step: Optional[str] = None
+
+
+class AnswerLabel(Enum):
+    PROVED = 'PROVED'
+    DISPROVED = 'DISPROVED'
+    UNKNOWN = 'UNKNOWN'
+
+
+class ProofStanceLabel(Enum):
+    PROVED = 'PROVED'
+    DISPROVED = 'DISPROVED'
+    UNKNOWN = 'UNKNOWN'

@@ -436,8 +436,6 @@ def test_calc_score_on_toy_examples():
     assert (math.isclose(score, calc_F(9, 7, 2)[-1]))
 
 
-
-
 def test_calc_score_on_real_examples():
     # the actual gold and precisions from our dataset
     score = _calc_score(

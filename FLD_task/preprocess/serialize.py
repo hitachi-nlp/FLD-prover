@@ -57,11 +57,11 @@ def serialize(
 
 
 def _get_stance_marker(example_proof_stance: str) -> StanceMarker:
-    if example_proof_stance == 'PROOF':
+    if example_proof_stance == 'PROVED':
         return StanceMarker.PROVED
-    elif example_proof_stance == 'DISPROOF':
+    elif example_proof_stance == 'DISPROVED':
         return StanceMarker.DISPROVED
     elif example_proof_stance == 'UNKNOWN':
         return StanceMarker.UNKNOWN
     else:
-        raise ValueError()
+        raise ValueError(f'Unknown stance label {example_proof_stance}')

@@ -275,6 +275,10 @@ class DataTrainingArguments:
         },
     )
 
+    log_examples: bool = field(
+        default=False,
+    )
+
     def __post_init__(self):
         if (
             self.dataset_name is None
@@ -559,8 +563,10 @@ def main():
         )
 
     def extract_inputs_targets(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str]]:
-        logger.info('')
-        logger.info('----------------------------- extract_inputs_targets() -----------------------------')
+        if training_args.log_examples:
+            logger.info('')
+            logger.info('----------------------------- extract_inputs_targets() -----------------------------')
+
         inputs: List[str] = []
         targets: List[str] = []
         for i_example in range(len(examples[text_column])):
@@ -569,8 +575,9 @@ def main():
             if text and summary:
                 inputs.append(text)
                 targets.append(summary)
-                logger.info('text    [%d] : "%s"', i_example, text)
-                logger.info('summary [%d] : "%s"', i_example, summary)
+                if training_args.log_examples:
+                        logger.info('text    [%d] : "%s"', i_example, text)
+                        logger.info('summary [%d] : "%s"', i_example, summary)
         return inputs, targets
 
     def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
@@ -756,6 +763,7 @@ def main():
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         texts_to_inputs_func=lambda texts: prepare_model_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
+        log_steps=training_args.log_examples,
     )
 
     # Training

@@ -38,7 +38,7 @@ def test_serialize_example():
             'hypothesis': hypothesis,
             'context': context,
             'proofs': [proof],
-            'proof_stance': 'PROOF',
+            'proof_stance': 'PROVED',
             'answer': 'True',
         }),
         [
@@ -56,7 +56,7 @@ def test_serialize_example():
                 'hypothesis': hypothesis,
                 'context': context,
                 'proofs': [proof],
-                'proof_stance': 'PROOF',
+                'proof_stance': 'PROVED',
                 'answer': 'True',
             }),
             [

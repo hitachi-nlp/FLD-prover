@@ -1,13 +1,13 @@
 #!/bin/bash
 
 MODEL_NAME_OR_PATH=t5-base
-OUTPUT_DIR=./outputs/01.run_FLD.sh/2023-05-12
+OUTPUT_DIR=./outputs/01.run_FLD.sh/2023-05-13
 
 TRAIN_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 VALID_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 TEST_JSONL=./res/datasets/FLD.schema_fixed/test.jsonl
 MAX_SAMPLES=10
-EPOCHS=1000
+EPOCHS=300
 BATCH_SIZE=4
 DO_TRAIN="--do_train"
 # DO_TRAIN=""
@@ -23,6 +23,7 @@ python ./run_FLD.py \
     --model_name_or_path "${MODEL_NAME_OR_PATH}" \
     ${DO_TRAIN} \
     --do_eval \
+    --do_predict \
     --train_file "${TRAIN_JSONL}" \
     --validation_file "${VALID_JSONL}" \
     --test_file "${TEST_JSONL}" \
