@@ -70,7 +70,7 @@ def calc_max_pooling_similarity_batch(golds: List[str], preds: List[str]) -> Lis
 
 def calc_accuracy(proof_gold_text: str,
                   proof_pred_text: str,
-                  no_similarity_threshold=True,
+                  similarity_threshold=False,
                   allowed_additional_proof_steps=0,
                   zero_one: bool = True) -> float:
     gold_labels = get_stance_markers(proof_gold_text)
@@ -84,7 +84,7 @@ def calc_accuracy(proof_gold_text: str,
         proof_score = calc_score(
             delete_stance_markers(proof_gold_text).rstrip(' '),
             delete_stance_markers(proof_pred_text).rstrip(' '),
-            no_similarity_threshold=no_similarity_threshold,
+            similarity_threshold=similarity_threshold,
             allowed_additional_proof_steps=allowed_additional_proof_steps,
             zero_one=zero_one,
         )
@@ -93,7 +93,7 @@ def calc_accuracy(proof_gold_text: str,
 
 def calc_score(proof_gold_text: str,
                proof_pred_text: str,
-               no_similarity_threshold=False,
+               similarity_threshold=True,
                allowed_additional_proof_steps=0,
                zero_one: bool = True) -> float:
     """ Calculate the similarity score between gold and prediction.
@@ -129,12 +129,12 @@ def calc_score(proof_gold_text: str,
         golds.append(gold_premise_uids_to_concl_sent[gold_premise_uids])
         preds.append(pred_premise_uids_to_concl_sent[gold_premise_uids])
 
-    if no_similarity_threshold:
-        levenstein_sims = [float('inf')] * len(golds)
-        rouge_sims = [float('inf')] * len(golds)
-    else:
+    if similarity_threshold:
         levenstein_sims = calc_levenstein_similarity_batch(golds, preds)
         rouge_sims = calc_rouge_batch(golds, preds)
+    else:
+        levenstein_sims = [float('inf')] * len(golds)
+        rouge_sims = [float('inf')] * len(golds)
         # we do not use bleurt similarity since it produce awkwardly low score for synthetic non-sense sentences.
         # And also, bleurt similarity scorer is slow.
 

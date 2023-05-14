@@ -5,8 +5,8 @@ import logging
 from pathlib import Path
 from pprint import pformat
 
-import torch
-from transformers import get_cosine_schedule_with_warmup
+# import torch
+# from transformers import get_cosine_schedule_with_warmup
 
 Example = Dict[str, Any]
 Batch = Dict[str, Any]
@@ -46,28 +46,28 @@ class DatasetType(Enum):
     EB = 'entailmentbank'
 
 
-def get_optimizers(
-    parameters: Iterable[torch.nn.parameter.Parameter],
-    lr: float,
-    num_warmup_grad_steps: int,
-    num_training_steps: int,
-) -> Dict[str, Any]:
-    """
-    Get an AdamW optimizer with linear learning rate warmup and cosine decay.
-    """
-    optimizer = torch.optim.AdamW(parameters, lr=lr)
-    scheduler = get_cosine_schedule_with_warmup(
-        optimizer,
-        num_warmup_steps=num_warmup_grad_steps,
-        num_training_steps=num_training_steps,
-    )
-    return {
-        "optimizer": optimizer,
-        "lr_scheduler": {
-            "scheduler": scheduler,
-            "interval": "step",
-        },
-    }
+# def get_optimizers(
+#     parameters: Iterable[torch.nn.parameter.Parameter],
+#     lr: float,
+#     num_warmup_grad_steps: int,
+#     num_training_steps: int,
+# ) -> Dict[str, Any]:
+#     """
+#     Get an AdamW optimizer with linear learning rate warmup and cosine decay.
+#     """
+#     optimizer = torch.optim.AdamW(parameters, lr=lr)
+#     scheduler = get_cosine_schedule_with_warmup(
+#         optimizer,
+#         num_warmup_steps=num_warmup_grad_steps,
+#         num_training_steps=num_training_steps,
+#     )
+#     return {
+#         "optimizer": optimizer,
+#         "lr_scheduler": {
+#             "scheduler": scheduler,
+#             "interval": "step",
+#         },
+#     }
 
 
 def get_json_lines(path: str) -> Iterable[str]:

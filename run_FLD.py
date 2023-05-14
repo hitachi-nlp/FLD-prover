@@ -49,6 +49,7 @@ from transformers import (
     set_seed,
 )
 from transformers.trainer_utils import get_last_checkpoint
+from transformers.generation.configuration_utils import GenerationConfig
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
@@ -208,16 +209,20 @@ class DataTrainingArguments:
             )
         },
     )
-    pad_to_max_length: bool = field(
+    # pad_to_max_length: bool = field(
+    #     default=False,
+    #     metadata={
+    #         "help": (
+    #             "Whether to pad all samples to model maximum sentence length. "
+    #             "If False, will pad the samples dynamically when batching to the maximum length in the batch. More "
+    #             "efficient on GPU but very bad for TPU."
+    #         )
+    #     },
+    # )
+    tokenizer_padding: Optional[str] = field(
         default=False,
-        metadata={
-            "help": (
-                "Whether to pad all samples to model maximum sentence length. "
-                "If False, will pad the samples dynamically when batching to the maximum length in the batch. More "
-                "efficient on GPU but very bad for TPU."
-            )
-        },
     )
+
     max_train_samples: Optional[int] = field(
         default=None,
         metadata={
@@ -275,7 +280,36 @@ class DataTrainingArguments:
         },
     )
 
+    proof_sampling: str = field(
+        default="stepwise",
+        metadata={"help": "[stepwise|single_shot]"},
+    )
+
+    sample_negative_proof: bool = field(
+        default=False,
+    )
+
+    generation_max_proof_steps: int = field(
+        default=20,
+    )
+
+    generation_top_k: int = field(
+        default=30,
+    )
+
+    scoring_imilarity_threshold: bool = field(
+        default=False,
+    )
+
+    scoring_allowed_additional_proof_steps: int = field(
+        default=0,
+    )
+
     log_examples: bool = field(
+        default=False,
+    )
+
+    log_generation: bool = field(
         default=False,
     )
 
@@ -324,12 +358,14 @@ def main():
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    training_args.generation_config = GenerationConfig(top_k=data_args.generation_top_k)
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -554,7 +590,8 @@ def main():
 
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
-    padding = "max_length" if data_args.pad_to_max_length else False
+    # padding = "max_length" if data_args.pad_to_max_length else False
+    padding = data_args.tokenizer_padding or False
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
         logger.warning(
@@ -563,7 +600,7 @@ def main():
         )
 
     def extract_inputs_targets(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str]]:
-        if training_args.log_examples:
+        if data_args.log_examples:
             logger.info('')
             logger.info('----------------------------- extract_inputs_targets() -----------------------------')
 
@@ -575,7 +612,7 @@ def main():
             if text and summary:
                 inputs.append(text)
                 targets.append(summary)
-                if training_args.log_examples:
+                if data_args.log_examples:
                         logger.info('text    [%d] : "%s"', i_example, text)
                         logger.info('summary [%d] : "%s"', i_example, summary)
         return inputs, targets
@@ -601,7 +638,11 @@ def main():
                             max_source_length: int,
                             max_target_length: int) -> Dict[str, List[Any]]:
         if split == 'train':
-            examples = preprocess_examples_train(examples)
+            examples = preprocess_examples_train(
+                examples,
+                stepwise=data_args.proof_sampling == 'stepwise',
+                sample_negative_proof=data_args.sample_negative_proof,
+            )
         elif split == 'eval':
             examples = preprocess_examples_eval(examples)
         else:
@@ -731,7 +772,14 @@ def main():
         proof_accs = []
         for proof_gt, proof_pred in zip(decoded_labels, decoded_preds):
             try:
-                proof_accs.append(calc_accuracy(proof_gt, proof_pred))
+                score = calc_accuracy(
+                    proof_gt,
+                    proof_pred,
+                    similarity_threshold=training_args.scoring_similarity_threshold,
+                    allowed_additional_proof_steps=training_args.scoring_allowed_additional_proof_steps,
+                    # zero_one: bool = True
+                )
+                proof_accs.append(score)
             except (InvalidProof, InvalidProofStep) as e:
                 logger.warning('could not calculate the accuracy due to the following error. will score as 0.0:\n%s', str(e))
                 proof_accs.append(0.0)
@@ -760,10 +808,11 @@ def main():
         eval_dataset=eval_dataset if training_args.do_eval else None,
         data_collator=data_collator,
         tokenizer=tokenizer,
+        max_steps=data_args.generation_max_proof_steps,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         texts_to_inputs_func=lambda texts: prepare_model_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
-        log_steps=training_args.log_examples,
+        log_generation=data_args.log_generation,
     )
 
     # Training
