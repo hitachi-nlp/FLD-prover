@@ -39,7 +39,6 @@ _PROVER_BATCH_SETTINGS = {
         'max_target_length': 100,
 
         'per_device_train_batch_size': 10,
-        'gradient_accumulation_steps': 6,
         'per_device_eval_batch_size': 10,
 
         # 'tokenizer_padding': 'max_length',
@@ -51,7 +50,6 @@ _PROVER_BATCH_SETTINGS = {
         'max_target_length': 100,
 
         'per_device_train_batch_size': 2,
-        'gradient_accumulation_steps': 32,
         'per_device_eval_batch_size': 2,
 
         # 'tokenizer_padding': 'max_length',
@@ -69,7 +67,6 @@ _PROVER_BATCH_SETTINGS = {
         'max_target_length': 100,
 
         'per_device_train_batch_size': 32,
-        'gradient_accumulation_steps': 2,
         'per_device_eval_batch_size': 32,
 
         # 'tokenizer_padding': 'max_length',
@@ -82,12 +79,10 @@ _PROVER_BATCH_SETTINGS = {
 
         # -- V100 --
         'per_device_train_batch_size': 2,
-        'gradient_accumulation_steps': 32,
         'per_device_eval_batch_size': 1,
 
         # -- A100 --
         # 'per_device_train_batch_size': 4,
-        # 'gradient_accumulation_steps': 16,
         # 'per_device_eval_batch_size': 4,
 
         # 'tokenizer_padding': 'max_length',
@@ -99,7 +94,6 @@ _PROVER_BATCH_SETTINGS = {
     #     'max_target_length': 100,
 
     #     'per_device_train_batch_size': 3,
-    #     'gradient_accumulation_steps': 21,
     #     'per_device_eval_batch_size': 3,
 
     #     # 'tokenizer_padding': 'max_length',
@@ -112,11 +106,9 @@ _PROVER_BATCH_SETTINGS = {
 
         # # XXX: may cause being killed by qsub manager ???
         'per_device_train_batch_size': 2,
-        'gradient_accumulation_steps': 32,
         'per_device_eval_batch_size': 2,
 
         # 'per_device_train_batch_size': 1,
-        # 'gradient_accumulation_steps': 64,
 
         # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
@@ -128,7 +120,6 @@ _PROVER_BATCH_SETTINGS = {
     #     'max_target_length': 100,
 
     #     'per_device_train_batch_size': 8,
-    #     'gradient_accumulation_steps': 8,
     #     'per_device_eval_batch_size': 8,
 
     #     # 'tokenizer_padding': 'max_length',
@@ -141,7 +132,6 @@ _PROVER_BATCH_SETTINGS = {
     #     'max_target_length': 100,
 
     #     'per_device_train_batch_size': 8,
-    #     'gradient_accumulation_steps': 8,
     #     'per_device_eval_batch_size': 8,
 
     #     # 'tokenizer_padding': 'max_length',
@@ -155,7 +145,6 @@ _VERIFIER_BATCH_SETTINGS = {
         # 'max_source_length': 400,
         'max_source_length': 300,
         'per_device_train_batch_size': 16,
-        'gradient_accumulation_steps': 8,
     },
 
     'roberta-large': {
@@ -163,7 +152,6 @@ _VERIFIER_BATCH_SETTINGS = {
         'max_source_length': 300,
 
         'per_device_train_batch_size': 16,
-        'gradient_accumulation_steps': 8,
 
         'tokenizer_padding': 'max_length',
         # 'tokenizer_padding': 'longest',
@@ -171,8 +159,15 @@ _VERIFIER_BATCH_SETTINGS = {
 }
 
 
-def get_batch_setting(model_name: str) -> Dict[str, Any]:
-    return _PROVER_BATCH_SETTINGS[model_name]
+def get_batch_setting(model_name: str,
+                      num_gpus: int,
+                      train_effective_batch_size=64) -> Dict[str, Any]:
+    setting = _PROVER_BATCH_SETTINGS[model_name]
+    accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * num_gpus))
+    if accum_steps < 1:
+        raise ValueError()
+    setting['gradient_accumulation_steps'] = accum_steps
+    return setting
 
 
 _DATASET_PATHS = {
@@ -575,9 +570,9 @@ _PROVER_CONFIGS = {
         'learning_rate': 1e-4,
         'warmup_steps': 1000,
         'model_name_or_path': 't5-large',
-        'fp16': True,
+        # 'fp16': True,
 
-        'source_prefix': 'Let\'s think step-by-step the following problem',
+        'source_prefix': 'Let\'s think step-by-step the following problem. ',
         'generation_num_beams': 10,
         'generation_top_k': 10,
         'generation_max_proof_steps': 20,
@@ -593,7 +588,7 @@ _PROVER_CONFIGS = {
         'scoring_allowed_additional_proof_steps': 0,
 
         'logging_strategy': 'steps',
-        'logging_steps': 50,
+        'logging_steps': 25,
         'overwrite_output_dir': True,
 
         'log_generation': True,
@@ -628,7 +623,6 @@ _PROVER_CONFIGS = {
         'save_strategy': 'steps',
 
         'logging_strategy': 'steps',
-        'logging_steps': 50,
 
     },
 
@@ -1242,7 +1236,7 @@ def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> D
 def make_command(output_dir: Union[str, Path],
                  setting: Dict,
                  run_mode: str,
-                 torchrun_n_gpus: Optional[int] = None) -> str:
+                 n_gpus: Optional[int] = None) -> str:
     unused_option_names = [
         'base_config_name',
         'checkpoint_name',
@@ -1263,9 +1257,9 @@ def make_command(output_dir: Union[str, Path],
     elif run_mode == 'profile':
         commands.append('kernprof -lv ./run_prover.py')
     elif run_mode == 'torchrun':
-        if torchrun_n_gpus is None:
+        if n_gpus is None:
             raise ValueError()
-        commands.append(f'torchrun --nproc_per_node {torchrun_n_gpus} ./run_prover.py')
+        commands.append(f'torchrun --nproc_per_node {n_gpus} ./run_prover.py')
     else:
         ValueError()
 
@@ -1371,7 +1365,6 @@ def make_output_dir(setting: Dict, top_dir: Union[str, Path]) -> str:
             'source_prefix',
             'logging_strategy',
 
-            'logging_steps',
             'overwrite_output_dir',
             'log_generation',
             'path_train_1',

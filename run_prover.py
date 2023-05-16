@@ -402,6 +402,8 @@ def main():
     transformers.utils.logging.enable_explicit_format()
 
     # Log on each process the small summary:
+    if training_args.fp16 and model_args.model_name_or_path.startswith('t5'):
+        raise ValueError('Do not use fp16 with for T5 models. Loss will explode or go to nan.')
     logger.warning(
         f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
         + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"

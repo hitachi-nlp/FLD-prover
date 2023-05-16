@@ -138,7 +138,12 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-15')
     # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.no_torchrun')
     # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.torchrun.large_steps')
-    output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.no_negative_proof')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.lrate-5e-5')
+    output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.no_fp16')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -171,6 +176,7 @@ def main():
 
     lrates = [
         1e-4,
+        # 5e-5,
     ]
 
     # sample_negative_proof = False  # debug
@@ -180,15 +186,17 @@ def main():
         0,
     ]
 
-    # engine = SubprocessEngine()   # debug
+    # engine = SubprocessEngine()
     engine = QsubEngine('ABCI', 'rt_G.large')
+    n_gpus = 4
 
-    # torchrun_n_gpus = None   # debug
-    torchrun_n_gpus = 4
+    # do_torchrun = True  # debug
+    do_torchrun = True
 
     dry_run = False
 
     # ------------------------ fixed ------------------------
+
     if shot == 'FT':
         hours = 72
     else:
@@ -325,13 +333,12 @@ def main():
 
                             # 'n_gpu': 1,
                             'dataloader_num_workers': 0,
-                            'n_proc_per_node': torchrun_n_gpus or None,
 
                             'log_examples': True,
                         })
                         all_setting.update(dataset_paths)
                         all_setting.update(dataset_1_paths)
-                        all_setting.update(get_batch_setting(all_setting['model_name_or_path']))
+                        all_setting.update(get_batch_setting(all_setting['model_name_or_path'], n_gpus))
                         all_setting.update(setting)
                         all_setting.update({
                             f'ckpt_{key}': val
@@ -358,8 +365,8 @@ def main():
                         output_dir = make_output_dir(all_setting, output_top_dir)
                         command = make_command(output_dir,
                                                all_setting,
-                                               'torchrun' if torchrun_n_gpus is not None else 'debug',
-                                               torchrun_n_gpus=torchrun_n_gpus)
+                                               'torchrun' if do_torchrun else 'debug',
+                                               n_gpus=n_gpus)
 
                         run_by_engine(
                             engine,
