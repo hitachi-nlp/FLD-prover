@@ -1,4 +1,11 @@
 # todo
+* [done] DPとDDPで結果が変わる．
+    - 学習が進んでいない
+        - tensorboardを調べる
+    - prediction_step x マルチGPUが良くない
+* [pending]
+    - dataloader_num_workers > 0 が = 0に比べて非常に低速．
+        - [pending] ボトルネックにはなっていない．
 
 
 
@@ -21,12 +28,42 @@
 # 開発
 
 ## 学習
-* ./01.train.py
-* settings -> setting
+* 実験の再現
+    1. [doing] 旧データセットでの性能計測
+        * 高速化
+        * 簡単なのからやる．
+    1. universal_elimなどを入れた新データセットでの性能計測
+
+* [done] ./A00.run_prover.sh の再現
+    - ./A00.run_prover.sh では，zero_one_accuracy=0.8
+    - ./01.train.pyあと，zero_one_accuracy=0.5
+        * gradient_accumulation_steps=1 -> 0.6
+    - negative_proofであった．
+* [pending] 逃したヒューリスティクスが無いか確認する．
+    * [pending] 再現できればそれで終わりなので．
+    * ./NLProofS/src/prover/datamodule.py
+          - shuffle_context
+    * ./NLProofS/src/prover/evaluate/__init__.py
+    * ./NLProofS/src/prover/evaluate/entailmentbank.py
+    * ./NLProofS/src/prover/evaluate/ruletaker.py
+    * ./NLProofS/src/prover/evaluate/scoring.py
+    * ./NLProofS/src/prover/main.py
+    * ./NLProofS/src/prover/model.py
+    * ./NLProofS/src/prover/proof.py
+    * ./NLProofS/src/prover/search.py
+    * ./NLProofS/src/prover/utils.py
+    * ./NLProofS/src/verifier/datamodule.py
+    * ./NLProofS/src/verifier/main.py
+    * ./NLProofS/src/verifier/model.py
+
+* [done] サンプルデータの更新
+* [done] ./01.train.py
+    * [done] warningを消す
+    * [done] 中身がきちんとしていそうか．
 * [done] losses Noneになる
 * [done] tensorboard
 
-## [pending] 予測
+## [done] 予測
 
 ## [done] 評価
 
@@ -40,7 +77,7 @@
 * ライブラリを分ける．
     - FLD_task
     - FLD_prover
-* (最後) CoT prompt -> どういう形式にするか？
+* CoT prompt -> どういう形式にするか？
     - promptに柔軟性を与えたい．
         * serialize.py のフォーマットを変える．
             * common.pyなどに影響がある可能性がある．よって，最後にする．
@@ -49,4 +86,3 @@
 * [done] リファクタリング
     * FLD_task
     * FLD_prover
-

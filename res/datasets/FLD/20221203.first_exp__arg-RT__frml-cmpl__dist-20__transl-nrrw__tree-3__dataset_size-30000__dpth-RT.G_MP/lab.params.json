@@ -1,0 +1,76 @@
+{
+    "add_subj_obj_swapped_distractor": true,
+    "argument_configs": [
+        "./configs/FLNL/arguments/axiom.pred_only.json",
+        "./configs/FLNL/arguments/axiom.pred_arg.json",
+        "./configs/FLNL/arguments/theorem.G_MP.pred_arg.json"
+    ],
+    "branch_extension_steps": [
+        0,
+        1,
+        2,
+        3
+    ],
+    "complication": 0.5,
+    "dataset_name": "20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP",
+    "depth_distribution": "ruletaker.ours.20221202",
+    "depths": [
+        1,
+        2,
+        3
+    ],
+    "distractor": "mixture.negative_tree.simplified_formula.various_form",
+    "fallback_from_formula_to_translation_distractor": true,
+    "limit_vocab_size_per_type": 100,
+    "num_distractors": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+    ],
+    "num_translation_distractors": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+    ],
+    "num_workers_per_job": 5,
+    "proof_stances": [
+        "PROOF",
+        "DISPROOF",
+        "UNKNOWN"
+    ],
+    "quantification": 0.2,
+    "reused_object_nouns_max_factor": 1.0,
+    "sample_distractor_formulas_from_tree": true,
+    "sample_hard_negatives": true,
+    "split_sizes": {
+        "train": 30000
+    },
+    "translation_configs": [
+        "./configs/FLNL/translations/thing.json",
+        "./configs/FLNL/translations/thing.sentence_negation.json"
+    ],
+    "translation_distractor": "word_swap",
+    "translation_volume_to_weight": "sqrt",
+    "try_negated_hypothesis_first": true,
+    "unknown_ratio": 0.33,
+    "use_collapsed_translation_nodes_for_unknown_tree": true,
+    "use_fixed_translation": true,
+    "use_simplified_tree_formulas_as_distractor_prototype": true,
+    "world_assump": "OWA"
+}
