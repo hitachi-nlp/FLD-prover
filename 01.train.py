@@ -137,27 +137,28 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
     # output_top_dir = Path('./outputs/01.train.py/2023-05-15')
     # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.no_torchrun')
-    output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.torchrun.large_steps')
+    # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.torchrun.large_steps')
+    output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
 
     local_dataset_names = [
-        'FLD.debug.2023-05-13',
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
+        # 'FLD.debug.2023-05-13',
+        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
     ]
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
-    # shot = 'FT.step-5000'
+    shot = 'FT.step-5000'
 
-    # max_steps = None
-    max_steps = 500
+    # max_steps = 500
+    max_steps = None
 
-    # eval_steps = None
-    eval_steps = 500
+    # eval_steps = 500
+    eval_steps = None
 
     CHECKPOINTS_DIRS = [
-        './outputs/10.train.py/20221203.first_exp.large_models.seed--7.small_lrate',
+        # './outputs/10.train.py/20221203.first_exp.large_models.seed--7.small_lrate',
     ]
 
     # checkpoint_names = [None]
@@ -172,15 +173,15 @@ def main():
         1e-4,
     ]
 
-    sample_negative_proof = False  # debug
-    # sample_negative_proof = True
+    # sample_negative_proof = False  # debug
+    sample_negative_proof = True
 
     seeds = [
         0,
     ]
 
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
     # torchrun_n_gpus = None   # debug
     torchrun_n_gpus = 4
@@ -191,7 +192,7 @@ def main():
     if shot == 'FT':
         hours = 72
     else:
-        hours = 72
+        hours = 24
 
     scoring_similarity_threshold = False
     use_test_as_train = False  # for debugging
