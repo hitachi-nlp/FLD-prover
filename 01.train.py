@@ -147,7 +147,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.FLD-impl')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -156,17 +156,44 @@ def main():
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
     ]
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
+    shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
 
     # eval_steps = 500
     eval_steps = None
+
+    # engine = SubprocessEngine()   # for debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
+
+    n_gpus = 4
+
+    # do_torchrun = False  # for debug
+    do_torchrun = True
+
+    lrates = [
+        1e-4,
+        # 5e-5,
+    ]
+
+    sample_negative_proof_args = [
+        # False,
+        True
+    ]
+
+    # ------------------------ fixed ------------------------
+    dry_run = False
+    hours = 72
+
+    seeds = [
+        0,
+    ]
 
     CHECKPOINTS_DIRS = [
         # './outputs/10.train.py/20221203.first_exp.large_models.seed--7.small_lrate',
@@ -180,36 +207,7 @@ def main():
         't5-base',
     ]
 
-    lrates = [
-        1e-4,
-        # 5e-5,
-    ]
-
-    sample_negative_proof_args = [
-        # False,
-        True
-    ]
-
-    seeds = [
-        0,
-    ]
-
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large')
-    n_gpus = 4
-
-    do_torchrun = False  # debug
-    # do_torchrun = True
-
-    dry_run = False
-
-    # ------------------------ fixed ------------------------
-
-    if shot == 'FT':
-        hours = 72
-    else:
-        hours = 24
-
+    do_predict = False
     scoring_similarity_threshold = False
     use_test_as_train = False  # for debugging
     use_test_as_val = True
@@ -277,7 +275,8 @@ def main():
             setting.update({
                 'do_train': 'train_file' in dataset_paths,
                 'do_eval': 'validation_file' in dataset_paths,
-                'do_predict': 'test_file' in dataset_paths,
+                # 'do_predict': 'test_file' in dataset_paths,
+                'do_predict': do_predict,
             })
 
             for seed in seeds:
