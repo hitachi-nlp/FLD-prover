@@ -366,6 +366,6 @@ def prettify_proof_text(proof_text: str, indent_level=0) -> str:
         pretty_lines.append(pretty_line)
 
     stance_markers_text = f'=>    stance markers = {str([mk.value for mk in stance_markers])}'
-    pretty_lines.append(' ' * indent_level + f'{stance_markers_text:>81}')
+    pretty_lines.append(' ' * 50 + stance_markers_text)
 
     return '\n'.join(pretty_lines)

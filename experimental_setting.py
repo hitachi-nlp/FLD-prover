@@ -1102,8 +1102,10 @@ SHOT_SETTINGS = {
     # -- pre-training: FLNL (arg-FLNL)
     'FT.step-20000': {
         'max_train_samples': None,
-        'max_eval_samples': 2000,
-        'max_predict_samples': 2000,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 1000,
+        'max_predict_samples': 1000,
 
         'max_steps': 20000,
         'eval_steps': 4000,

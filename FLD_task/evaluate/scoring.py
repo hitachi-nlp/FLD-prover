@@ -148,7 +148,7 @@ def calc_score(proof_gold_text: str,
 
     The score is invariant under the renaming of intermediate nodes.
     """
-    logger.info('\n\n========================================= calc_score() ==================================================')
+    logger.debug('\n\n========================================= calc_score() ==================================================')
     # TODO: should score the tree by global similarity between tree like AMR.
     # TODO: should calculate  precision / recall / f rather than a single score.
     (
@@ -158,10 +158,10 @@ def calc_score(proof_gold_text: str,
         pred_premise_uids_to_concl_sent,
     ) = _get_aligned_proof_by_uids(proof_gold_text, proof_pred_text)
 
-    logger.info('=========== gold_premise_uids_to_concl_uid ==============')
-    logger.info('\n' + pformat(gold_premise_uids_to_concl_uid))
-    logger.info('=========== pred_premise_uids_to_concl_uid ==============')
-    logger.info('\n' + pformat(pred_premise_uids_to_concl_uid))
+    logger.debug('=========== gold_premise_uids_to_concl_uid ==============')
+    logger.debug('\n' + pformat(gold_premise_uids_to_concl_uid))
+    logger.debug('=========== pred_premise_uids_to_concl_uid ==============')
+    logger.debug('\n' + pformat(pred_premise_uids_to_concl_uid))
 
     if zero_one:
         if len(pred_premise_uids_to_concl_uid) < len(gold_premise_uids_to_concl_uid)\
@@ -219,7 +219,7 @@ def _to_uid(id_: str) -> str:
 
 def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
         -> Tuple[Dict[Tuple[str], str], Dict[Tuple[str], str], Dict[Tuple[str], str], Dict[Tuple[str], str]]:
-    logger.info('\n\n=================================== _get_aligned_proof_by_uids() ============================================')
+    logger.debug('\n\n=================================== _get_aligned_proof_by_uids() ============================================')
 
     gold_premise_ids_to_concl_id, gold_premise_ids_to_concl_sent = _split_steps_into_id_dics(proof_gold_text)
     pred_premise_ids_to_concl_id, pred_premise_ids_to_concl_sent = _split_steps_into_id_dics(proof_pred_text)
@@ -258,7 +258,7 @@ def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
         return None
 
     while True: 
-        logger.info('\n========================= while loop ==========================')
+        logger.debug('\n========================= while loop ==========================')
 
         gold_premise_uids_to_concl_uid = {
             tuple(sorted([gold_id_to_uid.get(premise_id, premise_id) for premise_id in premise_ids])): gold_id_to_uid.get(concl_id, concl_id)
@@ -268,26 +268,26 @@ def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
             tuple(sorted([pred_id_to_uid.get(premise_id, premise_id) for premise_id in premise_ids])): pred_id_to_uid.get(concl_id, concl_id)
             for premise_ids, concl_id in pred_premise_uids_to_concl_uid.items()
         }
-        logger.info('----------- gold_id_to_uid --------------')
-        logger.info('\n' + pformat(gold_id_to_uid))
-        logger.info('----------- pred_id_to_uid --------------')
-        logger.info('\n' + pformat(pred_id_to_uid))
+        logger.debug('----------- gold_id_to_uid --------------')
+        logger.debug('\n' + pformat(gold_id_to_uid))
+        logger.debug('----------- pred_id_to_uid --------------')
+        logger.debug('\n' + pformat(pred_id_to_uid))
 
-        logger.info('----------- build resolution dicts --------------')
+        logger.debug('----------- build resolution dicts --------------')
         is_resolved_any = False
         for gold_premise_ids, gold_conclusion_id in sorted(gold_premise_uids_to_concl_uid.items(),
                                                            key=lambda k_v: premise_sort_key(k_v[0])):
-            logger.info('    gold_premise_ids %s: ', gold_premise_ids)
+            logger.debug('    gold_premise_ids %s: ', gold_premise_ids)
             _gold_premise_uids = tuple(_to_uid(id_) for id_ in gold_premise_ids)
             if _gold_premise_uids in done_premise_uids:
-                logger.info('        skip since already done')
+                logger.debug('        skip since already done')
                 continue
 
             _gold_conclusion_uid = _to_uid(gold_conclusion_id)
 
             matched_pred_premise_ids = find_gold_premise_ids_from_pred_premise_uids(gold_premise_ids)
             if matched_pred_premise_ids is not None:
-                logger.info('        updating dicts by: %s', gold_premise_ids)
+                logger.debug('        updating dicts by: %s', gold_premise_ids)
                 done_premise_uids.add(_gold_premise_uids)
                 pred_conclusion_id = pred_premise_uids_to_concl_uid[matched_pred_premise_ids]
 
@@ -304,7 +304,7 @@ def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
                 is_resolved_any = True
                 break
             else:
-                logger.info('        skip since it it not found in prediction: %s', gold_premise_ids)
+                logger.debug('        skip since it it not found in prediction: %s', gold_premise_ids)
                 pass
 
         if not is_resolved_any:

@@ -367,6 +367,9 @@ class RemoveUnusedColumnsCollator(DataCollatorForSeq2Seq):
 
 
 def main():
+    logging.getLogger().handlers.clear()  # remove handler automatically added
+    setup_logger(do_stderr=True, level=logging.INFO)
+
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
@@ -398,8 +401,6 @@ def main():
     #     datefmt="%m/%d/%Y %H:%M:%S",
     #     handlers=[logging.StreamHandler(sys.stdout)],
     # )
-    logging.getLogger().handlers.clear()  # remove handler automatically added
-    setup_logger(do_stderr=True, level=logging.INFO)
 
     if training_args.should_log:
         # The default of training_args.log_level is passive, so we set log level at info here to have that default.
@@ -625,7 +626,7 @@ def main():
     def extract_inputs_targets(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str]]:
         if data_args.log_examples:
             logger.info('')
-            logger.info('----------------------------- extract_inputs_targets() -----------------------------')
+            logger.info('============================= extract_inputs_targets() =============================')
 
         inputs: List[str] = []
         targets: List[str] = []
@@ -807,12 +808,14 @@ def main():
 
             logger.info('')
             logger.info('')
-            logger.info('---------------- compute_metrics i_example-%d ---------------- ', i_example)
-            logger.info('proof_gold:\n%s', prettify_proof_text(proof_gt))
-            logger.info('proof_pred:\n%s', prettify_proof_text(proof_pred))
-            logger.info('metrics:')
+            logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
+            logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt))
+            logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred))
+            log_texts, log_args = [], []
             for metric_name, metric_val in sorted(_metrics.items()):
-                logger.info('    %s<10: %s<10', metric_name, metric_val)
+                log_texts.append('%-20s: %5.2f')
+                log_args.extend([metric_name, metric_val])
+            logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
