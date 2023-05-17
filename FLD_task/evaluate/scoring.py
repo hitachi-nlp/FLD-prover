@@ -4,11 +4,14 @@ from pprint import pformat
 from copy import deepcopy
 from typing import Set, Tuple, Dict, Callable, Optional, Any
 import logging
+import re
 
+import evaluate
+import nltk
 from common import calc_F
 from proof_common import extract_assumptions, get_node_type, NodeType, extract_idents
 from stance_indication import delete_stance_markers, get_stance_markers, StanceMarker
-from FLD_task.proof import InvalidProof
+from FLD_task.proof import InvalidProof, InvalidProofStep
 from strsimpy.normalized_levenshtein import NormalizedLevenshtein
 from proof_common import (
     get_node_type,
@@ -27,6 +30,7 @@ _ROUGE = rouge_scorer.RougeScorer(
     ['rouge1', 'rouge2', 'rouge3', 'rouge4', 'rougeL'],
     use_stemmer=True,
 )
+_HF_ROUGE_METRIC = evaluate.load("rouge")
 
 # We tuned the following threshold using "./tests/prover/test_scoring.py"
 LEVENSTEIN_SIMILARITY_THRESHOLD = 0.25
@@ -68,6 +72,47 @@ def calc_max_pooling_similarity_batch(golds: List[str], preds: List[str]) -> Lis
     return [max(lev_sims[i], bleurt_sims[i], rouge_sims[i]) for i in range(0, len(golds))]
 
 
+def _hf_rouge_postprocess_text(preds: List[str], labels: List[str]) -> Tuple[List[str], List[str]]:
+    preds = [pred.strip() for pred in preds]
+    labels = [label.strip() for label in labels]
+
+    # rougeLSum expects newline after each sentence
+    preds = ["\n".join(nltk.sent_tokenize(pred)) for pred in preds]
+    labels = ["\n".join(nltk.sent_tokenize(label)) for label in labels]
+
+    return preds, labels
+
+
+def _hf_compute_rouges(decoded_labels: List[str], decoded_preds: List[str]) -> Dict[str, Any]:
+    # Some simple post-processing
+    _decoded_preds, _decoded_labels = _hf_rouge_postprocess_text(decoded_preds, decoded_labels)
+    result = _HF_ROUGE_METRIC.compute(predictions=_decoded_preds, references=_decoded_labels, use_stemmer=True)
+    result = {k: round(v * 100, 4) for k, v in result.items()}
+    return result
+
+
+def calc_metrics(proof_gold_text: str,
+                 proof_pred_text: str,
+                 similarity_threshold=False,
+                 allowed_additional_proof_steps=0,
+                 zero_one: bool = True) -> Dict[str, Any]:
+    metrics = {}
+
+    zero_one_acc = calc_accuracy(
+        proof_gold_text,
+        proof_pred_text,
+        similarity_threshold=similarity_threshold,
+        allowed_additional_proof_steps=allowed_additional_proof_steps,
+        zero_one=zero_one,
+    )
+    metrics['zero_one_accuracy'] = zero_one_acc
+
+    rouges = _hf_compute_rouges([proof_gold_text], [proof_pred_text])
+    metrics.update(rouges)
+
+    return metrics
+
+
 def calc_accuracy(proof_gold_text: str,
                   proof_pred_text: str,
                   similarity_threshold=False,
@@ -81,13 +126,16 @@ def calc_accuracy(proof_gold_text: str,
     if gold_labels == set([StanceMarker.UNKNOWN]):
         return 1.0
     else:
-        proof_score = calc_score(
-            delete_stance_markers(proof_gold_text).rstrip(' '),
-            delete_stance_markers(proof_pred_text).rstrip(' '),
-            similarity_threshold=similarity_threshold,
-            allowed_additional_proof_steps=allowed_additional_proof_steps,
-            zero_one=zero_one,
-        )
+        try:
+            proof_score = calc_score(
+                delete_stance_markers(proof_gold_text).rstrip(' '),
+                delete_stance_markers(proof_pred_text).rstrip(' '),
+                similarity_threshold=similarity_threshold,
+                allowed_additional_proof_steps=allowed_additional_proof_steps,
+                zero_one=zero_one,
+            )
+        except (InvalidProof, InvalidProofStep) as e:
+            proof_score = 0.0
         return proof_score
 
 

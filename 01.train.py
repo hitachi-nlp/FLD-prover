@@ -143,20 +143,26 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.no_negative_proof')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.lrate-5e-5')
-    output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.no_fp16')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.FLD-impl')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
-        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
+
+        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
+        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
     ]
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
-    shot = 'FT.step-5000'
+    # shot = 'FT.step-5000'
 
-    # max_steps = 500
+    # max_steps = 100
     max_steps = None
 
     # eval_steps = 500
@@ -179,19 +185,21 @@ def main():
         # 5e-5,
     ]
 
-    # sample_negative_proof = False  # debug
-    sample_negative_proof = True
+    sample_negative_proof_args = [
+        # False,
+        True
+    ]
 
     seeds = [
         0,
     ]
 
-    # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.large')
     n_gpus = 4
 
-    # do_torchrun = True  # debug
-    do_torchrun = True
+    do_torchrun = False  # debug
+    # do_torchrun = True
 
     dry_run = False
 
@@ -255,126 +263,128 @@ def main():
         else:
             dataset_1_paths = {}
 
-        setting = SHOT_SETTINGS[shot]
-        if max_steps is not None:
-            setting['max_steps'] = max_steps
-            if eval_steps is not None:
-                setting['eval_steps'] = eval_steps
-            if setting['eval_steps'] > max_steps:
-                setting['eval_steps'] = max_steps
-            
-        setting.update(dataset_setting)
-        setting.update({
-            'do_train': 'train_file' in dataset_paths,
-            'do_eval': 'validation_file' in dataset_paths,
-            'do_predict': 'test_file' in dataset_paths,
-        })
+        for sample_negative_proof in sample_negative_proof_args:
 
-        for seed in seeds:
-            for checkpoint_name in checkpoint_names:
-                if not do_transfer_on_same_dataset and checkpoint_name == local_dataset_name:
-                    logger.info('skip transfer from checkpoint_name="%s" to local_dataset_name=%s since do_transfer_on_same_dataset=False',
-                                checkpoint_name,
-                                local_dataset_name)
-                    continue
+            setting = SHOT_SETTINGS[shot]
+            if max_steps is not None:
+                setting['max_steps'] = max_steps
+                if eval_steps is not None:
+                    setting['eval_steps'] = eval_steps
+                if setting['eval_steps'] > max_steps:
+                    setting['eval_steps'] = max_steps
+                
+            setting.update(dataset_setting)
+            setting.update({
+                'do_train': 'train_file' in dataset_paths,
+                'do_eval': 'validation_file' in dataset_paths,
+                'do_predict': 'test_file' in dataset_paths,
+            })
 
-                checkpoint_spec = CheckpointSpec(
-                    name_or_local_dataset_name=checkpoint_name,
-
-                    # checkpoint_model_name_or_path='t5-large',
-                    checkpoint_model_name_or_path=None,
-
-                    # checkpoint_lrate = 1e-4
-                    checkpoint_lrate=None,
-
-                    # add_final_reference_to_proofs=None,
-                )
-
-                found_checkpoint_infos = get_checkpoints(
-                    checkpoint_spec,
-                    check_point_dirs=CHECKPOINTS_DIRS,
-                )
-                if len(found_checkpoint_infos) == 0:
-                    if only_warn_if_checkpoint_is_not_found:
-                        logger.warning(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
+            for seed in seeds:
+                for checkpoint_name in checkpoint_names:
+                    if not do_transfer_on_same_dataset and checkpoint_name == local_dataset_name:
+                        logger.info('skip transfer from checkpoint_name="%s" to local_dataset_name=%s since do_transfer_on_same_dataset=False',
+                                    checkpoint_name,
+                                    local_dataset_name)
                         continue
-                    else:
-                        raise ValueError(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
 
-                for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
+                    checkpoint_spec = CheckpointSpec(
+                        name_or_local_dataset_name=checkpoint_name,
 
-                    for _lrate in lrates:
+                        # checkpoint_model_name_or_path='t5-large',
+                        checkpoint_model_name_or_path=None,
 
-                        base_config_name = get_default_config_name(local_dataset_name)
-                        all_setting = get_config(base_config_name)
+                        # checkpoint_lrate = 1e-4
+                        checkpoint_lrate=None,
 
-                        all_setting.update({
-                            'seed': seed,
+                        # add_final_reference_to_proofs=None,
+                    )
 
-                            'local_dataset_name': local_dataset_name,
-                            'local_dataset_1_name': local_dataset_1_name,
-                            # 'exclude_unknown': False,
+                    found_checkpoint_infos = get_checkpoints(
+                        checkpoint_spec,
+                        check_point_dirs=CHECKPOINTS_DIRS,
+                    )
+                    if len(found_checkpoint_infos) == 0:
+                        if only_warn_if_checkpoint_is_not_found:
+                            logger.warning(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
+                            continue
+                        else:
+                            raise ValueError(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
 
-                            'base_config_name': base_config_name,
-                            # 'base_config_path': base_config_path,
+                    for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
 
-                            'checkpoint_name': checkpoint_name,
-                            'checkpoint_path': checkpoint_path,
-                            'model_name_or_path': checkpoint_path,
+                        for _lrate in lrates:
 
-                            # 'stance_indication_method': StanceIndicationMethod.STANCE_MARKER_IN_PROOF.value,
-                            # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                            'shot': shot,
-                            'scoring_similarity_threshold': scoring_similarity_threshold,
-                            'scoring_allowed_additional_proof_steps': 5,
-                            'sample_negative_proof': sample_negative_proof,
+                            base_config_name = get_default_config_name(local_dataset_name)
+                            all_setting = get_config(base_config_name)
 
-                            'learning_rate': _lrate,
+                            all_setting.update({
+                                'seed': seed,
 
-                            # 'n_gpu': 1,
-                            'dataloader_num_workers': 0,
+                                'local_dataset_name': local_dataset_name,
+                                'local_dataset_1_name': local_dataset_1_name,
+                                # 'exclude_unknown': False,
 
-                            'log_examples': True,
-                        })
-                        all_setting.update(dataset_paths)
-                        all_setting.update(dataset_1_paths)
-                        all_setting.update(get_batch_setting(all_setting['model_name_or_path'], n_gpus))
-                        all_setting.update(setting)
-                        all_setting.update({
-                            f'ckpt_{key}': val
-                            for key, val in found_checkpoint_spec.dict().items()
-                            if key != 'name_or_local_dataset_name'
-                        })
-                        all_setting['save_steps'] = all_setting['eval_steps']
+                                'base_config_name': base_config_name,
+                                # 'base_config_path': base_config_path,
 
-                        # if all_setting.get('max_steps', None) is not None:
-                        #     all_setting['num_train_epochs'] = -1
+                                'checkpoint_name': checkpoint_name,
+                                'checkpoint_path': checkpoint_path,
+                                'model_name_or_path': checkpoint_path,
 
-                        # if all_setting.get('num_val_stage_throught_training', None) is not None:
-                        #     all_setting.update(make_val_interval_setting(all, dataset_paths['train_file']))
+                                # 'stance_indication_method': StanceIndicationMethod.STANCE_MARKER_IN_PROOF.value,
+                                # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                'shot': shot,
+                                'scoring_similarity_threshold': scoring_similarity_threshold,
+                                'scoring_allowed_additional_proof_steps': 5,
+                                'sample_negative_proof': sample_negative_proof,
 
-                        # if 'train_file' in dataset_paths:
-                        #     dataset_setting_path = Path(dataset_paths['train_file']).parent / 'lab.params.json'
-                        #     if dataset_setting_path.exists():
-                        #         dataset_setting = json.load(open(str(dataset_setting_path)))
-                        #         all_setting.update({
-                        #             f'dataset_setting.{key}': val
-                        #             for key, val in dataset_setting.items()
-                        #         })
+                                'learning_rate': _lrate,
 
-                        output_dir = make_output_dir(all_setting, output_top_dir)
-                        command = make_command(output_dir,
-                                               all_setting,
-                                               'torchrun' if do_torchrun else 'debug',
-                                               n_gpus=n_gpus)
+                                # 'n_gpu': 1,
+                                'dataloader_num_workers': 0,
 
-                        run_by_engine(
-                            engine,
-                            command,
-                            output_dir,
-                            hours=hours,
-                            dry_run=dry_run
-                        )
+                                'log_examples': True,
+                            })
+                            all_setting.update(dataset_paths)
+                            all_setting.update(dataset_1_paths)
+                            all_setting.update(get_batch_setting(all_setting['model_name_or_path'], n_gpus))
+                            all_setting.update(setting)
+                            all_setting.update({
+                                f'ckpt_{key}': val
+                                for key, val in found_checkpoint_spec.dict().items()
+                                if key != 'name_or_local_dataset_name'
+                            })
+                            all_setting['save_steps'] = all_setting['eval_steps']
+
+                            # if all_setting.get('max_steps', None) is not None:
+                            #     all_setting['num_train_epochs'] = -1
+
+                            # if all_setting.get('num_val_stage_throught_training', None) is not None:
+                            #     all_setting.update(make_val_interval_setting(all, dataset_paths['train_file']))
+
+                            # if 'train_file' in dataset_paths:
+                            #     dataset_setting_path = Path(dataset_paths['train_file']).parent / 'lab.params.json'
+                            #     if dataset_setting_path.exists():
+                            #         dataset_setting = json.load(open(str(dataset_setting_path)))
+                            #         all_setting.update({
+                            #             f'dataset_setting.{key}': val
+                            #             for key, val in dataset_setting.items()
+                            #         })
+
+                            output_dir = make_output_dir(all_setting, output_top_dir)
+                            command = make_command(output_dir,
+                                                   all_setting,
+                                                   'torchrun' if do_torchrun else 'debug',
+                                                   n_gpus=n_gpus)
+
+                            run_by_engine(
+                                engine,
+                                command,
+                                output_dir,
+                                hours=hours,
+                                dry_run=dry_run
+                            )
 
     logger.info('------------- ./10.train.py finished !! -----------')
 

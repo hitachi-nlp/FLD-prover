@@ -25,6 +25,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import sys
 from dataclasses import dataclass, field
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
+from collections import defaultdict
 
 import torch
 import datasets
@@ -56,7 +57,7 @@ from transformers.utils import check_min_version, is_offline_mode, send_example_
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
 
-from FLD_task.evaluate.scoring import calc_accuracy
+from FLD_task.evaluate.scoring import calc_metrics
 from FLD_task.proof import InvalidProof, InvalidProofStep
 from stance_indication import get_stance_markers
 from FLD_prover import (
@@ -64,6 +65,7 @@ from FLD_prover import (
     preprocess_examples_train,
     preprocess_examples_eval,
 )
+from FLD_task.proof import prettify_proof_text
 import kern_profiler
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -355,6 +357,15 @@ summarization_name_mapping = {
 }
 
 
+class RemoveUnusedColumnsCollator(DataCollatorForSeq2Seq):
+
+    def __call__(self, features, return_tensors=None):
+        for feature in features:
+            if "depth" in feature:
+                feature.pop("depth", None)
+        return super().__call__(features, return_tensors=return_tensors)
+
+
 def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
@@ -625,8 +636,8 @@ def main():
                 inputs.append(text)
                 targets.append(summary)
                 if data_args.log_examples:
-                        logger.info('text    [%d] : "%s"', i_example, text)
-                        logger.info('summary [%d] : "%s"', i_example, summary)
+                    logger.info('text    [%d] : "%s"', i_example, text)
+                    logger.info('summary [%d] : "%s"', i_example, summary)
         return inputs, targets
 
     def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
@@ -665,9 +676,10 @@ def main():
         inputs = [prefix + inp for inp in inputs]
 
         model_inputs = prepare_model_inputs(inputs, max_source_length)
-
         model_targets = prepare_model_targets(targets, max_target_length)
         model_inputs["labels"] = model_targets["input_ids"]
+
+        model_inputs["depth"] = examples["depth"]
 
         return model_inputs
 
@@ -732,7 +744,7 @@ def main():
 
     # Data collator
     label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
-    data_collator = DataCollatorForSeq2Seq(
+    data_collator = RemoveUnusedColumnsCollator(
         tokenizer,
         model=model,
         label_pad_token_id=label_pad_token_id,
@@ -742,7 +754,7 @@ def main():
     # Metric
     metric = evaluate.load("rouge")
 
-    def postprocess_text(preds, labels):
+    def postprocess_text(preds: List[str], labels: List[str]) -> Tuple[List[str], List[str]]:
         preds = [pred.strip() for pred in preds]
         labels = [label.strip() for label in labels]
 
@@ -752,21 +764,14 @@ def main():
 
         return preds, labels
 
-    def compute_rouges(preds,
-                       decoded_preds: List[str],
-                       decoded_labels: List[str]) -> Dict[str, Any]:
+    def compute_rouges(decoded_preds: List[str], decoded_labels: List[str]) -> Dict[str, Any]:
         # Some simple post-processing
         _decoded_preds, _decoded_labels = postprocess_text(decoded_preds, decoded_labels)
         result = metric.compute(predictions=_decoded_preds, references=_decoded_labels, use_stemmer=True)
         result = {k: round(v * 100, 4) for k, v in result.items()}
-        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-        result["gen_len"] = np.mean(prediction_lens)
         return result
 
-    def compute_metrics(eval_preds) -> Dict[str, Any]:
-        logger.info('')
-        logger.info('--------------------------- compute_metrics() ----------------------------')
-
+    def compute_metrics(eval_preds, dataloader=None) -> Dict[str, Any]:
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
@@ -776,29 +781,43 @@ def main():
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
-        for i_example, (decoded_pred, decoded_label) in enumerate(zip(decoded_preds, decoded_labels)):
-            logger.info('decoded_pred  [%d] : "%s"', i_example, decoded_pred)
-            logger.info('decoded_label [%d] : "%s"', i_example, decoded_label)
+        # result = compute_rouges(decoded_preds, decoded_labels)
+        results = {}
 
-        result = compute_rouges(preds, decoded_preds, decoded_labels)
+        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+        results["gen_len"] = np.mean(prediction_lens)
 
-        proof_accs = []
-        for proof_gt, proof_pred in zip(decoded_labels, decoded_preds):
-            try:
-                score = calc_accuracy(
-                    proof_gt,
-                    proof_pred,
-                    similarity_threshold=data_args.scoring_similarity_threshold,
-                    allowed_additional_proof_steps=data_args.scoring_allowed_additional_proof_steps,
-                    # zero_one: bool = True
-                )
-                proof_accs.append(score)
-            except (InvalidProof, InvalidProofStep) as e:
-                logger.warning('could not calculate the accuracy due to the following error. will score as 0.0:\n%s', str(e))
-                proof_accs.append(0.0)
-        result["zero_one_accuracy"] = np.mean(proof_accs)
+        if dataloader is not None:
+            examples = [example for example in dataloader.dataset]  # before collating
+        else:
+            examples = [None] * len(decoded_labels)
 
-        return result
+        metrics: Dict[str, List[Any]] = defaultdict(list)
+        for i_example, (proof_gt, proof_pred, example) in enumerate(zip(decoded_labels, decoded_preds, examples)):
+            _metrics = calc_metrics(
+                proof_gt,
+                proof_pred,
+                similarity_threshold=data_args.scoring_similarity_threshold,
+                allowed_additional_proof_steps=data_args.scoring_allowed_additional_proof_steps,
+            )
+            depths = ['all'] if example is None else ['all', str(example['depth'])]
+            for depth in depths:
+                for metric_name, metric_val in _metrics.items():
+                    metrics[f"D-{depth}.{metric_name}"].append(metric_val)
+
+            logger.info('')
+            logger.info('')
+            logger.info('---------------- compute_metrics i_example-%d ---------------- ', i_example)
+            logger.info('proof_gold:\n%s', prettify_proof_text(proof_gt))
+            logger.info('proof_pred:\n%s', prettify_proof_text(proof_pred))
+            logger.info('metrics:')
+            for metric_name, metric_val in sorted(_metrics.items()):
+                logger.info('    %s<10: %s<10', metric_name, metric_val)
+
+        for metric_name, metric_vals in metrics.items():
+            results[f"{metric_name}"] = np.mean(metric_vals)
+
+        return results
 
     # Override the decoding parameters of Seq2SeqTrainer
     training_args.generation_max_length = (

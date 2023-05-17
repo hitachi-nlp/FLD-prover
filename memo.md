@@ -17,32 +17,18 @@
 
 
 
+# Pitfalls
+* localでやると高速に見える．ジョブで投げると低速に見える．
+    - ターミナルに出力される頻度の問題である．真実は，tqdmの出力(X it / sec)を見よ．同じである．
 
-# 開発
+
+
+# [todo] 開発
 
 ## [todo] 実験の再現
-1. 評価
-    - depth毎の計測結果
-1. 旧データセットでの性能計測
-    - [doing] ./outputs/01.train.py/2023-05-16.sFLD-impl
+1. [再現実験](./experimental_logs.md)
 1. universal_elimなどを入れた新データセットでの性能計測
 
-## [pending] 逃したヒューリスティクスが無いか確認する．
-* [pending] 再現できればそれで終わりなので．
-* ./NLProofS/src/prover/datamodule.py
-      - shuffle_context
-* ./NLProofS/src/prover/evaluate/__init__.py
-* ./NLProofS/src/prover/evaluate/entailmentbank.py
-* ./NLProofS/src/prover/evaluate/ruletaker.py
-* ./NLProofS/src/prover/evaluate/scoring.py
-* ./NLProofS/src/prover/main.py
-* ./NLProofS/src/prover/model.py
-* ./NLProofS/src/prover/proof.py
-* ./NLProofS/src/prover/search.py
-* ./NLProofS/src/prover/utils.py
-* ./NLProofS/src/verifier/datamodule.py
-* ./NLProofS/src/verifier/main.py
-* ./NLProofS/src/verifier/model.py
 
 ## (最後)
 * proof_common, common, evaluateなど
@@ -83,4 +69,3 @@
     * [done] 中身がきちんとしていそうか．
 * [done] losses Noneになる
 * [done] tensorboard
-

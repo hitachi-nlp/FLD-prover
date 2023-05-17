@@ -20,12 +20,10 @@ def main():
     output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-05-15')
 
     local_dataset_names = [
-        # 'EB-task1.shuffled',
-        # 'EB-task2.shuffled',
-
         # 'FLD.debug.2023-05-13',
+
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-        '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000',
+        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
     ]
 
     engine = SubprocessEngine()
