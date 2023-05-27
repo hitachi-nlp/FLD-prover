@@ -147,13 +147,16 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-16.FLD-impl')
 
-    output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
+    # output_top_dir = Path('./outputs/01.train.py/2023-05-17.FLD-impl.large_steps')
+    output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
 
-        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
+        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
+        '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
     ]
 
     # shot = 'debug.tiny'  # debug
