@@ -33,11 +33,11 @@ def load_examples(path: Union[str, Path])\
 @click.command()
 @click.argument('train_path')
 @click.argument('eval_path')
-@click.argument('output_path')
+@click.argument('output_dir')
 @click.option('--n-shot', type=int, default=10)
 @click.option('--seed', type=int, default=0)
 @click.option('--log-level', default='INFO')
-def main(train_path, eval_path, n_shot, output_path, seed, log_level):
+def main(train_path, eval_path, n_shot, output_dir, seed, log_level):
     setup_logger(level=log_level)
     random.seed(seed)
 
@@ -45,8 +45,12 @@ def main(train_path, eval_path, n_shot, output_path, seed, log_level):
     eval_path = Path(eval_path)
 
     train_exs, train_label_exs = load_examples(train_path)
+
     n_shot_per_label = int(n_shot / len(train_label_exs))
-    fewshot_exs = random.sample(train_exs, n_shot_per_label)
+    fewshot_exs: List[DeductionExample] = []
+    for _, label_exs in train_label_exs.items():
+        fewshot_exs.extend(random.sample(label_exs, n_shot_per_label))
+    random.shuffle(fewshot_exs)
 
     eval_exs, _ = load_examples(eval_path)
 
@@ -63,11 +67,19 @@ def main(train_path, eval_path, n_shot, output_path, seed, log_level):
     fewshot_serials = [serialize(fewshot_ex, stepwise=False)
                        for fewshot_ex in fewshot_exs]
 
-    output_path = Path(output_path)
-    output_path.parent.mkdir(exist_ok=True)
-    with open(output_path, 'w') as f_out:
+    output_dir = Path(output_dir)
+    output_dir.mkdir(exist_ok=True)
+    with open(output_dir / 'prompts.jsonl', 'w') as f_jsonl,\
+            open(output_dir / 'prompts.txt', 'w') as f_txt:
+
         for eval_ex in eval_exs:
+            f_txt.write('\n\n============ prompt ============\n')
+
             eval_serial = serialize(eval_ex, stepwise=False)
+            prompt = join_serial_dumps(
+                [dump_serial(serial) for serial in fewshot_serials]
+                + [dump_serial(eval_serial, no_label=True)]
+            )
             instance = {
                 'example': eval_ex.dict(),
                 'fewshot_examples': [fewshot_ex.dict()
@@ -75,11 +87,11 @@ def main(train_path, eval_path, n_shot, output_path, seed, log_level):
                 'serial': eval_serial.dict(),
                 'fewshot_serials': [fewshot_serial.dict()
                                     for fewshot_serial in fewshot_serials],
-                'prompt': join_serial_dumps(
-                    [dump_serial(serial) for serial in fewshot_serials]
-                    + [dump_serial(eval_serial)])
+                'prompt': prompt,
             }
-            f_out.write(json.dumps(instance) + '\n')
+
+            f_txt.write(prompt)
+            f_jsonl.write(json.dumps(instance) + '\n')
 
 
 if __name__ == '__main__':

@@ -32,10 +32,10 @@ def main():
     seeds = [0]
     n_shot_list = [
         3,
-        # 10,
-        # 30,
-        # 100,
-        # 300,
+        10,
+        30,
+        100,
+        300,
     ]
 
     engine = SubprocessEngine()   # for debug
@@ -95,7 +95,7 @@ def main():
                     'python ./make_prompts.py',
                     str(setting['train_file']),
                     str(setting['test_file']),
-                    str(output_dir / 'prompts.jsonl'),
+                    str(output_dir),
                     f'--n-shot {str(n_shot)}',
                     f'--seed {str(seed)}',
                 ])

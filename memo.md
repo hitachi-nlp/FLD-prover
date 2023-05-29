@@ -4,6 +4,17 @@
 * top-level で呼びたいものは? loadとか．
 
 
+## LLM評価
+* 一旦1-pass通す
+* GPT-3.5で評価
+* CoTのrefine
+* in-context learningのrefine
+
+* 参考情報
+    - [pricing](https://openai.com/pricing)
+    * [Models - OpenAI API](https://platform.openai.com/docs/models/model-endpoint-compatibility)
+    * [Pricing](https://openai.com/pricing)
+
 
 
 # 方針
