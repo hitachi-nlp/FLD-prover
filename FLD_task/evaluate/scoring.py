@@ -96,6 +96,11 @@ def calc_metrics(proof_gold_text: str,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
+    proof_pred_text = re.sub('\n+', ' ', proof_pred_text)
+    # proof_pred_text = re.sub('[\n ]*$', '', re.sub('^[\n ]*', '', proof_pred_text))
+    proof_pred_text = re.sub(r'\s+', ' ', proof_pred_text)
+    proof_pred_text = re.sub(r'\s+$', '', re.sub(r'^\s+', '', proof_pred_text))
+
     metrics = {}
 
     zero_one_acc = calc_accuracy(

@@ -6,6 +6,7 @@ from typing import List, Union, Dict, Tuple
 import json
 from collections import defaultdict
 import statistics
+from pprint import pprint
 
 from logger_setup import setup as setup_logger
 import click
@@ -54,6 +55,7 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
     json.dump(metrics_summary,
               open(str(output_dir / 'metrics_summary.json'), 'w'),
               ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+    pprint(metrics_summary)
 
 
 if __name__ == '__main__':

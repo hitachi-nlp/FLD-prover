@@ -8,6 +8,7 @@ import click
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 from lab import build_dir
+from tqdm import tqdm
 
 from experimental_setting import run_by_engine
 
@@ -19,12 +20,8 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
     # ----------------- input output paths ---------------------
-
-    # input_top_dir = Path('./outputs/10.make_prompts.py/sFLD-impl')
-    # output_top_dir = Path('./outputs/11.reason_by_llm/sFLD-impl')
-
-    input_top_dir = Path('./outputs/10.make_prompts.py/sFLD-impl/dtst_nm=20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP/n_sht=3/sd=0/')
-    output_top_dir = Path('./outputs/11.reason_by_llm/sFLD-impl')
+    input_top_dir = Path('./outputs/10.make_prompts.py/2023-05-29/sFLD-impl.use_fixed_translation/dtst_nm=20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP/prmpt_typ=in_context_examples.COT/n_sht=10/sd=0/')
+    output_top_dir = Path('./outputs/11.reason_by_llm/2023-05-29/sFLD-impl')
 
     # ----------------- settings ---------------------
 
@@ -50,7 +47,7 @@ def main():
     # since the reasoning will be charged.
     time.sleep(10)
 
-    for prompt_path in prompt_paths:
+    for prompt_path in tqdm(prompt_paths):
         setting = {
             'input_path': str(prompt_path),
             'model_name': model_name,

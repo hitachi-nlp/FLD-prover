@@ -19,8 +19,8 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
     # ----------------- input output paths ---------------------
-    input_top_dir = Path('./outputs/11.reason_by_llm/sFLD-impl')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs')
+    input_top_dir = Path('./outputs/11.reason_by_llm/2023-05-29/sFLD-impl')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-05-29/sFLD-impl')
 
     # ----------------- settings ---------------------
 

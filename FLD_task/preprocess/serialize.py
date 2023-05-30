@@ -13,6 +13,8 @@ def serialize(
     example: DeductionExample,
     stepwise=True,
     sample_negative_proof=False,
+    newlines=False,
+    proof_indicator=True,
 ) -> SerializedDeductionStep:
     """
 
@@ -68,8 +70,17 @@ def serialize(
     input_text = ' ; '.join([
         f'$hypothesis$ = {example.hypothesis}',
         f'$context$ = {example.context}',
-        f'$proof$ = {partial_proof}',
     ])
+    if proof_indicator:
+        input_text = ' ; '.join([input_text, f'$proof$ = {partial_proof}'])
+    else:
+        if stepwise:
+            raise ValueError('Can not add partial proof because proof_indicator=False is specified')
+
+    if newlines:
+        input_text = re.sub(' *; *', ';\n', input_text)
+        input_text = re.sub('sent([0-9]*)', r'\nsent\g<1>', input_text).lstrip('\n')
+        next_step = re.sub(' *; *', ';\n', next_step)
 
     serialized_example = SerializedDeductionStep(
         input=input_text,

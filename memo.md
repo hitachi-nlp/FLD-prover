@@ -5,10 +5,13 @@
 
 
 ## LLM評価
-* 一旦1-pass通す
-* GPT-3.5で評価
-* CoTのrefine
-* in-context learningのrefine
+* なぜ全く解けないのか？
+    * 翻訳が悪さをしているのでは？
+        - GPT-4を試してみる
+    * context_lenに入っていない？
+        - 多分そう．few-shot exampleが全然入っていない．
+            * todo: GPT-4でやってみる．
+* メモリ機能
 
 * 参考情報
     - [pricing](https://openai.com/pricing)
