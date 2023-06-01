@@ -19,8 +19,11 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
     # ----------------- input output paths ---------------------
-    input_top_dir = Path('./outputs/11.reason_by_llm/2023-05-29/sFLD-impl')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-05-29/sFLD-impl')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/2023-05-29/sFLD-impl')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-05-29/sFLD-impl')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM')
 
     # ----------------- settings ---------------------
 
@@ -30,11 +33,12 @@ def main():
     allowed_additional_proof_steps = 5
     similarity_threshold = False
 
+    skip_if_exists = True
     dry_run = False
 
     # ----------------- running ---------------------
 
-    for cmpl_path in input_top_dir.glob('**/completions.jsonl'):
+    for cmpl_path in input_top_dir.glob('**/replies.jsonl'):
         setting = {
             'input_path': str(cmpl_path),
             'allowed_additional_proof_steps': allowed_additional_proof_steps,
@@ -43,7 +47,7 @@ def main():
 
         cmpl_setting = json.load(open(cmpl_path.parent / 'lab.params.json'))
         setting.update({
-            f'completion.{name}': val
+            f'reply.{name}': val
             for name, val in cmpl_setting.items()
         })
 
@@ -51,22 +55,22 @@ def main():
             setting,
             top_dir=str(
                 Path(output_top_dir)
-                / f'dtst_nm={setting.get("completion.dataset.local_dataset_name", None)}'
+                / f'dtst_nm={setting.get("reply.dataset.local_dataset_name", None)}'
             ),
             short=True,
             dirname_ignore_params=[
-                'completion.dataset.local_dataset_name',
-                'completion.dataset.train_file',
-                'completion.dataset.validation_file',
-                'completion.dataset.test_file',
+                'reply.dataset.local_dataset_name',
+                'reply.dataset.train_file',
+                'reply.dataset.validation_file',
+                'reply.dataset.test_file',
 
-                'completion.input_path',
+                'reply.input_path',
 
                 'input_path',
             ],
             save_params=True
         )
-
+        
         command = ' '.join([
             'python ./evaluate_llm_proofs.py',
             str(cmpl_path),
@@ -75,13 +79,16 @@ def main():
             f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',
         ])
 
-        run_by_engine(
-            engine,
-            command,
-            output_dir,
-            hours=1,
-            dry_run=dry_run
-        )
+        if skip_if_exists and (output_dir / 'metrics_summary.json').exists():
+            logger.warning('skip evaluating for the existing results "%s"', str(output_dir))
+        else:
+            run_by_engine(
+                engine,
+                command,
+                output_dir,
+                hours=1,
+                dry_run=dry_run
+            )
 
     logger.info('------------- ./12.evaluate_llm_proofs.py finished !! -----------')
 

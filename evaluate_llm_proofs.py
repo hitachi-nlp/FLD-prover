@@ -34,7 +34,7 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
             sample = json.loads(line.strip('\n'))
 
             gold = sample['serial']['next_step']
-            pred = sample['completion']
+            pred = sample['reply']
 
             metrics = calc_metrics(
                 gold,

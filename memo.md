@@ -5,18 +5,15 @@
 
 
 ## LLM評価
-* なぜ全く解けないのか？
-    * 翻訳が悪さをしているのでは？
-        - GPT-4を試してみる
-    * context_lenに入っていない？
-        - 多分そう．few-shot exampleが全然入っていない．
-            * todo: GPT-4でやってみる．
-* メモリ機能
-
+* 省料金 (是枝) どうすればよいか？
+        * メモリ機能?
+        * contextの抽出
 * 参考情報
     - [pricing](https://openai.com/pricing)
     * [Models - OpenAI API](https://platform.openai.com/docs/models/model-endpoint-compatibility)
-    * [Pricing](https://openai.com/pricing)
+    -https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+        - 100token / 75words -> 1.33 [tokens] / [words]
+
 
 
 

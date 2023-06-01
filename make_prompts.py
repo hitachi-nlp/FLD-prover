@@ -56,10 +56,15 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
         train_exs, train_label_exs = load_examples(train_path)
 
     n_shot_per_label = int(n_shot / len(train_label_exs))
+    fweshot_label_exs: Dict[Union[bool, str], List[DeductionExample]] = defaultdict(list)
+    for label, label_exs in train_label_exs.items():
+        fweshot_label_exs[label].extend(random.sample(label_exs, n_shot_per_label))
+
+    # add examples following the label order: labelA, labelB, labelC, labelA, ...
     fewshot_exs: List[DeductionExample] = []
-    for _, label_exs in train_label_exs.items():
-        fewshot_exs.extend(random.sample(label_exs, n_shot_per_label))
-    random.shuffle(fewshot_exs)
+    for i_ex in range(n_shot_per_label):
+        for _, label_exs in sorted(fweshot_label_exs.items()):
+            fewshot_exs.append(label_exs[i_ex])
 
     # remove few-shot examples from eval dataset
     fewshot_exs_set = set(id(ex) for ex in fewshot_exs)
@@ -112,6 +117,12 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
                 'fewshot_serials': [fewshot_serial.dict()
                                     for fewshot_serial in fewshot_serials],
                 'prompt': prompt,
+
+                'stats': {
+                    'prompt': {
+                        'num_words': len(prompt.split()),
+                    },
+                },
             }
 
             f_jsonl.write(json.dumps(instance) + '\n')
