@@ -5,9 +5,29 @@
 
 
 ## LLM評価
-* 省料金 (是枝) どうすればよいか？
-        * メモリ機能?
-        * contextの抽出
+* 問題
+    - 低すぎる．
+        * "出力形式に慣れていない"
+        * [done] shotが足りない？
+            - [done] 20shot
+                - 性能が下がった..．なぜ？
+                    * 揺らぎ?
+                        * [done] examplesを増やしてみる．
+                            - 揺らぎだった．
+                * [rejected] context_lenから溢れているだろうか？
+                    - APIの場合，max_lenを超えると，エラーが出る．エラーが出ていないので，はみ出ていない．
+        * [transferred] 揺らぎ？
+            - [transferred] max_samplesを増やしてみる．
+        * バグ？
+            - [todo] webから試してみる．
+    - answer_accuracyとの乖離が激しい
+        - 出力形式に慣れていない
+            - 出力形式に慣れていないのでproof_accuracyが低いが，理解はしているのでanswer_accuracyは高い
+                 - 実例を見るに，こういった例はそれなりにある．
+                     * [todo] どうするか？
+                         - [todo] プロンプトでなんとかしてみる．
+        - [rejected] 揺らぎである．
+            - 
 * 参考情報
     - [pricing](https://openai.com/pricing)
     * [Models - OpenAI API](https://platform.openai.com/docs/models/model-endpoint-compatibility)

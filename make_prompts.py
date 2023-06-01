@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import logging
 from pathlib import Path
-from typing import List, Union, Dict, Tuple
+from typing import List, Union, Dict, Tuple, Optional
 import json
 import random
 from collections import defaultdict
@@ -31,13 +31,63 @@ def load_examples(path: Union[str, Path])\
     return examples, label_examples
 
 
+_INTROS = {
+
+    'v0': '==== 1. First, we show some examples of deductive reasoning tasks as follows. In each example, the sentences after the "context" show a set of facts. Based on these facts, you have to either prove the "hypothesis", disprove it, or declare it as unknown if the facts are insufficient. You have to write the step-by-step thought after the "output".',
+
+    'v1': """\
+******** First, we show some examples of deductive reasoning tasks below. ********
+
+An example consists of an input part and an output part, shown after "---- input ----" and "---- output ----," respectively.
+
+In the input part, we have a set of facts shown after "$context$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
+
+The output part shows the step-by-step thought to verify the hypothesis.
+
+Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "sent2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions.
+
+After these steps, we conclude either the hypothesis can be proved (__PROVED__), disproved (__DISPROVED__), or neither (__UNKNOWN__) because the facts are insufficient.
+"""
+
+}
+
+_QUESTIONS = {
+
+    'v0': '==== 2. Now, solve the following example. Write the step-by-step thought after the "output" using the same format demonstrated in the above examples.',
+
+    'v1': '******** 2. Now, solve the following example, i.e., write a step-by-step thought to verify the hypothesis after the "output", using exactly the same format demonstrated in the above examples.'
+}
+
+
+def _make_intro(prompt_type: str) -> Optional[str]:
+    if prompt_type == 'in_context_examples.COT':
+        return _INTROS['v0']
+    elif prompt_type == 'in_context_examples.COT.v1':
+        return _INTROS['v1']
+    else:
+        return None
+
+
+def _make_question(prompt_type: str) -> Optional[str]:
+    if prompt_type == 'in_context_examples.COT':
+        return _QUESTIONS['v0']
+    elif prompt_type == 'in_context_examples.COT.v1':
+        return _QUESTIONS['v1']
+    else:
+        return None
+
+
 @click.command()
 @click.argument('eval_path')
 @click.argument('output_dir')
 @click.option('--train-path')
 @click.option('--prompt-type',
-              type=click.Choice(['in_context_examples', 'in_context_examples.COT']),
-              default='in_context_examples')
+              type=click.Choice([
+                  'in_context_examples',
+                  'in_context_examples.COT',
+                  'in_context_examples.COT.v1',
+              ]),
+              default='in_context_examples.COT')
 @click.option('--n-shot', type=int, default=10)
 @click.option('--seed', type=int, default=0)
 @click.option('--log-level', default='INFO')
@@ -76,12 +126,13 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
 
     def dump_serial(serial: SerializedDeductionStep,
                     no_label=False) -> str:
-        input_text = f'**** input ****\n{serial.input}'
+        example_text = '============ an example ============'
+        input_text = f'---- input ----\n{serial.input}'
         if no_label:
-            output_text = '**** output ****\n'
+            output_text = '---- output ----\n'
         else:
-            output_text = f'**** output ****\n{serial.next_step}'
-        return '\n\n'.join([input_text, output_text])
+            output_text = f'---- output ----\n{serial.next_step}'
+        return '\n\n'.join([example_text, input_text, output_text])
 
     def join_serial_dumps(serial_dumps: List[str]) -> str:
         return '\n\n\n'.join(serial_dumps)
@@ -102,11 +153,17 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
             eval_serial = _serialize(eval_ex)
 
             prompt = ''
-            if prompt_type == 'in_context_examples.COT':
-                prompt += '==== 1. First, we show some examples of deductive reasoning tasks as follows. In each example, the sentences after the "context" show a set of facts. Based on these facts, you have to either prove the "hypothesis", disprove it, or declare it as unknown if the facts are insufficient. You have to write the step-by-step thought after the "output".\n\n'
+
+            intro = _make_intro(prompt_type)
+            if intro is not None:
+                prompt += intro + '\n\n\n'
+
             prompt += join_serial_dumps([dump_serial(serial) for serial in fewshot_serials]) + '\n\n'
-            if prompt_type == 'in_context_examples.COT':
-                prompt += '==== 2. Now, solve the following example. Write the step-by-step thought after the "output" using the same format demonstrated in the above examples.\n\n'
+
+            question = _make_question(prompt_type)
+            if question is not None:
+                prompt += '\n\n\n' + question + '\n\n\n'
+
             prompt += dump_serial(eval_serial, no_label=True)
 
             instance = {
@@ -127,10 +184,10 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
 
             f_jsonl.write(json.dumps(instance) + '\n')
 
-            f_txt.write('\n\n\n======================== example ========================\n')
-            f_txt.write('\n\n\n------------ prompt ------------\n\n')
+            f_txt.write('\n\n\n************************************************ [meta comment] this is an instance ************************************************\n')
+            f_txt.write('\n\n\n************************ [meta comment] this is the prompt ************************\n\n')
             f_txt.write(prompt)
-            f_txt.write('\n\n\n------------ gold ------------\n\n')
+            f_txt.write('\n\n\n************************ [meta comment] this is the gold output ************************\n\n')
             f_txt.write(eval_serial.next_step)
 
 

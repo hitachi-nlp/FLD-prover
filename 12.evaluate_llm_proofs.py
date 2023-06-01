@@ -22,8 +22,14 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/2023-05-29/sFLD-impl')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-05-29/sFLD-impl')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation')
 
     # ----------------- settings ---------------------
 

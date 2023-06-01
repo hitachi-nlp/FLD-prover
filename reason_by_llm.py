@@ -14,6 +14,7 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
+from tqdm import tqdm
 
 
 logger = logging.getLogger(__name__)
@@ -55,13 +56,18 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
             return chat_model([HumanMessage(content=prompt)]).content
 
     with open(output_path, 'w') as f_out:
-        for i_sample, line in enumerate(open(input_path)):
+        for i_sample, line in tqdm(enumerate(open(input_path))):
             if i_sample >= max_samples:
                 break
             sample = json.loads(line.strip('\n'))
             prompt = sample['prompt']
 
+            logger.info('-- running the LLM on a example ... --')
+            logger.info('prompt # words: %d', len(prompt.split()))
+
             reply = get_reply(prompt)
+
+            logger.info('reply # words: %d', len(reply.split()))
 
             sample['reply'] = reply
             f_out.write(json.dumps(sample) + '\n')
