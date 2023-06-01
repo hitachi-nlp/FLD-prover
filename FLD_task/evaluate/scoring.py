@@ -97,11 +97,12 @@ def calc_metrics(proof_gold_text: str,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
     proof_pred_text = re.sub('\n+', ' ', proof_pred_text)
-    # proof_pred_text = re.sub('[\n ]*$', '', re.sub('^[\n ]*', '', proof_pred_text))
     proof_pred_text = re.sub(r'\s+', ' ', proof_pred_text)
     proof_pred_text = re.sub(r'\s+$', '', re.sub(r'^\s+', '', proof_pred_text))
 
-    metrics = {}
+    metrics: Dict[str, Any] = {}
+
+    metrics['answer_accuracy'] = float(set(get_stance_markers(proof_gold_text)) == set(get_stance_markers(proof_pred_text)))
 
     zero_one_acc = calc_accuracy(
         proof_gold_text,
@@ -110,7 +111,7 @@ def calc_metrics(proof_gold_text: str,
         allowed_additional_proof_steps=allowed_additional_proof_steps,
         zero_one=zero_one,
     )
-    metrics['zero_one_accuracy'] = zero_one_acc
+    metrics['proof_accuracy.zero_one'] = zero_one_acc
 
     rouges = _hf_compute_rouges([proof_gold_text], [proof_pred_text])
     metrics.update(rouges)
