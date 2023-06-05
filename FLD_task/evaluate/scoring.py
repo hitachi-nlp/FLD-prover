@@ -18,6 +18,7 @@ from proof_common import (
     NodeType,
     HYPOTHESIS_IDENT,
     VOID_IDENT,
+    normalize_proof,
 )
 import datasets
 from rouge_score import rouge_scorer
@@ -96,9 +97,7 @@ def calc_metrics(proof_gold_text: str,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
-    proof_pred_text = re.sub('\n+', ' ', proof_pred_text)
-    proof_pred_text = re.sub(r'\s+', ' ', proof_pred_text)
-    proof_pred_text = re.sub(r'\s+$', '', re.sub(r'^\s+', '', proof_pred_text))
+    proof_pred_text = normalize_proof(proof_pred_text)
 
     metrics: Dict[str, Any] = {}
 

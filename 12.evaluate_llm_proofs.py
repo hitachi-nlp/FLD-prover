@@ -44,17 +44,17 @@ def main():
 
     # ----------------- running ---------------------
 
-    for cmpl_path in input_top_dir.glob('**/replies.jsonl'):
+    for replly_path in input_top_dir.glob('**/replies.jsonl'):
         setting = {
-            'input_path': str(cmpl_path),
+            'input_path': str(replly_path),
             'allowed_additional_proof_steps': allowed_additional_proof_steps,
             'similarity_threshold': similarity_threshold,
         }
 
-        cmpl_setting = json.load(open(cmpl_path.parent / 'lab.params.json'))
+        reply_setting = json.load(open(replly_path.parent / 'lab.params.json'))
         setting.update({
             f'reply.{name}': val
-            for name, val in cmpl_setting.items()
+            for name, val in reply_setting.items()
         })
 
         output_dir = build_dir(
@@ -70,7 +70,7 @@ def main():
                 'reply.dataset.validation_file',
                 'reply.dataset.test_file',
 
-                'reply.input_path',
+                'reply.prompt_path',
 
                 'input_path',
             ],
@@ -79,7 +79,7 @@ def main():
         
         command = ' '.join([
             'python ./evaluate_llm_proofs.py',
-            str(cmpl_path),
+            str(replly_path),
             str(output_dir),
             '--similarity-threshold' if similarity_threshold else '',
             f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',

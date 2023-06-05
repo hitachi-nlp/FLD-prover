@@ -34,6 +34,14 @@
     -https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
         - 100token / 75words -> 1.33 [tokens] / [words]
 
+## エラー解析
+### ./outputs/13.analyze_llm_errors/20230601.fix_translation/dtst_nm=20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000/answr_accrcy_thrshld=0.1/mtrcs.llwd_addtnl_prf_stps=5/mtrcs.rply.dtst.n_sht=20/mtrcs.rply.dtst.prmpt_typ=in_context_examples.COT.v1/mtrcs.rply.dtst.sd=0/mtrcs.rply.mx_smpls=30/mtrcs.rply.mdl_nm=gpt-4/mtrcs.smlrty_thrshld=False/errors.txt
+間違っている方を挙げる．
+* example-0: LLM is wrong
+* example-1: LLM is OK
+* example-2: LLM is wrong
+* example-3: gold is wrong
+
 
 
 

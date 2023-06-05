@@ -537,3 +537,10 @@ def _make_reference_sentence(hypothesis: str, answer: Answer) -> str:
         raise ValueError()
     else:
         raise ValueError()
+
+
+def normalize_proof(proof_text: str) -> str:
+    proof_text = re.sub('\n+', ' ', proof_text)
+    proof_text = re.sub(r'\s+', ' ', proof_text)
+    proof_text = re.sub(r'\s+$', '', re.sub(r'^\s+', '', proof_text))
+    return proof_text

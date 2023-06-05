@@ -22,6 +22,7 @@ from proof_common import(
     SENT_IDENT,
     INT_IDENT,
     ASSUMP_IDENT,
+    normalize_proof,
 )
 from stance_indication import delete_stance_markers, get_stance_markers, StanceMarker
 
@@ -329,6 +330,7 @@ class Proof:
 
 
 def prettify_proof_text(proof_text: str, indent_level=0) -> str:
+    proof_text = normalize_proof(proof_text)
     stance_markers = get_stance_markers(proof_text)
     proof_text = delete_stance_markers(proof_text)
 
@@ -369,3 +371,7 @@ def prettify_proof_text(proof_text: str, indent_level=0) -> str:
     pretty_lines.append(' ' * 50 + stance_markers_text)
 
     return '\n'.join(pretty_lines)
+
+
+def prettify_context_text(context_text: str) -> str:
+    return re.sub('sent([0-9]*)', '\nsent\g<1>', context_text).strip('\n')
