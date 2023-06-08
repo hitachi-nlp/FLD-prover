@@ -24,6 +24,8 @@ class DeductionExample(BaseModel):
     negative_proof_stance: Optional[str] = None
     negative_answer: Optional[str] = None
 
+    version: Optional[str] = None
+
 
 class SerializedDeductionStep(BaseModel):
     input: str

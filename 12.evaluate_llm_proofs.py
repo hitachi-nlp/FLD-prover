@@ -28,7 +28,7 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation')
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation/')
     output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation')
 
     # ----------------- settings ---------------------
@@ -39,12 +39,14 @@ def main():
     allowed_additional_proof_steps = 5
     similarity_threshold = False
 
-    skip_if_exists = True
+    skip_if_exists = False
     dry_run = False
 
     # ----------------- running ---------------------
 
     for replly_path in input_top_dir.glob('**/replies.jsonl'):
+        if str(replly_path).find('v2') < 0:
+            continue
         setting = {
             'input_path': str(replly_path),
             'allowed_additional_proof_steps': allowed_additional_proof_steps,
@@ -70,7 +72,7 @@ def main():
                 'reply.dataset.validation_file',
                 'reply.dataset.test_file',
 
-                'reply.prompt_path',
+                'reply.input_path',
 
                 'input_path',
             ],

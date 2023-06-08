@@ -10,7 +10,7 @@ from logger_setup import setup as setup_logger
 import click
 from FLD_task.loaders import load
 from FLD_task.schema import DeductionExample, SerializedDeductionStep
-from FLD_task.preprocess import serialize
+from FLD_task.preprocess import serialize, serialize_gold
 import kern_profiler
 
 
@@ -47,7 +47,23 @@ The output part shows the step-by-step thought to verify the hypothesis.
 Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "sent2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions.
 
 After these steps, we conclude either the hypothesis can be proved (__PROVED__), disproved (__DISPROVED__), or neither (__UNKNOWN__) because the facts are insufficient.
+""",
+
+
+    'v2': """\
+******** First, we show some examples of deductive reasoning tasks below. ********
+
+An example consists of an input part and an output part, shown after "---- input ----" and "---- output ----," respectively.
+
+In the input part, we have a set of facts shown after "$context$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
+
+The output part shows the step-by-step thought to verify the hypothesis.
+
+Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "sent2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions. For example, the following is not allowed: "sent3 -> int2: this is a sentence" where the content of "sent3" is "this is a sentence".
+
+After these steps, we conclude either the hypothesis can be proved (__PROVED__), disproved (__DISPROVED__), or neither (__UNKNOWN__) because the facts are insufficient.
 """
+
 
 }
 
@@ -64,6 +80,9 @@ def _make_intro(prompt_type: str) -> Optional[str]:
         return _INTROS['v0']
     elif prompt_type == 'in_context_examples.COT.v1':
         return _INTROS['v1']
+    elif prompt_type == 'in_context_examples.COT.v2':
+        return _INTROS['v2']
+
     else:
         return None
 
@@ -72,6 +91,8 @@ def _make_question(prompt_type: str) -> Optional[str]:
     if prompt_type == 'in_context_examples.COT':
         return _QUESTIONS['v0']
     elif prompt_type == 'in_context_examples.COT.v1':
+        return _QUESTIONS['v1']
+    elif prompt_type == 'in_context_examples.COT.v2':
         return _QUESTIONS['v1']
     else:
         return None
@@ -86,6 +107,7 @@ def _make_question(prompt_type: str) -> Optional[str]:
                   'in_context_examples',
                   'in_context_examples.COT',
                   'in_context_examples.COT.v1',
+                  'in_context_examples.COT.v2',
               ]),
               default='in_context_examples.COT')
 @click.option('--n-shot', type=int, default=10)
@@ -148,7 +170,9 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
     with open(output_dir / 'prompts.jsonl', 'w') as f_jsonl,\
             open(output_dir / 'prompts.txt', 'w') as f_txt:
 
-        for eval_ex in eval_exs:
+        for i_ex, eval_ex in enumerate(eval_exs):
+            # if i_ex not in [7, 8]:
+            #     continue
 
             eval_serial = _serialize(eval_ex)
 
@@ -170,6 +194,9 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
                 'example': eval_ex.dict(),
                 'fewshot_examples': [fewshot_ex.dict()
                                      for fewshot_ex in fewshot_exs],
+
+                'gold_proof': serialize_gold(eval_ex),
+
                 'serial': eval_serial.dict(),
                 'fewshot_serials': [fewshot_serial.dict()
                                     for fewshot_serial in fewshot_serials],
