@@ -41,22 +41,23 @@ def main():
         # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
 
         # ---------------------------------- 20230529.use_fixed_translation_for_LLM ------------------------------------
-        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-        '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-        # '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
+        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
+        # '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
+        '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
     ]
 
     prompt_types = [
         # 'in_context_examples',
         # 'in_context_examples.COT',
         'in_context_examples.COT.v1',
+        # 'in_context_examples.COT.v2',
     ]
 
     n_shot_list = [
         # 3,
-        6,  # for chatGPT web, which have limited context length.
+        # 6,  # for chatGPT web, which have limited context length.
 
-        10,
+        # 10,
         20,  # XXX: should use 20 so that LLMs can understand the complicated format of our dataset.
 
         # -- over token limit = 8k token --

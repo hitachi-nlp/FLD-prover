@@ -41,7 +41,7 @@ def main(input_path, output_dir, log_level):
             context = normalize_proof(sample['example']['context'])
             hypothesis = normalize_proof(sample['example']['hypothesis'])
             # proof_gold = sample['example']['proofs'][0]
-            proof_gold = sample['serial']['next_step']
+            proof_gold = sample['gold_proof']
             proof_pred = normalize_proof(sample['reply'])
 
             f_err.write('\n\n\n\n\n')

@@ -1,1 +1,1 @@
-from .serialize import serialize
+from .serialize import serialize, serialize_gold

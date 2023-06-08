@@ -1,4 +1,9 @@
 # 再現実験
+* 2023-06-05
+    - LLMの評価に伴い，fix-scorerブランチでscorerのバグを治した．よって，以下の結果はもう一度出し直す必要がある．おそらく，性能が上がる．
+    - また，goldが怪しい．next_stepをgoldにしていると，例えばnegativeが入ったりする．make_goldを使うこと．
+        - また，serializeとmake_goldの境が曖昧．serializeはaugmentationの機能も含んでしまっていることが問題．
+    - ./memo.md "gold is wrong"
 * 2023-05-23 現状
     - FLD.2の実験をしたところ．性能差があるので，対処が必要．
 

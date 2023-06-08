@@ -1,9 +1,17 @@
-from typing import Union
+from typing import Union, Optional
 from FLD_task.schema import DeductionExample
 
 
-def load(dic: dict) -> DeductionExample:
-    version = dic.get('__version__', '0.0')
+def load(dic: dict, force_version: str = None) -> DeductionExample:
+    if force_version is not None:
+        version = force_version
+    else:
+        version = dic.get('version', None)
+        version = version or dic.get('__version__', None)  # back compatibility
+        version = version or force_version
+        # if force_version is not None and force_version != version:
+        #     raise ValueError(f'the forced version {force_version} does not match the found version {version}')
+        version = version or '0.0'
 
     if version == '0.0':
 
@@ -38,7 +46,12 @@ def load(dic: dict) -> DeductionExample:
     elif version == '0.1':
         pass
 
+    elif version == 'DeductionExampleInstance':
+        pass
+
     else:
         raise ValueError()
 
-    return DeductionExample.parse_obj(dic)
+    dic['version'] = 'DeductionExampleInstance'
+    ex = DeductionExample.parse_obj(dic)
+    return ex

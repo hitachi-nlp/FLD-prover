@@ -10,7 +10,9 @@ from pprint import pprint
 
 from logger_setup import setup as setup_logger
 import click
+from FLD_task.loaders import load
 from FLD_task.evaluate.scoring import calc_metrics
+from FLD_task.preprocess import serialize_gold
 
 
 logger = logging.getLogger(__name__)
@@ -30,10 +32,14 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
     metrics_path = output_dir / 'metrics.jsonl'
     all_metrics: Dict[str, float] = defaultdict(list)
     with open(metrics_path, 'w') as f_out:
-        for line in open(input_path):
+        for i_example, line in enumerate(open(input_path)):
             sample = json.loads(line.strip('\n'))
 
-            gold = sample['serial']['next_step']
+            if 'gold_proof' not in sample:
+                sample['gold_proof'] = serialize_gold(
+                    load(sample['example'], force_version='DeductionExampleInstance')
+                )
+            gold = sample['gold_proof']
             pred = sample['reply']
 
             metrics = calc_metrics(
@@ -42,6 +48,14 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
                 similarity_threshold=similarity_threshold,
                 allowed_additional_proof_steps=allowed_additional_proof_steps,
             )
+
+            metrics = calc_metrics(
+                gold,
+                pred,
+                similarity_threshold=similarity_threshold,
+                allowed_additional_proof_steps=allowed_additional_proof_steps,
+            )
+
             sample['metrics'] = metrics
 
             for name, val in metrics.items():

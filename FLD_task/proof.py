@@ -334,8 +334,12 @@ def prettify_proof_text(proof_text: str, indent_level=0) -> str:
     stance_markers = get_stance_markers(proof_text)
     proof_text = delete_stance_markers(proof_text)
 
+    proof_text = re.sub(' *; *$', '', proof_text)
     pretty_lines = []
-    proof_lines = proof_text.split('; ')
+    if re.match(r'\S+', proof_text):
+        proof_lines = re.split(r' *; *', proof_text)
+    else:
+        proof_lines = []
     for line in proof_lines:
         if line.find(' -> ') < 0:
             logger.info('Could not prettify the proof since the following line have no " -> ": "%s"', line)
