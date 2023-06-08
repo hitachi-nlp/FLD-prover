@@ -97,11 +97,15 @@ def calc_metrics(proof_gold_text: str,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
+    proof_gold_text = normalize_proof(proof_gold_text)
     proof_pred_text = normalize_proof(proof_pred_text)
 
     metrics: Dict[str, Any] = {}
 
-    metrics['answer_accuracy'] = float(set(get_stance_markers(proof_gold_text)) == set(get_stance_markers(proof_pred_text)))
+    gold_labels = set(get_stance_markers(proof_gold_text))
+    pred_labels = set(get_stance_markers(proof_pred_text))
+
+    metrics['answer_accuracy'] = float(gold_labels == pred_labels)
 
     zero_one_acc = calc_accuracy(
         proof_gold_text,
@@ -123,12 +127,16 @@ def calc_accuracy(proof_gold_text: str,
                   similarity_threshold=False,
                   allowed_additional_proof_steps=0,
                   zero_one: bool = True) -> float:
+    proof_gold_text = normalize_proof(proof_gold_text)
+    proof_pred_text = normalize_proof(proof_pred_text)
+
     gold_labels = get_stance_markers(proof_gold_text)
     pred_labels = get_stance_markers(proof_pred_text)
+
     if set(gold_labels) != set(pred_labels):
         return 0.0
 
-    if gold_labels == set([StanceMarker.UNKNOWN]):
+    if set(gold_labels) == set([StanceMarker.UNKNOWN]):
         return 1.0
     else:
         try:
