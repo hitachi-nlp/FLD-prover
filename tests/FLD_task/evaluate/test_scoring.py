@@ -435,6 +435,23 @@ def test_calc_score_on_toy_examples():
     )
     assert (math.isclose(score, calc_F(9, 7, 2)[-1]))
 
+    score = _calc_score(
+        '; '.join([
+            'sent1 & sent2 -> hypothesis',
+        ]),
+        '; '.join([
+            'sent1 -> int1: this is a sentence A',
+            'sent2 -> int2: this is a sentence B',
+            'int1 & int2 -> hypothesis'
+        ]),
+        zero_one=True,
+        allow_reference_step=True,
+        context='sent1: this is a sentence A sent2: this is a sentence B'
+    )
+    assert (math.isclose(score, 1.0))
+
+
+
 
 def test_calc_score_on_real_examples():
     # the actual gold and precisions from our dataset

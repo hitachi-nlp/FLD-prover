@@ -153,7 +153,7 @@ def extract_context(ctx: str, no_lower=True) -> OrderedDict[str, str]:
         {
             ident.strip(): normalize_sentence(sent, no_lower=no_lower)
             for ident, sent in re.findall(
-                r"(?P<ident>sent\d+): (?P<sent>.+?) (?=sent)", ctx + " sent"
+                r"(?P<ident>sent\d+): (?P<sent>.+?) (?=sent\d+)", ctx + " sent999"
             )
         }
     )
