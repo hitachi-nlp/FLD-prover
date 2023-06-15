@@ -84,6 +84,14 @@ def test_similarity_thresholds():
         True,
     )
 
+    check_threshold(
+        'if a cubist designates intemperance it is tense',
+        [
+            'if the cubist designates intemperance, the cubist is tense',
+        ],
+        True,
+    )
+
 
 if __name__ == '__main__':
     test_similarity_thresholds()

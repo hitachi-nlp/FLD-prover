@@ -28,8 +28,11 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation/')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230615.formula_checkers')
 
     # ----------------- settings ---------------------
 
@@ -44,16 +47,14 @@ def main():
 
     # ----------------- running ---------------------
 
-    for replly_path in input_top_dir.glob('**/replies.jsonl'):
-        if str(replly_path).find('v2') < 0:
-            continue
+    for reply_path in input_top_dir.glob('**/replies.jsonl'):
         setting = {
-            'input_path': str(replly_path),
+            'input_path': str(reply_path),
             'allowed_additional_proof_steps': allowed_additional_proof_steps,
             'similarity_threshold': similarity_threshold,
         }
 
-        reply_setting = json.load(open(replly_path.parent / 'lab.params.json'))
+        reply_setting = json.load(open(reply_path.parent / 'lab.params.json'))
         setting.update({
             f'reply.{name}': val
             for name, val in reply_setting.items()
@@ -81,7 +82,7 @@ def main():
         
         command = ' '.join([
             'python ./evaluate_llm_proofs.py',
-            str(replly_path),
+            str(reply_path),
             str(output_dir),
             '--similarity-threshold' if similarity_threshold else '',
             f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',

@@ -29,8 +29,11 @@ def main():
     # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
 
-    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation/dtst_nm=20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000/allwd_addtnl_prf_stps=5/rply.dtst.n_sht=20/rply.dtst.prmpt_typ=in_context_examples.COT.v2')
-    output_top_dir = Path('./outputs/13.analyze_llm_errors/20230601.fix_translation')
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230601.fix_translation/dtst_nm=20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000/allwd_addtnl_prf_stps=5/rply.dtst.n_sht=20/rply.dtst.prmpt_typ=in_context_examples.COT.v2')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230601.fix_translation')
+
+    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230615.formula_checkers')
+    output_top_dir = Path('./outputs/13.analyze_llm_errors/20230615.formula_checkers')
 
     # ----------------- settings ---------------------
 

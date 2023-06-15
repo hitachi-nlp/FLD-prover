@@ -16,7 +16,6 @@ def _calc_score(gold: str, pred: str, *args, **kwargs) -> float:
 
 
 def test_calc_score_on_toy_examples():
-    # prediction have irrelevant steps
     score = _calc_score(
         '; '.join([
             'sent1 & sent5 -> int1: this is a sentence A',
@@ -450,7 +449,36 @@ def test_calc_score_on_toy_examples():
     )
     assert (math.isclose(score, 1.0))
 
+    score = _calc_score(
+        '; '.join([
+            'sent1 & sent2 -> hypothesis',
+        ]),
+        '; '.join([
+            'sent1 -> int1: this is a sentence A',
+            'sent2 -> int2: this is a sentence B',
+            'int1 & int2 -> hypothesis'
+        ]),
+        zero_one=True,
+        allow_reference_step=True,
+        context='sent1: this is a sentence A sent2: this is a sentence B'
+    )
+    assert (math.isclose(score, 1.0))
 
+    score = _calc_score(
+        '; '.join([
+            'sent1 & sent2 -> int1: hoge',
+            'int1 & sent3 -> hypothesis',
+        ]),
+        '; '.join([
+            'sent1 -> int1: this is a sentence A',
+            'int1 & sent2 -> int2: hoge',
+            'int2 & sent3 -> hypothesis',
+        ]),
+        zero_one=True,
+        allow_reference_step=True,
+        context='sent1: this is a sentence A'
+    )
+    assert (math.isclose(score, 1.0))
 
 
 def test_calc_score_on_real_examples():
@@ -546,6 +574,26 @@ def test_calc_score_on_real_examples():
         zero_one=False,
     )
     assert (math.isclose(score, 1.0))
+
+    score = _calc_score(
+        'sent1                  ->           int1:       if the cubist grafts, the cubist will not letter and is bubaline;'
+        'sent2 & sent3          ->           int2:       if a cubist designates intemperance it grafts;'
+        'int1  & int2          ->     hypothesis;',
+
+        'sent3                  ->           int1:       if the cubist designates intemperance, the cubist is tense;'
+        'int1 & sent2          ->           int2:       if the cubist designates intemperance, the cubist grafts;'
+        'int2 & sent1          ->     hypothesis;',
+
+        zero_one=True,
+        allow_reference_step=True,
+        context='sent1: if something grafts, it will not letter and is bubaline '
+                'sent2: if a cubist is tense it grafts '
+                'sent3: if a cubist designates intemperance it is tense '
+                'sent4: if something grafts, it will not depart and is bubaline '
+                'sent5: if a cubist is tense it reship '
+                'sent6: if a cubist designates intemperance it is wieldy ',
+    )
+    assert (math.isclose(score, 0.0))
 
 
 def _check_limitation():

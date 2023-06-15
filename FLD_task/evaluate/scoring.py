@@ -9,7 +9,7 @@ import re
 import evaluate
 import nltk
 from common import calc_F
-from proof_common import extract_assumptions, get_node_type, NodeType, extract_idents
+from proof_common import extract_assumptions, get_node_type, NodeType, extract_idents, extract_context
 from stance_indication import delete_stance_markers, get_stance_markers, StanceMarker
 from FLD_task.proof import InvalidProof, InvalidProofStep
 from strsimpy.normalized_levenshtein import NormalizedLevenshtein
@@ -18,6 +18,8 @@ from proof_common import (
     NodeType,
     HYPOTHESIS_IDENT,
     VOID_IDENT,
+    INT_IDENT,
+    SENT_IDENT,
     normalize_proof,
 )
 import datasets
@@ -94,6 +96,8 @@ def _hf_compute_rouges(decoded_labels: List[str], decoded_preds: List[str]) -> D
 
 def calc_metrics(proof_gold_text: str,
                  proof_pred_text: str,
+                 allow_reference_step=False,
+                 context: Optional[str] = None,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
@@ -110,6 +114,8 @@ def calc_metrics(proof_gold_text: str,
     zero_one_acc = calc_accuracy(
         proof_gold_text,
         proof_pred_text,
+        allow_reference_step=allow_reference_step,
+        context=context,
         similarity_threshold=similarity_threshold,
         allowed_additional_proof_steps=allowed_additional_proof_steps,
         zero_one=zero_one,
@@ -124,6 +130,8 @@ def calc_metrics(proof_gold_text: str,
 
 def calc_accuracy(proof_gold_text: str,
                   proof_pred_text: str,
+                  allow_reference_step=False,
+                  context: Optional[str] = None,
                   similarity_threshold=False,
                   allowed_additional_proof_steps=0,
                   zero_one: bool = True) -> float:
@@ -143,6 +151,8 @@ def calc_accuracy(proof_gold_text: str,
             proof_score = calc_score(
                 delete_stance_markers(proof_gold_text).rstrip(' '),
                 delete_stance_markers(proof_pred_text).rstrip(' '),
+                allow_reference_step=allow_reference_step,
+                context=context,
                 similarity_threshold=similarity_threshold,
                 allowed_additional_proof_steps=allowed_additional_proof_steps,
                 zero_one=zero_one,
@@ -154,6 +164,8 @@ def calc_accuracy(proof_gold_text: str,
 
 def calc_score(proof_gold_text: str,
                proof_pred_text: str,
+               allow_reference_step=False,
+               context: Optional[str] = None,
                similarity_threshold=True,
                allowed_additional_proof_steps=0,
                zero_one: bool = True) -> float:
@@ -162,14 +174,16 @@ def calc_score(proof_gold_text: str,
     The score is invariant under the renaming of intermediate nodes.
     """
     logger.debug('\n\n========================================= calc_score() ==================================================')
-    # TODO: should score the tree by global similarity between tree like AMR.
-    # TODO: should calculate  precision / recall / f rather than a single score.
     (
         gold_premise_uids_to_concl_uid,
         gold_premise_uids_to_concl_sent,
         pred_premise_uids_to_concl_uid,
         pred_premise_uids_to_concl_sent,
-    ) = _get_aligned_proof_by_uids(proof_gold_text, proof_pred_text)
+    ) = _get_aligned_proof_by_uids(proof_gold_text,
+                                   proof_pred_text,
+                                   allow_reference_step=allow_reference_step,
+                                   context=context)
+
 
     logger.debug('=========== gold_premise_uids_to_concl_uid ==============')
     logger.debug('\n' + pformat(gold_premise_uids_to_concl_uid))
@@ -230,12 +244,98 @@ def _to_uid(id_: str) -> str:
     return id_.upper()
 
 
-def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
+def _get_aligned_proof_by_uids(proof_gold_text: str,
+                               proof_pred_text: str,
+                               allow_reference_step=False,
+                               context: Optional[str] = None)\
         -> Tuple[Dict[Tuple[str], str], Dict[Tuple[str], str], Dict[Tuple[str], str], Dict[Tuple[str], str]]:
     logger.debug('\n\n=================================== _get_aligned_proof_by_uids() ============================================')
 
     gold_premise_ids_to_concl_id, gold_premise_ids_to_concl_sent = _split_steps_into_id_dics(proof_gold_text)
     pred_premise_ids_to_concl_id, pred_premise_ids_to_concl_sent = _split_steps_into_id_dics(proof_pred_text)
+
+    if allow_reference_step:
+        # truncate reference steps which is something like "sent4 (hoge) -> int1: hoge"
+
+        if context is None:
+            raise ValueError('can not judge reference step because the context is not specified')
+        context_sents = extract_context(context)
+        context_sents = {id_: sent for id_, sent in context_sents.items()}
+
+        def is_reference(gold_sent: str, pred_sent: str) -> bool:
+            # LLMs generates reference sentences slightly different from the original one.
+            # Thus, we allow similarity less than 1.0
+            lev_sim = calc_levenstein_similarity_batch([gold_sent], [pred_sent])[0]
+            return lev_sim >= 0.7
+
+        reference_sent_id_to_int_id: Dict[str, str] = {}
+        reference_int_id_to_sent_id: Dict[str, str] = {}
+        for premise_ids, concl_id in pred_premise_ids_to_concl_id.items():
+            concl_sent = pred_premise_ids_to_concl_sent[premise_ids]
+            if len(premise_ids) == 1:
+                premise_id = premise_ids[0]
+                if premise_id.startswith(SENT_IDENT):
+                    premise_sent = context_sents[premise_id]
+                    if is_reference(premise_sent, concl_sent):
+                        reference_sent_id_to_int_id[premise_id] = concl_id
+                        reference_int_id_to_sent_id[concl_id] = premise_id
+
+        pred_premise_ids_to_concl_id_reference_exluded = {}
+        for premise_ids, concl_id in pred_premise_ids_to_concl_id.items():
+            if len(premise_ids) == 1 and premise_ids[0] in reference_sent_id_to_int_id:
+                # exclude reference step
+                continue
+            premise_ids_replaced = tuple(
+                sorted(reference_int_id_to_sent_id.get(premise_id, premise_id)
+                       for premise_id in premise_ids)
+            )
+            pred_premise_ids_to_concl_id_reference_exluded[premise_ids_replaced] = concl_id
+
+        pred_premise_ids_to_concl_sent_reference_exluded = {}
+        for premise_ids, concl_sent in pred_premise_ids_to_concl_sent.items():
+            if len(premise_ids) == 1 and premise_ids[0] in reference_sent_id_to_int_id:
+                # exclude reference step
+                continue
+            premise_ids_replaced = tuple(
+                sorted(reference_int_id_to_sent_id.get(premise_id, premise_id)
+                       for premise_id in premise_ids)
+            )
+            pred_premise_ids_to_concl_sent_reference_exluded[premise_ids_replaced] = concl_sent
+
+        # fill vacant int ids
+        all_pred_int_ids: Set[str] = set()
+        for premise_ids, concl_id in pred_premise_ids_to_concl_id_reference_exluded.items():
+            for id_ in list(premise_ids) + [concl_id]:
+                if id_.startswith(INT_IDENT):
+                    all_pred_int_ids.add(id_)
+
+        int_ids_map: Dict[str, str] = {}
+        i = 1
+        for int_id in sorted(all_pred_int_ids, key = lambda int_id: int(int_id[3:])):
+            int_idx = int(int_id[3:])
+            if int_idx != i:
+                int_ids_map[int_id] = f'{INT_IDENT}{i}'
+            i += 1
+
+        pred_premise_ids_to_concl_id_reference_exluded_int_remaped = {}
+        for premise_ids, concl_id in pred_premise_ids_to_concl_id_reference_exluded.items():
+            premise_ids_replaced = tuple(
+                sorted(int_ids_map.get(premise_id, premise_id)
+                       for premise_id in premise_ids)
+            )
+            concl_id_replaced = int_ids_map.get(concl_id, concl_id)
+            pred_premise_ids_to_concl_id_reference_exluded_int_remaped[premise_ids_replaced] = concl_id_replaced
+
+        pred_premise_ids_to_concl_sent_reference_exluded_int_remaped = {}
+        for premise_ids, concl_sent in pred_premise_ids_to_concl_sent_reference_exluded.items():
+            premise_ids_replaced = tuple(
+                sorted(int_ids_map.get(premise_id, premise_id)
+                       for premise_id in premise_ids)
+            )
+            pred_premise_ids_to_concl_sent_reference_exluded_int_remaped[premise_ids_replaced] = concl_sent
+
+        pred_premise_ids_to_concl_id = pred_premise_ids_to_concl_id_reference_exluded_int_remaped
+        pred_premise_ids_to_concl_sent = pred_premise_ids_to_concl_sent_reference_exluded_int_remaped
 
     def premise_sort_key(premise_ids: Tuple[str]) -> Any:
         # sort key so that ('sent1', 'sent2') is faster than ('sent1', 'int1') and ('int1', 'int2')
@@ -248,8 +348,6 @@ def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
     gold_id_to_uid: Dict[str, str] = {}
     pred_id_to_uid: Dict[str, str] = {}
 
-    # for ident in re.findall(r'(sent\d+|int\d+|assump\d+)', proof_gold_text):
-    #     gold_id_to_uid[ident] = ident.upper()
     for ident in extract_idents(proof_gold_text):
         if get_node_type(ident) in [NodeType.sent, NodeType.int, NodeType.assump, NodeType.assump_deletion]:
             gold_id_to_uid[ident] = ident.upper()
@@ -270,7 +368,7 @@ def _get_aligned_proof_by_uids(proof_gold_text: str, proof_pred_text: str)\
             return gold_premise_ids
         return None
 
-    while True: 
+    while True:
         logger.debug('\n========================= while loop ==========================')
 
         gold_premise_uids_to_concl_uid = {
@@ -361,16 +459,16 @@ def _split_steps_into_id_dics(proof: str) -> Tuple[Dict[Tuple[str, str], str], D
             i_void_premise += 1
 
         if get_node_type(conclusion_text) == NodeType.hypothesis:
-            conclusion_id = HYPOTHESIS_IDENT
-            conclusion_sentence = HYPOTHESIS_IDENT
+            concl_id = HYPOTHESIS_IDENT
+            concl_sent = HYPOTHESIS_IDENT
         else:
             if conclusion_text.find(': ') < 0:
                 raise InvalidProof()
-            conclusion_id = conclusion_text.split(': ')[0]
-            conclusion_sentence = ': '.join(conclusion_text.split(': ')[1:])
+            concl_id = conclusion_text.split(': ')[0]
+            concl_sent = ': '.join(conclusion_text.split(': ')[1:])
 
-        premise_ids_to_concl_id[tuple(premise_ids)] = conclusion_id
-        premise_ids_to_concl_sent[tuple(premise_ids)] = conclusion_sentence
+        premise_ids_to_concl_id[tuple(premise_ids)] = concl_id
+        premise_ids_to_concl_sent[tuple(premise_ids)] = concl_sent
 
     return premise_ids_to_concl_id, premise_ids_to_concl_sent
 

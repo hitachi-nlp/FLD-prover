@@ -41,17 +41,13 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
                 )
             gold = sample['gold_proof']
             pred = sample['reply']
+            context = sample['example']['context']
 
             metrics = calc_metrics(
                 gold,
                 pred,
-                similarity_threshold=similarity_threshold,
-                allowed_additional_proof_steps=allowed_additional_proof_steps,
-            )
-
-            metrics = calc_metrics(
-                gold,
-                pred,
+                allow_reference_step=True,
+                context=context,
                 similarity_threshold=similarity_threshold,
                 allowed_additional_proof_steps=allowed_additional_proof_steps,
             )
