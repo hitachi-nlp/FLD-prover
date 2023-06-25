@@ -329,7 +329,7 @@ class Proof:
         return self.proof_text.endswith("-> hypothesis")
 
 
-def prettify_proof_text(proof_text: str, indent_level=0) -> str:
+def prettify_proof_text(proof_text: str, indent=0) -> str:
     proof_text = normalize_proof(proof_text)
     stance_markers = get_stance_markers(proof_text)
     proof_text = delete_stance_markers(proof_text)
@@ -368,14 +368,19 @@ def prettify_proof_text(proof_text: str, indent_level=0) -> str:
         else:
             pretty_concl_text = f'{concl_text:>10}'
 
-        pretty_line = ' ' * indent_level + f'{pretty_premises_text:<25} ->     {pretty_concl_text}'
+        # pretty_line = ' ' * indent_level + f'{pretty_premises_text:<25} ->     {pretty_concl_text}'
+        pretty_line = f'{pretty_premises_text:<25} ->     {pretty_concl_text}'
         pretty_lines.append(pretty_line)
 
     stance_markers_text = f'=>    stance markers = {str([mk.value for mk in stance_markers])}'
     pretty_lines.append(' ' * 50 + stance_markers_text)
 
-    return '\n'.join(pretty_lines)
+    pretty = ' ' * indent + ('\n' + ' ' * indent).join(pretty_lines)
+    return pretty
 
 
-def prettify_context_text(context_text: str) -> str:
-    return re.sub('sent([0-9]*)', '\nsent\g<1>', context_text).strip('\n')
+def prettify_context_text(context_text: str, indent: int = 0) -> str:
+    sentences = re.sub('sent([0-9]*)', '\nsent\g<1>', context_text).strip('\n').split('\n')
+    sentences = sorted(sentences, key = lambda sentence: int(re.sub(r'^sent([0-9]*).*', r'\g<1>', sentence)))
+    pretty = ' ' * indent + ('\n' + ' ' * indent).join(sentences)
+    return pretty

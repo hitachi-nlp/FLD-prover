@@ -39,12 +39,12 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
             #     sample['gold_proof'] = _serialize_gold(
             #         load(sample['example'], force_version='DeductionExampleInstance')
             #     )
-            golds = sample['gold_proofs']
+            gold = sample['gold_proof']
             pred = sample['reply']
             context = sample['example']['context']
 
             metrics = calc_metrics(
-                golds,
+                [gold],
                 pred,
                 allow_reference_step=True,
                 context=context,

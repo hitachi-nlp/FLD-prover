@@ -52,7 +52,10 @@ def main():
 
     model_names = [
         # 'text-davinci-003',   # stupid. proof accuracy = 0.0 for sFLD-impl :(
-        'gpt-3.5-turbo',      # stupid. proof accuracy = 0.2 for sFLD-impl :(
+
+        # 'gpt-3.5-turbo',      # stupid. proof accuracy = 0.2 for sFLD-impl :(
+        'gpt-3.5-turbo-16k'
+
         # 'gpt-4',                # smart. proof accuracy = 0.5 for sFLD-impl :)
         # 'gpt-4-32k',
     ]

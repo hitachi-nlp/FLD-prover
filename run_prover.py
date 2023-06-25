@@ -20,6 +20,7 @@ Fine-tuning the library models for sequence to sequence.
 
 import logging
 import os
+import re
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import sys
@@ -65,7 +66,7 @@ from FLD_prover import (
     preprocess_examples_train,
     preprocess_examples_eval,
 )
-from FLD_task.proof import prettify_proof_text
+from FLD_task.proof import prettify_proof_text, prettify_context_text
 import kern_profiler
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -806,11 +807,31 @@ def main():
                 for metric_name, metric_val in _metrics.items():
                     metrics[f"D-{depth}.{metric_name}"].append(metric_val)
 
+            if example is not None:
+                input_ids = example['input_ids']
+                input_ids = np.where(np.array(input_ids) != -100, input_ids, tokenizer.pad_token_id)
+                decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
+
+                context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
+                hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
+            else:
+                context = None
+                hypothesis = None
+
             logger.info('')
             logger.info('')
             logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
-            logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt))
-            logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred))
+
+            if context is not None:
+                logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
+
+            if hypothesis is not None:
+                logger.info('------------ hypothesis ------------\n\n    %s\n', hypothesis)
+
+            logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt, indent=4))
+
+            logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred, indent=4))
+
             log_texts, log_args = [], []
             for metric_name, metric_val in sorted(_metrics.items()):
                 log_texts.append('%-20s: %5.2f')
