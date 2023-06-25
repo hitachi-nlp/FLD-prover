@@ -10,7 +10,7 @@ from logger_setup import setup as setup_logger
 import click
 from FLD_task.loaders import load
 from FLD_task.schema import DeductionExample, SerializedDeductionStep
-from FLD_task.preprocess import serialize, serialize_gold
+from FLD_task.preprocess import serialize
 import kern_profiler
 
 
@@ -190,12 +190,14 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
 
             prompt += dump_serial(eval_serial, no_label=True)
 
+            if len(eval_serial.gold_proofs) > 1:
+                raise ValueError()
             instance = {
                 'example': eval_ex.dict(),
                 'fewshot_examples': [fewshot_ex.dict()
                                      for fewshot_ex in fewshot_exs],
 
-                'gold_proof': serialize_gold(eval_ex),
+                'gold_proofs': eval_serial.gold_proofs,
 
                 'serial': eval_serial.dict(),
                 'fewshot_serials': [fewshot_serial.dict()

@@ -149,22 +149,23 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-17.FLD-impl.large_steps')
-    output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
+    # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
+    output_top_dir = Path('./outputs/01.train.py/debug/')
 
     local_dataset_names = [
-        # 'FLD.debug.2023-05-13',
+        'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
-        '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
+        # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
     ]
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -172,13 +173,13 @@ def main():
     # eval_steps = 500
     eval_steps = None
 
-    # engine = SubprocessEngine()   # for debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # for debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
     n_gpus = 4
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    do_torchrun = False  # for debug
+    # do_torchrun = True
 
     lrates = [
         1e-4,

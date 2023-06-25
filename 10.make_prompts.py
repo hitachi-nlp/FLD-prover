@@ -24,7 +24,8 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230601.fix_translation')
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers')
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -32,7 +33,8 @@ def main():
         # './NLProofS/outputs/00.create_cc100_corpus.py/',
         # './FLD-generator/outputs/10.create_FLD_corpus/20230529.use_fixed_translation_for_LLM',
         # './FLD-generator/outputs/10.create_FLD_corpus/20230601.fix_translation',
-        './FLD-generator/outputs/10.create_FLD_corpus/20230615.formula_checkers',
+        # './FLD-generator/outputs/10.create_FLD_corpus/20230615.formula_checkers',
+        './FLD-generator/outputs/10.create_FLD_corpus/20230621.formula_checkers',
     ]
 
     local_dataset_names = [
@@ -49,8 +51,11 @@ def main():
 
         # ---------------------------------- 20230615.formula_checkers ------------------------------------
         # '20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-        '20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
+        # '20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
 
+        # ---------------------------------- 20230621.formula_checkers ------------------------------------
+        # '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
+        '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist',
     ]
 
     prompt_types = [

@@ -150,14 +150,6 @@ class DataTrainingArguments:
     dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    text_column: Optional[str] = field(
-        default='input_text',
-        metadata={"help": "The name of the column in the datasets containing the full texts (for summarization)."},
-    )
-    summary_column: Optional[str] = field(
-        default='output_text',
-        metadata={"help": "The name of the column in the datasets containing the summaries (for summarization)."},
-    )
     train_file: Optional[str] = field(
         default=None, metadata={"help": "The input training data file (a jsonlines or csv file)."}
     )
@@ -609,8 +601,9 @@ def main():
     #         raise ValueError(
     #             f"--summary_column' value '{data_args.summary_column}' needs to be one of: {', '.join(column_names)}"
     #         )
-    text_column = data_args.text_column
-    summary_column = data_args.summary_column
+    context_column = 'context'
+    next_step_column = 'next_step'
+    gold_proof_column = 'gold_proof'
 
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
@@ -623,23 +616,27 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def extract_inputs_targets(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str]]:
+    def extract_serials(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str], List[str]]:
         if data_args.log_examples:
             logger.info('')
             logger.info('============================= extract_inputs_targets() =============================')
 
         inputs: List[str] = []
         targets: List[str] = []
-        for i_example in range(len(examples[text_column])):
-            text = examples[text_column][i_example]
-            summary = examples[summary_column][i_example]
-            if text and summary:
-                inputs.append(text)
-                targets.append(summary)
+        gold_proofs: List[str] = []
+        for i_example in range(len(examples[context_column])):
+            context = examples[context_column][i_example]
+            next_step = examples[next_step_column][i_example]
+            gold_proof = examples[gold_proof_column][i_example]
+            if context and next_step:
+                inputs.append(context)
+                targets.append(next_step)
+                gold_proofs.append(gold_proof)
                 if data_args.log_examples:
-                    logger.info('text    [%d] : "%s"', i_example, text)
-                    logger.info('summary [%d] : "%s"', i_example, summary)
-        return inputs, targets
+                    logger.info('context    [%d] : "%s"', i_example, context)
+                    logger.info('next_step [%d] : "%s"', i_example, next_step)
+                    logger.info('gold_proof [%d] : "%s"', i_example, gold_proof)
+        return inputs, targets, gold_proofs
 
     def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
         return tokenizer(inputs, max_length=max_length, padding=padding, truncation=True)
@@ -673,12 +670,15 @@ def main():
         else:
             raise ValueError()
 
-        inputs, targets = extract_inputs_targets(examples)
+        inputs, targets, gold_proofs = extract_serials(examples)
         inputs = [prefix + inp for inp in inputs]
 
         model_inputs = prepare_model_inputs(inputs, max_source_length)
-        model_targets = prepare_model_targets(targets, max_target_length)
-        model_inputs["labels"] = model_targets["input_ids"]
+
+        if split == 'train':
+            model_inputs["labels"] = prepare_model_targets(targets, max_target_length)["input_ids"]
+        else:
+            model_inputs["labels"] = prepare_model_targets(gold_proofs, max_target_length)["input_ids"]
 
         model_inputs["depth"] = examples["depth"]
 
@@ -796,7 +796,7 @@ def main():
         metrics: Dict[str, List[Any]] = defaultdict(list)
         for i_example, (proof_gt, proof_pred, example) in enumerate(zip(decoded_labels, decoded_preds, examples)):
             _metrics = calc_metrics(
-                proof_gt,
+                [proof_gt],
                 proof_pred,
                 similarity_threshold=data_args.scoring_similarity_threshold,
                 allowed_additional_proof_steps=data_args.scoring_allowed_additional_proof_steps,

@@ -12,7 +12,7 @@ from logger_setup import setup as setup_logger
 import click
 from FLD_task.loaders import load
 from FLD_task.evaluate.scoring import calc_metrics
-from FLD_task.preprocess import serialize_gold
+# from FLD_task.preprocess import _serialize_gold
 
 
 logger = logging.getLogger(__name__)
@@ -35,16 +35,16 @@ def main(input_path, output_dir, similarity_threshold, allowed_additional_proof_
         for i_example, line in enumerate(open(input_path)):
             sample = json.loads(line.strip('\n'))
 
-            if 'gold_proof' not in sample:
-                sample['gold_proof'] = serialize_gold(
-                    load(sample['example'], force_version='DeductionExampleInstance')
-                )
-            gold = sample['gold_proof']
+            # if 'gold_proof' not in sample:
+            #     sample['gold_proof'] = _serialize_gold(
+            #         load(sample['example'], force_version='DeductionExampleInstance')
+            #     )
+            golds = sample['gold_proofs']
             pred = sample['reply']
             context = sample['example']['context']
 
             metrics = calc_metrics(
-                gold,
+                golds,
                 pred,
                 allow_reference_step=True,
                 context=context,

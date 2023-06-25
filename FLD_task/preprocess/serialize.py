@@ -9,14 +9,36 @@ from stance_indication import add_stance_markers, StanceMarker
 from FLD_task.schema import DeductionExample, SerializedDeductionStep
 
 
-def serialize_gold(example: DeductionExample) -> str:
+def serialize(
+    example: DeductionExample,
+    stepwise=True,
+    sample_negative_proof=False,
+    newlines=False,
+    proof_indicator=True,
+) -> SerializedDeductionStep:
+    serial = _serialize(
+        example,
+        stepwise=stepwise,
+        sample_negative_proof=sample_negative_proof,
+        newlines=newlines,
+        proof_indicator=proof_indicator,
+    )
+
+    serial.gold_proofs = [
+        _serialize_gold(example)
+    ]
+
+    return serial
+
+
+def _serialize_gold(example: DeductionExample) -> str:
     if _get_stance_marker(example.proof_stance) == StanceMarker.UNKNOWN:
         return add_stance_markers('', [StanceMarker.UNKNOWN])
     else:
-        return serialize(example, stepwise=False, sample_negative_proof=False, newlines=False, proof_indicator=True).next_step
+        return _serialize(example, stepwise=False, sample_negative_proof=False, newlines=False, proof_indicator=True).next_step
 
 
-def serialize(
+def _serialize(
     example: DeductionExample,
     stepwise=True,
     sample_negative_proof=False,

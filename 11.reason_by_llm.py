@@ -40,8 +40,11 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230601.fix_translation/dtst_nm=20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000/prmpt_typ=in_context_examples.COT.v2/n_sht=20/sd=0/')
     # output_top_dir = Path('./outputs/11.reason_by_llm/20230601.fix_translation')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers/dtst_nm=20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems')
-    output_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers/dtst_nm=20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers/dtst_nm=20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist')
+    output_top_dir = Path('./outputs/11.reason_by_llm/20230621.formula_checkers/')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
@@ -49,8 +52,8 @@ def main():
 
     model_names = [
         # 'text-davinci-003',   # stupid. proof accuracy = 0.0 for sFLD-impl :(
-        # 'gpt-3.5-turbo',      # stupid. proof accuracy = 0.2 for sFLD-impl :(
-        'gpt-4',                # smart. proof accuracy = 0.5 for sFLD-impl :)
+        'gpt-3.5-turbo',      # stupid. proof accuracy = 0.2 for sFLD-impl :(
+        # 'gpt-4',                # smart. proof accuracy = 0.5 for sFLD-impl :)
         # 'gpt-4-32k',
     ]
 

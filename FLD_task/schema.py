@@ -30,6 +30,7 @@ class DeductionExample(BaseModel):
 class SerializedDeductionStep(BaseModel):
     input: str
     next_step: Optional[str] = None
+    gold_proofs: Optional[List[str]] = None
 
 
 class AnswerLabel(Enum):

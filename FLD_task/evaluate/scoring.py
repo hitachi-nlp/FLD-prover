@@ -94,14 +94,16 @@ def _hf_compute_rouges(decoded_labels: List[str], decoded_preds: List[str]) -> D
     return result
 
 
-def calc_metrics(proof_gold_text: str,
+def calc_metrics(proof_gold_texts: List[str],
                  proof_pred_text: str,
                  allow_reference_step=False,
                  context: Optional[str] = None,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
                  zero_one: bool = True) -> Dict[str, Any]:
-    proof_gold_text = normalize_proof(proof_gold_text)
+    if len(proof_gold_texts) >= 2:
+        raise NotImplementedError()
+    proof_gold_text = normalize_proof(proof_gold_texts[0])
     proof_pred_text = normalize_proof(proof_pred_text)
 
     metrics: Dict[str, Any] = {}
