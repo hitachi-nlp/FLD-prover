@@ -150,50 +150,56 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
     # output_top_dir = Path('./outputs/01.train.py/2023-05-17.FLD-impl.large_steps')
     # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
-    output_top_dir = Path('./outputs/01.train.py/debug/')
+
+    output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
-        'FLD.debug.2023-05-13',
+        # 'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
         # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
+
+        # ---------------------------------- 20230626.many_bugs_fixed ------------------------------------
+        '20230626.many_bugs_fixed.20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
     ]
 
-    shot = 'debug.tiny'  # debug
+    # use_test_as_train = True  # debug
+    use_test_as_train = False
+
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
-    # shot = 'FT.step-20000'
+    shot = 'FT.step-20000'
 
-    # max_steps = 100
+    # max_steps = 300
     max_steps = None
 
-    # eval_steps = 500
+    # eval_steps = 300
     eval_steps = None
 
-    engine = SubprocessEngine()   # for debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
+    # n_gpus = 1  # debug
     n_gpus = 4
 
-    do_torchrun = False  # for debug
-    # do_torchrun = True
+    # do_torchrun = False  # for debug
+    do_torchrun = True
 
     lrates = [
         1e-4,
         # 5e-5,
     ]
 
-    sample_negative_proof_args = [
-        # False,
-        True
-    ]
-
     # ------------------------ fixed ------------------------
     dry_run = False
     hours = 72
+
+    max_eval_samples = 500  # for short evaluation
 
     seeds = [
         0,
@@ -213,9 +219,13 @@ def main():
 
     do_predict = False
     scoring_similarity_threshold = False
-    use_test_as_train = False  # for debugging
     use_test_as_val = True
     do_transfer_on_same_dataset = True
+
+    sample_negative_proof_args = [
+        # False,
+        True
+    ]
 
     local_dataset_1_name = None
     # local_dataset_1_name = 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled'
