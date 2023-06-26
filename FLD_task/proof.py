@@ -380,7 +380,7 @@ def prettify_proof_text(proof_text: str, indent=0) -> str:
 
 
 def prettify_context_text(context_text: str, indent: int = 0) -> str:
-    sentences = re.sub('sent([0-9]*)', '\nsent\g<1>', context_text).strip('\n').split('\n')
-    sentences = sorted(sentences, key = lambda sentence: int(re.sub(r'^sent([0-9]*).*', r'\g<1>', sentence)))
+    sentences = re.sub('sent([0-9]+)', '\nsent\g<1>', context_text).strip('\n').split('\n')
+    sentences = sorted(sentences, key = lambda sentence: int(re.sub(r'^sent([0-9]+).*', r'\g<1>', sentence)))
     pretty = ' ' * indent + ('\n' + ' ' * indent).join(sentences)
     return pretty

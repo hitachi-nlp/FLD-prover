@@ -17,12 +17,18 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-05-15')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-05-15')
+
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed')
 
     local_dataset_names = [
-        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
-        '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',            # FLD-impl.0
-        '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',                 # FLD.2
+        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
+        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',            # FLD-impl.0
+        # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',                 # FLD.2
+
+        # ---------------------------------- 20230626.many_bugs_fixed ------------------------------------
+        '20230626.many_bugs_fixed.20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
+
     ]
 
     engine = SubprocessEngine()
@@ -34,6 +40,8 @@ def main():
         './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
         './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
         './NLProofS/outputs/00.create_cc100_corpus.py/',
+
+        './NLProofS/outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
     ]
 
     for local_dataset_name in local_dataset_names:

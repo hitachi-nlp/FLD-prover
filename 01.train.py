@@ -226,10 +226,13 @@ def main():
     only_warn_if_checkpoint_is_not_found = True
 
     DATASETS_DIRS = [
-        './outputs/00.fix_FLD_schema.py/2023-05-15/'
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
         # './NLProofS/outputs/00.create_cc100_corpus.py/',
+
+        './outputs/00.fix_FLD_schema.py/2023-05-15/',
+
+        './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
     ]
 
     for local_dataset_name in local_dataset_names:
@@ -268,6 +271,7 @@ def main():
         for sample_negative_proof in sample_negative_proof_args:
 
             setting = SHOT_SETTINGS[shot]
+            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
             if max_steps is not None:
                 setting['max_steps'] = max_steps
                 if eval_steps is not None:

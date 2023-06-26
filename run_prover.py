@@ -823,7 +823,10 @@ def main():
             logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
             if context is not None:
-                logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
+                try:
+                    logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
+                except:
+                    logger.fatal('prettify_context failed for the following context. This is unexpected:%s', context)
 
             if hypothesis is not None:
                 logger.info('------------ hypothesis ------------\n\n    %s\n', hypothesis)

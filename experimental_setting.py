@@ -512,6 +512,12 @@ def get_dataset_setting(name: str) -> Dict[str, Any]:
             'predict_with_generate': True,
             'remove_unused_columns': False,
         }
+    elif name.startswith('20230626.many_bugs_fixed'):
+        return {
+            'file_type': 'json',
+            'predict_with_generate': True,
+            'remove_unused_columns': False,
+        }
     else:
         raise NotImplementedError()
 
