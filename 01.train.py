@@ -152,7 +152,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
 
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
-    output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
+    # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
+    output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -167,13 +168,16 @@ def main():
 
 
         # ---------------------------------- 20230628.make_harder ------------------------------------
-        # '20230626.many_bugs_fixed.D3.hard',
-        '20230626.many_bugs_fixed.D8.hard',
+        '20230626.many_bugs_fixed.D3.hard',
+        # '20230626.many_bugs_fixed.D8.hard',
 
         # '20230626.many_bugs_fixed.D3.hard.dist-trees',
-        '20230626.many_bugs_fixed.D8.hard.dist-trees',
+        # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
     ]
+
+    scoring_disallow_any_proof_for_unknown, scoring_allowed_additional_proof_steps = True, 0
+    # scoring_disallow_any_proof_for_unknown, scoring_allowed_additional_proof_steps = False, 5
 
     # use_test_as_train = True  # debug
     use_test_as_train = False
@@ -363,7 +367,8 @@ def main():
                                 # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                                 'shot': shot,
                                 'scoring_similarity_threshold': scoring_similarity_threshold,
-                                'scoring_allowed_additional_proof_steps': 5,
+                                'scoring_allowed_additional_proof_steps': scoring_allowed_additional_proof_steps,
+                                'scoring_disallow_any_proof_for_unknown': scoring_disallow_any_proof_for_unknown,
                                 'sample_negative_proof': sample_negative_proof,
 
                                 'learning_rate': _lrate,

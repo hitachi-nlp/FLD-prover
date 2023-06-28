@@ -304,6 +304,10 @@ class DataTrainingArguments:
         default=0,
     )
 
+    scoring_disallow_any_proof_for_unknown: bool = field(
+        default=False,
+    )
+
     log_examples: bool = field(
         default=False,
     )
@@ -804,6 +808,7 @@ def main():
                 proof_pred,
                 similarity_threshold=data_args.scoring_similarity_threshold,
                 allowed_additional_proof_steps=data_args.scoring_allowed_additional_proof_steps,
+                disallow_any_proof_for_unknown=data_args.scoring_disallow_any_proof_for_unknown,
             )
             depths = ['all'] if example is None else ['all', str(example['depth'])]
             for depth in depths:

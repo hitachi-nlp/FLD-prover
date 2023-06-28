@@ -10,8 +10,12 @@ class DeductionExample(BaseModel):
     hypothesis: str
     context: str
 
+    formula_context: Optional[str] = None
+
     proofs: Optional[List[str]] = None
     proof_stance: Optional[str] = None
+    formula_proofs: Optional[List[str]] = None
+
     answer: Optional[str] = None
     original_tree_depth: Optional[int] = None
     depth: Optional[int] = None

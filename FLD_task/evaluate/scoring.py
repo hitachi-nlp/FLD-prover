@@ -100,6 +100,7 @@ def calc_metrics(proof_gold_texts: List[str],
                  context: Optional[str] = None,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
+                 disallow_any_proof_for_unknown=True,
                  zero_one: bool = True) -> Dict[str, Any]:
     if len(proof_gold_texts) >= 2:
         raise NotImplementedError()
@@ -120,6 +121,7 @@ def calc_metrics(proof_gold_texts: List[str],
         context=context,
         similarity_threshold=similarity_threshold,
         allowed_additional_proof_steps=allowed_additional_proof_steps,
+        disallow_any_proof_for_unknown=disallow_any_proof_for_unknown,
         zero_one=zero_one,
     )
     metrics['proof_accuracy.zero_one'] = zero_one_acc
@@ -136,6 +138,7 @@ def calc_accuracy(proof_gold_text: str,
                   context: Optional[str] = None,
                   similarity_threshold=False,
                   allowed_additional_proof_steps=0,
+                  disallow_any_proof_for_unknown=True,
                   zero_one: bool = True) -> float:
     proof_gold_text = normalize_proof(proof_gold_text)
     proof_pred_text = normalize_proof(proof_pred_text)
@@ -146,7 +149,7 @@ def calc_accuracy(proof_gold_text: str,
     if set(gold_labels) != set(pred_labels):
         return 0.0
 
-    if set(gold_labels) == set([StanceMarker.UNKNOWN]):
+    if not disallow_any_proof_for_unknown and set(gold_labels) == set([StanceMarker.UNKNOWN]):
         return 1.0
     else:
         try:
