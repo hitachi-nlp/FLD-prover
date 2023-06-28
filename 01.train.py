@@ -151,8 +151,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-05-17.FLD-impl.large_steps')
     # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
 
-    output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
+    output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -163,7 +163,16 @@ def main():
 
         # ---------------------------------- 20230626.many_bugs_fixed ------------------------------------
         # '20230626.many_bugs_fixed.20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-        '20230626.many_bugs_fixed.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.plus_quantifiers',
+        # '20230626.many_bugs_fixed.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.plus_quantifiers',
+
+
+        # ---------------------------------- 20230628.make_harder ------------------------------------
+        '20230626.many_bugs_fixed.D3.hard',
+        '20230626.many_bugs_fixed.D8.hard',
+
+        '20230626.many_bugs_fixed.D3.hard.dist-trees',
+        '20230626.many_bugs_fixed.D8.hard.dist-trees',
+
     ]
 
     # use_test_as_train = True  # debug
@@ -198,7 +207,7 @@ def main():
 
     # ------------------------ fixed ------------------------
     dry_run = False
-    hours = 72
+    hours = 24
 
     max_eval_samples = 500  # for short evaluation
 
@@ -241,9 +250,9 @@ def main():
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
         # './NLProofS/outputs/00.create_cc100_corpus.py/',
 
-        './outputs/00.fix_FLD_schema.py/2023-05-15/',
-
-        './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
+        # './outputs/00.fix_FLD_schema.py/2023-05-15/',
+        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
+        './outputs/00.fix_FLD_schema.py/20230628.make_harder',
     ]
 
     for local_dataset_name in local_dataset_names:

@@ -17,6 +17,7 @@ python ./run_summarization.py \
     --validation_file "${DATASET_JSONL}" \
     --source_prefix "summarize: " \
     --output_dir "${OUTPUT_DIR}" \
+    --torch_compile=true \
     --overwrite_output_dir \
     --per_device_train_batch_size=4 \
     --per_device_eval_batch_size=4 \

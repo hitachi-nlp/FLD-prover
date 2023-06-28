@@ -399,7 +399,6 @@ def main():
         if data_args.test_file is not None:
             data_files["test"] = data_args.test_file
             extension = data_args.test_file.split(".")[-1]
-        import pudb; pudb.set_trace()
         raw_datasets = load_dataset(
             extension,
             data_files=data_files,
