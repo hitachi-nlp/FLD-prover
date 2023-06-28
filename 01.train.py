@@ -152,7 +152,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
 
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
-    output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
+    # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -167,10 +168,10 @@ def main():
 
 
         # ---------------------------------- 20230628.make_harder ------------------------------------
-        '20230626.many_bugs_fixed.D3.hard',
+        # '20230626.many_bugs_fixed.D3.hard',
         '20230626.many_bugs_fixed.D8.hard',
 
-        '20230626.many_bugs_fixed.D3.hard.dist-trees',
+        # '20230626.many_bugs_fixed.D3.hard.dist-trees',
         '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
     ]
@@ -178,12 +179,12 @@ def main():
     # use_test_as_train = True  # debug
     use_test_as_train = False
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'
 
     # max_steps = 300
     max_steps = None
@@ -191,14 +192,14 @@ def main():
     # eval_steps = 300
     eval_steps = None
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    do_torchrun = False  # for debug
+    # do_torchrun = True
 
     lrates = [
         1e-4,

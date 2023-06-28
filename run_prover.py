@@ -67,6 +67,7 @@ from FLD_prover import (
     preprocess_examples_eval,
 )
 from FLD_task.proof import prettify_proof_text, prettify_context_text
+from FLD_prover.utils import tokenize_with_log
 import kern_profiler
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -642,11 +643,11 @@ def main():
         return inputs, targets, gold_proofs
 
     def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
-        return tokenizer(inputs, max_length=max_length, padding=padding, truncation=True)
+        return tokenize_with_log(tokenizer, text=inputs, max_length=max_length, padding=padding, truncation=True)
 
     def prepare_model_targets(targets: List[str], max_length: int) -> Dict[str, List[Any]]:
         # Tokenize targets with the `text_target` keyword argument
-        labels = tokenizer(text_target=targets, max_length=max_length, padding=padding, truncation=True)
+        labels = tokenize_with_log(tokenizer, text_target=targets, max_length=max_length, padding=padding, truncation=True)
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
         # padding in the loss.
