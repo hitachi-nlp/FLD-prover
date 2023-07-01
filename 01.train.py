@@ -154,9 +154,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
+    output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
 
     local_dataset_names = [
-        'FLD.debug.2023-05-13',
+        # 'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
@@ -180,33 +181,36 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard',
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
+        # ---------------------------------- 20230701.finalize ------------------------------------
+        '20230701.D3.default',
+        '20230701.D8.default',
     ]
 
-    use_test_as_train = True  # debug
-    # use_test_as_train = False
+    # use_test_as_train = True  # debug
+    use_test_as_train = False
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'
+    shot = 'FT.step-20000'
 
-    max_steps = 100
-    # max_steps = None
+    # max_steps = 100
+    max_steps = None
 
-    eval_steps = 100
-    # eval_steps = None
+    # eval_steps = 100
+    eval_steps = None
 
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
-    n_gpus = 1  # debug
-    # n_gpus = 4
+    # n_gpus = 1  # debug
+    n_gpus = 4
 
     do_torchrun = False  # for debug
     # do_torchrun = True
@@ -260,7 +264,8 @@ def main():
 
         # './outputs/00.fix_FLD_schema.py/2023-05-15/',
         # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
-        './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        './outputs/00.fix_FLD_schema.py/20230701.finalize',
     ]
 
     for local_dataset_name in local_dataset_names:

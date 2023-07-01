@@ -513,7 +513,7 @@ def get_dataset_setting(name: str) -> Dict[str, Any]:
             'predict_with_generate': True,
             'remove_unused_columns': False,
         }
-    elif name.startswith('20230626.many_bugs_fixed'):
+    elif name.startswith('2023'):
         return {
             'file_type': 'json',
             'predict_with_generate': True,
@@ -1125,7 +1125,7 @@ SHOT_SETTINGS = {
         'max_predict_samples': 1000,
 
         'max_steps': 20000,
-        'eval_steps': 4000,
+        'eval_steps': 5000,
         'warmup_steps': 1000,
     },
 
