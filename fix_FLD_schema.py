@@ -7,7 +7,7 @@ from pathlib import Path
 import click
 
 from logger_setup import setup as setup_logger
-from FLD_task.loaders import load
+from FLD_task import load_deduction
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def main(input_path, output_path):
 
     with open(output_path, 'w') as f_out:
         for line in open(input_path):
-            instance = load(json.loads(line.rstrip()))
+            instance = load_deduction(json.loads(line.rstrip()))
             # for key, type_ in schema_conversion.items():
             #     instance[key] = type_(instance[key])
             f_out.write(json.dumps(instance.dict()) + '\n')

@@ -5,7 +5,6 @@ from pathlib import Path
 import click
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
-# from stance_indication import StanceIndicationMethod
 
 from experimental_setting import (
     get_dataset_paths,

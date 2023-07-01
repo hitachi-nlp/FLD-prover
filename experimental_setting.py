@@ -10,7 +10,6 @@ from lab import build_dir
 from script_engine import QsubEngine, SubprocessEngine
 from script_engine.base import EngineBase
 # from pytorch_lightning import Trainer
-# from common import DatasetType
 
 
 logger = logging.getLogger(__name__)
@@ -406,18 +405,6 @@ _DATASET_PATHS = {
 }
 
 
-def guess_dataset_type(local_dataset_name: str) -> str:
-    raise NotImplementedError()
-    if local_dataset_name.startswith('EB-'):
-        return DatasetType.EB.value
-    elif local_dataset_name.startswith('ruletaker'):
-        return DatasetType.RuleTaker.value
-    elif local_dataset_name.startswith('cc100'):
-        return DatasetType.Seq2Seq.value
-    else:
-        return DatasetType.FLNL.value
-
-
 def get_dataset_paths(name: str,
                       top_dirs: List[str],
                       use_test_as_train=False,
@@ -572,7 +559,6 @@ _PROVER_CONFIGS = {
         # 'check_val_every_n_epoch': 1,
         'max_eval_samples': 2000,
         'proof_sampling': 'stepwise',
-        # 'stance_indication_method': NEGATED_HYPOTHESIS_BY_I_DONT_THINK,
         'max_proof_steps': 30,
         'learning_rate': 1e-4,
         'warmup_steps': 1000,
@@ -603,7 +589,6 @@ _PROVER_CONFIGS = {
         # 'path_val': specify_me,
         # 'path_test': specify_me,
 
-        # 'stance_indication_method': NEGATED_HYPOTHESIS_BY_I_DONT_THINK,
         # 'exclude_unknown': False,
         # 'add_final_reference_to_proofs': False,
         # 'sample_goal': intermediates # hypothesis | intermediates,

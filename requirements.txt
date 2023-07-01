@@ -6,20 +6,15 @@ accelerate >= 0.12.0
 datasets >= 1.8.0
 sentencepiece != 0.1.92
 protobuf
-rouge-score
-nltk
 py7zr
 torch >= 1.3
-evaluate
 ete3==3.1.2
 
 # requirements imported from NLProofS
 pypdf3
 sklearn
-strsimpy
 git+https://github.com/google-research/bleurt.git
 
 # others
-pydantic
 logger_setup@git+https://github.com/HonoMi/python-logger-setup.git@master
 script_engine@git+https://github.com/HonoMi/script-engine.git@master

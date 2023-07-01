@@ -8,8 +8,7 @@ from pprint import pprint
 
 from logger_setup import setup as setup_logger
 import click
-from FLD_task.proof import prettify_proof_text, prettify_context_text
-from proof_common import normalize_proof
+from FLD_task import prettify_proof_text, prettify_context_text
 
 
 logger = logging.getLogger(__name__)
@@ -38,11 +37,10 @@ def main(input_path, output_dir, log_level):
             if proof_accuracy > 0.0:
                 continue
 
-            context = normalize_proof(sample['example']['context'])
-            hypothesis = normalize_proof(sample['example']['hypothesis'])
-            # proof_gold = sample['example']['proofs'][0]
+            context = sample['example']['context']
+            hypothesis = sample['example']['hypothesis']
             proof_gold = sample['gold_proof']
-            proof_pred = normalize_proof(sample['reply'])
+            proof_pred = sample['reply']
 
             f_err.write('\n\n\n\n\n')
             f_err.write(f'****************************************** example-{i_line} ******************************************')
