@@ -243,7 +243,7 @@ def main():
         True
     ]
 
-    local_dataset_1_name = None
+    # local_dataset_1_name = None
     # local_dataset_1_name = 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled'
     # local_dataset_1_name = 'ruletaker.ours.20221202'
     # local_dataset_1_name = 'cc100.20221103.small'
@@ -256,9 +256,9 @@ def main():
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
         # './NLProofS/outputs/00.create_cc100_corpus.py/',
 
-        # './outputs/00.fix_FLD_schema.py/2023-05-15/',
-        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
-        './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        # './outputs/00.convert_json_schema.py/2023-05-15/',
+        # './outputs/00.convert_json_schema.py/20230626.many_bugs_fixed',
+        './outputs/00.convert_json_schema.py/20230628.make_harder',
     ]
 
     for local_dataset_name in local_dataset_names:

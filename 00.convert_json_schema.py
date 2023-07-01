@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-05-15')
+    # output_top_dir = Path('./outputs/00.convert_json_schema.py/2023-05-15')
 
-    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed')
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230628.make_harder')
+    # output_top_dir = Path('./outputs/00.convert_json_schema.py/20230626.many_bugs_fixed')
+    output_top_dir = Path('./outputs/00.convert_json_schema.py/20230628.make_harder')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -76,7 +76,7 @@ def main():
             output_path = output_dir / input_path.name
 
             engine.run(
-                f'python ./fix_FLD_schema.py {input_path} {str(output_path)}',
+                f'python ./convert_json_schema.py {input_path} {str(output_path)}',
                 wait_until_finish=True,
                 dry_run=dry_run,
             )
@@ -86,7 +86,7 @@ def main():
                 engine.run(f'cp {str(setting_path)} {str(output_dir)}')
                 is_settings_copied = True
 
-    logger.info('------------- ./00.fix_FLD_schema.py finished !! -----------')
+    logger.info('------------- ./00.convert_json_schema.py finished !! -----------')
 
 
 if __name__ == '__main__':

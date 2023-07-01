@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 import json
-from pathlib import Path
 import logging
 from pathlib import Path
 
 import click
-
 from logger_setup import setup as setup_logger
 from FLD_task import load_deduction
 
@@ -21,19 +19,12 @@ def main(input_path, output_path):
     logger.info('input_path: %s', str(input_path))
     logger.info('output_path: %s', str(output_path))
 
-    # schema_conversion = {
-    #     'answer': str,
-    #     'negative_answer': str,
-    # }
-
     output_path = Path(output_path)
     output_path.parent.mkdir(exist_ok=True, parents=True)
 
     with open(output_path, 'w') as f_out:
         for line in open(input_path):
             instance = load_deduction(json.loads(line.rstrip()))
-            # for key, type_ in schema_conversion.items():
-            #     instance[key] = type_(instance[key])
             f_out.write(json.dumps(instance.dict()) + '\n')
 
 
