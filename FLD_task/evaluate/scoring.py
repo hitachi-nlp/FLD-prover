@@ -100,7 +100,7 @@ def calc_metrics(proof_gold_texts: List[str],
                  context: Optional[str] = None,
                  similarity_threshold=False,
                  allowed_additional_proof_steps=0,
-                 disallow_any_proof_for_unknown=True,
+                 allow_any_proof_for_unknown=False,
                  zero_one: bool = True) -> Dict[str, Any]:
     if len(proof_gold_texts) >= 2:
         raise NotImplementedError()
@@ -121,7 +121,7 @@ def calc_metrics(proof_gold_texts: List[str],
         context=context,
         similarity_threshold=similarity_threshold,
         allowed_additional_proof_steps=allowed_additional_proof_steps,
-        disallow_any_proof_for_unknown=disallow_any_proof_for_unknown,
+        allow_any_proof_for_unknown=allow_any_proof_for_unknown,
         zero_one=zero_one,
     )
     metrics['proof_accuracy.zero_one'] = zero_one_acc
@@ -138,7 +138,7 @@ def calc_accuracy(proof_gold_text: str,
                   context: Optional[str] = None,
                   similarity_threshold=False,
                   allowed_additional_proof_steps=0,
-                  disallow_any_proof_for_unknown=True,
+                  allow_any_proof_for_unknown=False,
                   zero_one: bool = True) -> float:
     proof_gold_text = normalize_proof(proof_gold_text)
     proof_pred_text = normalize_proof(proof_pred_text)
@@ -149,7 +149,7 @@ def calc_accuracy(proof_gold_text: str,
     if set(gold_labels) != set(pred_labels):
         return 0.0
 
-    if not disallow_any_proof_for_unknown and set(gold_labels) == set([StanceMarker.UNKNOWN]):
+    if allow_any_proof_for_unknown and set(gold_labels) == set([StanceMarker.UNKNOWN]):
         return 1.0
     else:
         try:
@@ -517,3 +517,28 @@ def _make_assumption_mapping(proof_gold_text: str,
         pred_id_to_uid[f'[{pred_id}]'] = f'[{pred_uid}]'
 
     return gold_id_to_uid, pred_id_to_uid
+
+
+def build_metrics(type_: str) -> Callable[[List[str], str], Dict[str, float]]:
+    """ A thin wrapper to bind the settings"""
+    if type_ == 'strict':
+        def calc(gold_proofs: List[str], pred_proof: str) -> Dict[str, float]:
+            return calc_metrics(
+                gold_proofs,
+                pred_proof,
+                similarity_threshold=False,
+                allowed_additional_proof_steps=0,
+                allow_any_proof_for_unknown=False,
+            )
+    elif type_ == 'allow_extra_steps':
+        def calc(gold_proofs: List[str], pred_proof: str) -> Dict[str, float]:
+            return calc_metrics(
+                gold_proofs,
+                pred_proof,
+                similarity_threshold=False,
+                allowed_additional_proof_steps=5,
+                allow_any_proof_for_unknown=True,
+            )
+    else:
+        raise ValueError(f'Unknown metrics type {type_}')
+    return calc

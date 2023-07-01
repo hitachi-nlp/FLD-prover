@@ -25,7 +25,8 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230529.use_fixed_translation_for_LLM.fewshot_label_wise')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230601.fix_translation')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers')
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers')
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -34,7 +35,10 @@ def main():
         # './FLD-generator/outputs/10.create_FLD_corpus/20230529.use_fixed_translation_for_LLM',
         # './FLD-generator/outputs/10.create_FLD_corpus/20230601.fix_translation',
         # './FLD-generator/outputs/10.create_FLD_corpus/20230615.formula_checkers',
-        './FLD-generator/outputs/10.create_FLD_corpus/20230621.formula_checkers',
+        # './FLD-generator/outputs/10.create_FLD_corpus/20230621.formula_checkers',
+
+        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
+        './outputs/00.fix_FLD_schema.py/20230628.make_harder',
     ]
 
     local_dataset_names = [
@@ -55,7 +59,21 @@ def main():
 
         # ---------------------------------- 20230621.formula_checkers ------------------------------------
         # '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
-        '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist',
+        # '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist',
+
+
+        # ---------------------------------- 20230628.make_harder ------------------------------------
+        # '20230626.many_bugs_fixed.D3.hard',
+        # '20230626.many_bugs_fixed.D3.hard.dist-trees',
+        # '20230626.many_bugs_fixed.D3.hard.unk-0.1',
+        # '20230626.many_bugs_fixed.D3.hard.brnch-high',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-1.0',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.5',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
+        # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
+
+        '20230626.many_bugs_fixed.D8.hard',
+        # '20230626.many_bugs_fixed.D8.hard.dist-trees',
     ]
 
     prompt_types = [
@@ -70,7 +88,8 @@ def main():
         # 6,  # for chatGPT web, which have limited context length.
 
         # 10,
-        20,  # XXX: should use 20 so that LLMs can understand the complicated format of our dataset.
+        15,
+        # 20,  # XXX: should use 20 so that LLMs can understand the complicated format of our dataset.
 
         # -- over token limit = 8k token --
         # 30,

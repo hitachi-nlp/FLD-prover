@@ -153,10 +153,10 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
-    output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
+    # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
 
     local_dataset_names = [
-        # 'FLD.debug.2023-05-13',
+        'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
@@ -168,52 +168,57 @@ def main():
 
 
         # ---------------------------------- 20230628.make_harder ------------------------------------
-        '20230626.many_bugs_fixed.D3.hard',
-        # '20230626.many_bugs_fixed.D8.hard',
-
+        # '20230626.many_bugs_fixed.D3.hard',
         # '20230626.many_bugs_fixed.D3.hard.dist-trees',
+        # '20230626.many_bugs_fixed.D3.hard.unk-0.1',
+        # '20230626.many_bugs_fixed.D3.hard.brnch-high',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-1.0',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.5',
+        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
+        # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
+
+        # '20230626.many_bugs_fixed.D8.hard',
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
     ]
 
-    scoring_disallow_any_proof_for_unknown, scoring_allowed_additional_proof_steps = True, 0
-    # scoring_disallow_any_proof_for_unknown, scoring_allowed_additional_proof_steps = False, 5
+    use_test_as_train = True  # debug
+    # use_test_as_train = False
 
-    # use_test_as_train = True  # debug
-    use_test_as_train = False
-
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-8100'
+    # shot = 'FT.step-20000'
 
-    # max_steps = 300
-    max_steps = None
+    max_steps = 100
+    # max_steps = None
 
-    # eval_steps = 300
-    eval_steps = None
+    eval_steps = 100
+    # eval_steps = None
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    # max_eval_samples = 500  # for short evaluation
+    max_eval_samples = None
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
-    lrates = [
-        1e-4,
-        # 5e-5,
-    ]
+    do_torchrun = False  # for debug
+    # do_torchrun = True
 
     # ------------------------ fixed ------------------------
     dry_run = False
     hours = 24
 
-    max_eval_samples = 500  # for short evaluation
+    lrates = [
+        1e-4,
+        # 5e-5,
+    ]
 
     seeds = [
         0,
@@ -232,7 +237,6 @@ def main():
     ]
 
     do_predict = False
-    scoring_similarity_threshold = False
     use_test_as_val = True
     do_transfer_on_same_dataset = True
 
@@ -366,9 +370,6 @@ def main():
                                 # 'stance_indication_method': StanceIndicationMethod.STANCE_MARKER_IN_PROOF.value,
                                 # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                                 'shot': shot,
-                                'scoring_similarity_threshold': scoring_similarity_threshold,
-                                'scoring_allowed_additional_proof_steps': scoring_allowed_additional_proof_steps,
-                                'scoring_disallow_any_proof_for_unknown': scoring_disallow_any_proof_for_unknown,
                                 'sample_negative_proof': sample_negative_proof,
 
                                 'learning_rate': _lrate,

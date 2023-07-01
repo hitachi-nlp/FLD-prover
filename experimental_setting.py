@@ -591,8 +591,6 @@ _PROVER_CONFIGS = {
         'max_source_length': 512,
         # 'tokenizer_padding': longest,
         'max_target_length': 64,
-        'scoring_similarity_threshold': False,
-        'scoring_allowed_additional_proof_steps': 0,
 
         'logging_strategy': 'steps',
         'logging_steps': 25,
@@ -1105,6 +1103,18 @@ SHOT_SETTINGS = {
         'warmup_steps': 1000,
     },
 
+    'FT.step-8100': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 1000,
+        'max_predict_samples': 1000,
+
+        'max_steps': 8100,
+        'eval_steps': 4000,
+        'warmup_steps': 1000,
+    },
+
     # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
     # -- pre-training: FLNL (arg-FLNL)
     'FT.step-20000': {
@@ -1253,7 +1263,6 @@ def make_command(output_dir: Union[str, Path],
         'shot',
         'max_proof_steps',
         'local_dataset_name',
-        'scoring_allowed_additional_proof_steps',
         'n_proc_per_node',
     ]
 

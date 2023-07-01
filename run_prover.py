@@ -58,7 +58,7 @@ from transformers.utils import check_min_version, is_offline_mode, send_example_
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
 
-from FLD_task.evaluate.scoring import calc_metrics
+from FLD_task.evaluate.scoring import build_metrics
 from FLD_task.proof import InvalidProof, InvalidProofStep
 from stance_indication import get_stance_markers
 from FLD_prover import (
@@ -294,18 +294,6 @@ class DataTrainingArguments:
 
     generation_top_k: int = field(
         default=30,
-    )
-
-    scoring_similarity_threshold: bool = field(
-        default=False,
-    )
-
-    scoring_allowed_additional_proof_steps: int = field(
-        default=0,
-    )
-
-    scoring_disallow_any_proof_for_unknown: bool = field(
-        default=False,
     )
 
     log_examples: bool = field(
@@ -780,6 +768,11 @@ def main():
         result = {k: round(v * 100, 4) for k, v in result.items()}
         return result
 
+    metric_funcs = {
+        'strct': build_metrics('strict'),
+        'extr_stps': build_metrics('allow_extra_steps'),
+    }
+
     def compute_metrics(eval_preds, dataloader=None) -> Dict[str, Any]:
         preds, labels = eval_preds
         if isinstance(preds, tuple):
@@ -803,17 +796,9 @@ def main():
 
         metrics: Dict[str, List[Any]] = defaultdict(list)
         for i_example, (proof_gt, proof_pred, example) in enumerate(zip(decoded_labels, decoded_preds, examples)):
-            _metrics = calc_metrics(
-                [proof_gt],
-                proof_pred,
-                similarity_threshold=data_args.scoring_similarity_threshold,
-                allowed_additional_proof_steps=data_args.scoring_allowed_additional_proof_steps,
-                disallow_any_proof_for_unknown=data_args.scoring_disallow_any_proof_for_unknown,
-            )
-            depths = ['all'] if example is None else ['all', str(example['depth'])]
-            for depth in depths:
-                for metric_name, metric_val in _metrics.items():
-                    metrics[f"D-{depth}.{metric_name}"].append(metric_val)
+            logger.info('')
+            logger.info('')
+            logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
             if example is not None:
                 input_ids = example['input_ids']
@@ -825,10 +810,6 @@ def main():
             else:
                 context = None
                 hypothesis = None
-
-            logger.info('')
-            logger.info('')
-            logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
             if context is not None:
                 try:
@@ -843,11 +824,21 @@ def main():
 
             logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred, indent=4))
 
-            log_texts, log_args = [], []
-            for metric_name, metric_val in sorted(_metrics.items()):
-                log_texts.append('%-20s: %5.2f')
-                log_args.extend([metric_name, metric_val])
-            logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
+            for metric_type, calc_metrics in metric_funcs.items():
+                _metrics = calc_metrics(
+                    [proof_gt],
+                    proof_pred,
+                )
+                depths = ['all'] if example is None else ['all', str(example['depth'])]
+                for depth in depths:
+                    for metric_name, metric_val in _metrics.items():
+                        metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
+
+                log_texts, log_args = [], []
+                for metric_name, metric_val in sorted(_metrics.items()):
+                    log_texts.append('%-20s: %5.2f')
+                    log_args.extend([f"{metric_type}.{metric_name}", metric_val])
+                logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
