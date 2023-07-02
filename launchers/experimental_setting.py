@@ -565,7 +565,7 @@ _PROVER_CONFIGS = {
         'model_name_or_path': 't5-large',
         # 'fp16': True,
 
-        'source_prefix': 'Let\'s think step-by-step the following problem. ',
+        'source_prefix': 'Solve FLD task:',
         'generation_num_beams': 10,
         'generation_top_k': 10,
         'generation_max_proof_steps': 20,

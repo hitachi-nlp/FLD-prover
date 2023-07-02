@@ -66,7 +66,7 @@ from FLD_prover import (
     preprocess_examples_train,
     preprocess_examples_eval,
 )
-import line_profiler
+import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.29.0.dev0")

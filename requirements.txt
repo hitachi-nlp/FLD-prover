@@ -15,5 +15,6 @@ langchain
 openai
 tqdm
 pydantic
+colorlog
 
 line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main

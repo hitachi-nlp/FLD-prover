@@ -152,10 +152,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
-    output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
+    # output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
-        # 'FLD.debug.2023-05-13',
+        'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
@@ -180,20 +181,20 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
         # ---------------------------------- 20230701.finalize ------------------------------------
-        '20230701.D3.default',
-        '20230701.D8.default',
+        # '20230701.D3.default',
+        # '20230701.D8.default',
     ]
 
-    # use_test_as_train = True  # debug
-    use_test_as_train = False
+    use_test_as_train = True  # debug
+    # use_test_as_train = False
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -204,17 +205,17 @@ def main():
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
     do_torchrun = False  # for debug
     # do_torchrun = True
 
     # ------------------------ fixed ------------------------
-    dry_run = False
+    dry_run = True
     hours = 24
 
     lrates = [
@@ -287,6 +288,7 @@ def main():
                     setting['eval_steps'] = eval_steps
                 if setting['eval_steps'] > max_steps:
                     setting['eval_steps'] = max_steps
+            setting['save_steps'] = setting.get('eval_steps', None)
                 
             setting.update(dataset_setting)
             setting.update({
@@ -366,7 +368,6 @@ def main():
                                 for key, val in found_checkpoint_spec.dict().items()
                                 if key != 'name_or_local_dataset_name'
                             })
-                            all_setting['save_steps'] = all_setting['eval_steps']
 
                             output_dir = make_output_dir(all_setting, output_top_dir)
                             command = make_command(output_dir,
