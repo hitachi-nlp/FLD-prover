@@ -18,8 +18,9 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
     # output_top_dir = Path('./outputs/00.convert_json_schema.py/2023-05-15')
 
-    # output_top_dir = Path('./outputs/00.convert_json_schema.py/20230626.many_bugs_fixed')
-    output_top_dir = Path('./outputs/00.convert_json_schema.py/20230628.make_harder')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230628.make_harder')
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230701.finalize')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -38,10 +39,14 @@ def main():
         # '20230626.many_bugs_fixed.D3.hard.dist-neg-1.0',
         # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.5',
         # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
-        '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
+        # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
 
         # '20230626.many_bugs_fixed.D8.hard',
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
+
+        # ---------------------------------- 20230701.finalize ------------------------------------
+        '20230701.D3.default',
+        '20230701.D8.default',
     ]
 
     engine = SubprocessEngine()
@@ -56,6 +61,7 @@ def main():
 
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
         './NLProofS/outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
+        './NLProofS/outputs.FLD/10.create_FLD_corpus/20230701.finalize'
     ]
 
     for local_dataset_name in local_dataset_names:
