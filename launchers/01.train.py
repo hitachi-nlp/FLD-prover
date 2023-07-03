@@ -17,6 +17,7 @@ from experimental_setting import (
     get_dataset_paths,
     get_dataset_setting,
     get_batch_setting,
+    get_logging_step_setting,
     make_output_dir,
     make_command,
     run_by_engine,
@@ -156,7 +157,7 @@ def main():
     output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
-        'FLD.debug.2023-05-13',
+        # 'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
@@ -181,20 +182,20 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
         # ---------------------------------- 20230701.finalize ------------------------------------
-        # '20230701.D3.default',
+        '20230701.D3.default',
         # '20230701.D8.default',
     ]
 
-    use_test_as_train = True  # debug
-    # use_test_as_train = False
+    # use_test_as_train = True  # debug
+    use_test_as_train = False
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'
+    shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -205,14 +206,14 @@ def main():
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
-    n_gpus = 1  # debug
-    # n_gpus = 4
+    # n_gpus = 1  # debug
+    n_gpus = 4
 
-    do_torchrun = False  # for debug
-    # do_torchrun = True
+    # do_torchrun = False  # for debug
+    do_torchrun = True
 
     # ------------------------ fixed ------------------------
     dry_run = True
@@ -272,31 +273,12 @@ def main():
                                           DATASETS_DIRS,
                                           use_test_as_val=use_test_as_val,
                                           use_test_as_train=use_test_as_train)
-        dataset_setting = get_dataset_setting(local_dataset_name)
 
         for split_name, path in dataset_paths.items():
             if not Path(path).exists:
                 raise Exception(f'{split_name} dataset does not exist at {path}')
 
         for sample_negative_proof in sample_negative_proof_args:
-
-            setting = SHOT_SETTINGS[shot]
-            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
-            if max_steps is not None:
-                setting['max_steps'] = max_steps
-                if eval_steps is not None:
-                    setting['eval_steps'] = eval_steps
-                if setting['eval_steps'] > max_steps:
-                    setting['eval_steps'] = max_steps
-            setting['save_steps'] = setting.get('eval_steps', None)
-                
-            setting.update(dataset_setting)
-            setting.update({
-                'do_train': 'train_file' in dataset_paths,
-                'do_eval': 'validation_file' in dataset_paths,
-                # 'do_predict': 'test_file' in dataset_paths,
-                'do_predict': do_predict,
-            })
 
             for seed in seeds:
                 for checkpoint_name in checkpoint_names:
@@ -332,18 +314,37 @@ def main():
                     for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
 
                         for _lrate in lrates:
+                            setting = dataset_paths.copy()
+                            dataset_setting = get_dataset_setting(local_dataset_name)
+                            setting.update(dataset_setting)
+                            setting.update({
+                                'do_train': 'train_file' in dataset_paths,
+                                'do_eval': 'validation_file' in dataset_paths,
+                                # 'do_predict': 'test_file' in dataset_paths,
+                                'do_predict': do_predict,
+                            })
 
                             base_config_name = get_default_config_name(local_dataset_name)
-                            all_setting = get_config(base_config_name)
+                            base_setting = get_config(base_config_name)
+                            setting.update(base_setting)
 
-                            all_setting.update({
+                            shot_setting = SHOT_SETTINGS[shot].copy()
+                            setting.update(shot_setting)
+
+                            batch_setting = get_batch_setting(checkpoint_path, n_gpus)
+                            setting.update(batch_setting)
+
+                            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
+
+                            setting.update(get_logging_step_setting(max_steps=max_steps,
+                                                                    eval_steps=eval_steps))
+
+                            setting.update({
                                 'seed': seed,
 
                                 'local_dataset_name': local_dataset_name,
-                                # 'exclude_unknown': False,
 
                                 'base_config_name': base_config_name,
-                                # 'base_config_path': base_config_path,
 
                                 'checkpoint_name': checkpoint_name,
                                 'checkpoint_path': checkpoint_path,
@@ -360,18 +361,16 @@ def main():
 
                                 'log_examples': True,
                             })
-                            all_setting.update(dataset_paths)
-                            all_setting.update(get_batch_setting(all_setting['model_name_or_path'], n_gpus))
-                            all_setting.update(setting)
-                            all_setting.update({
+
+                            setting.update({
                                 f'ckpt_{key}': val
                                 for key, val in found_checkpoint_spec.dict().items()
                                 if key != 'name_or_local_dataset_name'
                             })
 
-                            output_dir = make_output_dir(all_setting, output_top_dir)
+                            output_dir = make_output_dir(setting, output_top_dir)
                             command = make_command(output_dir,
-                                                   all_setting,
+                                                   setting,
                                                    'torchrun' if do_torchrun else 'debug',
                                                    n_gpus=n_gpus)
 

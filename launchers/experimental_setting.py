@@ -565,7 +565,7 @@ _PROVER_CONFIGS = {
         'model_name_or_path': 't5-large',
         # 'fp16': True,
 
-        'source_prefix': 'Solve FLD task:',
+        'source_prefix': 'Solve FLD task: ',
         'generation_num_beams': 10,
         'generation_top_k': 10,
         'generation_max_proof_steps': 20,
@@ -1194,6 +1194,20 @@ def get_checkpoints(spec: CheckpointSpec,
                     checkpoints.append((str(checkpoint), found_spec))
 
         return checkpoints
+
+
+def get_logging_step_setting(max_steps: Optional[int] = None,
+                             eval_steps: Optional[int] = None) -> Dict[str, Any]:
+    setting = {}
+    if max_steps is not None:
+        setting['max_steps'] = max_steps
+        if eval_steps is not None:
+            setting['eval_steps'] = eval_steps
+        if setting['eval_steps'] > max_steps:
+            setting['eval_steps'] = max_steps
+    setting['save_steps'] = setting.get('eval_steps', None)
+    return setting
+
 
 
 def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> Dict[str, Any]:
