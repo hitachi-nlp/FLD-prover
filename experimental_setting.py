@@ -1137,7 +1137,7 @@ SHOT_SETTINGS = {
         'num_train_epochs': None,
 
         'max_steps': 300,
-        'eval_steps': 300,
+        'eval_steps': 150,
         'warmup_steps': 0,
     },
 

@@ -11,7 +11,7 @@ import click
 from FLD_task.loaders import load
 from FLD_task.schema import DeductionExample, SerializedDeductionStep
 from FLD_task.preprocess import serialize
-import kern_profiler
+import line_profiling
 
 
 logger = logging.getLogger(__name__)

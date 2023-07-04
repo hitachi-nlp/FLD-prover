@@ -154,7 +154,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
-    output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
+    # output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
+    output_top_dir = Path('./outputs/01.train.py/debug/eval_steps-149')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -183,19 +184,23 @@ def main():
 
         # ---------------------------------- 20230701.finalize ------------------------------------
         '20230701.D3.default',
-        '20230701.D8.default',
+        # '20230701.D3.wo_transl_dist',
+        # '20230701.D3.brnch-small',
+        # '20230701.D3.dist-small',
+
+        # '20230701.D8.default',
     ]
 
     # use_test_as_train = True  # debug
     use_test_as_train = False
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -212,12 +217,12 @@ def main():
     # n_gpus = 1  # debug
     n_gpus = 4
 
-    do_torchrun = False  # for debug
-    # do_torchrun = True
+    # do_torchrun = False  # for debug
+    do_torchrun = True
 
     # ------------------------ fixed ------------------------
     dry_run = False
-    hours = 24
+    hours = 48
 
     lrates = [
         1e-4,

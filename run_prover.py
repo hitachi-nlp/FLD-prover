@@ -68,7 +68,7 @@ from FLD_prover import (
 )
 from FLD_task.proof import prettify_proof_text, prettify_context_text
 from FLD_prover.utils import tokenize_with_log
-import kern_profiler
+import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.29.0.dev0")

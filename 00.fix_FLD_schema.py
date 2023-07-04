@@ -46,8 +46,12 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
         # ---------------------------------- 20230701.finalize ------------------------------------
-        '20230701.D3.default',
-        '20230701.D8.default',
+        # '20230701.D3.default',
+        '20230701.D3.wo_transl_dist',
+        '20230701.D3.brnch-small',
+        '20230701.D3.dist-small',
+
+        # '20230701.D8.default',
     ]
 
     engine = SubprocessEngine()
