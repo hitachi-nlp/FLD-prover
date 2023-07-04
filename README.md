@@ -16,7 +16,7 @@ $ pip install -r ./requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task
 ```
 
-## How to run
+## How to train a prover
 1. Download the FLD corpus from [FLD-corpus](https://github.com/hitachi-nlp/FLD-corpus), or, create your own using [FLD-generator](https://github.com/hitachi-nlp/FLD-generator.git)
 1. Convert json schema of the original corpus to fit the prover script:
 
