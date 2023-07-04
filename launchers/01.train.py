@@ -9,7 +9,6 @@ import math
 import click
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
-# from stance_indication import StanceIndicationMethod
 
 from experimental_setting import (
     get_config,
@@ -18,10 +17,10 @@ from experimental_setting import (
     get_dataset_paths,
     get_dataset_setting,
     get_batch_setting,
+    get_logging_step_setting,
     make_output_dir,
     make_command,
     run_by_engine,
-    guess_dataset_type,
     CheckpointSpec,
     ICML_2023_NL_TRANSFER_MAJOR_DATASETS,
     ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH,
@@ -155,7 +154,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
     # output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
-    output_top_dir = Path('./outputs/01.train.py/debug/eval_steps-149')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -187,7 +186,6 @@ def main():
         # '20230701.D3.wo_transl_dist',
         # '20230701.D3.brnch-small',
         # '20230701.D3.dist-small',
-
         # '20230701.D8.default',
     ]
 
@@ -254,7 +252,7 @@ def main():
         True
     ]
 
-    local_dataset_1_name = None
+    # local_dataset_1_name = None
     # local_dataset_1_name = 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled'
     # local_dataset_1_name = 'ruletaker.ours.20221202'
     # local_dataset_1_name = 'cc100.20221103.small'
@@ -278,52 +276,12 @@ def main():
                                           DATASETS_DIRS,
                                           use_test_as_val=use_test_as_val,
                                           use_test_as_train=use_test_as_train)
-        dataset_setting = get_dataset_setting(local_dataset_name)
 
         for split_name, path in dataset_paths.items():
             if not Path(path).exists:
                 raise Exception(f'{split_name} dataset does not exist at {path}')
 
-        if local_dataset_1_name is not None:
-            _dataset_1_paths = get_dataset_paths(local_dataset_1_name,
-                                                 DATASETS_DIRS,
-                                                 use_test_as_val=use_test_as_val,
-                                                 use_test_as_train=use_test_as_train)
-            for split_name, path in _dataset_1_paths.items():
-                if not Path(path).exists:
-                    raise Exception(f'{split_name} dataset does not exist at {path}')
-
-            dataset_1_type = guess_dataset_type(local_dataset_1_name)
-
-            dataset_1_paths = {
-                'dataset_1': dataset_1_type,
-                'train_file_1': _dataset_1_paths['train_file']
-
-                # currently, the different types of datasets can not be used in valid and test split, due to the limitation of the EntailmentWriter()
-                # 'validation_file_1': dataset_1_paths['validation_file']
-                # 'test_file_1': dataset_1_paths['test_file']
-            }
-        else:
-            dataset_1_paths = {}
-
         for sample_negative_proof in sample_negative_proof_args:
-
-            setting = SHOT_SETTINGS[shot]
-            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
-            if max_steps is not None:
-                setting['max_steps'] = max_steps
-                if eval_steps is not None:
-                    setting['eval_steps'] = eval_steps
-                if setting['eval_steps'] > max_steps:
-                    setting['eval_steps'] = max_steps
-                
-            setting.update(dataset_setting)
-            setting.update({
-                'do_train': 'train_file' in dataset_paths,
-                'do_eval': 'validation_file' in dataset_paths,
-                # 'do_predict': 'test_file' in dataset_paths,
-                'do_predict': do_predict,
-            })
 
             for seed in seeds:
                 for checkpoint_name in checkpoint_names:
@@ -359,25 +317,42 @@ def main():
                     for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
 
                         for _lrate in lrates:
+                            setting = dataset_paths.copy()
+                            dataset_setting = get_dataset_setting(local_dataset_name)
+                            setting.update(dataset_setting)
+                            setting.update({
+                                'do_train': 'train_file' in dataset_paths,
+                                'do_eval': 'validation_file' in dataset_paths,
+                                # 'do_predict': 'test_file' in dataset_paths,
+                                'do_predict': do_predict,
+                            })
 
                             base_config_name = get_default_config_name(local_dataset_name)
-                            all_setting = get_config(base_config_name)
+                            base_setting = get_config(base_config_name)
+                            setting.update(base_setting)
 
-                            all_setting.update({
+                            shot_setting = SHOT_SETTINGS[shot].copy()
+                            setting.update(shot_setting)
+
+                            batch_setting = get_batch_setting(checkpoint_path, n_gpus)
+                            setting.update(batch_setting)
+
+                            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
+
+                            setting.update(get_logging_step_setting(max_steps=max_steps,
+                                                                    eval_steps=eval_steps))
+
+                            setting.update({
                                 'seed': seed,
 
                                 'local_dataset_name': local_dataset_name,
-                                'local_dataset_1_name': local_dataset_1_name,
-                                # 'exclude_unknown': False,
 
                                 'base_config_name': base_config_name,
-                                # 'base_config_path': base_config_path,
 
                                 'checkpoint_name': checkpoint_name,
                                 'checkpoint_path': checkpoint_path,
                                 'model_name_or_path': checkpoint_path,
 
-                                # 'stance_indication_method': StanceIndicationMethod.STANCE_MARKER_IN_PROOF.value,
                                 # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                                 'shot': shot,
                                 'sample_negative_proof': sample_negative_proof,
@@ -389,35 +364,16 @@ def main():
 
                                 'log_examples': True,
                             })
-                            all_setting.update(dataset_paths)
-                            all_setting.update(dataset_1_paths)
-                            all_setting.update(get_batch_setting(all_setting['model_name_or_path'], n_gpus))
-                            all_setting.update(setting)
-                            all_setting.update({
+
+                            setting.update({
                                 f'ckpt_{key}': val
                                 for key, val in found_checkpoint_spec.dict().items()
                                 if key != 'name_or_local_dataset_name'
                             })
-                            all_setting['save_steps'] = all_setting['eval_steps']
 
-                            # if all_setting.get('max_steps', None) is not None:
-                            #     all_setting['num_train_epochs'] = -1
-
-                            # if all_setting.get('num_val_stage_throught_training', None) is not None:
-                            #     all_setting.update(make_val_interval_setting(all, dataset_paths['train_file']))
-
-                            # if 'train_file' in dataset_paths:
-                            #     dataset_setting_path = Path(dataset_paths['train_file']).parent / 'lab.params.json'
-                            #     if dataset_setting_path.exists():
-                            #         dataset_setting = json.load(open(str(dataset_setting_path)))
-                            #         all_setting.update({
-                            #             f'dataset_setting.{key}': val
-                            #             for key, val in dataset_setting.items()
-                            #         })
-
-                            output_dir = make_output_dir(all_setting, output_top_dir)
+                            output_dir = make_output_dir(setting, output_top_dir)
                             command = make_command(output_dir,
-                                                   all_setting,
+                                                   setting,
                                                    'torchrun' if do_torchrun else 'debug',
                                                    n_gpus=n_gpus)
 

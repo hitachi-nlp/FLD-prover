@@ -58,16 +58,14 @@ from transformers.utils import check_min_version, is_offline_mode, send_example_
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
 
-from FLD_task.evaluate.scoring import build_metrics
-from FLD_task.proof import InvalidProof, InvalidProofStep
-from stance_indication import get_stance_markers
+from FLD_task import build_metrics, prettify_context_text, prettify_proof_text
+from FLD_task.proof import get_stance_markers
+from FLD_prover.utils import tokenize_with_log
 from FLD_prover import (
     StepWiseGenerationTrainer,
     preprocess_examples_train,
     preprocess_examples_eval,
 )
-from FLD_task.proof import prettify_proof_text, prettify_context_text
-from FLD_prover.utils import tokenize_with_log
 import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.

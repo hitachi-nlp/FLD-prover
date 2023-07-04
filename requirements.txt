@@ -1,25 +1,20 @@
-# transformers latest version is required.
 git+https://github.com/huggingface/transformers
+git+https://github.com/google-research/bleurt.git
 
-# requirements for ./run_FLD.py
 accelerate >= 0.12.0
 datasets >= 1.8.0
 sentencepiece != 0.1.92
 protobuf
-rouge-score
-nltk
 py7zr
 torch >= 1.3
-evaluate
 ete3==3.1.2
+numpy
+evaluate
 
-# requirements imported from NLProofS
-pypdf3
-sklearn
-strsimpy
-git+https://github.com/google-research/bleurt.git
-
-# others
+langchain
+openai
+tqdm
 pydantic
-logger_setup@git+https://github.com/HonoMi/python-logger-setup.git@master
-script_engine@git+https://github.com/HonoMi/script-engine.git@master
+colorlog
+
+line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main

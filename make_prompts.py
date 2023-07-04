@@ -8,9 +8,12 @@ from collections import defaultdict
 
 from logger_setup import setup as setup_logger
 import click
-from FLD_task.loaders import load
-from FLD_task.schema import DeductionExample, SerializedDeductionStep
-from FLD_task.preprocess import serialize
+from FLD_task(
+    load_deduction,
+    Deduction,
+    SerializedDeduction,
+    serialize,
+)
 import line_profiling
 
 
@@ -18,12 +21,12 @@ logger = logging.getLogger(__name__)
 
 
 def load_examples(path: Union[str, Path])\
-        -> Tuple[List[DeductionExample],
-                 Dict[Union[str, bool], List[DeductionExample]]]:
-    examples: List[DeductionExample] = []
-    label_examples: Dict[Union[str, bool], List[DeductionExample]] = defaultdict(list)
+        -> Tuple[List[Deduction],
+                 Dict[Union[str, bool], List[Deduction]]]:
+    examples: List[Deduction] = []
+    label_examples: Dict[Union[str, bool], List[Deduction]] = defaultdict(list)
     for line in open(path):
-        example = load(json.loads(line.rstrip('\n')))
+        example = load_deduction(json.loads(line.rstrip('\n')))
         label = example.answer
 
         examples.append(example)
@@ -128,12 +131,12 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
         train_exs, train_label_exs = load_examples(train_path)
 
     n_shot_per_label = int(n_shot / len(train_label_exs))
-    fweshot_label_exs: Dict[Union[bool, str], List[DeductionExample]] = defaultdict(list)
+    fweshot_label_exs: Dict[Union[bool, str], List[Deduction]] = defaultdict(list)
     for label, label_exs in train_label_exs.items():
         fweshot_label_exs[label].extend(random.sample(label_exs, n_shot_per_label))
 
     # add examples following the label order: labelA, labelB, labelC, labelA, ...
-    fewshot_exs: List[DeductionExample] = []
+    fewshot_exs: List[Deduction] = []
     for i_ex in range(n_shot_per_label):
         for _, label_exs in sorted(fweshot_label_exs.items()):
             fewshot_exs.append(label_exs[i_ex])
@@ -146,7 +149,7 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
         for label, label_exs in eval_label_exs.items()
     }
 
-    def dump_serial(serial: SerializedDeductionStep,
+    def dump_serial(serial: SerializedDeduction,
                     no_label=False) -> str:
         example_text = '============ an example ============'
         input_text = f'---- input ----\n{serial.input}'
@@ -159,7 +162,7 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
     def join_serial_dumps(serial_dumps: List[str]) -> str:
         return '\n\n\n'.join(serial_dumps)
 
-    def _serialize(ex: DeductionExample) -> SerializedDeductionStep:
+    def _serialize(ex: Deduction) -> SerializedDeduction:
         return serialize(ex, stepwise=False, newlines=True, proof_indicator=False)
 
     fewshot_serials = [_serialize(fewshot_ex)

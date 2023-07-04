@@ -3,9 +3,7 @@ from typing import Dict, List, Any, Optional
 from typing import TypedDict
 
 from pydantic import BaseModel
-from FLD_task.schema import DeductionExample
-from FLD_task.loaders import load
-from FLD_task.preprocess import serialize
+from FLD_task import Deduction, load_deduction, serialize
 
 
 def preprocess_examples_train(batch_examples: Dict[str, List[Any]],
@@ -24,10 +22,10 @@ def _preprocess_examples(batch_examples: Dict[str, List[Any]],
     keys = list(batch_examples.keys())
     n_examples = len(batch_examples[keys[0]])
 
-    examples: List[DeductionExample] = []
+    examples: List[Deduction] = []
     for i_example in range(0, n_examples):
         examples.append(
-            load({
+            load_deduction({
                 key: batch_examples[key][i_example]
                 for key in keys
             })

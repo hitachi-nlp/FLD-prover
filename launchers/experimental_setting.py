@@ -10,7 +10,6 @@ from lab import build_dir
 from script_engine import QsubEngine, SubprocessEngine
 from script_engine.base import EngineBase
 # from pytorch_lightning import Trainer
-# from common import DatasetType
 
 
 logger = logging.getLogger(__name__)
@@ -406,18 +405,6 @@ _DATASET_PATHS = {
 }
 
 
-def guess_dataset_type(local_dataset_name: str) -> str:
-    raise NotImplementedError()
-    if local_dataset_name.startswith('EB-'):
-        return DatasetType.EB.value
-    elif local_dataset_name.startswith('ruletaker'):
-        return DatasetType.RuleTaker.value
-    elif local_dataset_name.startswith('cc100'):
-        return DatasetType.Seq2Seq.value
-    else:
-        return DatasetType.FLNL.value
-
-
 def get_dataset_paths(name: str,
                       top_dirs: List[str],
                       use_test_as_train=False,
@@ -572,14 +559,13 @@ _PROVER_CONFIGS = {
         # 'check_val_every_n_epoch': 1,
         'max_eval_samples': 2000,
         'proof_sampling': 'stepwise',
-        # 'stance_indication_method': NEGATED_HYPOTHESIS_BY_I_DONT_THINK,
         'max_proof_steps': 30,
         'learning_rate': 1e-4,
         'warmup_steps': 1000,
         'model_name_or_path': 't5-large',
         # 'fp16': True,
 
-        'source_prefix': 'Let\'s think step-by-step the following problem. ',
+        'source_prefix': 'Solve FLD task: ',
         'generation_num_beams': 10,
         'generation_top_k': 10,
         'generation_max_proof_steps': 20,
@@ -603,7 +589,6 @@ _PROVER_CONFIGS = {
         # 'path_val': specify_me,
         # 'path_test': specify_me,
 
-        # 'stance_indication_method': NEGATED_HYPOTHESIS_BY_I_DONT_THINK,
         # 'exclude_unknown': False,
         # 'add_final_reference_to_proofs': False,
         # 'sample_goal': intermediates # hypothesis | intermediates,
@@ -1209,6 +1194,20 @@ def get_checkpoints(spec: CheckpointSpec,
                     checkpoints.append((str(checkpoint), found_spec))
 
         return checkpoints
+
+
+def get_logging_step_setting(max_steps: Optional[int] = None,
+                             eval_steps: Optional[int] = None) -> Dict[str, Any]:
+    setting = {}
+    if max_steps is not None:
+        setting['max_steps'] = max_steps
+        if eval_steps is not None:
+            setting['eval_steps'] = eval_steps
+        if setting['eval_steps'] > max_steps:
+            setting['eval_steps'] = max_steps
+    setting['save_steps'] = setting.get('eval_steps', None)
+    return setting
+
 
 
 def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> Dict[str, Any]:
