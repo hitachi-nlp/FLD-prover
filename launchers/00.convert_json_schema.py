@@ -21,7 +21,9 @@ def main():
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed')
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230701.finalize')
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230703.test_for_release')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230703.test_for_release')
+
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230707.finalize')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -47,17 +49,27 @@ def main():
 
         # ---------------------------------- 20230701.finalize ------------------------------------
         # '20230701.D3.default',
-        '20230701.D3.wo_transl_dist',
-        '20230701.D3.brnch-small',
-        '20230701.D3.dist-small',
+        # '20230701.D3.wo_transl_dist',
+        # '20230701.D3.brnch-small',
+        # '20230701.D3.dist-small',
 
         # '20230701.D8.default',
+
+        # ---------------------------------- 20230707.finalize ------------------------------------
+        '20230707.finalize.D3.dist-double',
+        '20230707.finalize.D3.dist-triple',
+        '20230707.finalize.D3.dist-quadruple',
+
+        # '20230707.finalize.D8.dist-double',
+        # '20230707.finalize.D8.dist-triple',
+        # '20230707.finalize.D8.dist-quadruple',
+
     ]
 
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    dry_run = True
+    dry_run = False
 
     DATASETS_DIRS = [
         './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -66,7 +78,10 @@ def main():
 
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
         './NLProofS/outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
-        './NLProofS/outputs.FLD/10.create_FLD_corpus/20230701.finalize'
+        './NLProofS/outputs.FLD/10.create_FLD_corpus/20230701.finalize',
+
+        './NLProofS/outputs.FLD/10.create_FLD_corpus/20230707.finalize',
+        
     ]
 
     for local_dataset_name in local_dataset_names:

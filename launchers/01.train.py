@@ -154,7 +154,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
     # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
     # output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # output_top_dir = Path('./outputs/01.train.py/20230707.finalize')
+    output_top_dir = Path('./outputs/01.train.py/20230707.finalize.max_train_samples=15000')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -182,29 +185,41 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
         # ---------------------------------- 20230701.finalize ------------------------------------
-        '20230701.D3.default',
+        # '20230701.D3.default',
         # '20230701.D3.wo_transl_dist',
         # '20230701.D3.brnch-small',
         # '20230701.D3.dist-small',
         # '20230701.D8.default',
+
+        # ---------------------------------- 20230707.finalize ------------------------------------
+        '20230707.finalize.D3.dist-double',
+        # '20230707.finalize.D3.dist-triple',
+        # '20230707.finalize.D3.dist-quadruple',
+
+        # '20230707.finalize.D8.dist-double',
+        # '20230707.finalize.D8.dist-triple',
+        # '20230707.finalize.D8.dist-quadruple',
     ]
 
     # use_test_as_train = True  # debug
     use_test_as_train = False
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'
+    shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
 
     # eval_steps = 100
     eval_steps = None
+
+    # max_train_samples = None
+    max_train_samples = 15000
 
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
@@ -268,7 +283,9 @@ def main():
         # './outputs/00.fix_FLD_schema.py/2023-05-15/',
         # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
         # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
-        './outputs/00.fix_FLD_schema.py/20230701.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230701.finalize',
+
+        './outputs/00.fix_FLD_schema.py/20230707.finalize',
     ]
 
     for local_dataset_name in local_dataset_names:
@@ -337,6 +354,7 @@ def main():
                             batch_setting = get_batch_setting(checkpoint_path, n_gpus)
                             setting.update(batch_setting)
 
+                            setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                             setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
                             setting.update(get_logging_step_setting(max_steps=max_steps,

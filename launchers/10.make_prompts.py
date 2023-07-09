@@ -26,7 +26,9 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230601.fix_translation')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers')
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder')
+
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -38,7 +40,10 @@ def main():
         # './FLD-generator/outputs/10.create_FLD_corpus/20230621.formula_checkers',
 
         # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
-        './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        # './outputs/00.fix_FLD_schema.py/20230701.finalize',
+
+        './outputs/00.fix_FLD_schema.py/20230707.finalize',
     ]
 
     local_dataset_names = [
@@ -72,8 +77,18 @@ def main():
         # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
         # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
 
-        '20230626.many_bugs_fixed.D8.hard',
+        # '20230626.many_bugs_fixed.D8.hard',
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
+
+        # ---------------------------------- 20230707.finalize ------------------------------------
+        '20230707.finalize.D3.dist-double',
+        # '20230707.finalize.D3.dist-triple',
+        # '20230707.finalize.D3.dist-quadruple',
+
+        # '20230707.finalize.D8.dist-double',
+        # '20230707.finalize.D8.dist-triple',
+        # '20230707.finalize.D8.dist-quadruple',
+
     ]
 
     prompt_types = [
@@ -87,8 +102,8 @@ def main():
         # 3,
         # 6,  # for chatGPT web, which have limited context length.
 
-        # 10,
-        15,
+        10,
+        # 15,
         # 20,  # XXX: should use 20 so that LLMs can understand the complicated format of our dataset.
 
         # -- over token limit = 8k token --

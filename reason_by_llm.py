@@ -2,7 +2,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import List, Union, Dict, Tuple
+from typing import List, Union, Dict, Tuple, Optional
 import json
 
 from logger_setup import setup as setup_logger
@@ -14,6 +14,7 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
+import openai
 from tqdm import tqdm
 
 
@@ -52,8 +53,12 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
         chat_model = ChatOpenAI(model_name=model_name,
                                 openai_api_key=api_key)
 
-        def get_reply(prompt: str) -> str:
-            return chat_model([HumanMessage(content=prompt)]).content
+        def get_reply(prompt: str) -> Optional[str]:
+            try:
+                return chat_model([HumanMessage(content=prompt)]).content
+            except openai.error.InvalidRequestError as e:
+                logger.critical(e)
+                return None
 
     with open(output_path, 'w') as f_out:
         for i_sample, line in tqdm(enumerate(open(input_path))):
@@ -67,7 +72,8 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
 
             reply = get_reply(prompt)
 
-            logger.info('reply # words: %d', len(reply.split()))
+            if reply is not None:
+                logger.info('reply # words: %d', len(reply.split()))
 
             sample['reply'] = reply
             f_out.write(json.dumps(sample) + '\n')

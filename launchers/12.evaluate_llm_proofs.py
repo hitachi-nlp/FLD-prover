@@ -34,16 +34,19 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230615.formula_checkers')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230621.formula_checkers/dtst_nm=20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230621.formula_checkers/')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230621.formula_checkers/dtst_nm=20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230621.formula_checkers/')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize')
 
     # ----------------- settings ---------------------
 
     engine = SubprocessEngine()   # for debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    allowed_additional_proof_steps = 5
-    similarity_threshold = False
+    # allowed_additional_proof_steps = 5
+    # similarity_threshold = False
 
     skip_if_exists = False
     dry_run = False
@@ -53,8 +56,8 @@ def main():
     for reply_path in input_top_dir.glob('**/replies.jsonl'):
         setting = {
             'input_path': str(reply_path),
-            'allowed_additional_proof_steps': allowed_additional_proof_steps,
-            'similarity_threshold': similarity_threshold,
+            # 'allowed_additional_proof_steps': allowed_additional_proof_steps,
+            # 'similarity_threshold': similarity_threshold,
         }
 
         reply_setting = json.load(open(reply_path.parent / 'lab.params.json'))
@@ -87,8 +90,8 @@ def main():
             'python ./evaluate_llm_proofs.py',
             str(reply_path),
             str(output_dir),
-            '--similarity-threshold' if similarity_threshold else '',
-            f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',
+            # '--similarity-threshold' if similarity_threshold else '',
+            # f'--allowed-additional-proof-steps {allowed_additional_proof_steps}',
         ])
 
         if skip_if_exists and (output_dir / 'metrics_summary.json').exists():

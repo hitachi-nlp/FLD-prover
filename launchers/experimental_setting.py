@@ -1041,7 +1041,7 @@ ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH = [
 SHOT_SETTINGS = {
     'FS.shot-0': {
         'max_train_samples': 0,
-        'max_eval_samples': 2000,
+        'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
         'num_train_epochs': None,
@@ -1053,7 +1053,7 @@ SHOT_SETTINGS = {
 
     'FS.shot-10': {
         'max_train_samples': 10,
-        'max_eval_samples': 2000,
+        'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
         'num_train_epochs': None,
@@ -1065,7 +1065,7 @@ SHOT_SETTINGS = {
 
     'FS.shot-100': {
         'max_train_samples': 100,
-        'max_eval_samples': 2000,
+        'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
         'num_train_epochs': None,
@@ -1080,7 +1080,7 @@ SHOT_SETTINGS = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 1000,
+        'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
         'max_steps': 5000,
@@ -1092,7 +1092,7 @@ SHOT_SETTINGS = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 1000,
+        'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
         'max_steps': 8100,
@@ -1106,7 +1106,7 @@ SHOT_SETTINGS = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 1000,
+        'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
         'max_steps': 20000,

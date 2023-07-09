@@ -8,7 +8,7 @@ from collections import defaultdict
 
 from logger_setup import setup as setup_logger
 import click
-from FLD_task(
+from FLD_task import (
     load_deduction,
     Deduction,
     SerializedDeduction,

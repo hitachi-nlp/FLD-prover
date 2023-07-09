@@ -24,38 +24,42 @@ def main(input_path, output_dir, log_level):
     input_path = Path(input_path)
     output_dir = Path(output_dir)
 
-    errors_path = output_dir / 'errors.txt'
-    with open(errors_path, 'w') as f_err:
-        for i_line, line in enumerate(open(input_path)):
-            sample = json.loads(line.strip('\n'))
+    samples = [
+        json.loads(line.strip('\n'))
+        for line in open(input_path)
+    ]
+    metrics_types = list(samples[0]['metrics'].keys())
 
-            # proof_accuracy = sample['metrics']['proof_accuracy']
-            # if proof_accuracy >= proof_accuracy_threshold:
-            #     continue
+    for metric_type in metrics_types:
+        errors_path = output_dir / f'errors.metric--{metric_type}.txt'
+        with open(errors_path, 'w') as f_err:
 
-            proof_accuracy = sample['metrics']['proof_accuracy.zero_one']
-            if proof_accuracy > 0.0:
-                continue
+            for i_sample, sample in enumerate(samples):
+                proof_accuracy = sample['metrics'][metric_type]['proof_accuracy.zero_one']
+                if proof_accuracy > 0.0:
+                    continue
 
-            context = sample['example']['context']
-            hypothesis = sample['example']['hypothesis']
-            proof_gold = sample['gold_proof']
-            proof_pred = sample['reply']
+                context = sample['example']['context']
+                hypothesis = sample['example']['hypothesis']
+                proof_golds = sample['gold_proofs']
+                if len(proof_golds) >= 2:
+                    raise NotImplementedError()
+                proof_pred = sample['reply']
 
-            f_err.write('\n\n\n\n\n')
-            f_err.write(f'****************************************** example-{i_line} ******************************************')
+                f_err.write('\n\n\n\n\n')
+                f_err.write(f'****************************************** example-{i_sample} ******************************************')
 
-            f_err.write('\n\n===================== context =====================\n')
-            f_err.write(prettify_context_text(context))
+                f_err.write('\n\n===================== context =====================\n')
+                f_err.write(prettify_context_text(context))
 
-            f_err.write('\n\n===================== hypothesis =====================\n')
-            f_err.write(hypothesis)
+                f_err.write('\n\n===================== hypothesis =====================\n')
+                f_err.write(hypothesis)
 
-            f_err.write('\n\n===================== proof_gold =====================\n')
-            f_err.write(prettify_proof_text(proof_gold))
+                f_err.write('\n\n===================== proof_gold =====================\n')
+                f_err.write(prettify_proof_text(proof_golds[0]))
 
-            f_err.write('\n\n===================== proof_pred =====================\n')
-            f_err.write(prettify_proof_text(proof_pred))
+                f_err.write('\n\n===================== proof_pred =====================\n')
+                f_err.write(prettify_proof_text(proof_pred))
 
 
 if __name__ == '__main__':

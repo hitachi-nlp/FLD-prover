@@ -43,9 +43,8 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers/dtst_nm=20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems')
     # output_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
 
-    # input_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder/dtst_nm=20230626.many_bugs_fixed.D8.hard/prmpt_typ=in_context_examples.COT.v1/n_sht=10')
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder/dtst_nm=20230626.many_bugs_fixed.D8.hard/prmpt_typ=in_context_examples.COT.v1/n_sht=10')
-    output_top_dir = Path('tmp')
+    input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
+    output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
@@ -63,8 +62,9 @@ def main():
 
     # max_samples = 1
     # max_samples = 5
-    max_samples = 10
+    # max_samples = 10
     # max_samples = 30
+    max_samples = 100
     # max_samples = None
 
     dry_run = False
