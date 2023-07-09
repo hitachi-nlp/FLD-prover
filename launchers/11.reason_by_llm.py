@@ -43,8 +43,11 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230615.formula_checkers/dtst_nm=20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems')
     # output_top_dir = Path('./outputs/11.reason_by_llm/20230615.formula_checkers')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
-    output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
+    # output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
+    output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize.fix')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
@@ -63,8 +66,8 @@ def main():
     # max_samples = 1
     # max_samples = 5
     # max_samples = 10
-    # max_samples = 30
-    max_samples = 100
+    max_samples = 50
+    # max_samples = 100
     # max_samples = None
 
     dry_run = False
@@ -83,7 +86,7 @@ def main():
 
     # wait a min to consider carmly whether the paths are right
     # since the reasoning will be charged.
-    time.sleep(10)
+    time.sleep(5)
 
     for prompt_path in prompt_paths:
         for model_name in model_names:

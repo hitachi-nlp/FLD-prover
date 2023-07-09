@@ -37,8 +37,11 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230621.formula_checkers/dtst_nm=20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230621.formula_checkers/')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize.fix')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize.fix')
 
     # ----------------- settings ---------------------
 

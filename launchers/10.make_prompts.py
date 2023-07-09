@@ -28,7 +28,8 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230621.formula_checkers')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder')
 
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',

@@ -27,7 +27,7 @@ def load_examples(path: Union[str, Path])\
     label_examples: Dict[Union[str, bool], List[Deduction]] = defaultdict(list)
     for line in open(path):
         example = load_deduction(json.loads(line.rstrip('\n')))
-        label = example.answer
+        label = example.world_assump_label
 
         examples.append(example)
         label_examples[label].append(example)
@@ -131,15 +131,15 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
         train_exs, train_label_exs = load_examples(train_path)
 
     n_shot_per_label = int(n_shot / len(train_label_exs))
-    fweshot_label_exs: Dict[Union[bool, str], List[Deduction]] = defaultdict(list)
+    fewshot_label_exs: Dict[Union[bool, str], List[Deduction]] = defaultdict(list)
     for label, label_exs in train_label_exs.items():
-        fweshot_label_exs[label].extend(random.sample(label_exs, n_shot_per_label))
+        fewshot_label_exs[label].extend(random.sample(label_exs, n_shot_per_label))
 
     # add examples following the label order: labelA, labelB, labelC, labelA, ...
     fewshot_exs: List[Deduction] = []
-    for i_ex in range(n_shot_per_label):
-        for _, label_exs in sorted(fweshot_label_exs.items()):
-            fewshot_exs.append(label_exs[i_ex])
+    for i_ex_of_label in range(n_shot_per_label):
+        for _, label_exs in sorted(fewshot_label_exs.items()):
+            fewshot_exs.append(label_exs[i_ex_of_label])
 
     # remove few-shot examples from eval dataset
     fewshot_exs_set = set(id(ex) for ex in fewshot_exs)
@@ -173,10 +173,7 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
     with open(output_dir / 'prompts.jsonl', 'w') as f_jsonl,\
             open(output_dir / 'prompts.txt', 'w') as f_txt:
 
-        for i_ex, eval_ex in enumerate(eval_exs):
-            # if i_ex not in [7, 8]:
-            #     continue
-
+        for i_ex_of_label, eval_ex in enumerate(eval_exs):
             eval_serial = _serialize(eval_ex)
 
             prompt = ''
