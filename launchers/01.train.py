@@ -157,7 +157,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     # output_top_dir = Path('./outputs/01.train.py/20230707.finalize')
-    output_top_dir = Path('./outputs/01.train.py/20230707.finalize.max_train_samples=15000')
+    # output_top_dir = Path('./outputs/01.train.py/20230707.finalize.max_train_samples=15000')
+    # output_top_dir = Path('./outputs/01.train.py//20230711.refactor_distractors')
+
+    output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -192,13 +195,18 @@ def main():
         # '20230701.D8.default',
 
         # ---------------------------------- 20230707.finalize ------------------------------------
-        '20230707.finalize.D3.dist-double',
+        # '20230707.finalize.D3.dist-double',
         # '20230707.finalize.D3.dist-triple',
         # '20230707.finalize.D3.dist-quadruple',
 
         # '20230707.finalize.D8.dist-double',
         # '20230707.finalize.D8.dist-triple',
         # '20230707.finalize.D8.dist-quadruple',
+
+        # ---------------------------------- 20230711 ------------------------------------
+        # '20230711.dist-fallback',
+        '20230711.finalize.D3',
+        '20230711.finalize.D8',
     ]
 
     # use_test_as_train = True  # debug
@@ -218,8 +226,8 @@ def main():
     # eval_steps = 100
     eval_steps = None
 
-    # max_train_samples = None
-    max_train_samples = 15000
+    # max_train_samples = 15000
+    max_train_samples = None
 
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
@@ -235,7 +243,7 @@ def main():
 
     # ------------------------ fixed ------------------------
     dry_run = False
-    hours = 48
+    hours = 72
 
     lrates = [
         1e-4,
@@ -285,7 +293,9 @@ def main():
         # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
         # './outputs/00.fix_FLD_schema.py/20230701.finalize',
 
-        './outputs/00.fix_FLD_schema.py/20230707.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230707.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
+        './outputs/00.fix_FLD_schema.py/20230711.finalize',
     ]
 
     for local_dataset_name in local_dataset_names:

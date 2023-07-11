@@ -40,8 +40,20 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize.fix')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize.fix')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230707.finalize.fix')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize.fix')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.bf51eb2')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.bf51eb2')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.7485fef')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.7485fef')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
 
     # ----------------- settings ---------------------
 

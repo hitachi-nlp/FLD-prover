@@ -46,27 +46,40 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
     # output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
-    output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize.fix')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
+    # output_top_dir = Path('./outputs/11.reason_by_llm//20230707.finalize.fix')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.bf51eb2')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.bf51eb2')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.7485fef')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.7485fef')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/prmpt_typ=in_context_examples.COT.v1/n_sht=10')
+    output_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
     model_names = [
-        # 'text-davinci-003',   # stupid. proof accuracy = 0.0 for sFLD-impl :(
+        # 'text-davinci-003',
 
-        # 'gpt-3.5-turbo',      # stupid. proof accuracy = 0.2 for sFLD-impl :(
+        # 'gpt-3.5-turbo',
         # 'gpt-3.5-turbo-16k'
 
-        'gpt-4',                # smart. proof accuracy = 0.5 for sFLD-impl :)
+        # 'gpt-4-0314',
+        'gpt-4',
         # 'gpt-4-32k',
     ]
 
     # max_samples = 1
     # max_samples = 5
-    # max_samples = 10
-    max_samples = 50
+    max_samples = 10
+    # max_samples = 50
     # max_samples = 100
     # max_samples = None
 

@@ -29,7 +29,12 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230628.make_harder')
 
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize')
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230707.finalize.fix')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.bf51eb2')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.7485fef')
+
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -44,7 +49,13 @@ def main():
         # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
         # './outputs/00.fix_FLD_schema.py/20230701.finalize',
 
-        './outputs/00.fix_FLD_schema.py/20230707.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230707.finalize',
+
+        # './outputs/00.fix_FLD_schema.py/20230710.update_translation',
+        # './outputs/00.fix_FLD_schema.py/20230710.update_translation.bf51eb2',
+        # './outputs/00.fix_FLD_schema.py/20230710.update_translation.7485fef',
+
+        './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
     ]
 
     local_dataset_names = [
@@ -82,7 +93,7 @@ def main():
         # '20230626.many_bugs_fixed.D8.hard.dist-trees',
 
         # ---------------------------------- 20230707.finalize ------------------------------------
-        '20230707.finalize.D3.dist-double',
+        # '20230707.finalize.D3.dist-double',
         # '20230707.finalize.D3.dist-triple',
         # '20230707.finalize.D3.dist-quadruple',
 
@@ -90,6 +101,10 @@ def main():
         # '20230707.finalize.D8.dist-triple',
         # '20230707.finalize.D8.dist-quadruple',
 
+        # ---------------------------------- 20230711 ------------------------------------
+        # '20230711.dist-fallback',
+        '20230711.finalize.D3',
+        # '20230711.finalize.D8',
     ]
 
     prompt_types = [
@@ -104,10 +119,11 @@ def main():
         # 6,  # for chatGPT web, which have limited context length.
 
         10,
-        # 15,
-        # 20,  # XXX: should use 20 so that LLMs can understand the complicated format of our dataset.
+        # 12,
 
         # -- over token limit = 8k token --
+        # 15,
+        # 20,
         # 30,
         # 100,
         # 300,

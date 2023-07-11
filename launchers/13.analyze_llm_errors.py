@@ -41,15 +41,26 @@ def main():
     # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize')
     # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230707.finalize')
 
-    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize.fix')
-    output_top_dir = Path('./outputs/13.analyze_llm_errors/20230707.finalize.fix')
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230707.finalize.fix')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230707.finalize.fix')
+
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230710.update_translation')
+
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.bf51eb2')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230710.update_translation.bf51eb2')
+
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.7485fef')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230710.update_translation.7485fef')
+
+    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
+    output_top_dir = Path('./outputs/13.analyze_llm_errors/20230711.refactor_distractors')
 
     # ----------------- settings ---------------------
-
     engine = SubprocessEngine()   # for debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # ----------------- running ---------------------
+    # ----------------- run ---------------------
     dry_run = False
     # answer_accuracy_threshold = 0.1
 
