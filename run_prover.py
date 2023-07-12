@@ -805,38 +805,39 @@ def main():
 
                 context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
                 hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
-            else:
-                context = None
-                hypothesis = None
 
-            if context is not None:
                 try:
                     logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
                 except:
                     logger.fatal('prettify_context failed for the following context. This is unexpected:%s', context)
 
-            if hypothesis is not None:
                 logger.info('------------ hypothesis ------------\n\n    %s\n', hypothesis)
 
-            logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt, indent=4))
+                logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt, indent=4))
 
-            logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred, indent=4))
+                logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred, indent=4))
 
-            for metric_type, calc_metrics in metric_funcs.items():
-                _metrics = calc_metrics(
-                    [proof_gt],
-                    proof_pred,
-                )
-                depths = ['all'] if example is None else ['all', str(example['depth'])]
-                for depth in depths:
-                    for metric_name, metric_val in _metrics.items():
-                        metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
+                for metric_type, calc_metrics in metric_funcs.items():
+                    _metrics = calc_metrics(
+                        [proof_gt],
+                        proof_pred,
+                        context=context,
+                    )
+                    depths = ['all'] if example is None else ['all', str(example['depth'])]
+                    for depth in depths:
+                        for metric_name, metric_val in _metrics.items():
+                            metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
 
-                log_texts, log_args = [], []
-                for metric_name, metric_val in sorted(_metrics.items()):
-                    log_texts.append('%-20s: %5.2f')
-                    log_args.extend([f"{metric_type}.{metric_name}", metric_val])
-                logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
+                    log_texts, log_args = [], []
+                    for metric_name, metric_val in sorted(_metrics.items()):
+                        log_texts.append('%-20s: %5.2f')
+                        log_args.extend([f"{metric_type}.{metric_name}", metric_val])
+                    logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
+
+            else:
+                # XXX: why pass here?
+                context = None
+                hypothesis = None
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
