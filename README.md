@@ -6,7 +6,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD) for the oth
 
 ## About this release
 * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which is a little complex due to the code for the proof verifier.
-* For simplicity and ease of use, we have re-implemented a prover in`./run_prover.py`, which is a straightforward adaptation from the HuggingFace [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
+* For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the HuggingFace [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
 * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
 ## Installation
