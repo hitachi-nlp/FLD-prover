@@ -160,7 +160,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230707.finalize.max_train_samples=15000')
     # output_top_dir = Path('./outputs/01.train.py//20230711.refactor_distractors')
 
-    output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
+    # output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -206,19 +207,19 @@ def main():
         # ---------------------------------- 20230711 ------------------------------------
         # '20230711.dist-fallback',
         '20230711.finalize.D3',
-        '20230711.finalize.D8',
+        # '20230711.finalize.D8',
     ]
 
-    # use_test_as_train = True  # debug
-    use_test_as_train = False
+    use_test_as_train = True  # debug
+    # use_test_as_train = False
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -232,17 +233,18 @@ def main():
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    do_torchrun = False  # for debug
+    # do_torchrun = True
+
+    dry_run = False
 
     # ------------------------ fixed ------------------------
-    dry_run = False
     hours = 72
 
     lrates = [
@@ -413,7 +415,7 @@ def main():
                                 dry_run=dry_run
                             )
 
-    logger.info('------------- ./10.train.py finished !! -----------')
+    logger.info('------------- ./01.train.py finished !! -----------')
 
 
 if __name__ == '__main__':

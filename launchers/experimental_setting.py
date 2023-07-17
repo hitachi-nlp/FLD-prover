@@ -1297,7 +1297,9 @@ def make_command(output_dir: Union[str, Path],
     return ' '.join(commands)
 
 
-def make_output_dir(setting: Dict, top_dir: Union[str, Path]) -> str:
+def make_output_dir(setting: Dict,
+                    top_dir: Union[str, Path],
+                    dirname_ignore_params: Optional[List[str]] = None) -> str:
     dataset_setting_names = [key for key in setting if
                              key.startswith('dataset_setting.')]
     return build_dir(
@@ -1336,6 +1338,7 @@ def make_output_dir(setting: Dict, top_dir: Union[str, Path]) -> str:
             'base_config_name',
             # 'base_config_path',
 
+            'resume_from_checkpoint',
             'checkpoint_name',
             'checkpoint_path',
 
@@ -1404,7 +1407,7 @@ def make_output_dir(setting: Dict, top_dir: Union[str, Path]) -> str:
             'remove_unused_columns',
             'save_steps',
 
-        ] + dataset_setting_names,
+        ] + dataset_setting_names + (dirname_ignore_params or []),
         save_params=True
     )
 
