@@ -31,105 +31,6 @@ from experimental_setting import (
 logger = logging.getLogger(__name__)
 
 
-ALL_DATASET_NAMES = [
-    # ---------------------------------- 20221203.first_exp ------------------------------------
-    '20221203.first_exp__arg-RT__frml-smpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-AA__frml-cmpl__dist-20__transl-nrrw__tree-1__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000',
-
-    # ---------------------------------- 20221215 additional experiments ------------------------------------
-    '20221203.first_exp__arg-RT__frml-smpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-
-    # ---------------------------------- 20221216 additional experiments ------------------------------------
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-smpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-8__dataset_size-30000.G_MP',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.G_MP',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000.G_MP',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.G_MP',
-
-    # ---------------------------------- 20221217.back_to_the_past ------------------------------------
-    '20221217.back_to_the_past__arg-FLNL__frml-cmpl__dist-10__transl-wide__tree-10__dataset_size-100000',
-
-    # ---------------------------------- baselines ------------------------------------
-
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.D5.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.birds-electricity.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-
-    'ruletaker.ours.20221202',
-    'ruletaker.NL.ours.20221202',
-    'ruletaker.BE.ours.20221202',
-
-    'EB-task1.shuffled',
-    'EB-task2.shuffled',
-
-]
-
-
-ALL_CHECKPOINT_NAMES = [
-
-    '20221203.first_exp__arg-RT__frml-smpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-AA__frml-cmpl__dist-20__transl-nrrw__tree-1__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000',
-
-    # ---------------------------------- 20221216 additional experiments ------------------------------------
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-smpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-8__dataset_size-30000.G_MP',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000.G_MP',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.G_MP',
-
-    # ---------------------------------- multitask ------------------------------------
-    # XXX: missing!
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--ruletaker.ours.20221202',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--cc100.20221103.small',
-
-    # ---------------------------------- 20221217.back_to_the_past ------------------------------------
-    '20221217.back_to_the_past__arg-FLNL__frml-cmpl__dist-10__transl-wide__tree-10__dataset_size-100000',
-
-    # ---------------------------------- baselines ------------------------------------
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.D5.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-
-    # -- for multitask --
-    'ruletaker.ours.20221202',
-    'ruletaker.NL.ours.20221202',
-
-    'EB-task1.shuffled',
-    'EB-task2.shuffled',
-
-    None,
-
-]
-
 
 @click.command()
 def main():
@@ -161,7 +62,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py//20230711.refactor_distractors')
 
     # output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
-    output_top_dir = Path('./outputs/01.train.py/debug')
+
+    output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -206,20 +108,25 @@ def main():
 
         # ---------------------------------- 20230711 ------------------------------------
         # '20230711.dist-fallback',
-        '20230711.finalize.D3',
+        # '20230711.finalize.D3',
         # '20230711.finalize.D8',
+
+        # ---------------------------------- 20230718.case_study ------------------------------------
+        '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        # '20230718.case_study.D8.dist-mixture.num_dist-wide',
+
     ]
 
-    use_test_as_train = True  # debug
-    # use_test_as_train = False
+    # use_test_as_train = True  # debug
+    use_test_as_train = False
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'
+    shot = 'FT.step-20000'
 
     # max_steps = 100
     max_steps = None
@@ -233,14 +140,14 @@ def main():
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
-    n_gpus = 1  # debug
-    # n_gpus = 4
+    # n_gpus = 1  # debug
+    n_gpus = 4
 
-    do_torchrun = False  # for debug
-    # do_torchrun = True
+    # do_torchrun = False  # for debug
+    do_torchrun = True
 
     dry_run = False
 
@@ -297,7 +204,9 @@ def main():
 
         # './outputs/00.fix_FLD_schema.py/20230707.finalize',
         # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
-        './outputs/00.fix_FLD_schema.py/20230711.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230711.finalize',
+
+        './outputs/00.fix_FLD_schema.py/20230718.case_study',
     ]
 
     for local_dataset_name in local_dataset_names:

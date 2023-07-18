@@ -30,7 +30,9 @@ def main():
 
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230711.refactor_distractors')
 
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230711.finalize')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230711.finalize')
+
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230718.case_study')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -73,8 +75,12 @@ def main():
 
         # ---------------------------------- 20230711.finalize ------------------------------------
         # '20230711.dist-fallback',
-        '20230711.finalize.D3',
-        '20230711.finalize.D8',
+        # '20230711.finalize.D3',
+        # '20230711.finalize.D8',
+
+        # ---------------------------------- 20230718.case_study ------------------------------------
+        '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        # '20230718.case_study.D8.dist-mixture.num_dist-wide',
     ]
 
     engine = SubprocessEngine()
@@ -83,13 +89,13 @@ def main():
     dry_run = False
 
     DATASETS_DIRS = [
-        './outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
-        './outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
-        './NLProofS/outputs/00.create_cc100_corpus.py/',
+        # './outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
+        # './outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
+        # './NLProofS/outputs/00.create_cc100_corpus.py/',
 
         # './outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
-        './outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
-        './outputs.FLD/10.create_FLD_corpus/20230701.finalize',
+        # './outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
+        # './outputs.FLD/10.create_FLD_corpus/20230701.finalize',
 
         # './outputs.FLD/10.create_FLD_corpus/20230707.finalize',
 
@@ -98,7 +104,9 @@ def main():
         # './outputs.FLD/00.create_corpus/20230710.update_translation.7485fef',
 
         # './outputs.FLD/00.create_corpus/20230711.refactor_distractors',
-        './outputs.FLD/00.create_corpus/20230711.finalize',
+        # './outputs.FLD/00.create_corpus/20230711.finalize',
+
+        './outputs.FLD/00.create_corpus/20230718.case_study',
     ]
 
     for local_dataset_name in local_dataset_names:
