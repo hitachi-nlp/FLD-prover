@@ -298,6 +298,10 @@ class DataTrainingArguments:
         default=30,
     )
 
+    generation_num_return_sequences: int = field(
+        default=1,
+    )
+
     interactive_mode: str = field(
         default=None,
     )
@@ -925,7 +929,10 @@ def main():
     if training_args.do_predict:
         logger.info("*** Predict ***")
 
-        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict")
+        if data_args.num_return_sequences > 1:
+            raise NotImplementedError()
+
+        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict", num_return_sequences=data_args.generation_num_return_sequences)
         metrics = predict_results.metrics
         max_predict_samples = (
             data_args.max_predict_samples if data_args.max_predict_samples is not None else len(predict_dataset)
@@ -975,7 +982,9 @@ def main():
                                                      max_source_length=data_args.max_source_length,
                                                      max_target_length=data_args.max_target_length * 20))
 
-            results = trainer.predict(user_input_dataset, metric_key_prefix="predict")
+            results = trainer.predict(user_input_dataset,
+                                      metric_key_prefix="predict",
+                                      num_return_sequences=data_args.generation_num_return_sequences)
 
             # metrics = results.metrics
             # trainer.log_metrics("predict", metrics)
@@ -997,13 +1006,17 @@ def main():
         if data_args.interactive_mode == 'console':
             while True:
                 print('\n\n======================= interactive mode ========================')
-                context = input('\ncontext:\n')
-                hypothesis = input('\nhypothesis:\n')
+                context = input('\ncontext:\n\n')
+                hypothesis = input('\nhypothesis:\n\n')
 
                 proof = get_prediction(context, hypothesis)
                 proof = prettify_proof_text(proof)
                 print('\n------------------ context ------------------')
-                print(prettify_context_text(context))
+                try:
+                    print(prettify_context_text(context))
+                except Exception as e:
+                    logger.warning('could not prettify context.')
+                    print(context)
                 print('\n------------------ hypothesis ------------------')
                 print(hypothesis)
                 print('\n------------------ prediction ------------------')

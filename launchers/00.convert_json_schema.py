@@ -79,7 +79,9 @@ def main():
         # '20230711.finalize.D8',
 
         # ---------------------------------- 20230718.case_study ------------------------------------
-        '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        '20230718.case_study.D3.dist-mixture',
+        '20230718.case_study.D3.num_dist-wide',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
         # '20230718.case_study.D8.dist-mixture.num_dist-wide',
     ]
 

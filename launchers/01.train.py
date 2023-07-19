@@ -63,6 +63,7 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
 
+    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
     output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
 
     local_dataset_names = [
@@ -112,7 +113,9 @@ def main():
         # '20230711.finalize.D8',
 
         # ---------------------------------- 20230718.case_study ------------------------------------
-        '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        '20230718.case_study.D3.dist-mixture',
+        # '20230718.case_study.D3.num_dist-wide',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
         # '20230718.case_study.D8.dist-mixture.num_dist-wide',
 
     ]
