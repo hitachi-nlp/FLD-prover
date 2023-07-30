@@ -1114,6 +1114,19 @@ SHOT_SETTINGS = {
         'warmup_steps': 1000,
     },
 
+    'FT.step-50000': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 500,
+        'max_predict_samples': 1000,
+
+        'max_steps': 50000,
+        'eval_steps': 5000,
+        'warmup_steps': 3000,
+    },
+
+
     'debug.tiny': {
         'max_train_samples': 10,
         'max_eval_samples': 10,

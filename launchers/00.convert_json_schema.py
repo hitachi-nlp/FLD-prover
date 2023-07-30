@@ -32,7 +32,10 @@ def main():
 
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230711.finalize')
 
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230718.case_study')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230718.case_study')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-07-27.compare_models')
+
+    output_top_dir = Path('./outputs/00.create_corpus/20230729.case_study_finalize')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -79,16 +82,19 @@ def main():
         # '20230711.finalize.D8',
 
         # ---------------------------------- 20230718.case_study ------------------------------------
-        '20230718.case_study.D3.dist-mixture',
-        '20230718.case_study.D3.num_dist-wide',
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        # '20230718.case_study.D3.dist-mixture',
+        # '20230718.case_study.D3.num_dist-wide',
         # '20230718.case_study.D8.dist-mixture.num_dist-wide',
+        
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_logE',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal',
+
+        # ---------------------------------- 20230729.case_study_finalize ------------------------------------
+        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D8',
     ]
-
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large')
-
-    dry_run = False
 
     DATASETS_DIRS = [
         # './outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -108,8 +114,17 @@ def main():
         # './outputs.FLD/00.create_corpus/20230711.refactor_distractors',
         # './outputs.FLD/00.create_corpus/20230711.finalize',
 
-        './outputs.FLD/00.create_corpus/20230718.case_study',
+        # './outputs.FLD/00.create_corpus/20230718.case_study',
+        # './outputs.FLD/00.create_corpus/2023-07-27.compare_models',
+
+        './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
     ]
+
+    engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.large')
+
+    dry_run = False
+
 
     for local_dataset_name in local_dataset_names:
         output_dir = output_top_dir / local_dataset_name

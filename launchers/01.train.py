@@ -64,7 +64,13 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
 
     # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
-    output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
+    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
+    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models')
+    # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps')
+
+    output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -113,11 +119,39 @@ def main():
         # '20230711.finalize.D8',
 
         # ---------------------------------- 20230718.case_study ------------------------------------
-        '20230718.case_study.D3.dist-mixture',
+        # '20230718.case_study.D3.dist-mixture',
         # '20230718.case_study.D3.num_dist-wide',
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
         # '20230718.case_study.D8.dist-mixture.num_dist-wide',
+        
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_logE',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10',
+        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal',
 
+
+        # ---------------------------------- 20230729.case_study_finalize ------------------------------------
+        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D8',
+    ]
+
+    DATASETS_DIRS = [
+        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
+        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
+        # './NLProofS/outputs/00.create_cc100_corpus.py/',
+
+        # './outputs/00.fix_FLD_schema.py/2023-05-15/',
+        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
+        # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
+        # './outputs/00.fix_FLD_schema.py/20230701.finalize',
+
+        # './outputs/00.fix_FLD_schema.py/20230707.finalize',
+        # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
+        # './outputs/00.fix_FLD_schema.py/20230711.finalize',
+
+        # './outputs/00.fix_FLD_schema.py/20230718.case_study',
+        # './outputs/00.fix_FLD_schema.py/2023-07-27.compare_models',
+
+        './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
     ]
 
     # use_test_as_train = True  # debug
@@ -129,7 +163,8 @@ def main():
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'
+    # shot = 'FT.step-20000'   # 20k steps are not enough
+    shot = 'FT.step-50000'
 
     # max_steps = 100
     max_steps = None
@@ -194,23 +229,6 @@ def main():
 
     # only_warn_if_checkpoint_is_not_found = False
     only_warn_if_checkpoint_is_not_found = True
-
-    DATASETS_DIRS = [
-        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
-        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
-        # './NLProofS/outputs/00.create_cc100_corpus.py/',
-
-        # './outputs/00.fix_FLD_schema.py/2023-05-15/',
-        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
-        # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
-        # './outputs/00.fix_FLD_schema.py/20230701.finalize',
-
-        # './outputs/00.fix_FLD_schema.py/20230707.finalize',
-        # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
-        # './outputs/00.fix_FLD_schema.py/20230711.finalize',
-
-        './outputs/00.fix_FLD_schema.py/20230718.case_study',
-    ]
 
     for local_dataset_name in local_dataset_names:
         dataset_paths = get_dataset_paths(local_dataset_name,
@@ -294,6 +312,8 @@ def main():
                                 'checkpoint_name': checkpoint_name,
                                 'checkpoint_path': checkpoint_path,
                                 'model_name_or_path': checkpoint_path,
+
+                                'save_total_limit': 1,
 
                                 # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                                 'shot': shot,
