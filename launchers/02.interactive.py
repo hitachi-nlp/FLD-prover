@@ -32,7 +32,8 @@ logger = logging.getLogger(__name__)
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    output_top_dir = Path('./outputs/02.interactive.py/dev_null')
+    # output_top_dir = Path('./outputs/02.interactive.py/dev_null')
+    output_top_dir = Path('./outputs/02.interactive.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
 
     # # -- D3 --
     # checkpoint_top_dir = Path('./outputs/01.train.py/20230711.finalize/dtst_nm=20230711.finalize.D3/dtst_1_nm=None/bs_cnfg_nm=FLNLcorpus.20220827.base/chckpnt_nm=t5-base/ckpt_lrt=None/ckpt_mdl_nm=None/gnrtn_nm_bms=10/gnrtn_tp_k=10/lrnng_rt=0.0001/mx_stps=20000/mdl_nm_or_pth=t5-base/prf_smplng=stepwise/smpl_ngtv_prf=True/sd=0/sht=FT.step-20000/wrmp_stps=1000/checkpoint-19500')
@@ -47,11 +48,15 @@ def main():
     # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal/')
 
     # ---------------------------------- 2023-07-27.compare_models.large_steps ------------------------------------
-    checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
+    # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
     # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
+    # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
+
+    checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
 
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
+    gradio_port = 9200
 
     engine = SubprocessEngine()   # debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
@@ -69,7 +74,10 @@ def main():
     local_dataset_name = '20230711.finalize.D3'
 
     checkpoint_configs = [path for path in checkpoint_top_dir.glob('**/*/tokenizer_config.json')
-                       if str(path).find('checkpoint-') < 0]
+                          if str(path).find('checkpoint-') < 0]  # this finds the final checkpoint output to the top dir
+    if len(checkpoint_configs) == 0:
+        checkpoint_configs = [path for path in checkpoint_top_dir.glob('**/*/tokenizer_config.json')]
+
     if len(checkpoint_configs) == 0:
         raise ValueError(f'No checkpoint found under "{str(checkpoint_top_dir)}"')
     elif len(checkpoint_configs) >= 2:
@@ -82,6 +90,7 @@ def main():
         'do_eval': False,
         'do_predict': False,
         'interactive_mode': interactive_mode,
+        'gradio_port': gradio_port,
     })
     base_config_name = get_default_config_name(local_dataset_name)
     base_setting = get_config(base_config_name)

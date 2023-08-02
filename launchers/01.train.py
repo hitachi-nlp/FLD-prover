@@ -70,7 +70,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models')
     # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps')
 
-    output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
+    # output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
+    # output_top_dir = Path('./outputs/01.train.py/20230801.case_study_finalize.fix')
+    output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -131,7 +133,7 @@ def main():
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         '20230729.case_study_finalize.D3',
-        # '20230729.case_study_finalize.D8',
+        '20230729.case_study_finalize.D8',
     ]
 
     DATASETS_DIRS = [
@@ -151,7 +153,8 @@ def main():
         # './outputs/00.fix_FLD_schema.py/20230718.case_study',
         # './outputs/00.fix_FLD_schema.py/2023-07-27.compare_models',
 
-        './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        # './outputs/00.fix_FLD_schema.py/20230729.case_study_finalize',
+        './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix',
     ]
 
     # use_test_as_train = True  # debug
@@ -163,8 +166,9 @@ def main():
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'   # 20k steps are not enough
-    shot = 'FT.step-50000'
+    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    # shot = 'FT.step-50000'
+    shot = 'FT.step-100000'
 
     # max_steps = 100
     max_steps = None

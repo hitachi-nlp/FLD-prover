@@ -35,7 +35,8 @@ def main():
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230718.case_study')
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-07-27.compare_models')
 
-    output_top_dir = Path('./outputs/00.create_corpus/20230729.case_study_finalize')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230729.case_study_finalize')
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix')
 
     local_dataset_names = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -92,8 +93,8 @@ def main():
         # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal',
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
-        # '20230729.case_study_finalize.D8',
+        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D8',
     ]
 
     DATASETS_DIRS = [
@@ -117,7 +118,8 @@ def main():
         # './outputs.FLD/00.create_corpus/20230718.case_study',
         # './outputs.FLD/00.create_corpus/2023-07-27.compare_models',
 
-        './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
     ]
 
     engine = SubprocessEngine()

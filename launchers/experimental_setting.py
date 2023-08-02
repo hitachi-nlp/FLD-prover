@@ -1126,6 +1126,29 @@ SHOT_SETTINGS = {
         'warmup_steps': 3000,
     },
 
+    'FT.step-100000': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 500,
+        'max_predict_samples': 1000,
+
+        'max_steps': 100000,
+        'eval_steps': 10000,
+        'warmup_steps': 3000,
+    },
+
+    'FT.step-150000': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 500,
+        'max_predict_samples': 1000,
+
+        'max_steps': 150000,
+        'eval_steps': 10000,
+        'warmup_steps': 3000,
+    },
 
     'debug.tiny': {
         'max_train_samples': 10,

@@ -306,6 +306,8 @@ class DataTrainingArguments:
         default=None,
     )
 
+    gradio_port: int = 8010
+
     log_examples: bool = field(
         default=False,
     )
@@ -1035,7 +1037,7 @@ def main():
                         gr.Textbox(lines=1, placeholder='Allen is red')],
                 outputs=['text'],
             )
-            demo.launch(share=True, server_name='0.0.0.0', server_port=8010)
+            demo.launch(share=True, server_name='0.0.0.0', server_port=data_args.gradio_port)
         else:
             raise ValueError()
 
