@@ -72,7 +72,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
     # output_top_dir = Path('./outputs/01.train.py/20230801.case_study_finalize.fix')
-    output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun')
+    # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun')
+
+    output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -166,9 +168,9 @@ def main():
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
     # shot = 'FT.step-50000'
-    shot = 'FT.step-100000'
+    # shot = 'FT.step-100000'
 
     # max_steps = 100
     max_steps = None
