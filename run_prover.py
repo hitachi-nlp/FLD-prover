@@ -21,12 +21,15 @@ Fine-tuning the library models for sequence to sequence.
 import logging
 import os
 import re
+import tempfile
+import json
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import sys
 from dataclasses import dataclass, field
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 from collections import defaultdict
+import readline
 
 import torch
 import datasets
@@ -36,6 +39,7 @@ import numpy as np
 from datasets import load_dataset
 from datasets import Features, Value
 from filelock import FileLock
+import gradio as gr
 
 import transformers
 from transformers import (
@@ -294,6 +298,16 @@ class DataTrainingArguments:
         default=30,
     )
 
+    generation_num_return_sequences: int = field(
+        default=1,
+    )
+
+    interactive_mode: str = field(
+        default=None,
+    )
+
+    gradio_port: int = 8010
+
     log_examples: bool = field(
         default=False,
     )
@@ -308,8 +322,9 @@ class DataTrainingArguments:
             and self.train_file is None
             and self.validation_file is None
             and self.test_file is None
+            and self.interactive_mode is None
         ):
-            raise ValueError("Need either a dataset name or a training, validation, or test file.")
+            raise ValueError("Need either a dataset name or a training, validation, test file, or self.interactive_mode.")
         else:
             # if self.train_file is not None:
             #     extension = self.train_file.split(".")[-1]
@@ -454,6 +469,10 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
         )
     else:
+        extension = data_args.file_type
+        if extension is None or extension not in ['json', 'csv']:
+            raise ValueError()
+
         data_files = {}
         if data_args.train_file is not None:
             data_files["train"] = data_args.train_file
@@ -465,16 +484,15 @@ def main():
             data_files["test"] = data_args.test_file
             # extension = data_args.test_file.split(".")[-1]
 
-        extension = data_args.file_type
-        if extension is None or extension not in ['json', 'csv']:
-            raise ValueError()
-
-        raw_datasets = load_dataset(
-            extension,
-            data_files=data_files,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-        )
+        if len(data_files) > 0:
+            raw_datasets = load_dataset(
+                extension,
+                data_files=data_files,
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+            )
+        else:
+            raw_datasets = {}
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -549,15 +567,17 @@ def main():
     if training_args.do_train:
         if "train" not in raw_datasets:
             raise ValueError("--do_train requires a train dataset")
-        column_names = raw_datasets["train"].column_names
+        # column_names = raw_datasets["train"].column_names
     elif training_args.do_eval:
         if "validation" not in raw_datasets:
             raise ValueError("--do_eval requires a validation dataset")
-        column_names = raw_datasets["validation"].column_names
+        # column_names = raw_datasets["validation"].column_names
     elif training_args.do_predict:
         if "test" not in raw_datasets:
             raise ValueError("--do_predict requires a test dataset")
-        column_names = raw_datasets["test"].column_names
+        # column_names = raw_datasets["test"].column_names
+    elif data_args.interactive_mode is not None:
+        pass
     else:
         logger.info("There is nothing to do. Please pass `do_train`, `do_eval` and/or `do_predict`.")
         return
@@ -622,14 +642,14 @@ def main():
             context = examples[context_column][i_example]
             next_step = examples[next_step_column][i_example]
             gold_proof = examples[gold_proof_column][i_example]
-            if context and next_step:
-                inputs.append(context)
-                targets.append(next_step)
-                gold_proofs.append(gold_proof)
-                if data_args.log_examples:
-                    logger.info('context    [%d] : "%s"', i_example, context)
-                    logger.info('next_step [%d] : "%s"', i_example, next_step)
-                    logger.info('gold_proof [%d] : "%s"', i_example, gold_proof)
+
+            inputs.append(context)
+            targets.append(next_step)
+            gold_proofs.append(gold_proof)
+            if data_args.log_examples:
+                logger.info('context    [%d] : "%s"', i_example, context)
+                logger.info('next_step [%d] : "%s"', i_example, next_step)
+                logger.info('gold_proof [%d] : "%s"', i_example, gold_proof)
         return inputs, targets, gold_proofs
 
     def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
@@ -670,11 +690,18 @@ def main():
         model_inputs = prepare_model_inputs(inputs, max_source_length)
 
         if split == 'train':
-            model_inputs["labels"] = prepare_model_targets(targets, max_target_length)["input_ids"]
+            if any(_targets is None for _targets in targets):
+                raise ValueError()
+            else:
+                model_inputs["labels"] = prepare_model_targets(targets, max_target_length)["input_ids"]
         else:
-            model_inputs["labels"] = prepare_model_targets(gold_proofs, max_target_length)["input_ids"]
+            if any(_gold_proofs is None for _gold_proofs in gold_proofs):
+                pass
+            else:
+                model_inputs["labels"] = prepare_model_targets(gold_proofs, max_target_length)["input_ids"]
 
-        model_inputs["depth"] = examples["depth"]
+        if "depth" in examples:
+            model_inputs["depth"] = examples["depth"]
 
         return model_inputs
 
@@ -698,7 +725,6 @@ def main():
                                                  max_target_length=data_args.max_target_length))
 
     if training_args.do_eval:
-        max_target_length = data_args.val_max_target_length
         eval_dataset = raw_datasets["validation"]
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
@@ -718,7 +744,6 @@ def main():
                                                  max_target_length=data_args.max_target_length * 20))
 
     if training_args.do_predict:
-        max_target_length = data_args.val_max_target_length
         predict_dataset = raw_datasets["test"]
         if data_args.max_predict_samples is not None:
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
@@ -823,7 +848,7 @@ def main():
                         proof_pred,
                         context=context,
                     )
-                    depths = ['all'] if example is None else ['all', str(example['depth'])]
+                    depths = ['all', str(example['depth'])] if example.get('depth', None) is not None else ['all']
                     for depth in depths:
                         for metric_name, metric_val in _metrics.items():
                             metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
@@ -906,7 +931,10 @@ def main():
     if training_args.do_predict:
         logger.info("*** Predict ***")
 
-        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict")
+        if data_args.num_return_sequences > 1:
+            raise NotImplementedError()
+
+        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict", num_return_sequences=data_args.generation_num_return_sequences)
         metrics = predict_results.metrics
         max_predict_samples = (
             data_args.max_predict_samples if data_args.max_predict_samples is not None else len(predict_dataset)
@@ -927,6 +955,94 @@ def main():
                 output_prediction_file = os.path.join(training_args.output_dir, "generated_predictions.txt")
                 with open(output_prediction_file, "w") as writer:
                     writer.write("\n".join(predictions))
+
+    if data_args.interactive_mode is not None:
+
+        def get_prediction(context: str, hypothesis: str) -> str:
+            context = re.sub(r'\s+', ' ', re.sub(r'\n', ' ', context))
+            instance = {
+                'context': context,
+                'hypothesis': hypothesis,
+            }
+
+            tmp = tempfile.mktemp()
+            with open(tmp, 'w') as f_out:
+                f_out.write(json.dumps(instance))
+
+            extension = data_args.file_type
+            if extension is None or extension not in ['json', 'csv']:
+                raise ValueError()
+
+            user_input_dataset = load_dataset(
+                extension,
+                data_files={'tmp': tmp},
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+            )['tmp']
+            user_input_dataset.set_transform(
+                lambda examples: preprocess_function(examples, 'eval',
+                                                     max_source_length=data_args.max_source_length,
+                                                     max_target_length=data_args.max_target_length * 20))
+
+            results = trainer.predict(user_input_dataset,
+                                      metric_key_prefix="predict",
+                                      num_return_sequences=data_args.generation_num_return_sequences)
+
+            # metrics = results.metrics
+            # trainer.log_metrics("predict", metrics)
+            # trainer.save_metrics("predict", metrics)
+
+            if trainer.is_world_process_zero():
+                if training_args.predict_with_generate:
+                    predictions = results.predictions
+                    predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
+                    predictions = tokenizer.batch_decode(
+                        predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
+                    )
+                    predictions = [pred.strip() for pred in predictions]
+                    return predictions[0]
+
+            # TODO: implement the logic here
+            raise NotImplementedError()
+
+        if data_args.interactive_mode == 'console':
+            while True:
+                print('\n\n======================= interactive mode ========================')
+                context = input('\ncontext:\n\n')
+                hypothesis = input('\nhypothesis:\n\n')
+
+                proof = get_prediction(context, hypothesis)
+                proof = prettify_proof_text(proof)
+                print('\n------------------ context ------------------')
+                try:
+                    print(prettify_context_text(context))
+                except Exception as e:
+                    logger.warning('could not prettify context.')
+                    print(context)
+                print('\n------------------ hypothesis ------------------')
+                print(hypothesis)
+                print('\n------------------ prediction ------------------')
+                print(proof)
+
+        elif data_args.interactive_mode == 'gradio':
+
+            def predict(context: str, hypothesis: str):
+                proof = get_prediction(context, hypothesis)
+                proof = prettify_proof_text(proof)
+                return proof
+
+            demo = gr.Interface(
+                fn=predict,
+                inputs=[gr.Textbox(lines=10, placeholder='sent1: Allen is red\nsent2: Allen is blue'),
+                        gr.Textbox(lines=1, placeholder='Allen is red')],
+                outputs=['text'],
+            )
+            demo.launch(share=True, server_name='0.0.0.0', server_port=data_args.gradio_port)
+        else:
+            raise ValueError()
+
+        return
+
 
     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "summarization"}
     if data_args.dataset_name is not None:

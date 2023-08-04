@@ -52,7 +52,7 @@ def _preprocess_examples(batch_examples: Dict[str, List[Any]],
         if len(serial.gold_proofs) >= 2:
             raise NotImplementedError()
     preprocessed_batch_examples['gold_proof'] = [
-        serialized_examples[i_example].gold_proofs[0]
+        serialized_examples[i_example].gold_proofs[0] if len(serialized_examples[i_example].gold_proofs) > 0 else None
         for i_example in range(0, len(examples))
     ]
 

@@ -448,19 +448,37 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             if i_step == 0:
                 labels = _labels
 
-            pred_seqs = self._tensor_to_seqs(_preds)
-
-            # log the current sequences
-            if self._log_generation:
-                for i_example, (extended_input_seq, pred_seq) in enumerate(zip(extended_input_seqs, pred_seqs)):
-                    logger.info('step=%d    example=%d    %s    ----------> %s', i_step, i_example, extended_input_seq, pred_seq)
+            num_return_sequences = self._gen_kwargs.get('num_return_sequences', 1)
+            _pred_seqs = self._tensor_to_seqs(_preds)
+            if num_return_sequences == 1:
+                nbest_pred_seqs = [[_pred_seqs[i_example]] for i_example in range(n_examples)]
+            else:
+                if n_examples == 1:
+                    nbest_pred_seqs = [_pred_seqs]
+                else:
+                    raise NotImplementedError()
 
             # extend sequence
-            for i_example, pred_seq in enumerate(pred_seqs):
+            for i_example in range(n_examples):
+                extended_input_seq = extended_input_seqs[i_example]
+                extended_pred_seq = extended_pred_seqs[i_example]
+                _nbest_pred_seqs = nbest_pred_seqs[i_example]
+                onebest_pred_seq = nbest_pred_seqs[i_example][0]
+
+                if self._log_generation:
+                    logger.info('---------    example=%d   step=%d   ----------', i_example, i_step)
+                    logger.info('partial_input:')
+                    logger.info('    %s', extended_input_seq)
+                    logger.info('')
+                    for i_nbest, nbest_pred_seq in enumerate(_nbest_pred_seqs):
+                        logger.info('nbest=%d', i_nbest)
+                        logger.info('    ' + nbest_pred_seq)
+
                 if not are_finished[i_example]:
-                    extended_pred_seqs[i_example] = ' '.join([extended_pred_seqs[i_example], pred_seq])
-                    extended_input_seqs[i_example] = input_seqs[i_example] + extended_pred_seqs[i_example]
-                    if self._is_finished_func(pred_seq):
+                    extended_pred_seq_next = ' '.join([extended_pred_seq, onebest_pred_seq])
+                    extended_pred_seqs[i_example] = extended_pred_seq_next
+                    extended_input_seqs[i_example] = input_seqs[i_example] + extended_pred_seq_next
+                    if self._is_finished_func(onebest_pred_seq):
                         are_finished[i_example] = True
 
             if all(are_finished.values()):
