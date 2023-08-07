@@ -52,7 +52,9 @@ def main():
     # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
     # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
 
-    checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
+    # checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
+
+    checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
 
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
@@ -115,7 +117,7 @@ def main():
 
         'dataloader_num_workers': 0,
 
-        'generation_num_return_sequences': 5,
+        'generation_num_return_sequences': 10,
 
         'log_examples': True,
     })

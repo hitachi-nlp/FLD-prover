@@ -441,6 +441,21 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                 ignore_keys=ignore_keys,
             )
 
+            # we need these option to get the scores. They are allowed only in the higher version of transformers.
+            # However, if we use higher version of transformers, we need to re-implemente this class.
+            # self._gen_kwargs.update({
+            #     'return_dict_in_generate': True,
+            #     'output_scores': True,
+            # })
+            # hoge = super().prediction_step(
+            #     model,
+            #     extended_inputs,
+            #     prediction_loss_only,
+            #     ignore_keys=ignore_keys,
+            # )
+            # self._gen_kwargs.pop('return_dict_in_generate', None)
+            # self._gen_kwargs.pop('output_scores', None)
+
             if isinstance(_preds, tuple):
                 _preds = _preds[0]
 
@@ -472,7 +487,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                     logger.info('')
                     for i_nbest, nbest_pred_seq in enumerate(_nbest_pred_seqs):
                         logger.info('nbest=%d', i_nbest)
-                        logger.info('    ' + nbest_pred_seq)
+                        logger.info('    %s', nbest_pred_seq)
 
                 if not are_finished[i_example]:
                     extended_pred_seq_next = ' '.join([extended_pred_seq, onebest_pred_seq])
