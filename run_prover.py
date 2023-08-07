@@ -283,7 +283,7 @@ class DataTrainingArguments:
 
     proof_sampling: str = field(
         default="stepwise",
-        metadata={"help": "[stepwise|single_shot]"},
+        metadata={"help": "[stepwise|all_at_once]"},
     )
 
     sample_negative_proof: bool = field(
@@ -674,9 +674,15 @@ def main():
                             max_source_length: int,
                             max_target_length: int) -> Dict[str, List[Any]]:
         if split == 'train':
+            if data_args.proof_sampling == 'stepwise':
+                do_stepwise = True
+            elif data_args.proof_sampling == 'all_at_once':
+                do_stepwise = False
+            else:
+                raise ValueError()
             examples = preprocess_examples_train(
                 examples,
-                stepwise=data_args.proof_sampling == 'stepwise',
+                stepwise=do_stepwise,
                 sample_negative_proof=data_args.sample_negative_proof,
             )
         elif split == 'eval':
@@ -724,6 +730,8 @@ def main():
                                                  max_source_length=data_args.max_source_length,
                                                  max_target_length=data_args.max_target_length))
 
+    generation_max_target_length_factor = 20 if data_args.proof_sampling == 'stepwise' else 1
+
     if training_args.do_eval:
         eval_dataset = raw_datasets["validation"]
         if data_args.max_eval_samples is not None:
@@ -741,7 +749,7 @@ def main():
         eval_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval',
                                                  max_source_length=data_args.max_source_length,
-                                                 max_target_length=data_args.max_target_length * 20))
+                                                 max_target_length=data_args.max_target_length * generation_max_target_length_factor))
 
     if training_args.do_predict:
         predict_dataset = raw_datasets["test"]
@@ -760,7 +768,7 @@ def main():
         predict_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval',
                                                  max_source_length=data_args.max_source_length,
-                                                 max_target_length=data_args.max_target_length * 20))
+                                                 max_target_length=data_args.max_target_length * generation_max_target_length_factor))
 
     # Data collator
     label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
@@ -890,7 +898,7 @@ def main():
         eval_dataset=eval_dataset if training_args.do_eval else None,
         data_collator=data_collator,
         tokenizer=tokenizer,
-        max_steps=data_args.generation_max_proof_steps,
+        max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         texts_to_inputs_func=lambda texts: prepare_model_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
@@ -982,7 +990,7 @@ def main():
             user_input_dataset.set_transform(
                 lambda examples: preprocess_function(examples, 'eval',
                                                      max_source_length=data_args.max_source_length,
-                                                     max_target_length=data_args.max_target_length * 20))
+                                                     max_target_length=data_args.max_target_length * generation_max_target_length_factor))
 
             results = trainer.predict(user_input_dataset,
                                       metric_key_prefix="predict",

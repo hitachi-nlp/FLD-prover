@@ -74,7 +74,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230801.case_study_finalize.fix')
     # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun')
 
-    output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
+    # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
+
+    output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
     local_dataset_names = [
         # 'FLD.debug.2023-05-13',
@@ -134,7 +136,7 @@ def main():
 
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         '20230729.case_study_finalize.D8',
     ]
 
@@ -172,6 +174,9 @@ def main():
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
+    # proof_sampling = 'stepwise'
+    proof_sampling = 'all_at_once'
+
     # max_steps = 100
     max_steps = None
 
@@ -184,8 +189,8 @@ def main():
     # max_eval_samples = 500  # for short evaluation
     max_eval_samples = None
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
     # n_gpus = 1  # debug
     n_gpus = 4
@@ -217,6 +222,7 @@ def main():
     # checkpoint_names = ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH
     checkpoint_names = [
         't5-base',
+        # 't5-large'
     ]
 
     do_predict = False
@@ -299,7 +305,10 @@ def main():
                             shot_setting = SHOT_SETTINGS[shot].copy()
                             setting.update(shot_setting)
 
-                            batch_setting = get_batch_setting(checkpoint_path, n_gpus)
+                            batch_setting = get_batch_setting(
+                                checkpoint_path + '.all_at_once' if proof_sampling == 'all_at_once' else checkpoint_path,
+                                n_gpus,
+                            )
                             setting.update(batch_setting)
 
                             setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
@@ -322,6 +331,7 @@ def main():
                                 'save_total_limit': 1,
 
                                 # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                'proof_sampling': proof_sampling,
                                 'shot': shot,
                                 'sample_negative_proof': sample_negative_proof,
 

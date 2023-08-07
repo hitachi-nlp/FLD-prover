@@ -89,6 +89,23 @@ _PROVER_BATCH_SETTINGS = {
         'tokenizer_padding': 'longest',
     },
 
+    't5-base.all_at_once': {
+        'max_source_length': 1000,
+        'max_target_length': 1000,
+
+        # -- V100 --
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        # -- A100 --
+        # 'per_device_train_batch_size': 4,
+        # 'per_device_eval_batch_size': 4,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+
     # 't5-large': {
     #     'max_source_length': 1200,
     #     'max_target_length': 100,
