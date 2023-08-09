@@ -14,7 +14,6 @@ from experimental_setting import (
     get_config,
     get_default_config_name,
     get_checkpoints,
-    get_dataset_paths,
     get_dataset_setting,
     get_batch_setting,
     get_logging_step_setting,
@@ -76,9 +75,10 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
 
-    output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
+    # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
-    local_dataset_names = [
+    dataset_unames = [
         # 'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -137,7 +137,10 @@ def main():
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         # '20230729.case_study_finalize.D3',
-        '20230729.case_study_finalize.D8',
+        # '20230729.case_study_finalize.D8',
+
+        # 'hf.hitachi-nlp/FLD.3',
+        'hf.hitachi-nlp/FLD.4',
     ]
 
     DATASETS_DIRS = [
@@ -158,24 +161,25 @@ def main():
         # './outputs/00.fix_FLD_schema.py/2023-07-27.compare_models',
 
         # './outputs/00.fix_FLD_schema.py/20230729.case_study_finalize',
-        './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix',
+        # './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix',
+        './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix.test_large',
     ]
 
-    # use_test_as_train = True  # debug
-    use_test_as_train = False
+    use_test_as_train = True  # debug
+    # use_test_as_train = False
 
-    # shot = 'debug.tiny'  # debug
+    shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    # proof_sampling = 'stepwise'
-    proof_sampling = 'all_at_once'
+    proof_sampling = 'stepwise'
+    # proof_sampling = 'all_at_once'
 
     # max_steps = 100
     max_steps = None
@@ -192,11 +196,16 @@ def main():
     engine = SubprocessEngine()   # debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    do_torchrun = False  # for debug
+    # do_torchrun = True
+
+    # XXX: BE CAREFUL NOT TO OVERWRITE THE OFFICIAL DATASETS
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.3'
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.4'
+    dataset_push_to_hub_repo_name = None
 
     dry_run = False
 
@@ -227,7 +236,6 @@ def main():
 
     do_predict = False
     use_test_as_val = True
-    do_transfer_on_same_dataset = True
 
     sample_negative_proof_args = [
         # False,
@@ -242,25 +250,12 @@ def main():
     # only_warn_if_checkpoint_is_not_found = False
     only_warn_if_checkpoint_is_not_found = True
 
-    for local_dataset_name in local_dataset_names:
-        dataset_paths = get_dataset_paths(local_dataset_name,
-                                          DATASETS_DIRS,
-                                          use_test_as_val=use_test_as_val,
-                                          use_test_as_train=use_test_as_train)
-
-        for split_name, path in dataset_paths.items():
-            if not Path(path).exists:
-                raise Exception(f'{split_name} dataset does not exist at {path}')
+    for dataset_uname in dataset_unames:
 
         for sample_negative_proof in sample_negative_proof_args:
 
             for seed in seeds:
                 for checkpoint_name in checkpoint_names:
-                    if not do_transfer_on_same_dataset and checkpoint_name == local_dataset_name:
-                        logger.info('skip transfer from checkpoint_name="%s" to local_dataset_name=%s since do_transfer_on_same_dataset=False',
-                                    checkpoint_name,
-                                    local_dataset_name)
-                        continue
 
                     checkpoint_spec = CheckpointSpec(
                         name_or_local_dataset_name=checkpoint_name,
@@ -288,17 +283,21 @@ def main():
                     for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
 
                         for _lrate in lrates:
-                            setting = dataset_paths.copy()
-                            dataset_setting = get_dataset_setting(local_dataset_name)
+                            setting = {}
+
+                            dataset_setting = get_dataset_setting(dataset_uname,
+                                                                  DATASETS_DIRS,
+                                                                  use_test_as_val=use_test_as_val,
+                                                                  use_test_as_train=use_test_as_train)
                             setting.update(dataset_setting)
+
                             setting.update({
-                                'do_train': 'train_file' in dataset_paths,
-                                'do_eval': 'validation_file' in dataset_paths,
-                                # 'do_predict': 'test_file' in dataset_paths,
+                                'do_train': True,
+                                'do_eval': True,
                                 'do_predict': do_predict,
                             })
 
-                            base_config_name = get_default_config_name(local_dataset_name)
+                            base_config_name = get_default_config_name(dataset_uname)
                             base_setting = get_config(base_config_name)
                             setting.update(base_setting)
 
@@ -320,7 +319,8 @@ def main():
                             setting.update({
                                 'seed': seed,
 
-                                'local_dataset_name': local_dataset_name,
+                                'dataset_uname': dataset_uname,
+                                'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
 
                                 'base_config_name': base_config_name,
 

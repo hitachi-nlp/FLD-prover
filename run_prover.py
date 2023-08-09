@@ -171,6 +171,9 @@ class DataTrainingArguments:
             "help": "An optional input test data file to evaluate the metrics (rouge) on (a jsonlines or csv file)."
         },
     )
+    dataset_push_to_hub_repo_name: str = field(
+        default=None,
+    )
     file_type: Optional[str] = field(
         default=None, metadata={"help": "The input file type such as 'json' or 'csv'"}
     )
@@ -493,6 +496,9 @@ def main():
             )
         else:
             raw_datasets = {}
+    if data_args.dataset_push_to_hub_repo_name is not None:
+        raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
+        return
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 

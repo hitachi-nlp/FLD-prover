@@ -7,7 +7,7 @@ from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 
 from experimental_setting import (
-    get_dataset_paths,
+    get_local_dataset_paths,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,9 +36,10 @@ def main():
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/2023-07-27.compare_models')
 
     # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230729.case_study_finalize')
-    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix')
+    # output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix')
+    output_top_dir = Path('./outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix.test_large')
 
-    local_dataset_names = [
+    dataset_unames = [
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',            # FLD-impl.0
         # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',                 # FLD.2
@@ -93,7 +94,7 @@ def main():
         # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal',
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         '20230729.case_study_finalize.D8',
     ]
 
@@ -127,15 +128,14 @@ def main():
 
     dry_run = False
 
-
-    for local_dataset_name in local_dataset_names:
-        output_dir = output_top_dir / local_dataset_name
+    for dataset_uname in dataset_unames:
+        output_dir = output_top_dir / dataset_uname
         output_dir.mkdir(exist_ok=True, parents=True)
 
-        dataset_paths = get_dataset_paths(local_dataset_name,
-                                          DATASETS_DIRS,
-                                          use_test_as_val=False,
-                                          use_test_as_train=False)
+        dataset_paths = get_local_dataset_paths(dataset_uname,
+                                                DATASETS_DIRS,
+                                                use_test_as_val=False,
+                                                use_test_as_train=False)
 
         is_settings_copied = False
         for input_path_str in dataset_paths.values():

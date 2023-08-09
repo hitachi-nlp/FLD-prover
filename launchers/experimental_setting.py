@@ -422,12 +422,47 @@ _DATASET_PATHS = {
 }
 
 
-def get_dataset_paths(name: str,
-                      top_dirs: List[str],
-                      use_test_as_train=False,
-                      use_test_as_val=False) -> Dict[str, Optional[str]]:
-    if name in _DATASET_PATHS:
-        paths = _DATASET_PATHS[name].copy()
+def get_dataset_setting(uname: str,
+                        top_dirs: List[str],
+                        use_test_as_train=False,
+                        use_test_as_val=False) -> Dict[str, Any]:
+    type_, dataset_name = _parse_dataset_name(uname)
+
+    setting: Dict[str, Any] = {
+        'predict_with_generate': True,
+        'remove_unused_columns': False,
+    }
+    if type_ == 'local':
+        setting.update(get_local_dataset_paths(dataset_name,
+                                               top_dirs=top_dirs,
+                                               use_test_as_train=use_test_as_train,
+                                               use_test_as_val=use_test_as_val))
+        setting['file_type'] = 'json'
+
+    elif type_ == 'hf':
+        setting['dataset_name'] = dataset_name
+
+    else:
+        raise ValueError()
+
+    return setting
+
+
+def get_local_dataset_paths(uname: str,
+                            top_dirs: List[str],
+                            use_test_as_train=False,
+                            use_test_as_val=False) -> Dict[str, Optional[str]]:
+    type_, dataset_name = _parse_dataset_name(uname)
+    if type_ != 'local':
+        raise ValueError()
+
+    def validate(dataset_paths):
+        for split_name, path in dataset_paths.items():
+            if not Path(path).exists:
+                raise Exception(f'{split_name} dataset does not exist at {path}')
+
+    if dataset_name in _DATASET_PATHS:
+        paths = _DATASET_PATHS[dataset_name].copy()
 
         if use_test_as_train:
             paths['train_file'] = paths['test_file']
@@ -435,6 +470,7 @@ def get_dataset_paths(name: str,
         if use_test_as_val:
             paths['validation_file'] = paths['test_file']
 
+        validate(paths)
         return paths
 
     else:
@@ -474,18 +510,18 @@ def get_dataset_paths(name: str,
 
                 setting = json.load(open(lab_path))
 
-                if setting.get('dataset_name', None) != name:
+                if setting.get('dataset_name', None) != dataset_name:
                     continue
 
                 if found_lab_path is not None:
-                    raise Exception(f'Multiple files for dataset "{name}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
+                    raise Exception(f'Multiple files for dataset "{ndataset_nameame}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
 
                 lab_path = Path(lab_path)
                 found_lab_path = lab_path
 
-                train_path = get_split_jsonl_with_warning(lab_path.parent, name, 'train')
-                valid_path = get_split_jsonl_with_warning(lab_path.parent, name, 'valid')
-                test_path = get_split_jsonl_with_warning(lab_path.parent, name, 'test')
+                train_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'train')
+                valid_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'valid')
+                test_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'test')
 
                 if use_test_as_train:
                     train_path = test_path
@@ -499,32 +535,17 @@ def get_dataset_paths(name: str,
                 }
 
             if found_dataset_paths is not None:
+                validate(found_dataset_paths)
                 return found_dataset_paths
 
-    raise ValueError(f'Dataset {name} not found under {top_dirs}.')
+    raise ValueError(f'Dataset {dataset_name} not found under {top_dirs}.')
 
 
-def get_dataset_setting(name: str) -> Dict[str, Any]:
-    if name.startswith('FLD'):
-        return {
-            'file_type': 'json',
-            'predict_with_generate': True,
-            'remove_unused_columns': False,
-        }
-    elif name.startswith('20221203.first_exp'):
-        return {
-            'file_type': 'json',
-            'predict_with_generate': True,
-            'remove_unused_columns': False,
-        }
-    elif name.startswith('2023'):
-        return {
-            'file_type': 'json',
-            'predict_with_generate': True,
-            'remove_unused_columns': False,
-        }
+def _parse_dataset_name(name: str) -> Tuple[str, str]:
+    if name.startswith('hf.'):
+        return name.split('.', 1)
     else:
-        raise NotImplementedError()
+        return 'local', name
 
 
 # _PROVER_CONFIGS = {
@@ -532,27 +553,25 @@ def get_dataset_setting(name: str) -> Dict[str, Any]:
 #     # 'ruletaker'   : './configs/prover/cli_ruletaker_stepwise_t5-large.yaml',
 #     # 'EB-task1'   : './configs/prover/cli_task1_stepwise_t5-large.yaml',
 #     # 'EB-task2': './configs/prover/cli_task2_stepwise_t5-large.yaml',
-# 
+#
 #     # -- (old) aacorpus --
 #     # 'aacorpus_20220702.trial': './configs/prover/cli_aacorpus_20220702.trial_stepwise_t5-large.yaml',
 #     # 'aacorpus_20220707.small': './configs/prover/cli_aacorpus_20220707.small_stepwise_t5-large.yaml',
-# 
+#
 #     # -- our setting --
 #     # 'ruletaker.20220922.base': './configs/prover/ruletaker.20220922.base.yaml',
-# 
+#
 #     'FLNLcorpus.20220827.base': './configs/prover/FLNLcorpus.20220827.base.yaml',
-# 
+#
 #     'ruletaker.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
 #     'ruletaker.D5.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
 #     'ruletaker.NatLang.include_all_answers.20220922.base': './configs/prover/ruletaker.NatLang.include_all_answers.20220922.base.yaml',
 #     'ruletaker.birds-electricity.include_all_answers.20220922.base': './configs/prover/ruletaker.birds-electricity.include_all_answers.20220922.base.yaml',
-# 
+#
 #     'EB-task1.20220922.base': './configs/prover/EB-task1.20220922.base.yaml',
 #     'EB-task2.20220922.base': './configs/prover/EB-task2.20220922.base.yaml',
 #     'EB-task3.20220922.base': './configs/prover/EB-task3.20220922.base.yaml',
 # }
-
-
 _PROVER_CONFIGS = {
     # -- official --
     # 'ruletaker'   : './configs/prover/cli_ruletaker_stepwise_t5-large.yaml',
@@ -729,7 +748,6 @@ _VERIFIER_CHECKPOINTS = {
     '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=0-step=45000.ckpt',
 
 }
-
 
 
 ICML_2023_NL_TRANSFER_MAJOR_DATASETS = [
@@ -925,133 +943,133 @@ ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH = [
 #         'limit_train_batches': 1,
 #         'shuffle_train': False,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
 #         'warmup_steps': 0,
-# 
+#
 #         'max_steps': 1,
-# 
+#
 #         'num_val_stage_throught_training': None,
 #         'val_check_interval_in_batch': None,
 #         # 'check_val_every_n_epoch': 1,
 #     },
-# 
+#
 #     'few-shot.batch-3': {
 #         'limit_train_batches': 3,
 #         'shuffle_train': False,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
 #         'warmup_steps': 500,
-# 
+#
 #         'max_steps': 2000,
-# 
+#
 #         'num_val_stage_throught_training': 5,
 #         'val_check_interval_in_batch': None,
 #         # 'check_val_every_n_epoch': None,
 #     },
-# 
+#
 #     'few-shot.batch-25': {
 #         'limit_train_batches': 25,
 #         'shuffle_train': False,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
 #         'warmup_steps': 500,
-# 
+#
 #         'max_steps': 2000,
-# 
+#
 #         'num_val_stage_throught_training': 5,
 #         'val_check_interval_in_batch': None,
 #         # 'check_val_every_n_epoch': None,
 #     },
-# 
+#
 #     'few-shot.batch-75': {
 #         'limit_train_batches': 75,
 #         'shuffle_train': False,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
 #         'warmup_steps': 500,
-# 
+#
 #         'max_steps': 2000,
-# 
+#
 #         'num_val_stage_throught_training': 5,
 #         'val_check_interval_in_batch': None,
 #         # 'check_val_every_n_epoch': None,
 #     },
-# 
+#
 #     'few-shot.batch-250': {
 #         'limit_train_batches': 1000,
 #         'shuffle_train': False,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
-# 
+#
 #         'warmup_steps': 500,
-# 
+#
 #         'max_steps': 2000,
-# 
+#
 #         'num_val_stage_throught_training': 5,
 #         'val_check_interval_in_batch': None,
 #         # 'check_val_every_n_epoch': None,
 #     },
-# 
+#
 #     'FT': {
 #         # -- NLProofS_hypara--
 #         # 'max_steps': 12500,
 #         # 'max_source_length': 1024,
 #         # 'max_target_length': 64,
-# 
-# 
+#
+#
 #         'limit_train_batches': None,
 #         'shuffle_train': True,
 #         'limit_eval_batches': 500,
-# 
+#
 #         'num_train_epochs': None,
-# 
+#
 #         'num_val_stage_throught_training': 10,
 #         'val_check_interval_in_batch': None,
-# 
+#
 #         # ----------------------- pre-trianing --------------------------
-# 
+#
 #         # -- pre-training: FLNL (arg-RT/arg-AA) / RuleTaker / EB
 #         # 'max_steps': 5000,
-# 
+#
 #         # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
 #         # 'max_steps': 20000,
-# 
+#
 #         # -- pre-training: FLNL (arg-FLNL)
 #         # 'max_steps': 20000,
-# 
+#
 #         # -- pre-training: large models
 #         # 'max_steps': 10000,
-# 
+#
 #         # ----------------------- EB fine-tuning --------------------------
 #         'max_steps': 10000,
 #         # 'max_steps': 5000,
-# 
+#
 #         'warmup_steps': None,
 #         # 'warmup_steps': 1000,
 #         # 'warmup_steps': 3000,
 #     },
-# 
-# 
+#
+#
 #     # ----------- XXX: this is for debug!!! --------------
 #     # 'FT': {
 #     #     'limit_train_batches': None,
 #     #     'shuffle_train': True,
 #     #     'limit_eval_batches': 100,
-# 
+#
 #     #     'num_train_epochs': None,
 #     #     'max_steps': 100,
 #     #     'warmup_steps': 10,
-# 
+#
 #     #     'num_val_stage_throught_training': 2,
 #     #     'val_check_interval_in_batch': None,
 #     #     # 'check_val_every_n_epoch': None,
 #     # },
-# 
+#
 # }
 
 
@@ -1233,15 +1251,15 @@ def get_checkpoints(spec: CheckpointSpec,
                     continue
 
                 if name_or_local_dataset_name.find('.local_dataset_1_name--') >= 0:
-                    local_dataset_name, local_dataset_1_name = name_or_local_dataset_name.split('.local_dataset_1_name--')
+                    dataset_uname, local_dataset_1_name = name_or_local_dataset_name.split('.local_dataset_1_name--')
                 else:
-                    local_dataset_name = name_or_local_dataset_name
+                    dataset_uname = name_or_local_dataset_name
                     local_dataset_1_name = None
 
-                found_local_dataset_name = lab_setting['local_dataset_name']
+                found_local_dataset_name = lab_setting['dataset_uname']
                 found_local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
 
-                if found_local_dataset_name == local_dataset_name and found_local_dataset_1_name == local_dataset_1_name:
+                if found_local_dataset_name == dataset_uname and found_local_dataset_1_name == local_dataset_1_name:
                     found_spec = CheckpointSpec(**lab_setting)
                     found_spec.name_or_local_dataset_name = name_or_local_dataset_name
                     checkpoints.append((str(checkpoint), found_spec))
@@ -1260,7 +1278,6 @@ def get_logging_step_setting(max_steps: Optional[int] = None,
             setting['eval_steps'] = max_steps
     setting['save_steps'] = setting.get('eval_steps', None)
     return setting
-
 
 
 def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> Dict[str, Any]:
@@ -1314,7 +1331,7 @@ def make_command(output_dir: Union[str, Path],
         'checkpoint_path',
         'shot',
         'max_proof_steps',
-        'local_dataset_name',
+        'dataset_uname',
         'n_proc_per_node',
     ]
 
@@ -1360,7 +1377,7 @@ def make_output_dir(setting: Dict,
         top_dir=str(
             Path(top_dir)
             # / f'sstm_nm={setting.get("system_name", str(None))}'
-            / f'dtst_nm={setting.get("local_dataset_name", None)}'
+            / f'dtst_nm={setting.get("dataset_uname", None)}'
             / f'dtst_1_nm={setting.get("local_dataset_1_name", None)}'
             # / f'excld_unknwn={setting.get("exclude_unknown", None)}'
             # / f'add_fnl_rfrc_t_prfs={setting.get("add_final_reference_to_proofs", None)}'
@@ -1376,7 +1393,7 @@ def make_output_dir(setting: Dict,
             # 'system_name',
             # 'EB_task',
 
-            'local_dataset_name',
+            'dataset_uname',
             'local_dataset_1_name',
             'dataset_1',
             'train_file_1',
@@ -1466,11 +1483,11 @@ def make_output_dir(setting: Dict,
 
 
 def make_system_name(lab_setting: Dict) -> str:
-    local_dataset_name = lab_setting['local_dataset_name']
+    dataset_uname = lab_setting['dataset_uname']
     # local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
     checkpoint_name = lab_setting['checkpoint_name']
 
-    return f'checkpoint_name--{checkpoint_name}__local_dataset_name--{local_dataset_name}'
+    return f'checkpoint_name--{checkpoint_name}__local_dataset_name--{dataset_uname}'
 
 
 def run_by_engine(engine: EngineBase,

@@ -33,7 +33,8 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
     # output_top_dir = Path('./outputs/02.interactive.py/dev_null')
-    output_top_dir = Path('./outputs/02.interactive.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
+    # output_top_dir = Path('./outputs/02.interactive.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
+    output_top_dir = Path('./outputs/02.interactive.py/tmp')
 
     # # -- D3 --
     # checkpoint_top_dir = Path('./outputs/01.train.py/20230711.finalize/dtst_nm=20230711.finalize.D3/dtst_1_nm=None/bs_cnfg_nm=FLNLcorpus.20220827.base/chckpnt_nm=t5-base/ckpt_lrt=None/ckpt_mdl_nm=None/gnrtn_nm_bms=10/gnrtn_tp_k=10/lrnng_rt=0.0001/mx_stps=20000/mdl_nm_or_pth=t5-base/prf_smplng=stepwise/smpl_ngtv_prf=True/sd=0/sht=FT.step-20000/wrmp_stps=1000/checkpoint-19500')
@@ -54,7 +55,9 @@ def main():
 
     # checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
 
-    checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
+    # checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
+
+    checkpoint_top_dir = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
 
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
@@ -73,7 +76,7 @@ def main():
 
     # ------------------------ fixed ------------------------
     hours = 72
-    local_dataset_name = '20230711.finalize.D3'
+    dataset_uname = '20230711.finalize.D3'
 
     checkpoint_configs = [path for path in checkpoint_top_dir.glob('**/*/tokenizer_config.json')
                           if str(path).find('checkpoint-') < 0]  # this finds the final checkpoint output to the top dir
@@ -94,11 +97,11 @@ def main():
         'interactive_mode': interactive_mode,
         'gradio_port': gradio_port,
     })
-    base_config_name = get_default_config_name(local_dataset_name)
+    base_config_name = get_default_config_name(dataset_uname)
     base_setting = get_config(base_config_name)
     setting.update(base_setting)
 
-    dataset_setting = get_dataset_setting(local_dataset_name)
+    dataset_setting = get_dataset_setting(dataset_uname)
     setting.update(dataset_setting)
 
     model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
@@ -108,7 +111,7 @@ def main():
     setting.update({
         'seed': 0,
 
-        'local_dataset_name': local_dataset_name,
+        'dataset_uname': dataset_uname,
 
         'base_config_name': base_config_name,
 

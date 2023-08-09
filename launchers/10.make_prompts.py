@@ -9,7 +9,7 @@ from logger_setup import setup as setup_logger
 from lab import build_dir
 
 from experimental_setting import (
-    get_dataset_paths,
+    get_local_dataset_paths,
     run_by_engine,
 )
 
@@ -140,7 +140,7 @@ def main():
 
     # -------------------------- running --------------------------
     for local_dataset_name in local_dataset_names:
-        dataset_paths = get_dataset_paths(local_dataset_name,
+        dataset_paths = get_local_dataset_paths(local_dataset_name,
                                           DATASETS_DIRS,
                                           use_test_as_val=False,
                                           use_test_as_train=use_test_as_train)
