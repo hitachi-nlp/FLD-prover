@@ -5,9 +5,9 @@ This repository includes the code for the deductive prover model.
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD) for the other repositories used in the paper.
 
 ## About this release
-* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which is a little complex due to the code for the proof verifier.
+* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier.
 * For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the HuggingFace [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
-* Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
+* Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
 ## Installation
 The code has been tested on Python 3.8.5.
@@ -17,18 +17,15 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
 ```
 
 ## How to train a prover
-1. Download the FLD corpus from [FLD-corpus](https://github.com/hitachi-nlp/FLD-corpus), or, create your own using [FLD-generator](https://github.com/hitachi-nlp/FLD-generator.git)
 
-1. Train the prover:
+1. Run the training script. We use the `FLD.3` corpus on the [huggingface dataset hub](https://huggingface.co/datasets/hitachi-nlp/FLD.3):
 
     ```console
     $ python\
         ./run_prover.py\
+        --dataset_name hitachi-nlp/FLD.3\
         --output_dir outputs/\
         --logging_dir outputs/tensorboard/\
-        --train_file ./data/FLD/FLD.3/train.jsonl\
-        --validation_file ./data/FLD/FLD.3/valid.jsonl\
-        --test_file ./data/FLD/FLD.3/test.jsonl\
         --file_type json\
         --predict_with_generate True\
         --remove_unused_columns False\
@@ -66,7 +63,16 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
         --tokenizer_padding longest
     ```
 
-3. Check the results using tensorboard:
+Or, if you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
+
+    ```console
+        --train_file ./data/FLD/FLD.3/train.jsonl\
+        --validation_file ./data/FLD/FLD.3/valid.jsonl\
+        --test_file ./data/FLD/FLD.3/test.jsonl\
+    ```
+
+
+1. Check the results using tensorboard:
 
     ```console
     $ tensorboard --port 6006 --logdir ./outputs/tensorboard/
