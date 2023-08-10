@@ -139,8 +139,8 @@ def main():
         # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.3',
-        'hf.hitachi-nlp/FLD.4',
+        'hf.hitachi-nlp/FLD.v2',
+        # 'hf.hitachi-nlp/FLD-star.v2',
     ]
 
     DATASETS_DIRS = [
@@ -168,9 +168,6 @@ def main():
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
     ]
 
-    use_test_as_train = True  # debug
-    # use_test_as_train = False
-
     shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
@@ -180,6 +177,10 @@ def main():
     # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
+
+    # use_test_as_train = True   # debug
+    use_test_as_train = False
+    use_test_as_val = True
 
     proof_sampling = 'stepwise'
     # proof_sampling = 'all_at_once'
@@ -205,14 +206,22 @@ def main():
     do_torchrun = False  # for debug
     # do_torchrun = True
 
-    # XXX: BE CAREFUL NOT TO OVERWRITE THE OFFICIAL DATASETS
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.3'
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.4'
-    dataset_push_to_hub_repo_name = None
-
     dry_run = False
 
+    # ---------------------- pushing datasets to hub -------------------
+    # XXX: BE CAREFUL PUSHING TO HUB DEFAULTLY OVERWRITE THE OFFICIAL DATASETS
+    # XXX: SPECIFY use_test_as_train = False, use_test_as_val = False
+
+    dataset_push_to_hub_repo_name = None
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
+
+    # Specify as follows so that we push all the splits.
+    # use_test_as_train = False
+    # use_test_as_val = False
+
     # ------------------------ fixed ------------------------
+    
     hours = 72
 
     lrates = [
@@ -238,8 +247,7 @@ def main():
     ]
 
     do_predict = False
-    use_test_as_val = True
-
+    
     sample_negative_proof_args = [
         # False,
         True
