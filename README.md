@@ -18,12 +18,12 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
 
 ## How to train a prover
 
-1. Run the training script. We use the `FLD.3` corpus on [the huggingface dataset hub](https://huggingface.co/datasets/hitachi-nlp/FLD.3):
+1. Run the training script. We use the **FLD** (FLD.3 in the paper) corpus hosted by [huggingface](https://huggingface.co/datasets/hitachi-nlp/FLD.v2):
 
     ```console
     $ python\
         ./run_prover.py\
-        --dataset_name hitachi-nlp/FLD.3\
+        --dataset_name hitachi-nlp/FLD.v2\
         --output_dir outputs/\
         --logging_dir outputs/tensorboard/\
         --file_type json\
@@ -66,9 +66,9 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
     Or, if you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
 
     ```console
-        --train_file ./data/FLD/FLD.3/train.jsonl\
-        --validation_file ./data/FLD/FLD.3/valid.jsonl\
-        --test_file ./data/FLD/FLD.3/test.jsonl\
+        --train_file ./data/FLD.v2/FLD.v2/train.jsonl\
+        --validation_file ./data/FLD.v2/FLD.v2/valid.jsonl\
+        --test_file ./data/FLD.v2/FLD.v2/test.jsonl\
     ```
 
 
@@ -83,8 +83,8 @@ A prover trained for 20000 steps on each corpus should perform as follows:
 
 | corpus           | extr_stps.D-all.proof_accuracy | strct.D-all.answer_accuracy | D-all.answer_accuracy |
 |------------------|--------------------------------|-----------------------------|-----------------------|
-| FLD.3 (**FLD**)  | 85.2                           | 74.8                        | 91.6                  |
-| FLD.4 (**FLD★**) | 60.6                           |43.4                        | 72.2                  |
+| **FLD** (FLD.3)  | 85.2                           | 74.8                        | 91.6                  |
+| **FLD★**(FLD.4   | 60.6                           |43.4                        | 72.2                  |
 
 As seen above, we have defined the two types of metrics:
 * `strict` (shown as `strct.*`. used in the paper.)
