@@ -62,7 +62,7 @@ from transformers.utils import check_min_version, is_offline_mode, send_example_
 from transformers.utils.versions import require_version
 from logger_setup import setup as setup_logger
 
-from FLD_task import build_metrics, prettify_context_text, prettify_proof_text
+from FLD_task import load_deduction, build_metrics, prettify_context_text, prettify_proof_text
 from FLD_task.proof import get_stance_markers
 from FLD_prover.utils import tokenize_with_log
 from FLD_prover import (
@@ -496,6 +496,13 @@ def main():
             )
         else:
             raw_datasets = {}
+
+    # load and dump once to normalize the schema from different versions of datasets.
+    raw_datasets = raw_datasets.map(
+        lambda example: load_deduction(example).dict(),
+        batched=False,
+    )
+
     if data_args.dataset_push_to_hub_repo_name is not None:
         raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
         return

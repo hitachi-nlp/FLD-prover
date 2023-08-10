@@ -144,25 +144,28 @@ def main():
     ]
 
     DATASETS_DIRS = [
-        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
-        # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
+        # './outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
+        # './outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
         # './NLProofS/outputs/00.create_cc100_corpus.py/',
 
-        # './outputs/00.fix_FLD_schema.py/2023-05-15/',
-        # './outputs/00.fix_FLD_schema.py/20230626.many_bugs_fixed',
-        # './outputs/00.fix_FLD_schema.py/20230628.make_harder',
-        # './outputs/00.fix_FLD_schema.py/20230701.finalize',
+        # './outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
+        # './outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
+        # './outputs.FLD/10.create_FLD_corpus/20230701.finalize',
 
-        # './outputs/00.fix_FLD_schema.py/20230707.finalize',
-        # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
-        # './outputs/00.fix_FLD_schema.py/20230711.finalize',
+        # './outputs.FLD/10.create_FLD_corpus/20230707.finalize',
 
-        # './outputs/00.fix_FLD_schema.py/20230718.case_study',
-        # './outputs/00.fix_FLD_schema.py/2023-07-27.compare_models',
+        # './outputs.FLD/00.create_corpus/20230710.update_translation',
+        # './outputs.FLD/00.create_corpus/20230710.update_translation.bf51eb2',
+        # './outputs.FLD/00.create_corpus/20230710.update_translation.7485fef',
 
-        # './outputs/00.fix_FLD_schema.py/20230729.case_study_finalize',
-        # './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix',
-        './outputs/00.fix_FLD_schema.py/20230801.case_study_finalize.fix.test_large',
+        # './outputs.FLD/00.create_corpus/20230711.refactor_distractors',
+        # './outputs.FLD/00.create_corpus/20230711.finalize',
+
+        # './outputs.FLD/00.create_corpus/20230718.case_study',
+        # './outputs.FLD/00.create_corpus/2023-07-27.compare_models',
+
+        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
     ]
 
     use_test_as_train = True  # debug
