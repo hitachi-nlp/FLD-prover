@@ -18,7 +18,7 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
 
 ## How to train a prover
 
-1. Run the training script. We use the `FLD.3` corpus on the [huggingface dataset hub](https://huggingface.co/datasets/hitachi-nlp/FLD.3):
+1. Run the training script. We use the `FLD.3` corpus on [the huggingface dataset hub](https://huggingface.co/datasets/hitachi-nlp/FLD.3):
 
     ```console
     $ python\
@@ -63,7 +63,7 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
         --tokenizer_padding longest
     ```
 
-Or, if you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
+    Or, if you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
 
     ```console
         --train_file ./data/FLD/FLD.3/train.jsonl\
