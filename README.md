@@ -18,13 +18,6 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
 
 ## How to train a prover
 1. Download the FLD corpus from [FLD-corpus](https://github.com/hitachi-nlp/FLD-corpus), or, create your own using [FLD-generator](https://github.com/hitachi-nlp/FLD-generator.git)
-1. Convert json schema of the original corpus to fit the prover script:
-
-    ```console
-    $ python ./convert_json_schema.py ./data/FLD/FLD.3/train.jsonl  ./data/FLD.converted/FLD.3/train.jsonl
-    $ python ./convert_json_schema.py ./data/FLD/FLD.3/valid.jsonl  ./data/FLD.converted/FLD.3/valid.jsonl
-    $ python ./convert_json_schema.py ./data/FLD/FLD.3/test.jsonl   ./data/FLD.converted/FLD.3/test.jsonl
-    ```
 
 1. Train the prover:
 
@@ -33,9 +26,9 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
         ./run_prover.py\
         --output_dir outputs/\
         --logging_dir outputs/tensorboard/\
-        --train_file ./data/FLD.converted/FLD.3/train.jsonl\
-        --validation_file ./data/FLD.converted/FLD.3/valid.jsonl\
-        --test_file ./data/FLD.converted/FLD.3/test.jsonl\
+        --train_file ./data/FLD/FLD.3/train.jsonl\
+        --validation_file ./data/FLD/FLD.3/valid.jsonl\
+        --test_file ./data/FLD/FLD.3/test.jsonl\
         --file_type json\
         --predict_with_generate True\
         --remove_unused_columns False\

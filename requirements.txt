@@ -12,6 +12,7 @@ ete3==3.1.2
 numpy
 evaluate
 gradio
+huggingface_hub
 
 langchain
 openai
