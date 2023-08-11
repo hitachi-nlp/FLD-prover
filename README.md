@@ -4,8 +4,7 @@ This repository includes the code for training language models on FLD corpora.
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
 ## About this release
-* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier.
-* For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the HuggingFace [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
+* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
 * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
 ## Installation
@@ -80,7 +79,7 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
 ## Prover performance and the metrics
 A prover trained for 20000 steps on each corpus should perform as follows:
 
-| corpus           | extr_stps.D-all.proof_accuracy | strct.D-all.answer_accuracy | D-all.answer_accuracy |
+| corpus           | extr_stps.D-all.proof_accuracy | strct.D-all.proof_accuracy | D-all.answer_accuracy |
 |------------------|--------------------------------|-----------------------------|-----------------------|
 | **FLD** (FLD.3)  | 85.2                           | 74.8                        | 91.6                  |
 | **FLD★**(FLD.4)   | 60.6                           |43.4                        | 72.2                  |
