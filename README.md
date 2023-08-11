@@ -90,7 +90,7 @@ As seen above, we have defined the two types of metrics:
 * `extra_steps` (shown as `extr_stps.*`)
     * Allows such extra steps.
 
-The difference in the two metrics is the most noticeable for a dataset instance with an `unknown` label, on which the `strict` metric allows the model to output only `__UNKNOWN__` marker while the `extra_steps` metric allows the model to output some logical steps to investigate whether the hypothesis can be (dis-) proved or not.
+The difference in the two metrics is the most noticeable for a dataset instance with an `unknown` label, on which the `strict` metric allows the model to output *only* `__UNKNOWN__` marker while the `extra_steps` metric allows the model to output some logical steps to investigate whether the hypothesis can be (dis-) proved or not.
 
 We think both metrics have their Pros/Cons and both are OK for use as long as they are not contaminated.
 Note that the previous studies have used the metric colse to `extra_steps` regarding the `unknown` labels.
