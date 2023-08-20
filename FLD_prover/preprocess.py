@@ -1,8 +1,6 @@
 from copy import deepcopy
-from typing import Dict, List, Any, Optional
-from typing import TypedDict
+from typing import Dict, List, Any
 
-from pydantic import BaseModel
 from FLD_task import Deduction, load_deduction, serialize
 
 

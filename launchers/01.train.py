@@ -136,10 +136,10 @@ def main():
 
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        'hf.hitachi-nlp/FLD.v2',
+        # 'hf.hitachi-nlp/FLD.v2',
         # 'hf.hitachi-nlp/FLD-star.v2',
     ]
 
@@ -178,8 +178,8 @@ def main():
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    # use_test_as_train = True   # debug
-    use_test_as_train = False
+    use_test_as_train = True   # debug
+    # use_test_as_train = False
     use_test_as_val = True
 
     proof_sampling = 'stepwise'

@@ -440,6 +440,8 @@ def get_dataset_setting(uname: str,
         setting['file_type'] = 'json'
 
     elif type_ == 'hf':
+        if use_test_as_train or use_test_as_val:
+            raise ValueError()
         setting['dataset_name'] = dataset_name
 
     else:

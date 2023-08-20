@@ -70,6 +70,7 @@ from FLD_prover import (
     preprocess_examples_train,
     preprocess_examples_eval,
 )
+from FLD_task.hf_dataset import transform
 import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -686,23 +687,12 @@ def main():
                             split: str,
                             max_source_length: int,
                             max_target_length: int) -> Dict[str, List[Any]]:
-        if split == 'train':
-            if data_args.proof_sampling == 'stepwise':
-                do_stepwise = True
-            elif data_args.proof_sampling == 'all_at_once':
-                do_stepwise = False
-            else:
-                raise ValueError()
-            examples = preprocess_examples_train(
-                examples,
-                stepwise=do_stepwise,
-                sample_negative_proof=data_args.sample_negative_proof,
-            )
-        elif split == 'eval':
-            examples = preprocess_examples_eval(examples)
-        else:
-            raise ValueError()
+        examples = transform(examples,
+                             split,
+                             proof_sampling=data_args.proof_sampling,
+                             sample_negative_proof=data_args.sample_negative_proof)
 
+        # collate
         inputs, targets, gold_proofs = extract_serials(examples)
         inputs = [prefix + inp for inp in inputs]
 
