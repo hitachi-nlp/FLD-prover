@@ -70,7 +70,7 @@ from FLD_prover import (
     preprocess_examples_train,
     preprocess_examples_eval,
 )
-from FLD_task.hf_dataset import transform
+from FLD_task.hf_dataset import serialize_transform
 import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -498,15 +498,17 @@ def main():
         else:
             raw_datasets = {}
 
+    if data_args.dataset_push_to_hub_repo_name is not None:
+        raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
+        return
+
     # load and dump once to normalize the schema from different versions of datasets.
     raw_datasets = raw_datasets.map(
         lambda example: load_deduction(example).dict(),
         batched=False,
+        load_from_cache_file=False,  # to always reflect the modification of the preprocessing
     )
 
-    if data_args.dataset_push_to_hub_repo_name is not None:
-        raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
-        return
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -687,10 +689,10 @@ def main():
                             split: str,
                             max_source_length: int,
                             max_target_length: int) -> Dict[str, List[Any]]:
-        examples = transform(examples,
-                             split,
-                             proof_sampling=data_args.proof_sampling,
-                             sample_negative_proof=data_args.sample_negative_proof)
+        examples = serialize_transform(examples,
+                                       split,
+                                       proof_sampling=data_args.proof_sampling,
+                                       sample_negative_proof=data_args.sample_negative_proof)
 
         # collate
         inputs, targets, gold_proofs = extract_serials(examples)

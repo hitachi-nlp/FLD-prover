@@ -136,10 +136,10 @@ def main():
 
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.v2',
+        'hf.hitachi-nlp/FLD.v2',
         # 'hf.hitachi-nlp/FLD-star.v2',
     ]
 
@@ -168,6 +168,19 @@ def main():
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
     ]
 
+    # ---------------------- pushing datasets to hub -------------------
+    # XXX: BE CAREFUL PUSHING TO HUB DEFAULTLY OVERWRITE THE OFFICIAL DATASETS
+    # XXX: SPECIFY use_test_as_train = False, use_test_as_val = False
+
+    dataset_push_to_hub_repo_name = None
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
+    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
+
+    # Specify as follows so that we push all the splits.
+    # use_test_as_train = False
+    # use_test_as_val = False
+    # ---------------------- pushing datasets to hub -------------------
+
     shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
@@ -178,12 +191,11 @@ def main():
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    use_test_as_train = True   # debug
-    # use_test_as_train = False
-    use_test_as_val = True
+    use_test_as_train = False   # debug
+    use_test_as_val = False
 
-    proof_sampling = 'stepwise'
-    # proof_sampling = 'all_at_once'
+    # proof_sampling = 'stepwise'
+    proof_sampling = 'all_at_once'
 
     # max_steps = 100
     max_steps = None
@@ -200,28 +212,21 @@ def main():
     engine = SubprocessEngine()   # debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    n_gpus = 1  # debug
-    # n_gpus = 4
+    # n_gpus = 1  # debug
+    n_gpus = 4
 
-    do_torchrun = False  # for debug
-    # do_torchrun = True
+    # do_torchrun = False  # for debug
+    do_torchrun = True
 
     dry_run = False
 
-    # ---------------------- pushing datasets to hub -------------------
-    # XXX: BE CAREFUL PUSHING TO HUB DEFAULTLY OVERWRITE THE OFFICIAL DATASETS
-    # XXX: SPECIFY use_test_as_train = False, use_test_as_val = False
-
-    dataset_push_to_hub_repo_name = None
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
-
-    # Specify as follows so that we push all the splits.
-    # use_test_as_train = False
-    # use_test_as_val = False
-
     # ------------------------ fixed ------------------------
-    
+
+    if dataset_push_to_hub_repo_name is not None:
+        if n_gpus != 1 or do_torchrun:
+            # this does not work
+            raise ValueError()
+
     hours = 72
 
     lrates = [
