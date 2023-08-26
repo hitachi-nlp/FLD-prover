@@ -45,6 +45,7 @@ import transformers
 from transformers import (
     AutoConfig,
     AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,
     AutoTokenizer,
     DataCollatorForSeq2Seq,
     HfArgumentParser,
@@ -60,8 +61,10 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.generation.configuration_utils import GenerationConfig
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
-from logger_setup import setup as setup_logger
+import huggingface_hub
+from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 
+from logger_setup import setup as setup_logger
 from FLD_task import load_deduction, build_metrics, prettify_context_text, prettify_proof_text
 from FLD_task.proof import get_stance_markers
 from FLD_prover.utils import tokenize_with_log
@@ -139,6 +142,10 @@ class ModelArguments:
             )
         },
     )
+    lora: Optional[bool] = field(
+        default=False,
+    )
+
 
 
 @dataclass
@@ -299,7 +306,7 @@ class DataTrainingArguments:
     )
 
     generation_top_k: int = field(
-        default=30,
+        default=None,
     )
 
     generation_num_return_sequences: int = field(
@@ -387,9 +394,13 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    logger.info('reloading GenerationConfig to reflect the specified parameters: top_k= %s', data_args.generation_top_k)
-    training_args.generation_config = GenerationConfig.from_pretrained(model_args.model_name_or_path,
-                                                                       top_k=data_args.generation_top_k)
+    if data_args.generation_top_k is not None:
+        try:
+            logger.info('reloading GenerationConfig to reflect the specified parameters: top_k= %s', data_args.generation_top_k)
+            training_args.generation_config = GenerationConfig.from_pretrained(model_args.model_name_or_path,
+                                                                               top_k=data_args.generation_top_k)
+        except Exception as e:
+            logger.warning('Could not specify generation_top_k due to the following error:\n%s', str(e))
 
     if training_args.dataloader_num_workers > 0:
         raise Exception(f'dataloader_num_workers({training_args.dataloader_num_workers}) > 0 is extemely slow in our program. We strongly recommend to ppecify it as 0.')
@@ -530,7 +541,11 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    model = AutoModelForSeq2SeqLM.from_pretrained(
+    if model_args.model_name_or_path.find('t5') >= 0:
+        auto_model_class = AutoModelForSeq2SeqLM
+    else:
+        auto_model_class = AutoModelForCausalLM
+    model = auto_model_class.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
         config=config,
@@ -540,6 +555,17 @@ def main():
     )
     # torch._C._dynamo.disable
     # model = torch.compile(model)
+
+    if model_args.lora:
+        # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
+        peft_config = LoraConfig(task_type=PeftTaskType.SEQ_2_SEQ_LM,
+                                 inference_mode=False,
+                                 r=8,
+                                 lora_alpha=32,
+                                 lora_dropout=0.1)
+        model = get_peft_model(model, peft_config)
+        logger.info('train LoRA model with the following parameters:')
+        model.print_trainable_parameters()
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.

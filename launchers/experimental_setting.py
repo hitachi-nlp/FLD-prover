@@ -33,28 +33,6 @@ def maybe_option_flag(flag: str, value: bool) -> str:
 
 _PROVER_BATCH_SETTINGS = {
 
-    'google/long-t5-tglobal-base': {
-        'max_source_length': 1500,
-        'max_target_length': 100,
-
-        'per_device_train_batch_size': 10,
-        'per_device_eval_batch_size': 10,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-    'google/long-t5-tglobal-large': {
-        'max_source_length': 1500,
-        'max_target_length': 100,
-
-        'per_device_train_batch_size': 2,
-        'per_device_eval_batch_size': 2,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
     # XXX: if you change max_source_length or max_target_length,
     # make sure that all the stuf fit into memory with tokenizer_padding='max_len' option.
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
@@ -77,13 +55,8 @@ _PROVER_BATCH_SETTINGS = {
         'max_source_length': 1700,
         'max_target_length': 100,
 
-        # -- V100 --
         'per_device_train_batch_size': 1,
         'per_device_eval_batch_size': 1,
-
-        # -- A100 --
-        # 'per_device_train_batch_size': 4,
-        # 'per_device_eval_batch_size': 4,
 
         # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
@@ -93,29 +66,12 @@ _PROVER_BATCH_SETTINGS = {
         'max_source_length': 1000,
         'max_target_length': 1000,
 
-        # -- V100 --
         'per_device_train_batch_size': 1,
         'per_device_eval_batch_size': 1,
-
-        # -- A100 --
-        # 'per_device_train_batch_size': 4,
-        # 'per_device_eval_batch_size': 4,
 
         # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
     },
-
-
-    # 't5-large': {
-    #     'max_source_length': 1200,
-    #     'max_target_length': 100,
-
-    #     'per_device_train_batch_size': 3,
-    #     'per_device_eval_batch_size': 3,
-
-    #     # 'tokenizer_padding': 'max_length',
-    #     'tokenizer_padding': 'longest',
-    # },
 
     't5-large': {
         'max_source_length': 1500,
@@ -130,6 +86,8 @@ _PROVER_BATCH_SETTINGS = {
         # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
     },
+
+
 
     # # TODO must tune the max_source_length and batch size for speed
     # 'allenai/led-base-16384': {
@@ -155,6 +113,112 @@ _PROVER_BATCH_SETTINGS = {
     #     'tokenizer_padding': 'longest',
     # },
 
+
+
+
+    # 'google/long-t5-tglobal-base': {
+    #     'max_source_length': 1500,
+    #     'max_target_length': 100,
+
+    #     'per_device_train_batch_size': 10,
+    #     'per_device_eval_batch_size': 10,
+
+    #     # 'tokenizer_padding': 'max_length',
+    #     'tokenizer_padding': 'longest',
+    # },
+
+    # 'google/long-t5-tglobal-large': {
+    #     'max_source_length': 1500,
+    #     'max_target_length': 100,
+
+    #     'per_device_train_batch_size': 2,
+    #     'per_device_eval_batch_size': 2,
+
+    #     # 'tokenizer_padding': 'max_length',
+    #     'tokenizer_padding': 'longest',
+    # },
+
+
+
+
+
+
+
+
+
+    # XXX: can not fit into memory, possibly because of the large model
+    # additionally, multilingual model tend to generate large number of japanese tokens
+    # doe to the un-optimized tokenizer
+    # 'google/mt5-base': {
+    #     'max_source_length': 700,
+    #     'max_target_length': 100,
+
+    #     'per_device_train_batch_size': 0,
+    #     'per_device_eval_batch_size': 0,
+
+    #     'tokenizer_padding': 'max_length',
+    #     # 'tokenizer_padding': 'longest',
+    # },
+
+    'sonoisa/t5-base-japanese': {
+        'max_source_length': 1700,
+        'max_target_length': 100,
+
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+    'sonoisa/t5-base-japanese-v1.1': {
+        'max_source_length': 1700,
+        'max_target_length': 100,
+
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+    'retrieva-jp/t5-base-long': {
+        'max_source_length': 1700,
+        'max_target_length': 100,
+
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+
+    # 'sonoisa/t5-base-japanese-v1.1.all_at_once': {
+    #     'max_source_length': 1000,
+    #     'max_target_length': 1000,
+
+    #     'per_device_train_batch_size': 1,
+    #     'per_device_eval_batch_size': 1,
+
+    #     'tokenizer_padding': 'max_length',
+    #     # 'tokenizer_padding': 'longest',
+    # },
+
+    'matsuo-lab/weblab-10b': {
+        'max_source_length': 1000,
+        'max_target_length': 1000,
+
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+
+
+
 }
 
 _VERIFIER_BATCH_SETTINGS = {
@@ -179,13 +243,17 @@ _VERIFIER_BATCH_SETTINGS = {
 def get_batch_setting(model_name: str,
                       num_gpus: int,
                       train_effective_batch_size=64) -> Dict[str, Any]:
-    if model_name.startswith('google/mt5-'):
-        model_name = model_name[model_name.find('mt5-') + 1:]
+
     setting = _PROVER_BATCH_SETTINGS[model_name]
+    # if lora:
+    #     setting['per_device_train_batch_size'] = min(32, int(train_effective_batch_size / num_gpus))
+    #     setting['per_device_eval_batch_size'] = 4
+
     accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * num_gpus))
     if accum_steps < 1:
         raise ValueError()
     setting['gradient_accumulation_steps'] = accum_steps
+
     return setting
 
 
@@ -1214,7 +1282,7 @@ class CheckpointSpec(BaseModel):
 
 def get_checkpoints(spec: CheckpointSpec,
                     check_point_dirs: Optional[List[Union[str, Path]]] = None) -> List[Tuple[str, CheckpointSpec]]:
-    if spec.name_or_local_dataset_name.startswith('t5-') or spec.name_or_local_dataset_name.startswith('google/mt5-'):
+    if spec.name_or_local_dataset_name.startswith('hf.'):
         return [(spec.name_or_local_dataset_name, spec)]
     else:
         raise NotImplementedError()

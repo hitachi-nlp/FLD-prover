@@ -76,7 +76,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
 
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
-    output_top_dir = Path('./outputs/01.train.py/debug')
+
+    output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
 
     dataset_unames = [
         # 'FLD.debug.2023-05-13',
@@ -188,43 +189,56 @@ def main():
     # use_test_as_val = False
     # ------------------------------------------------------------
 
-    checkpoint_names = [
+    model_names = [
+        # -------------- English models -------------
         # 't5-base',
         # 't5-large'
 
-        'google/mt5-base',
+        # -------------- Japanese models -------------
+        # 'google/mt5-base',
+
+        'retrieva-jp/t5-base-long',
+        # 'retrieva-jp/t5-large-long',
+
+        # 'matsuo-lab/weblab-10b',
+        # 'stabilityai/japanese-stablelm-base-alpha-7b',
+
+        # 'cyberagent/open-calm-1b',
+        # 'cyberagent/open-calm-3b',
+        # 'cyberagent/open-calm-7b',
+
+        # 'line-corporation/japanese-large-lm-1.7b',
+        # 'line-corporation/japanese-large-lm-3.6b',
+
+        # 'rinna/japanese-gpt-1b',
+        # 'rinna/japanese-gpt-neox-3.6b',
+
+        # ! DO NOT use the following models, as their tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
+        # 'sonoisa/t5-base-japanese',
+        # 'sonoisa/t5-base-japanese-v1.1',
     ]
 
-    shot = 'debug.tiny'  # debug
+    # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    use_test_as_train = True   # debug
+    use_test_as_train = False   # debug
     use_test_as_val = True
 
     proof_sampling = 'stepwise'
     # proof_sampling = 'all_at_once'
 
-    # max_steps = 100
-    max_steps = None
+    lora = False
+    # lora = True
 
-    # eval_steps = 100
-    eval_steps = None
-
-    # max_train_samples = 15000
-    max_train_samples = None
-
-    # max_eval_samples = 500  # for short evaluation
-    max_eval_samples = None
-
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
     # n_gpus = 1  # debug
     n_gpus = 4
@@ -252,10 +266,6 @@ def main():
         0,
     ]
 
-    CHECKPOINTS_DIRS = [
-        # './outputs/10.train.py/20221203.first_exp.large_models.seed--7.small_lrate',
-    ]
-
     do_predict = False
     
     sample_negative_proof_args = [
@@ -263,126 +273,98 @@ def main():
         True
     ]
 
-    # local_dataset_1_name = None
-    # local_dataset_1_name = 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled'
-    # local_dataset_1_name = 'ruletaker.ours.20221202'
-    # local_dataset_1_name = 'cc100.20221103.small'
+    # max_steps = 100
+    max_steps = None
 
-    # only_warn_if_checkpoint_is_not_found = False
-    only_warn_if_checkpoint_is_not_found = True
+    # eval_steps = 100
+    eval_steps = None
+
+    # max_train_samples = 15000
+    max_train_samples = None
+
+    # max_eval_samples = 500  # for short evaluation
+    max_eval_samples = None
 
     for dataset_uname in dataset_unames:
 
         for sample_negative_proof in sample_negative_proof_args:
 
             for seed in seeds:
-                for checkpoint_name in checkpoint_names:
+                for model_name in model_names:
+                    for _lrate in lrates:
+                        setting = {}
 
-                    checkpoint_spec = CheckpointSpec(
-                        name_or_local_dataset_name=checkpoint_name,
+                        dataset_setting = get_dataset_setting(dataset_uname,
+                                                              DATASETS_DIRS,
+                                                              use_test_as_val=use_test_as_val,
+                                                              use_test_as_train=use_test_as_train)
+                        setting.update(dataset_setting)
 
-                        # checkpoint_model_name_or_path='t5-large',
-                        checkpoint_model_name_or_path=None,
+                        setting.update({
+                            'do_train': True,
+                            'do_eval': True,
+                            'do_predict': do_predict,
+                        })
 
-                        # checkpoint_lrate = 1e-4
-                        checkpoint_lrate=None,
+                        base_config_name = get_default_config_name(dataset_uname)
+                        base_setting = get_config(base_config_name)
+                        setting.update(base_setting)
 
-                        # add_final_reference_to_proofs=None,
-                    )
+                        shot_setting = SHOT_SETTINGS[shot].copy()
+                        setting.update(shot_setting)
 
-                    found_checkpoint_infos = get_checkpoints(
-                        checkpoint_spec,
-                        check_point_dirs=CHECKPOINTS_DIRS,
-                    )
-                    if len(found_checkpoint_infos) == 0:
-                        if only_warn_if_checkpoint_is_not_found:
-                            logger.warning(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
-                            continue
-                        else:
-                            raise ValueError(f'No checkpoints found under {str(CHECKPOINTS_DIRS)}')
+                        batch_setting = get_batch_setting(
+                            model_name + '.all_at_once' if proof_sampling == 'all_at_once' else model_name,
+                            n_gpus,
+                        )
+                        setting.update(batch_setting)
 
-                    for checkpoint_path, found_checkpoint_spec in found_checkpoint_infos:
+                        setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
+                        setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
-                        for _lrate in lrates:
-                            setting = {}
+                        setting.update(get_logging_step_setting(max_steps=max_steps,
+                                                                eval_steps=eval_steps))
 
-                            dataset_setting = get_dataset_setting(dataset_uname,
-                                                                  DATASETS_DIRS,
-                                                                  use_test_as_val=use_test_as_val,
-                                                                  use_test_as_train=use_test_as_train)
-                            setting.update(dataset_setting)
+                        setting.update({
+                            'seed': seed,
 
-                            setting.update({
-                                'do_train': True,
-                                'do_eval': True,
-                                'do_predict': do_predict,
-                            })
+                            'dataset_uname': dataset_uname,
+                            'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
 
-                            base_config_name = get_default_config_name(dataset_uname)
-                            base_setting = get_config(base_config_name)
-                            setting.update(base_setting)
+                            'base_config_name': base_config_name,
 
-                            shot_setting = SHOT_SETTINGS[shot].copy()
-                            setting.update(shot_setting)
+                            'model_name_or_path': model_name,
 
-                            batch_setting = get_batch_setting(
-                                checkpoint_path + '.all_at_once' if proof_sampling == 'all_at_once' else checkpoint_path,
-                                n_gpus,
-                            )
-                            setting.update(batch_setting)
+                            'save_total_limit': 1,
 
-                            setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
-                            setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
+                            # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                            'proof_sampling': proof_sampling,
+                            'shot': shot,
+                            'sample_negative_proof': sample_negative_proof,
 
-                            setting.update(get_logging_step_setting(max_steps=max_steps,
-                                                                    eval_steps=eval_steps))
+                            'learning_rate': _lrate,
 
-                            setting.update({
-                                'seed': seed,
+                            'lora': lora,
 
-                                'dataset_uname': dataset_uname,
-                                'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
+                            # 'n_gpu': 1,
+                            'dataloader_num_workers': 0,
 
-                                'base_config_name': base_config_name,
+                            'log_examples': True,
+                        })
 
-                                'checkpoint_name': checkpoint_name,
-                                'checkpoint_path': checkpoint_path,
-                                'model_name_or_path': checkpoint_path,
+                        output_dir = make_output_dir(setting, output_top_dir)
+                        command = make_command(output_dir,
+                                               setting,
+                                               'torchrun' if do_torchrun else 'debug',
+                                               n_gpus=n_gpus)
 
-                                'save_total_limit': 1,
-
-                                # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                'proof_sampling': proof_sampling,
-                                'shot': shot,
-                                'sample_negative_proof': sample_negative_proof,
-
-                                'learning_rate': _lrate,
-
-                                # 'n_gpu': 1,
-                                'dataloader_num_workers': 0,
-
-                                'log_examples': True,
-                            })
-
-                            setting.update({
-                                f'ckpt_{key}': val
-                                for key, val in found_checkpoint_spec.dict().items()
-                                if key != 'name_or_local_dataset_name'
-                            })
-
-                            output_dir = make_output_dir(setting, output_top_dir)
-                            command = make_command(output_dir,
-                                                   setting,
-                                                   'torchrun' if do_torchrun else 'debug',
-                                                   n_gpus=n_gpus)
-
-                            run_by_engine(
-                                engine,
-                                command,
-                                output_dir,
-                                hours=hours,
-                                dry_run=dry_run
-                            )
+                        run_by_engine(
+                            engine,
+                            command,
+                            output_dir,
+                            hours=hours,
+                            dry_run=dry_run
+                        )
 
     logger.info('------------- ./01.train.py finished !! -----------')
 
