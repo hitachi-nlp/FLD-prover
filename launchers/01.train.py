@@ -139,8 +139,11 @@ def main():
         # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        'hf.hitachi-nlp/FLD.v2',
+        # 'hf.hitachi-nlp/FLD.v2',
         # 'hf.hitachi-nlp/FLD-star.v2',
+
+        # ---------------------------------- 20230826.jpn ------------------------------------
+        '20230826.jpn.D3',
     ]
 
     DATASETS_DIRS = [
@@ -166,11 +169,15 @@ def main():
 
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+        './outputs.FLD/00.create_corpus/20230826.jpn',
     ]
 
     # ---------------------- pushing datasets to hub -------------------
-    # XXX: BE CAREFUL PUSHING TO HUB DEFAULTLY OVERWRITE THE OFFICIAL DATASETS
+    # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
+    # if you push to hub:
     # XXX: SPECIFY use_test_as_train = False, use_test_as_val = False
+    # XXX: Additionally, DO NOT DELETE THE REPOSITORY MANUALLY before pushing,
+    #      as it will delete all the statistics such as # downloads and likes.
 
     dataset_push_to_hub_repo_name = None
     # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
@@ -179,7 +186,14 @@ def main():
     # Specify as follows so that we push all the splits.
     # use_test_as_train = False
     # use_test_as_val = False
-    # ---------------------- pushing datasets to hub -------------------
+    # ------------------------------------------------------------
+
+    checkpoint_names = [
+        # 't5-base',
+        # 't5-large'
+
+        'google/mt5-base',
+    ]
 
     shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
@@ -191,11 +205,11 @@ def main():
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    use_test_as_train = False   # debug
-    use_test_as_val = False
+    use_test_as_train = True   # debug
+    use_test_as_val = True
 
-    # proof_sampling = 'stepwise'
-    proof_sampling = 'all_at_once'
+    proof_sampling = 'stepwise'
+    # proof_sampling = 'all_at_once'
 
     # max_steps = 100
     max_steps = None
@@ -240,15 +254,6 @@ def main():
 
     CHECKPOINTS_DIRS = [
         # './outputs/10.train.py/20221203.first_exp.large_models.seed--7.small_lrate',
-    ]
-
-    # checkpoint_names = [None]
-    # checkpoint_names = ALL_CHECKPOINT_NAMES
-    # checkpoint_names = ICML_2023_NL_TRANSFER_MAJOR_DATASETS
-    # checkpoint_names = ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH
-    checkpoint_names = [
-        't5-base',
-        # 't5-large'
     ]
 
     do_predict = False

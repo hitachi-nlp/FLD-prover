@@ -179,6 +179,8 @@ _VERIFIER_BATCH_SETTINGS = {
 def get_batch_setting(model_name: str,
                       num_gpus: int,
                       train_effective_batch_size=64) -> Dict[str, Any]:
+    if model_name.startswith('google/mt5-'):
+        model_name = model_name[model_name.find('mt5-') + 1:]
     setting = _PROVER_BATCH_SETTINGS[model_name]
     accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * num_gpus))
     if accum_steps < 1:
@@ -1212,7 +1214,7 @@ class CheckpointSpec(BaseModel):
 
 def get_checkpoints(spec: CheckpointSpec,
                     check_point_dirs: Optional[List[Union[str, Path]]] = None) -> List[Tuple[str, CheckpointSpec]]:
-    if spec.name_or_local_dataset_name.startswith('t5-'):
+    if spec.name_or_local_dataset_name.startswith('t5-') or spec.name_or_local_dataset_name.startswith('google/mt5-'):
         return [(spec.name_or_local_dataset_name, spec)]
     else:
         raise NotImplementedError()
