@@ -43,6 +43,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         max_steps: Optional[int] = 20,
         texts_to_inputs_func: Optional[Callable[[List[str]], Dict[str, Union[torch.Tensor, Any]]]] = None,
         is_finished_func: Optional[Callable[[str], bool]] = None,
+        no_loss_when_eval=False,
         log_generation=False,
         **kwargs,
     ):
@@ -51,6 +52,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         self._texts_to_inputs_func = texts_to_inputs_func
         self._is_finished_func = is_finished_func
         self._log_generation = log_generation
+        self._no_loss_when_eval = no_loss_when_eval
 
     def evaluation_loop(
         self,
@@ -432,8 +434,10 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
 
         for i_step in range(0, self._max_steps):
             # shoud used inputs for i_step=0 to get labels
-            extended_inputs = inputs if i_step == 0 else self._seqs_to_tensors(extended_input_seqs)
+            extended_inputs = inputs.copy() if i_step == 0 else self._seqs_to_tensors(extended_input_seqs)
 
+            if self._no_loss_when_eval:
+                extended_inputs.pop('labels', None)
             _, _preds, _labels = super().prediction_step(
                 model,
                 extended_inputs,
@@ -461,7 +465,8 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
 
             # update
             if i_step == 0:
-                labels = _labels
+                # labels = _labels
+                labels = inputs['labels']
 
             num_return_sequences = self._gen_kwargs.get('num_return_sequences', 1)
             _pred_seqs = self._tensor_to_seqs(_preds)

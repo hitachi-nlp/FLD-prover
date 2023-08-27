@@ -66,14 +66,14 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
     model_names = [
-        # 'text-davinci-003',
+        # 'openai.text-davinci-003',
 
-        # 'gpt-3.5-turbo',
-        # 'gpt-3.5-turbo-16k'
+        # 'openai.gpt-3.5-turbo',
+        # 'openai.gpt-3.5-turbo-16k'
 
-        # 'gpt-4-0314',
-        'gpt-4',
-        # 'gpt-4-32k',
+        # 'openai.gpt-4-0314',
+        # 'openai.gpt-4',
+        # 'openai.gpt-4-32k',
     ]
 
     # max_samples = 1

@@ -18,30 +18,23 @@ Fine-tuning the library models for sequence to sequence.
 """
 # You can also adapt this script on your own sequence to sequence task. Pointers for this are left as comments.
 
-import logging
-import os
-import re
-import tempfile
-import json
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-import sys
-from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Any, Union, Tuple, Any
-from collections import defaultdict
-import readline
-
-import torch
-import datasets
-import evaluate
-import nltk  # Here to have a nice missing dependency error message early on
-import numpy as np
-from datasets import load_dataset
-from datasets import Features, Value
-from filelock import FileLock
-import gradio as gr
-
-import transformers
+import line_profiling
+from FLD_task.hf_dataset import serialize_transform
+from FLD_prover import (
+    StepWiseGenerationTrainer,
+    preprocess_examples_train,
+    preprocess_examples_eval,
+)
+from FLD_prover.utils import tokenize_with_log
+from FLD_task.proof import get_stance_markers
+from FLD_task import load_deduction, build_metrics, prettify_context_text, prettify_proof_text
+from logger_setup import setup as setup_logger
+from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
+import huggingface_hub
+from transformers.utils.versions import require_version
+from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
+from transformers.generation.configuration_utils import GenerationConfig
+from transformers.trainer_utils import get_last_checkpoint
 from transformers import (
     AutoConfig,
     AutoModelForSeq2SeqLM,
@@ -53,28 +46,37 @@ from transformers import (
     MBart50TokenizerFast,
     MBartTokenizer,
     MBartTokenizerFast,
+    TrainingArguments,
+    Trainer,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     set_seed,
+    default_data_collator,
+    is_torch_tpu_available,
 )
-from transformers.trainer_utils import get_last_checkpoint
-from transformers.generation.configuration_utils import GenerationConfig
-from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
-from transformers.utils.versions import require_version
-import huggingface_hub
-from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
+import transformers
+import gradio as gr
+from filelock import FileLock
+from datasets import Features, Value
+from datasets import load_dataset
+import numpy as np
+import nltk  # Here to have a nice missing dependency error message early on
+import evaluate
+import datasets
+import torch
+from enum import Enum
+import readline
+from collections import defaultdict
+from typing import Optional, Dict, List, Any, Union, Tuple, Any
+from dataclasses import dataclass, field
+import sys
+import logging
+import os
+import re
+import tempfile
+import json
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-from logger_setup import setup as setup_logger
-from FLD_task import load_deduction, build_metrics, prettify_context_text, prettify_proof_text
-from FLD_task.proof import get_stance_markers
-from FLD_prover.utils import tokenize_with_log
-from FLD_prover import (
-    StepWiseGenerationTrainer,
-    preprocess_examples_train,
-    preprocess_examples_eval,
-)
-from FLD_task.hf_dataset import serialize_transform
-import line_profiling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.29.0.dev0")
@@ -145,7 +147,6 @@ class ModelArguments:
     lora: Optional[bool] = field(
         default=False,
     )
-
 
 
 @dataclass
@@ -277,6 +278,10 @@ class DataTrainingArguments:
             "help": "Whether to ignore the tokens corresponding to padded labels in the loss computation or not."
         },
     )
+    ignore_prompt_for_causal_lm_loss: bool = field(
+        default=True,
+        metadata={},
+    )
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
@@ -351,6 +356,11 @@ class DataTrainingArguments:
             self.val_max_target_length = self.max_target_length
 
 
+class LMType(Enum):
+    SEQ_2_SEQ = 'seq2seq'
+    CAUSAL = 'causal'
+
+
 summarization_name_mapping = {
     "amazon_reviews_multi": ("review_body", "review_title"),
     "big_patent": ("description", "abstract"),
@@ -367,7 +377,7 @@ summarization_name_mapping = {
 }
 
 
-class RemoveUnusedColumnsCollator(DataCollatorForSeq2Seq):
+class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
 
     def __call__(self, features, return_tensors=None):
         for feature in features:
@@ -376,17 +386,41 @@ class RemoveUnusedColumnsCollator(DataCollatorForSeq2Seq):
         return super().__call__(features, return_tensors=return_tensors)
 
 
+class RemoveUnusedColumnsCollator:
+
+    def __init__(self, return_tensors: Optional[str] = None):
+        if return_tensors is None:
+            raise ValueError()
+        self.return_tensors = return_tensors
+
+    def __call__(self, features, return_tensors=None):
+        for feature in features:
+            if "depth" in feature:
+                feature.pop("depth", None)
+        return default_data_collator(features,
+                                     return_tensors=return_tensors or self.return_tensors)
+
+
 def main():
     logging.getLogger().handlers.clear()  # remove handler automatically added
     setup_logger(do_stderr=True, level=logging.INFO)
+    # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+    os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
+    if any(arg == '--lm_type' for arg in sys.argv):
+        arg_idx = sys.argv.index('--lm_type')
+        lm_type = LMType(sys.argv[arg_idx + 1])
+        # XXX: too hacky
+        sys.argv = sys.argv[:arg_idx] + sys.argv[arg_idx + 2:]
+    else:
+        lm_type = 'seq2seq'
+
+    # Seq2SeqTrainingArguments is a sub-class of TrainingArguments, therefore simply loading as Seq2SeqTrainingArguments is enough
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
-    # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
-    os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
@@ -401,6 +435,8 @@ def main():
                                                                                top_k=data_args.generation_top_k)
         except Exception as e:
             logger.warning('Could not specify generation_top_k due to the following error:\n%s', str(e))
+    if lm_type == LMType.CAUSAL and data_args.proof_sampling == 'stepwise':
+        raise ValueError('causal does not support stepwise prover because it is actually equivalent to all_at_once prover.')
 
     if training_args.dataloader_num_workers > 0:
         raise Exception(f'dataloader_num_workers({training_args.dataloader_num_workers}) > 0 is extemely slow in our program. We strongly recommend to ppecify it as 0.')
@@ -541,10 +577,12 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    if model_args.model_name_or_path.find('t5') >= 0:
+    if lm_type == LMType.SEQ_2_SEQ:
         auto_model_class = AutoModelForSeq2SeqLM
-    else:
+    elif lm_type == LMType.CAUSAL:
         auto_model_class = AutoModelForCausalLM
+    else:
+        raise NotImplementedError()
     model = auto_model_class.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -552,17 +590,28 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        # torch_dtype=torch.float16 if training_args.fp16 else None,
     )
     # torch._C._dynamo.disable
     # model = torch.compile(model)
 
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
-        peft_config = LoraConfig(task_type=PeftTaskType.SEQ_2_SEQ_LM,
+        if lm_type == LMType.SEQ_2_SEQ:
+            task_type = PeftTaskType.SEQ_2_SEQ_LM
+        elif lm_type == LMType.CAUSAL:
+            task_type = PeftTaskType.CAUSAL_LM
+        else:
+            raise NotImplementedError()
+        peft_config = LoraConfig(task_type=task_type,
                                  inference_mode=False,
                                  r=8,
                                  lora_alpha=32,
                                  lora_dropout=0.1)
+
+        # [RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn](https://github.com/huggingface/peft/issues/137)
+        model.enable_input_require_grads()
+
         model = get_peft_model(model, peft_config)
         logger.info('train LoRA model with the following parameters:')
         model.print_trainable_parameters()
@@ -579,7 +628,7 @@ def main():
         else:
             model.config.decoder_start_token_id = tokenizer.convert_tokens_to_ids(data_args.lang)
 
-    if model.config.decoder_start_token_id is None:
+    if lm_type == LMType.SEQ_2_SEQ and model.config.decoder_start_token_id is None:
         raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
 
     if (
@@ -660,9 +709,10 @@ def main():
     context_column = 'context'
     next_step_column = 'next_step'
     gold_proof_column = 'gold_proof'
+    ignore_index = -100
 
     # Temporarily set max_target_length for training.
-    max_target_length = data_args.max_target_length
+    # max_target_length = data_args.max_target_length
     # padding = "max_length" if data_args.pad_to_max_length else False
     padding = data_args.tokenizer_padding or False
 
@@ -692,70 +742,165 @@ def main():
                 logger.info('context    [%d] : "%s"', i_example, context)
                 logger.info('next_step [%d] : "%s"', i_example, next_step)
                 logger.info('gold_proof [%d] : "%s"', i_example, gold_proof)
+
+        inputs = [prefix + inp for inp in inputs]
+
         return inputs, targets, gold_proofs
 
-    def prepare_model_inputs(inputs: List[str], max_length: int) -> Dict[str, List[Any]]:
-        return tokenize_with_log(tokenizer, text=inputs, max_length=max_length, padding=padding, truncation=True)
+    def prepare_tokenized_inputs(inputs: List[str],
+                                 max_length: int,
+                                 **kwargs) -> Dict[str, torch.Tensor]:
+        _padding = kwargs.pop('padding', padding)
+        tokenized = tokenize_with_log(tokenizer,
+                                      text=inputs,
+                                      max_length=max_length,
+                                      padding=_padding,
+                                      truncation=True,
+                                      return_tensors='pt',
+                                      **kwargs)
+        return tokenized
 
-    def prepare_model_targets(targets: List[str], max_length: int) -> Dict[str, List[Any]]:
-        # Tokenize targets with the `text_target` keyword argument
-        labels = tokenize_with_log(tokenizer, text_target=targets, max_length=max_length, padding=padding, truncation=True)
+    def prepare_tokenized_targets(targets: List[str],
+                                  max_length: int,
+                                  **kwargs) -> Dict[str, torch.Tensor]:
+        tokenized = tokenize_with_log(tokenizer,
+                                      text_target=targets,
+                                      max_length=max_length,
+                                      padding=padding,
+                                      truncation=True,
+                                      return_tensors='pt',
+                                      **kwargs)
+        return tokenized
 
-        # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
+    def mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
+        """
+        [OpenCALM-7BをLoRAでinstruction tuningするための実装解説](https://qiita.com/m__k/items/173ade78990b7d6a4be4)
+        """
+        # If we are padding here, replace all tokenizer.pad_token_id in the labels by ignore_index when we want to ignore
         # padding in the loss.
         if padding == "max_length" and data_args.ignore_pad_token_for_loss:
-            labels["input_ids"] = [
-                [(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]
-            ]
+            # labels = torch.tensor([
+            #     [(token_label if token_label != tokenizer.pad_token_id else ignore_index)
+            #      for token_label in label]
+            #     for label in labels
+            # ])
+            labels = torch.where(labels != tokenizer.pad_token_id, labels, ignore_index)
+
+        if mask_lengths is not None:
+            if data_args.ignore_prompt_for_causal_lm_loss:
+                for i_label, mask_length in enumerate(mask_lengths):
+                    labels[i_label][:mask_length] = ignore_index
 
         return labels
+
+    def unmask_by_pad_token(tensor: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
+        if isinstance(tensor, torch.Tensor):
+            tensor = tensor.detach().cpu().numpy()
+        return np.where(tensor != ignore_index, tensor, tokenizer.pad_token_id)
 
     @profile
     def preprocess_function(examples: Dict[str, List[Any]],
                             split: str,
                             max_source_length: int,
                             max_target_length: int) -> Dict[str, List[Any]]:
-        examples = serialize_transform(examples,
-                                       split,
-                                       proof_sampling=data_args.proof_sampling,
-                                       sample_negative_proof=data_args.sample_negative_proof)
+        examples = serialize_transform(
+            examples,
+            split,
+            proof_sampling=data_args.proof_sampling,
+            sample_negative_proof=data_args.sample_negative_proof if data_args.proof_sampling == 'stepwise' else False,
+        )
 
         # collate
-        inputs, targets, gold_proofs = extract_serials(examples)
-        inputs = [prefix + inp for inp in inputs]
+        prompts, proof_steps, gold_proofs = extract_serials(examples)
 
-        model_inputs = prepare_model_inputs(inputs, max_source_length)
+        # check whther the tokenizer can recognize stance markers
+        a_gold_proof = gold_proofs[0]
+        a_gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([a_gold_proof], max_target_length)["input_ids"][0])
+        if len(get_stance_markers(a_gold_proof_dec)) == 0:
+            raise ValueError(
+                '\n'.join([
+                    'The tokenizer could not recognized the stance markers.',
+                    f'The original proof: "{a_gold_proof}"',
+                    f'The tokenized proof: "{a_gold_proof_dec}"',
+                ])
+            )
 
+        forward_inputs: Dict[str, Any] = {}
         if split == 'train':
-            if any(_targets is None for _targets in targets):
+            if any(_targets is None for _targets in proof_steps):
                 raise ValueError()
+
+            if lm_type == LMType.SEQ_2_SEQ:
+                forward_inputs.update(prepare_tokenized_inputs(prompts, max_source_length))
+                forward_inputs["labels"] = prepare_tokenized_targets(proof_steps, max_target_length)["input_ids"]
+                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
+
+            elif lm_type == LMType.CAUSAL:
+                # just for getting length
+                prompt_lengths = [
+                    prepare_tokenized_inputs(
+                        [prompt],
+                        max_source_length,
+                        padding='longest',
+                        return_length=True,
+                        # add_special_tokens=False,
+                    )['length'][0]
+                    for prompt in prompts
+                ]
+
+                inputs_with_targets = [f'{prompt}{tokenizer.eos_token}{proof_step}' for prompt, proof_step in zip(prompts, proof_steps)]
+                forward_inputs.update(prepare_tokenized_inputs(inputs_with_targets, max_source_length))
+                forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
+                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"],
+                                                                       mask_lengths=prompt_lengths)
+
+                # tokenizer.decode(prepare_tokenized_inputs(prompts, max_source_length, add_special_tokens=False)['input_ids'][0][:385])
+                # tokenizer.decode(prepare_tokenized_inputs(inputs_with_targets, max_source_length, add_special_tokens=False)['input_ids'][0][:385])
             else:
-                model_inputs["labels"] = prepare_model_targets(targets, max_target_length)["input_ids"]
+                raise NotImplementedError()
         else:
             if any(_gold_proofs is None for _gold_proofs in gold_proofs):
-                pass
+                raise Exception('Why pass here? might be a bug?')
+
+            if lm_type == LMType.SEQ_2_SEQ:
+                forward_inputs.update(prepare_tokenized_inputs(prompts, max_source_length))
+                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
+                                                                     max_target_length)["input_ids"]
+                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
+
+            elif lm_type == LMType.CAUSAL:
+                forward_inputs.update(prepare_tokenized_inputs(prompts,
+                                                               max_source_length,
+                                                               # add_special_tokens=False,
+                                                               )
+                                      )
+                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
+                                                                     max_target_length)["input_ids"]
+                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
             else:
-                model_inputs["labels"] = prepare_model_targets(gold_proofs, max_target_length)["input_ids"]
+                raise NotImplementedError()
 
+        # some models do not accept 'token_type_ids' as inputs
+        if 'token_type_ids' in forward_inputs:
+            forward_inputs.pop('token_type_ids', None)
         if "depth" in examples:
-            model_inputs["depth"] = examples["depth"]
+            forward_inputs["depth"] = examples["depth"]
 
-        return model_inputs
+        inputs_decoded = tokenizer.batch_decode(unmask_by_pad_token(forward_inputs['input_ids']))
+        labels_decoded = tokenizer.batch_decode(unmask_by_pad_token(forward_inputs['labels']))
+        for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
+            logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
+            logger.info(input_decoded)
+            logger.info('------------ [example=%d] tokenized labels ----------------', i_example)
+            logger.info(label_decoded)
+
+        return forward_inputs
 
     if training_args.do_train:
         train_dataset = raw_datasets["train"]
         if data_args.max_train_samples is not None:
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
             train_dataset = train_dataset.select(range(max_train_samples))
-        # with training_args.main_process_first(desc="train dataset map pre-processing"):
-        #     train_dataset = train_dataset.map(
-        #         preprocess_function,
-        #         batched=True,
-        #         num_proc=data_args.preprocessing_num_workers,
-        #         remove_columns=column_names,
-        #         load_from_cache_file=not data_args.overwrite_cache,
-        #         desc="Running tokenizer on train dataset",
-        #     )
         train_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'train',
                                                  max_source_length=data_args.max_source_length,
@@ -768,15 +913,6 @@ def main():
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
-        # with training_args.main_process_first(desc="validation dataset map pre-processing"):
-        #     eval_dataset = eval_dataset.map(
-        #         preprocess_function,
-        #         batched=True,
-        #         num_proc=data_args.preprocessing_num_workers,
-        #         remove_columns=column_names,
-        #         load_from_cache_file=not data_args.overwrite_cache,
-        #         desc="Running tokenizer on validation dataset",
-        #     )
         eval_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval',
                                                  max_source_length=data_args.max_source_length,
@@ -787,28 +923,27 @@ def main():
         if data_args.max_predict_samples is not None:
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
             predict_dataset = predict_dataset.select(range(max_predict_samples))
-        # with training_args.main_process_first(desc="prediction dataset map pre-processing"):
-        #     predict_dataset = predict_dataset.map(
-        #         preprocess_function,
-        #         batched=True,
-        #         num_proc=data_args.preprocessing_num_workers,
-        #         remove_columns=column_names,
-        #         load_from_cache_file=not data_args.overwrite_cache,
-        #         desc="Running tokenizer on prediction dataset",
-        #     )
         predict_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval',
                                                  max_source_length=data_args.max_source_length,
                                                  max_target_length=data_args.max_target_length * generation_max_target_length_factor))
 
     # Data collator
-    label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
-    data_collator = RemoveUnusedColumnsCollator(
-        tokenizer,
-        model=model,
-        label_pad_token_id=label_pad_token_id,
-        pad_to_multiple_of=8 if training_args.fp16 else None,
-    )
+    label_pad_token_id = ignore_index if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
+    if lm_type == LMType.SEQ_2_SEQ:
+        data_collator = RemoveUnusedColumnsCollatorForSeq2Seq(
+            tokenizer,
+            model=model,
+            label_pad_token_id=label_pad_token_id,
+            pad_to_multiple_of=8 if training_args.fp16 else None,
+            return_tensors='pt',
+        )
+    elif lm_type == LMType.CAUSAL:
+        data_collator = RemoveUnusedColumnsCollator(
+            return_tensors='pt',
+        )
+    else:
+        raise NotImplementedError()
 
     # Metric
     metric = evaluate.load("rouge")
@@ -839,32 +974,48 @@ def main():
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
-        # Replace -100s used for padding as we can't decode them
-        preds = np.where(preds != -100, preds, tokenizer.pad_token_id)
-        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-        labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
-        # result = compute_rouges(decoded_preds, decoded_labels)
+        if dataloader is not None:
+            examples = [example for example in dataloader.dataset]  # before collating
+        else:
+            raise Exception('unexpected')
+            examples = [None] * len(preds)
+
+        # Replace ignore_indexs used for padding as we can't decode them
+        preds = unmask_by_pad_token(preds)
+        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+
+        if labels is not None:
+            labels = np.where(labels != ignore_index, labels, tokenizer.pad_token_id)
+            decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+        else:
+            decoded_labels = None
+
+        labels_from_examples = [examples[i]["labels"].detach().cpu().numpy() for i in range(len(examples))]
+        labels_from_examples = unmask_by_pad_token(labels_from_examples)
+        decoded_labels_from_examples = tokenizer.batch_decode(labels_from_examples, skip_special_tokens=True)
+        if decoded_labels is not None and tuple(decoded_labels) != tuple(decoded_labels_from_examples):
+            raise Exception('Unexcected, may be a bug')
+
         results = {}
 
         prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
         results["gen_len"] = np.mean(prediction_lens)
 
-        if dataloader is not None:
-            examples = [example for example in dataloader.dataset]  # before collating
-        else:
-            examples = [None] * len(decoded_labels)
-
         metrics: Dict[str, List[Any]] = defaultdict(list)
-        for i_example, (proof_gt, proof_pred, example) in enumerate(zip(decoded_labels, decoded_preds, examples)):
+        for i_example, (proof_gt, proof_pred, example) in enumerate(zip(decoded_labels_from_examples, decoded_preds, examples)):
             logger.info('')
             logger.info('')
             logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
+            if lm_type == LMType.CAUSAL and proof_pred.find('$proof$ = '):
+                # strip context and hypothesis from causal lm outputs
+                proof_pred = proof_pred[proof_pred.find('$proof$ = ') + len('$proof$ = '):]
+
             if example is not None:
                 input_ids = example['input_ids']
-                input_ids = np.where(np.array(input_ids) != -100, input_ids, tokenizer.pad_token_id)
+                # input_ids = np.where(np.array(input_ids) != ignore_index, input_ids, tokenizer.pad_token_id)
+                input_ids = unmask_by_pad_token(input_ids)
                 decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
 
                 context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
@@ -921,7 +1072,13 @@ def main():
     # Initialize our Trainer
     if training_args.remove_unused_columns:
         raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augumentation.')
-    # trainer = Seq2SeqTrainer(
+    if lm_type == LMType.SEQ_2_SEQ:
+        preprocess_logits_for_metrics = None
+    elif lm_type == LMType.CAUSAL:
+        preprocess_logits_for_metrics = None
+    else:
+        raise NotImplementedError()
+
     trainer = StepWiseGenerationTrainer(
         model=model,
         args=training_args,
@@ -930,9 +1087,11 @@ def main():
         data_collator=data_collator,
         tokenizer=tokenizer,
         max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
-        compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        texts_to_inputs_func=lambda texts: prepare_model_inputs(texts, data_args.max_source_length),
+        compute_metrics=compute_metrics if training_args.predict_with_generate and not is_torch_tpu_available() else None,
+        texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
+        preprocess_logits_for_metrics=preprocess_logits_for_metrics,
+        no_loss_when_eval=True,
         log_generation=data_args.log_generation,
     )
 
@@ -986,7 +1145,7 @@ def main():
         if trainer.is_world_process_zero():
             if training_args.predict_with_generate:
                 predictions = predict_results.predictions
-                predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
+                predictions = unmask_by_pad_token(predictions)
                 predictions = tokenizer.batch_decode(
                     predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
                 )
@@ -1034,7 +1193,7 @@ def main():
             if trainer.is_world_process_zero():
                 if training_args.predict_with_generate:
                     predictions = results.predictions
-                    predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
+                    predictions = unmask_by_pad_token(predictions)
                     predictions = tokenizer.batch_decode(
                         predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
                     )
@@ -1081,7 +1240,6 @@ def main():
             raise ValueError()
 
         return
-
 
     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "summarization"}
     if data_args.dataset_name is not None:

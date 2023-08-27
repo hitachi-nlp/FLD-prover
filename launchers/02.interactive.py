@@ -14,7 +14,7 @@ from experimental_setting import (
     get_config,
     get_default_config_name,
     get_dataset_setting,
-    get_batch_setting,
+    get_modelwise_setting,
     make_output_dir,
     make_command,
     run_by_engine,
@@ -105,7 +105,7 @@ def main():
     setting.update(dataset_setting)
 
     model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
-    batch_setting = get_batch_setting(model_name, n_gpus)
+    batch_setting = get_modelwise_setting(model_name, n_gpus)
     setting.update(batch_setting)
 
     setting.update({

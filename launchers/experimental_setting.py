@@ -31,7 +31,7 @@ def maybe_option_flag(flag: str, value: bool) -> str:
     return f'{flag} {str(value)}'
 
 
-_PROVER_BATCH_SETTINGS = {
+_MODELWISE_SETTINGS = {
 
     # XXX: if you change max_source_length or max_target_length,
     # make sure that all the stuf fit into memory with tokenizer_padding='max_len' option.
@@ -205,18 +205,71 @@ _PROVER_BATCH_SETTINGS = {
     #     # 'tokenizer_padding': 'longest',
     # },
 
-    'matsuo-lab/weblab-10b': {
+    'abeja/gpt2-large-japanese.all_at_once': {
         'max_source_length': 1000,
         'max_target_length': 1000,
 
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
+        'per_device_train_batch_size': 4,
+        'per_device_eval_batch_size': 4,
 
         # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
     },
 
 
+    'cyberagent/open-calm-1b.all_at_once': {
+        'max_source_length': 1000,
+        'max_target_length': 1000,
+
+        'per_device_train_batch_size': 1,
+        'per_device_eval_batch_size': 1,
+
+        'generation_num_beams': 1,
+        'generation_top_k': 1,
+        'generation_max_proof_steps': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+    'matsuo-lab/weblab-10b.all_at_once': {
+        'max_source_length': 2000,
+        'max_target_length': 2000,
+
+        'per_device_train_batch_size': 4,
+        'per_device_eval_batch_size': 4,
+
+        'generation_num_beams': 1,
+        'generation_top_k': 1,
+        'generation_max_proof_steps': 1,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+
+        'gradient_checkpointing': True,
+    },
+
+    'rinna/japanese-gpt2-medium.all_at_once': {
+        'max_source_length': 1000,
+        'max_target_length': 1000,
+
+        'per_device_train_batch_size': 4,
+        'per_device_eval_batch_size': 4,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
+
+    'rinna/japanese-gpt-1b.all_at_once': {
+        'max_source_length': 1000,
+        'max_target_length': 1000,
+
+        'per_device_train_batch_size': 4,
+        'per_device_eval_batch_size': 4,
+
+        # 'tokenizer_padding': 'max_length',
+        'tokenizer_padding': 'longest',
+    },
 
 
 }
@@ -240,14 +293,11 @@ _VERIFIER_BATCH_SETTINGS = {
 }
 
 
-def get_batch_setting(model_name: str,
-                      num_gpus: int,
-                      train_effective_batch_size=64) -> Dict[str, Any]:
+def get_modelwise_setting(model_name: str,
+                          num_gpus: int,
+                          train_effective_batch_size: int) -> Dict[str, Any]:
 
-    setting = _PROVER_BATCH_SETTINGS[model_name]
-    # if lora:
-    #     setting['per_device_train_batch_size'] = min(32, int(train_effective_batch_size / num_gpus))
-    #     setting['per_device_eval_batch_size'] = 4
+    setting = _MODELWISE_SETTINGS[model_name]
 
     accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * num_gpus))
     if accum_steps < 1:
@@ -1010,141 +1060,6 @@ ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH = [
 ]
 
 
-# SHOT_SETTINGS = {
-#     'zero-shot': {
-#         'limit_train_batches': 1,
-#         'shuffle_train': False,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#         'warmup_steps': 0,
-#
-#         'max_steps': 1,
-#
-#         'num_val_stage_throught_training': None,
-#         'val_check_interval_in_batch': None,
-#         # 'check_val_every_n_epoch': 1,
-#     },
-#
-#     'few-shot.batch-3': {
-#         'limit_train_batches': 3,
-#         'shuffle_train': False,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#         'warmup_steps': 500,
-#
-#         'max_steps': 2000,
-#
-#         'num_val_stage_throught_training': 5,
-#         'val_check_interval_in_batch': None,
-#         # 'check_val_every_n_epoch': None,
-#     },
-#
-#     'few-shot.batch-25': {
-#         'limit_train_batches': 25,
-#         'shuffle_train': False,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#         'warmup_steps': 500,
-#
-#         'max_steps': 2000,
-#
-#         'num_val_stage_throught_training': 5,
-#         'val_check_interval_in_batch': None,
-#         # 'check_val_every_n_epoch': None,
-#     },
-#
-#     'few-shot.batch-75': {
-#         'limit_train_batches': 75,
-#         'shuffle_train': False,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#         'warmup_steps': 500,
-#
-#         'max_steps': 2000,
-#
-#         'num_val_stage_throught_training': 5,
-#         'val_check_interval_in_batch': None,
-#         # 'check_val_every_n_epoch': None,
-#     },
-#
-#     'few-shot.batch-250': {
-#         'limit_train_batches': 1000,
-#         'shuffle_train': False,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#
-#         'warmup_steps': 500,
-#
-#         'max_steps': 2000,
-#
-#         'num_val_stage_throught_training': 5,
-#         'val_check_interval_in_batch': None,
-#         # 'check_val_every_n_epoch': None,
-#     },
-#
-#     'FT': {
-#         # -- NLProofS_hypara--
-#         # 'max_steps': 12500,
-#         # 'max_source_length': 1024,
-#         # 'max_target_length': 64,
-#
-#
-#         'limit_train_batches': None,
-#         'shuffle_train': True,
-#         'limit_eval_batches': 500,
-#
-#         'num_train_epochs': None,
-#
-#         'num_val_stage_throught_training': 10,
-#         'val_check_interval_in_batch': None,
-#
-#         # ----------------------- pre-trianing --------------------------
-#
-#         # -- pre-training: FLNL (arg-RT/arg-AA) / RuleTaker / EB
-#         # 'max_steps': 5000,
-#
-#         # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
-#         # 'max_steps': 20000,
-#
-#         # -- pre-training: FLNL (arg-FLNL)
-#         # 'max_steps': 20000,
-#
-#         # -- pre-training: large models
-#         # 'max_steps': 10000,
-#
-#         # ----------------------- EB fine-tuning --------------------------
-#         'max_steps': 10000,
-#         # 'max_steps': 5000,
-#
-#         'warmup_steps': None,
-#         # 'warmup_steps': 1000,
-#         # 'warmup_steps': 3000,
-#     },
-#
-#
-#     # ----------- XXX: this is for debug!!! --------------
-#     # 'FT': {
-#     #     'limit_train_batches': None,
-#     #     'shuffle_train': True,
-#     #     'limit_eval_batches': 100,
-#
-#     #     'num_train_epochs': None,
-#     #     'max_steps': 100,
-#     #     'warmup_steps': 10,
-#
-#     #     'num_val_stage_throught_training': 2,
-#     #     'val_check_interval_in_batch': None,
-#     #     # 'check_val_every_n_epoch': None,
-#     # },
-#
-# }
-
-
 SHOT_SETTINGS = {
     'FS.shot-0': {
         'max_train_samples': 0,
@@ -1154,6 +1069,7 @@ SHOT_SETTINGS = {
         'num_train_epochs': None,
         'warmup_steps': 0,
 
+        'train_effective_batch_size': 64,
         'max_steps': 1,
         'eval_steps': 1,
     },
@@ -1166,6 +1082,7 @@ SHOT_SETTINGS = {
         'num_train_epochs': None,
         'warmup_steps': 500,
 
+        'train_effective_batch_size': 64,
         'max_steps': 2000,
         'eval_steps': 100,
     },
@@ -1178,6 +1095,7 @@ SHOT_SETTINGS = {
         'num_train_epochs': None,
         'warmup_steps': 500,
 
+        'train_effective_batch_size': 64,
         'max_steps': 2000,
         'eval_steps': 100,
     },
@@ -1190,6 +1108,7 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 5000,
         'eval_steps': 1000,
         'warmup_steps': 1000,
@@ -1202,6 +1121,7 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 8100,
         'eval_steps': 4000,
         'warmup_steps': 1000,
@@ -1216,6 +1136,7 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 20000,
         'eval_steps': 5000,
         'warmup_steps': 1000,
@@ -1228,6 +1149,7 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 50000,
         'eval_steps': 5000,
         'warmup_steps': 3000,
@@ -1240,6 +1162,7 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 100000,
         'eval_steps': 10000,
         'warmup_steps': 3000,
@@ -1252,9 +1175,23 @@ SHOT_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 1000,
 
+        'train_effective_batch_size': 64,
         'max_steps': 150000,
         'eval_steps': 10000,
         'warmup_steps': 3000,
+    },
+
+    'debug.micro': {
+        'max_train_samples': 1,
+        'max_eval_samples': 1,
+        'max_predict_samples': 1,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 200,
+        'eval_steps': 200,
+        'warmup_steps': 0,
     },
 
     'debug.tiny': {
@@ -1264,8 +1201,9 @@ SHOT_SETTINGS = {
 
         'num_train_epochs': None,
 
+        'train_effective_batch_size': 64,
         'max_steps': 300,
-        'eval_steps': 150,
+        'eval_steps': 300,
         'warmup_steps': 0,
     },
 
@@ -1402,6 +1340,7 @@ def make_command(output_dir: Union[str, Path],
         'checkpoint_name',
         'checkpoint_path',
         'shot',
+        'train_effective_batch_size',
         'max_proof_steps',
         'dataset_uname',
         'n_proc_per_node',

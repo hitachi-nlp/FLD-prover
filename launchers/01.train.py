@@ -15,14 +15,12 @@ from experimental_setting import (
     get_default_config_name,
     get_checkpoints,
     get_dataset_setting,
-    get_batch_setting,
+    get_modelwise_setting,
     get_logging_step_setting,
     make_output_dir,
     make_command,
     run_by_engine,
     CheckpointSpec,
-    ICML_2023_NL_TRANSFER_MAJOR_DATASETS,
-    ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH,
     SHOT_SETTINGS,
     make_val_interval_setting,
 )
@@ -77,7 +75,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
-    output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     dataset_unames = [
         # 'FLD.debug.2023-05-13',
@@ -145,6 +145,7 @@ def main():
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         '20230826.jpn.D3',
+        # '20230826.jpn.D8',
     ]
 
     DATASETS_DIRS = [
@@ -191,65 +192,94 @@ def main():
 
     model_names = [
         # -------------- English models -------------
-        # 't5-base',
-        # 't5-large'
+        # ('t5-base', 'seq2seq'),
+        # ('t5-large', 'seq2seq'),
 
         # -------------- Japanese models -------------
-        # 'google/mt5-base',
+        # ('google/mt5-base', 'causal'),
 
-        'retrieva-jp/t5-base-long',
-        # 'retrieva-jp/t5-large-long',
+        # ('retrieva-jp/t5-base-long', 'seq2seq'),
+        # ('retrieva-jp/t5-large-long', 'seq2seq'),
+        # ('retrieva-jp/t5-xl', 'seq2seq'),
 
-        # 'matsuo-lab/weblab-10b',
-        # 'stabilityai/japanese-stablelm-base-alpha-7b',
+        ('abeja/gpt2-large-japanese', 'causal'),
 
-        # 'cyberagent/open-calm-1b',
-        # 'cyberagent/open-calm-3b',
-        # 'cyberagent/open-calm-7b',
+        # ('matsuo-lab/weblab-10b', 'causal'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal')
 
-        # 'line-corporation/japanese-large-lm-1.7b',
-        # 'line-corporation/japanese-large-lm-3.6b',
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal'),
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal')
 
-        # 'rinna/japanese-gpt-1b',
-        # 'rinna/japanese-gpt-neox-3.6b',
+        # ('cyberagent/open-calm-1b', 'causal'),
+        # ('cyberagent/open-calm-3b', 'causal'),
+        # ('cyberagent/open-calm-7b', 'causal'),
+        # ('izumi-lab/stormy-7b-10ep', causal)
+
+        # ('line-corporation/japanese-large-lm-1.7b', 'causal'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal'),
+        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal'),
+
+        # ('rinna/japanese-gpt2-medium', 'causal'),
+        # ('rinna/japanese-gpt-1b', 'causal'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal'),
 
         # ! DO NOT use the following models, as their tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
-        # 'sonoisa/t5-base-japanese',
-        # 'sonoisa/t5-base-japanese-v1.1',
+        # ('sonoisa/t5-base-japanese', 'seq2seq'),
+        # ('sonoisa/t5-base-japanese-v1.1', 'seq2seq'),
     ]
 
+    shot = 'debug.micro'  # debug
     # shot = 'debug.tiny'  # debug
     # shot = 'FS.shot-0'
     # shot = 'FS.shot-10'
     # shot = 'FS.shot-100'
     # shot = 'FT.step-5000'
     # shot = 'FT.step-8100'
-    shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
     # shot = 'FT.step-50000'
     # shot = 'FT.step-100000'
 
-    use_test_as_train = False   # debug
+    use_test_as_train = True   # debug
     use_test_as_val = True
 
-    proof_sampling = 'stepwise'
-    # proof_sampling = 'all_at_once'
+    # proof_sampling = 'stepwise'
+    proof_sampling = 'all_at_once'
 
     lora = False
     # lora = True
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
-    # do_torchrun = False  # for debug
-    do_torchrun = True
+    do_torchrun = False
+    # do_torchrun = True
 
     dry_run = False
 
     # ------------------------ fixed ------------------------
 
+    if isinstance(engine, QsubEngine):
+        if engine.resource == 'rt_G.small':
+            n_gpus = 1
+            do_torchrun = True
+        elif engine.resource == 'rt_G.large':
+            n_gpus = 4
+            do_torchrun = True
+        elif engine.resource == 'rt_AG.small':
+            n_gpus = 1
+            do_torchrun = False
+        elif engine.resource == 'rt_AF':
+            n_gpus = 8
+            do_torchrun = True
+        else:
+            raise ValueError()
+   
     if dataset_push_to_hub_repo_name is not None:
         if n_gpus != 1 or do_torchrun:
             # this does not work
@@ -290,7 +320,7 @@ def main():
         for sample_negative_proof in sample_negative_proof_args:
 
             for seed in seeds:
-                for model_name in model_names:
+                for model_name, lm_type in model_names:
                     for _lrate in lrates:
                         setting = {}
 
@@ -313,17 +343,18 @@ def main():
                         shot_setting = SHOT_SETTINGS[shot].copy()
                         setting.update(shot_setting)
 
-                        batch_setting = get_batch_setting(
-                            model_name + '.all_at_once' if proof_sampling == 'all_at_once' else model_name,
-                            n_gpus,
-                        )
-                        setting.update(batch_setting)
-
                         setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                         setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
                         setting.update(get_logging_step_setting(max_steps=max_steps,
                                                                 eval_steps=eval_steps))
+
+                        modelwise_setting = get_modelwise_setting(
+                            model_name + '.all_at_once' if proof_sampling == 'all_at_once' else model_name,
+                            n_gpus,
+                            shot_setting['train_effective_batch_size'],
+                        )
+                        setting.update(modelwise_setting)
 
                         setting.update({
                             'seed': seed,
@@ -334,6 +365,8 @@ def main():
                             'base_config_name': base_config_name,
 
                             'model_name_or_path': model_name,
+                            'lm_type': lm_type,
+                            'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
                             'save_total_limit': 1,
 

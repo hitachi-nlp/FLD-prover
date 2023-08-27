@@ -1,1 +1,0 @@
-script_engine@git+https://github.com/HonoMi/script-engine.git@master
