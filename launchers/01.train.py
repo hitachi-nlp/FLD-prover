@@ -2,9 +2,8 @@
 import logging
 from pathlib import Path
 import json
-from typing import Optional
+from typing import Optional, Set
 import math
-
 
 import click
 from script_engine import QsubEngine, SubprocessEngine
@@ -15,13 +14,13 @@ from experimental_setting import (
     get_default_config_name,
     get_checkpoints,
     get_dataset_setting,
-    get_modelwise_setting,
+    get_batch_setting,
     get_logging_step_setting,
     make_output_dir,
     make_command,
     run_by_engine,
     CheckpointSpec,
-    SHOT_SETTINGS,
+    LEARNING_SETTINGS,
     make_val_interval_setting,
 )
 
@@ -174,6 +173,87 @@ def main():
         './outputs.FLD/00.create_corpus/20230826.jpn',
     ]
 
+    model_settings = [
+        # ---------------------------- English models ----------------------------
+        # ('t5-base', 'seq2seq', 't5-base'),
+        # ('t5-large', 'seq2seq', 't5-base'),
+
+        # ---------------------------- Japanese models ----------------------------
+        # ('google/mt5-base', 'causal', 't5-base'),
+
+        # ('retrieva-jp/t5-base-long', 'seq2seq', 't5-base'),
+        # ('retrieva-jp/t5-large-long', 'seq2seq', 't5-base'),
+        # ('retrieva-jp/t5-xl', 'seq2seq', 't5-base'),
+
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
+        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+
+        # ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
+
+        # ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
+
+        # ('matsuo-lab/weblab-10b', 'causal', 't5-base'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 't5-base'),
+
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 't5-base'),
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 't5-base'),
+
+        # ('line-corporation/japanese-large-lm-1.7b', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 't5-base'),
+
+        # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt-1b', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 't5-base'),
+
+
+        # ---------------------------- rejected models ----------------------------
+        # tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
+        # [rejected] ('sonoisa/t5-base-japanese', 'seq2seq', 't5-base'),
+        # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
+    ]
+
+    # learning = 'debug.ZS'
+    # learning = 'debug.micro'
+    learning = 'debug.tiny'
+    # learning = 'FS.shot-0'
+    # learning = 'FS.shot-10'
+    # learning = 'FS.shot-100'
+    # learning = 'FT.step-5000'
+    # learning = 'FT.step-8100'
+    # learning = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    # learning = 'FT.step-50000'
+    # learning = 'FT.step-100000'
+
+    use_test_as_train = True   # debug
+    use_test_as_val = True
+
+    # proof_sampling = 'stepwise'
+    proof_sampling = 'all_at_once'
+
+    lora = False
+    # lora = True
+
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
+
+    # n_gpus = 1  # debug
+    n_gpus = 4
+
+    gpu_name_for_batch_size = 'A100_48_1'
+
+    run_mode = 'debug'
+    # run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
+
+    dry_run = False
+
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
     # if you push to hub:
@@ -190,98 +270,26 @@ def main():
     # use_test_as_val = False
     # ------------------------------------------------------------
 
-    model_names = [
-        # -------------- English models -------------
-        # ('t5-base', 'seq2seq'),
-        # ('t5-large', 'seq2seq'),
-
-        # -------------- Japanese models -------------
-        # ('google/mt5-base', 'causal'),
-
-        # ('retrieva-jp/t5-base-long', 'seq2seq'),
-        # ('retrieva-jp/t5-large-long', 'seq2seq'),
-        # ('retrieva-jp/t5-xl', 'seq2seq'),
-
-        ('abeja/gpt2-large-japanese', 'causal'),
-
-        # ('matsuo-lab/weblab-10b', 'causal'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal')
-
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal')
-
-        # ('cyberagent/open-calm-1b', 'causal'),
-        # ('cyberagent/open-calm-3b', 'causal'),
-        # ('cyberagent/open-calm-7b', 'causal'),
-        # ('izumi-lab/stormy-7b-10ep', causal)
-
-        # ('line-corporation/japanese-large-lm-1.7b', 'causal'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal'),
-        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal'),
-
-        # ('rinna/japanese-gpt2-medium', 'causal'),
-        # ('rinna/japanese-gpt-1b', 'causal'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal'),
-
-        # ! DO NOT use the following models, as their tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
-        # ('sonoisa/t5-base-japanese', 'seq2seq'),
-        # ('sonoisa/t5-base-japanese-v1.1', 'seq2seq'),
-    ]
-
-    shot = 'debug.micro'  # debug
-    # shot = 'debug.tiny'  # debug
-    # shot = 'FS.shot-0'
-    # shot = 'FS.shot-10'
-    # shot = 'FS.shot-100'
-    # shot = 'FT.step-5000'
-    # shot = 'FT.step-8100'
-    # shot = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
-    # shot = 'FT.step-50000'
-    # shot = 'FT.step-100000'
-
-    use_test_as_train = True   # debug
-    use_test_as_val = True
-
-    # proof_sampling = 'stepwise'
-    proof_sampling = 'all_at_once'
-
-    lora = False
-    # lora = True
-
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
-
-    n_gpus = 1  # debug
-    # n_gpus = 4
-
-    do_torchrun = False
-    # do_torchrun = True
-
-    dry_run = False
-
     # ------------------------ fixed ------------------------
 
     if isinstance(engine, QsubEngine):
         if engine.resource == 'rt_G.small':
             n_gpus = 1
-            do_torchrun = True
+            gpu_name_for_batch_size = 'V100_16_1'
         elif engine.resource == 'rt_G.large':
             n_gpus = 4
-            do_torchrun = True
+            gpu_name_for_batch_size = 'V100_16_4'
         elif engine.resource == 'rt_AG.small':
             n_gpus = 1
-            do_torchrun = False
+            gpu_name_for_batch_size = 'A100_48_1'
         elif engine.resource == 'rt_AF':
             n_gpus = 8
-            do_torchrun = True
+            gpu_name_for_batch_size = 'A100_48_8'
         else:
             raise ValueError()
    
     if dataset_push_to_hub_repo_name is not None:
-        if n_gpus != 1 or do_torchrun:
+        if n_gpus != 1 or run_mode != 'debug':
             # this does not work
             raise ValueError()
 
@@ -320,7 +328,7 @@ def main():
         for sample_negative_proof in sample_negative_proof_args:
 
             for seed in seeds:
-                for model_name, lm_type in model_names:
+                for model_name, lm_type, model_name_for_batch_size in model_settings:
                     for _lrate in lrates:
                         setting = {}
 
@@ -340,8 +348,8 @@ def main():
                         base_setting = get_config(base_config_name)
                         setting.update(base_setting)
 
-                        shot_setting = SHOT_SETTINGS[shot].copy()
-                        setting.update(shot_setting)
+                        learning_setting = LEARNING_SETTINGS[learning].copy()
+                        setting.update(learning_setting)
 
                         setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                         setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
@@ -349,11 +357,17 @@ def main():
                         setting.update(get_logging_step_setting(max_steps=max_steps,
                                                                 eval_steps=eval_steps))
 
-                        modelwise_setting = get_modelwise_setting(
-                            model_name + '.all_at_once' if proof_sampling == 'all_at_once' else model_name,
-                            n_gpus,
-                            shot_setting['train_effective_batch_size'],
+                        modelwise_setting = get_batch_setting(
+                            gpu_name_for_batch_size,
+                            model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                         )
+
+                        accum_steps = int(learning_setting['train_effective_batch_size']\
+                                          / (setting['per_device_train_batch_size'] * n_gpus))
+                        if accum_steps < 1:
+                            raise ValueError()
+                        setting['gradient_accumulation_steps'] = accum_steps
+
                         setting.update(modelwise_setting)
 
                         setting.update({
@@ -372,7 +386,7 @@ def main():
 
                             # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                             'proof_sampling': proof_sampling,
-                            'shot': shot,
+                            'learning': learning,
                             'sample_negative_proof': sample_negative_proof,
 
                             'learning_rate': _lrate,
@@ -388,7 +402,7 @@ def main():
                         output_dir = make_output_dir(setting, output_top_dir)
                         command = make_command(output_dir,
                                                setting,
-                                               'torchrun' if do_torchrun else 'debug',
+                                               run_mode,
                                                n_gpus=n_gpus)
 
                         run_by_engine(

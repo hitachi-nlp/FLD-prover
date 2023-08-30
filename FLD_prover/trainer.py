@@ -240,7 +240,8 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             all_inputs = nested_truncate(all_inputs, num_samples)
 
         # Metrics!
-        if self.compute_metrics is not None and all_preds is not None and all_labels is not None:
+        # if self.compute_metrics is not None and all_preds is not None and all_labels is not None:
+        if self.compute_metrics is not None and all_preds is not None:
             if args.include_inputs_for_metrics:
                 metrics = self.compute_metrics(
                     EvalPrediction(predictions=all_preds, label_ids=all_labels, inputs=all_inputs),
@@ -389,7 +390,8 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         label_ids = labels_gatherer.finalize() if not prediction_loss_only else None
         inputs_ids = inputs_gatherer.finalize() if not prediction_loss_only else None
 
-        if self.compute_metrics is not None and preds is not None and label_ids is not None:
+        # if self.compute_metrics is not None and preds is not None and label_ids is not None:
+        if self.compute_metrics is not None and preds is not None:
             if args.include_inputs_for_metrics:
                 metrics = self.compute_metrics(
                     EvalPrediction(predictions=preds, label_ids=label_ids, inputs=inputs_ids),
@@ -464,8 +466,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                 _preds = _preds[0]
 
             # update
-            if i_step == 0:
-                # labels = _labels
+            if i_step == 0 and 'labels' in inputs:
                 labels = inputs['labels']
 
             num_return_sequences = self._gen_kwargs.get('num_return_sequences', 1)
@@ -495,7 +496,10 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                         logger.info('    %s', nbest_pred_seq)
 
                 if not are_finished[i_example]:
-                    extended_pred_seq_next = ' '.join([extended_pred_seq, onebest_pred_seq])
+                    if i_step == 0:
+                        extended_pred_seq_next = onebest_pred_seq
+                    else:
+                        extended_pred_seq_next = ' '.join([extended_pred_seq, onebest_pred_seq])
                     extended_pred_seqs[i_example] = extended_pred_seq_next
                     extended_input_seqs[i_example] = input_seqs[i_example] + extended_pred_seq_next
                     if self._is_finished_func(onebest_pred_seq):

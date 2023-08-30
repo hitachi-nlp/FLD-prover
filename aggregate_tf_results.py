@@ -132,7 +132,7 @@ def main(input_dir, output_dir, log_level):
         out_path = output_dir / 'results.tsv'
         logger.info('write into %s', str(out_path))
         output_dir.mkdir(exist_ok=True, parents=True)
-        merged_df.to_csv(out_path, sep='\t')
+        merged_df.to_csv(out_path, sep='\t', index=None)
 
 
 

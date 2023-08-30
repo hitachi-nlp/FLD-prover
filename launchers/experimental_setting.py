@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional, Union, List, Tuple
+from typing import Any, Dict, Optional, Union, List, Tuple, Set
 import glob
 from pathlib import Path
 import json
@@ -31,245 +31,80 @@ def maybe_option_flag(flag: str, value: bool) -> str:
     return f'{flag} {str(value)}'
 
 
-_MODELWISE_SETTINGS = {
+_BATCH_SETTINGS = {
 
     # XXX: if you change max_source_length or max_target_length,
     # make sure that all the stuf fit into memory with tokenizer_padding='max_len' option.
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
     # thus, we can measure the maxmum usage of memory.
 
-    # only for fast experiments on small dataset like depth-3
-    't5-small': {
-        'max_source_length': 1000,
-        'max_target_length': 100,
+    'A100_48_1': {
 
-        'per_device_train_batch_size': 32,
-        'per_device_eval_batch_size': 32,
+        't5-base': {
+            'max_source_length': 1700,
+            'max_target_length': 100,
 
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
 
-    't5-base': {
-        # 'max_source_length': 1500,
-        'max_source_length': 1700,
-        'max_target_length': 100,
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+        },
 
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
+        't5-base.all_at_once': {
+            'max_source_length': 1000,
+            'max_target_length': 1000,
 
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
 
-    't5-base.all_at_once': {
-        'max_source_length': 1000,
-        'max_target_length': 1000,
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+        },
+        # 'allenai/led-base-16384': {}
+        # 'allenai/led-large-16384': {}
+        # 'google/long-t5-tglobal-base': {}
+        # 'google/long-t5-tglobal-large': {}
 
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
 
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
+        # 'google/mt5-base': {}
 
-    't5-large': {
-        'max_source_length': 1500,
-        'max_target_length': 100,
+        'cyberagent/open-calm-small.all_at_once': {
+            'max_source_length': 1000,
+            'max_target_length': 1000,
 
-        # # XXX: may cause being killed by qsub manager ???
-        'per_device_train_batch_size': 2,
-        'per_device_eval_batch_size': 2,
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': False,
 
-        # 'per_device_train_batch_size': 1,
+            'generation_num_beams': 1,
+            'generation_top_k': 1,
+            'generation_max_proof_steps': 1,
 
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+        },
 
 
+        'abeja/gpt2-large-japanese.all_at_once': {
+            'max_source_length': 1000,
+            'max_target_length': 1000,
 
-    # # TODO must tune the max_source_length and batch size for speed
-    # 'allenai/led-base-16384': {
-    #     'max_source_length': 1500,
-    #     'max_target_length': 100,
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': False,
 
-    #     'per_device_train_batch_size': 8,
-    #     'per_device_eval_batch_size': 8,
+            'generation_num_beams': 1,
+            'generation_top_k': 1,
+            'generation_max_proof_steps': 1,
 
-    #     # 'tokenizer_padding': 'max_length',
-    #     'tokenizer_padding': 'longest',
-    # },
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+        },
 
-    # # TODO must tune the max_source_length and batch size for speed
-    # 'allenai/led-large-16384': {
-    #     'max_source_length': 1500,
-    #     'max_target_length': 100,
 
-    #     'per_device_train_batch_size': 8,
-    #     'per_device_eval_batch_size': 8,
 
-    #     # 'tokenizer_padding': 'max_length',
-    #     'tokenizer_padding': 'longest',
-    # },
-
-
-
-
-    # 'google/long-t5-tglobal-base': {
-    #     'max_source_length': 1500,
-    #     'max_target_length': 100,
-
-    #     'per_device_train_batch_size': 10,
-    #     'per_device_eval_batch_size': 10,
-
-    #     # 'tokenizer_padding': 'max_length',
-    #     'tokenizer_padding': 'longest',
-    # },
-
-    # 'google/long-t5-tglobal-large': {
-    #     'max_source_length': 1500,
-    #     'max_target_length': 100,
-
-    #     'per_device_train_batch_size': 2,
-    #     'per_device_eval_batch_size': 2,
-
-    #     # 'tokenizer_padding': 'max_length',
-    #     'tokenizer_padding': 'longest',
-    # },
-
-
-
-
-
-
-
-
-
-    # XXX: can not fit into memory, possibly because of the large model
-    # additionally, multilingual model tend to generate large number of japanese tokens
-    # doe to the un-optimized tokenizer
-    # 'google/mt5-base': {
-    #     'max_source_length': 700,
-    #     'max_target_length': 100,
-
-    #     'per_device_train_batch_size': 0,
-    #     'per_device_eval_batch_size': 0,
-
-    #     'tokenizer_padding': 'max_length',
-    #     # 'tokenizer_padding': 'longest',
-    # },
-
-    'sonoisa/t5-base-japanese': {
-        'max_source_length': 1700,
-        'max_target_length': 100,
-
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-    'sonoisa/t5-base-japanese-v1.1': {
-        'max_source_length': 1700,
-        'max_target_length': 100,
-
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-    'retrieva-jp/t5-base-long': {
-        'max_source_length': 1700,
-        'max_target_length': 100,
-
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-
-    # 'sonoisa/t5-base-japanese-v1.1.all_at_once': {
-    #     'max_source_length': 1000,
-    #     'max_target_length': 1000,
-
-    #     'per_device_train_batch_size': 1,
-    #     'per_device_eval_batch_size': 1,
-
-    #     'tokenizer_padding': 'max_length',
-    #     # 'tokenizer_padding': 'longest',
-    # },
-
-    'abeja/gpt2-large-japanese.all_at_once': {
-        'max_source_length': 1000,
-        'max_target_length': 1000,
-
-        'per_device_train_batch_size': 4,
-        'per_device_eval_batch_size': 4,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-
-    'cyberagent/open-calm-1b.all_at_once': {
-        'max_source_length': 1000,
-        'max_target_length': 1000,
-
-        'per_device_train_batch_size': 1,
-        'per_device_eval_batch_size': 1,
-
-        'generation_num_beams': 1,
-        'generation_top_k': 1,
-        'generation_max_proof_steps': 1,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-    'matsuo-lab/weblab-10b.all_at_once': {
-        'max_source_length': 2000,
-        'max_target_length': 2000,
-
-        'per_device_train_batch_size': 4,
-        'per_device_eval_batch_size': 4,
-
-        'generation_num_beams': 1,
-        'generation_top_k': 1,
-        'generation_max_proof_steps': 1,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-
-        'gradient_checkpointing': True,
-    },
-
-    'rinna/japanese-gpt2-medium.all_at_once': {
-        'max_source_length': 1000,
-        'max_target_length': 1000,
-
-        'per_device_train_batch_size': 4,
-        'per_device_eval_batch_size': 4,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
-
-    'rinna/japanese-gpt-1b.all_at_once': {
-        'max_source_length': 1000,
-        'max_target_length': 1000,
-
-        'per_device_train_batch_size': 4,
-        'per_device_eval_batch_size': 4,
-
-        # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
-    },
+    }
 
 
 }
@@ -293,17 +128,8 @@ _VERIFIER_BATCH_SETTINGS = {
 }
 
 
-def get_modelwise_setting(model_name: str,
-                          num_gpus: int,
-                          train_effective_batch_size: int) -> Dict[str, Any]:
-
-    setting = _MODELWISE_SETTINGS[model_name]
-
-    accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * num_gpus))
-    if accum_steps < 1:
-        raise ValueError()
-    setting['gradient_accumulation_steps'] = accum_steps
-
+def get_batch_setting(gpu_name: str, model_name) -> Dict[str, Any]:
+    setting = _BATCH_SETTINGS[gpu_name][model_name]
     return setting
 
 
@@ -1060,7 +886,7 @@ ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH = [
 ]
 
 
-SHOT_SETTINGS = {
+LEARNING_SETTINGS = {
     'FS.shot-0': {
         'max_train_samples': 0,
         'max_eval_samples': 500,
@@ -1181,6 +1007,19 @@ SHOT_SETTINGS = {
         'warmup_steps': 3000,
     },
 
+    'debug.ZS': {
+        'max_train_samples': 1,
+        'max_eval_samples': 1,
+        'max_predict_samples': 1,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 1,
+        'eval_steps': 1,
+        'warmup_steps': 999999,
+    },
+
     'debug.micro': {
         'max_train_samples': 1,
         'max_eval_samples': 1,
@@ -1206,6 +1045,52 @@ SHOT_SETTINGS = {
         'eval_steps': 300,
         'warmup_steps': 0,
     },
+
+
+    # -------- LLM few-shot experiments for LREC --------------
+    'LLM_FS.shot-0': {
+        'max_train_samples': 100,
+        'max_eval_samples': 500,
+        'max_predict_samples': 0,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 32,
+        'warmup_steps': 1000000,
+        'max_steps': 1,
+        'eval_steps': 1,
+
+        'learning_rate': 1e-5,
+    },
+
+    'LLM_FS.shot-10': {
+        'max_train_samples': 10,
+        'max_eval_samples': 100,
+        'max_predict_samples': 0,
+
+        'num_train_epochs': None,
+        'train_effective_batch_size': 32,
+        'warmup_steps': int(0.1 * 40 * 10 / 32),
+        'max_steps': int(40 * 10 / 32),
+        'eval_steps': int(40 * 10 / 32),
+
+        'learning_rate': 1e-5,
+    },
+
+    'LLM_FS.shot-100': {
+        'max_train_samples': 100,
+        'max_eval_samples': 100,
+        'max_predict_samples': 0,
+
+        'num_train_epochs': None,
+        'train_effective_batch_size': 32,
+        'warmup_steps': int(0.1 * 40 * 100 / 32),
+        'max_steps': int(40 * 100 / 32),
+        'eval_steps': int(40 * 100 / 32),
+
+        'learning_rate': 1e-5,
+    },
+
 
 }
 
@@ -1335,11 +1220,12 @@ def make_command(output_dir: Union[str, Path],
                  setting: Dict,
                  run_mode: str,
                  n_gpus: Optional[int] = None) -> str:
+
     unused_option_names = [
         'base_config_name',
         'checkpoint_name',
         'checkpoint_path',
-        'shot',
+        'learning',
         'train_effective_batch_size',
         'max_proof_steps',
         'dataset_uname',
@@ -1358,6 +1244,30 @@ def make_command(output_dir: Union[str, Path],
         if n_gpus is None:
             raise ValueError()
         commands.append(f'torchrun --nproc_per_node {n_gpus} ./run_prover.py')
+    elif run_mode == 'deepspeed':
+        # import os
+        # cuda_devices_org = os.environ.get('CUDA_VISIBLE_DEVICES', None)
+        # gpu_archs: Set[str] = set([])
+        # for i in range(100):
+        #     import torch
+        #     try:
+        #         os.environ['CUDA_VISIBLE_DEVICES'] = str(i)
+        #         arch_ = torch.cuda.get_device_capability()
+        #         gpu_archs.add(f'{arch_[0]}.{arch_[1]}')
+        #     except RuntimeError:
+        #         # no device "i"
+        #         break
+
+        # if len(gpu_archs) == 0:
+        #     raise ValueError()
+        # else:
+        #     os.environ['TORCH_CUDA_ARCH_LIST'] = ';'.join(sorted(gpu_archs))
+
+        # if cuda_devices_org is not None:
+        #     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_devices_org
+
+        commands.append(f'torchrun --nproc_per_node {n_gpus} ./run_prover.py'
+                        ' --deepspeed ds_config/ds_config_zero3.json')
     else:
         ValueError()
 

@@ -14,6 +14,7 @@ evaluate
 gradio
 huggingface_hub
 peft
+deepspeed
 
 langchain
 openai
