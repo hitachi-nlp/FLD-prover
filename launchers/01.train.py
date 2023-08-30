@@ -185,7 +185,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 't5-base'),
         # ('retrieva-jp/t5-xl', 'seq2seq', 't5-base'),
 
-        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
         # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
@@ -193,7 +193,7 @@ def main():
 
         # ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
 
-        # ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
+        ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
 
         # ('matsuo-lab/weblab-10b', 'causal', 't5-base'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 't5-base'),
