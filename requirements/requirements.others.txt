@@ -1,2 +1,7 @@
+python-dotenv
+langchain
+openai
+gradio
+
 script_engine@git+https://github.com/HonoMi/script-engine.git@master
 machine_learning@git+https://github.com/HonoMi/machine-learing-python.git@master

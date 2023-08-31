@@ -58,8 +58,11 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.7485fef')
     # output_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.7485fef')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/prmpt_typ=in_context_examples.COT.v1/n_sht=10')
-    output_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/prmpt_typ=in_context_examples.COT.v1/n_sht=10')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn/')
+    output_top_dir = Path('./outputs/11.reason_by_llm/2023-08-31.jpn/')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
@@ -72,7 +75,7 @@ def main():
         # 'openai.gpt-3.5-turbo-16k'
 
         # 'openai.gpt-4-0314',
-        # 'openai.gpt-4',
+        'openai.gpt-4',
         # 'openai.gpt-4-32k',
     ]
 
@@ -83,13 +86,14 @@ def main():
     # max_samples = 100
     # max_samples = None
 
+    skip_if_exists = False
     dry_run = False
 
     # ----------------- running ---------------------
 
     prompt_paths = sorted(input_top_dir.glob('**/prompts.jsonl'))
 
-    logger.warning('********* will start after sleeping 10 seconds ... Please verify the following setting is on your demand ********* ')
+    logger.warning('********* will start after sleeping 5 seconds ... Please verify the following setting is on your demand ********* ')
     logger.info('== paths ==')
     for path in prompt_paths:
         logger.info('     - ' + str(path))
@@ -119,11 +123,11 @@ def main():
                 setting,
                 top_dir=str(
                     Path(output_top_dir)
-                    / f'dtst_nm={setting.get("dataset.local_dataset_name", None)}'
+                    / f'dtst_nm={setting.get("dataset.dataset_uname", None)}'
                 ),
                 short=True,
                 dirname_ignore_params=[
-                    'dataset.local_dataset_name',
+                    'dataset.dataset_uname',
                     'dataset.train_file',
                     'dataset.validation_file',
                     'dataset.test_file',
@@ -134,13 +138,16 @@ def main():
             )
             output_path = output_dir / 'replies.jsonl'
 
-            command = ' '.join([
-                'python ./reason_by_llm.py',
-                str(prompt_path),
-                str(output_path),
-                f'--model-name {model_name}',
-                f'--max-samples {max_samples}',
-            ])
+            if skip_if_exists and output_path.exists():
+                logger.warning('skip evaluating for the existing results "%s"', str(output_path))
+            else:
+                command = ' '.join([
+                    'python ./reason_by_llm.py',
+                    str(prompt_path),
+                    str(output_path),
+                    f'--model-name {model_name}',
+                    f'--max-samples {max_samples}',
+                ])
 
             run_by_engine(
                 engine,

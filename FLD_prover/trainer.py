@@ -150,6 +150,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                 losses_host = losses if losses_host is None else torch.cat((losses_host, losses), dim=0)
             if labels is not None:
                 labels = self._pad_across_processes(labels)
+
             if inputs_decode is not None:
                 inputs_decode = self._pad_across_processes(inputs_decode)
                 inputs_decode = self._nested_gather(inputs_decode)
@@ -440,6 +441,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
 
             if self._no_loss_when_eval:
                 extended_inputs.pop('labels', None)
+
             _, _preds, _labels = super().prediction_step(
                 model,
                 extended_inputs,
@@ -468,6 +470,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             # update
             if i_step == 0 and 'labels' in inputs:
                 labels = inputs['labels']
+                labels = labels.to(self.model.device)
 
             num_return_sequences = self._gen_kwargs.get('num_return_sequences', 1)
             _pred_seqs = self._tensor_to_seqs(_preds)

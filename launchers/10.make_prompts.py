@@ -34,7 +34,9 @@ def main():
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.bf51eb2')
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230710.update_translation.7485fef')
 
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors')
+
+    output_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -55,10 +57,13 @@ def main():
         # './outputs/00.fix_FLD_schema.py/20230710.update_translation.bf51eb2',
         # './outputs/00.fix_FLD_schema.py/20230710.update_translation.7485fef',
 
-        './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
+        # './outputs/00.fix_FLD_schema.py/20230711.refactor_distractors',
+
+        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+        './outputs.FLD/00.create_corpus/20230826.jpn',
     ]
 
-    local_dataset_names = [
+    dataset_unames = [
         # 'FLD.debug.2023-05-13',
 
         # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
@@ -103,15 +108,26 @@ def main():
 
         # ---------------------------------- 20230711 ------------------------------------
         # '20230711.dist-fallback',
-        '20230711.finalize.D3',
+        # '20230711.finalize.D3',
         # '20230711.finalize.D8',
+
+        # ---------------------------------- 20230729.case_study_finalize ------------------------------------
+        # '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D8',
+
+        # 'hf.hitachi-nlp/FLD.v2',
+        # 'hf.hitachi-nlp/FLD-star.v2',
+
+        # ---------------------------------- 20230826.jpn ------------------------------------
+        '20230826.jpn.D3',
+        # '20230826.jpn.D8',
     ]
 
     prompt_types = [
-        # 'in_context_examples',
-        # 'in_context_examples.COT',
-        'in_context_examples.COT.v1',
-        # 'in_context_examples.COT.v2',
+        # 'ICL',
+        # 'ICL-COT',
+        # 'ICL-COT.v1',
+        'ICL-COT.v2',
     ]
 
     n_shot_list = [
@@ -139,24 +155,19 @@ def main():
     use_test_as_train = False  # for debugging
 
     # -------------------------- running --------------------------
-    for local_dataset_name in local_dataset_names:
-        dataset_paths = get_local_dataset_paths(local_dataset_name,
-                                          DATASETS_DIRS,
-                                          use_test_as_val=False,
-                                          use_test_as_train=use_test_as_train)
-
-        for split_name, path in dataset_paths.items():
-            if path is None:
-                continue
-            if not Path(path).exists:
-                raise Exception(f'{split_name} dataset does not exist at {path}')
+    for dataset_uname in dataset_unames:
+        dataset_paths = get_local_dataset_paths(dataset_uname,
+                                                DATASETS_DIRS,
+                                                use_test_as_val=False,
+                                                use_test_as_train=use_test_as_train,
+                                                allow_not_found_splits=True)
 
         for prompt_type in prompt_types:
             for n_shot in n_shot_list:
                 for seed in seeds:
 
                     setting = {
-                        'local_dataset_name': local_dataset_name,
+                        'dataset_uname': dataset_uname,
                         'prompt_type': prompt_type,
                         'n_shot': n_shot,
                         'seed': seed,
@@ -167,13 +178,13 @@ def main():
                         setting,
                         top_dir=str(
                             Path(output_top_dir)
-                            / f'dtst_nm={setting["local_dataset_name"]}'
+                            / f'dtst_nm={setting["dataset_uname"]}'
                             / f'prmpt_typ={setting["prompt_type"]}'
                             / f'n_sht={setting["n_shot"]}'
                         ),
                         short=True,
                         dirname_ignore_params=[
-                            'local_dataset_name',
+                            'dataset_uname',
                             'train_file',
                             'validation_file',
                             'test_file',

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from dotenv import load_dotenv
+load_dotenv()  # must be here
 import os
 import logging
 from pathlib import Path

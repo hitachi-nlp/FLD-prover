@@ -428,36 +428,12 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    if data_args.generation_top_k is not None:
-        try:
-            logger.info('reloading GenerationConfig to reflect the specified parameters: top_k= %s', data_args.generation_top_k)
-            training_args.generation_config = GenerationConfig.from_pretrained(model_args.model_name_or_path,
-                                                                               top_k=data_args.generation_top_k)
-        except Exception as e:
-            logger.warning('Could not specify generation_top_k due to the following error:\n%s', str(e))
+
     if lm_type == LMType.CAUSAL and data_args.proof_sampling == 'stepwise':
         raise ValueError('causal does not support stepwise prover because it is actually equivalent to all_at_once prover.')
 
     if training_args.dataloader_num_workers > 0:
         raise Exception(f'dataloader_num_workers({training_args.dataloader_num_workers}) > 0 is extemely slow in our program. We strongly recommend to ppecify it as 0.')
-
-    # if lm_type == LMType.CAUSAL:
-    #     if training_args.per_device_eval_batch_size > 1:
-    #         logger.warning('we will use per_device_eval_batch_size=1 as model.generate() does not work with batch')
-    #         training_args.per_device_eval_batch_size = 1
-    #     if training_args.n_gpu >= 2 and not training_args.deepspeed:
-    #         raise
-
-    # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
-    # information sent is the one passed as arguments along with your Python/PyTorch versions.
-    # send_example_telemetry("run_summarization", model_args, data_args)
-
-    # Setup logging
-    # logging.basicConfig(
-    #     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    #     datefmt="%m/%d/%Y %H:%M:%S",
-    #     handlers=[logging.StreamHandler(sys.stdout)],
-    # )
 
     if training_args.should_log:
         # The default of training_args.log_level is passive, so we set log level at info here to have that default.
@@ -651,6 +627,17 @@ def main():
 
         def generation_exit():
             pass
+
+    def make_gen_kwargs():
+        # dynamically generation gen_kwargs because it dependes on the tokenizers state,
+        # which as pad_token_id changed at generation_init()
+        return {
+            'top_k': data_args.generation_top_k,
+            # 'do_sample': True,
+
+            'num_return_sequences': data_args.generation_num_return_sequences,
+            'pad_token_id': tokenizer.pad_token_id,
+        }
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -1181,19 +1168,13 @@ def main():
         trainer.save_metrics("train", metrics)
         trainer.save_state()
 
-    if lm_type == LMType.CAUSAL:
-        def generate(self):
-            tokenizer.padding_side = "left"
-            tokenizer.pad_token = tokenizer.eos_token
-            model.config.pad_token_id = model.config.eos_token_id
-
     # Evaluation
     results = {}
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
 
         generation_init()
-        metrics = trainer.evaluate(metric_key_prefix="eval")
+        metrics = trainer.evaluate(metric_key_prefix="eval", **make_gen_kwargs())
         generation_exit()
 
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
@@ -1209,7 +1190,7 @@ def main():
             raise NotImplementedError()
 
         generation_init()
-        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict", num_return_sequences=data_args.generation_num_return_sequences)
+        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict", **make_gen_kwargs())
         generation_exit()
 
         metrics = predict_results.metrics
@@ -1263,7 +1244,7 @@ def main():
             generation_init()
             results = trainer.predict(user_input_dataset,
                                       metric_key_prefix="predict",
-                                      num_return_sequences=data_args.generation_num_return_sequences)
+                                      **make_gen_kwargs())
             generation_exit()
 
             if trainer.is_world_process_zero():

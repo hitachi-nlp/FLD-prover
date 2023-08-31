@@ -52,8 +52,11 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230710.update_translation.7485fef')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.7485fef')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230711.refactor_distractors/dtst_nm=20230711.finalize.D3/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/2023-08-31.jpn/')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-08-31.jpn/')
 
     # ----------------- settings ---------------------
 
@@ -85,11 +88,11 @@ def main():
             setting,
             top_dir=str(
                 Path(output_top_dir)
-                / f'dtst_nm={setting.get("reply.dataset.local_dataset_name", None)}'
+                / f'dtst_nm={setting.get("reply.dataset.dataset_uname", None)}'
             ),
             short=True,
             dirname_ignore_params=[
-                'reply.dataset.local_dataset_name',
+                'reply.dataset.dataset_uname',
                 'reply.dataset.train_file',
                 'reply.dataset.validation_file',
                 'reply.dataset.test_file',

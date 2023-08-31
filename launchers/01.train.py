@@ -220,8 +220,8 @@ def main():
     ]
 
     # learning = 'debug.ZS'
-    # learning = 'debug.micro'
-    learning = 'debug.tiny'
+    learning = 'debug.micro'
+    # learning = 'debug.tiny'
     # learning = 'FS.shot-0'
     # learning = 'FS.shot-10'
     # learning = 'FS.shot-100'
@@ -248,9 +248,9 @@ def main():
 
     gpu_name_for_batch_size = 'A100_48_1'
 
-    run_mode = 'debug'
+    # run_mode = 'debug'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
     dry_run = False
 

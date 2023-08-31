@@ -74,16 +74,16 @@ _QUESTIONS = {
 
     'v0': '==== 2. Now, solve the following example. Write the step-by-step thought after the "output" using the same format demonstrated in the above examples.',
 
-    'v1': '******** 2. Now, solve the following example, i.e., write a step-by-step thought to verify the hypothesis after the "output", using exactly the same format demonstrated in the above examples.'
+    'v1': '******** 2. Now, solve the following example, i.e., write a step-by-step thought to verify the hypothesis after the "output", using exactly the same format demonstrated in the above examples.',
 }
 
 
 def _make_intro(prompt_type: str) -> Optional[str]:
-    if prompt_type == 'in_context_examples.COT':
+    if prompt_type == 'ICL-COT':
         return _INTROS['v0']
-    elif prompt_type == 'in_context_examples.COT.v1':
+    elif prompt_type == 'ICL-COT.v1':
         return _INTROS['v1']
-    elif prompt_type == 'in_context_examples.COT.v2':
+    elif prompt_type == 'ICL-COT.v2':
         return _INTROS['v2']
 
     else:
@@ -91,11 +91,11 @@ def _make_intro(prompt_type: str) -> Optional[str]:
 
 
 def _make_question(prompt_type: str) -> Optional[str]:
-    if prompt_type == 'in_context_examples.COT':
+    if prompt_type == 'ICL-COT':
         return _QUESTIONS['v0']
-    elif prompt_type == 'in_context_examples.COT.v1':
+    elif prompt_type == 'ICL-COT.v1':
         return _QUESTIONS['v1']
-    elif prompt_type == 'in_context_examples.COT.v2':
+    elif prompt_type == 'ICL-COT.v2':
         return _QUESTIONS['v1']
     else:
         return None
@@ -107,12 +107,17 @@ def _make_question(prompt_type: str) -> Optional[str]:
 @click.option('--train-path')
 @click.option('--prompt-type',
               type=click.Choice([
-                  'in_context_examples',
-                  'in_context_examples.COT',
-                  'in_context_examples.COT.v1',
-                  'in_context_examples.COT.v2',
+                  'ICL',
+                  'ICL-COT',
+                  'ICL-COT.v1',
+                  'ICL-COT.v2',
+
+                  'ICL.jpn',
+                  'ICL-COT.jpn',
+                  'ICL-COT.v1.jpn',
+                  'ICL-COT.v2.jpn',
               ]),
-              default='in_context_examples.COT')
+              default='ICL-COT')
 @click.option('--n-shot', type=int, default=10)
 @click.option('--seed', type=int, default=0)
 @click.option('--log-level', default='INFO')

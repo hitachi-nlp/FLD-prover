@@ -77,8 +77,8 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': False,
 
-            'generation_num_beams': 1,
-            'generation_top_k': 1,
+            'generation_num_beams': 10,
+            'generation_top_k': 10,
             'generation_max_proof_steps': 1,
 
             # 'tokenizer_padding': 'max_length',
@@ -90,9 +90,9 @@ _BATCH_SETTINGS = {
             'max_source_length': 1000,
             'max_target_length': 1000,
 
-            'per_device_train_batch_size': 4,
-            'per_device_eval_batch_size': 4,
-            'gradient_checkpointing': False,
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
 
             'generation_num_beams': 1,
             'generation_top_k': 1,
@@ -399,15 +399,21 @@ def get_dataset_setting(uname: str,
 def get_local_dataset_paths(uname: str,
                             top_dirs: List[str],
                             use_test_as_train=False,
-                            use_test_as_val=False) -> Dict[str, Optional[str]]:
+                            use_test_as_val=False,
+                            allow_not_found_splits=False) -> Dict[str, Optional[str]]:
     type_, dataset_name = _parse_dataset_name(uname)
     if type_ != 'local':
         raise ValueError()
 
     def validate(dataset_paths):
+
         for split_name, path in dataset_paths.items():
-            if not Path(path).exists:
-                raise Exception(f'{split_name} dataset does not exist at {path}')
+            if path is None or not Path(path).exists:
+                msg = f'dataset="{dataset_name}", split="{split_name}" not found under {str(top_dirs)}'
+                if allow_not_found_splits:
+                    logger.warning(msg)
+                else:
+                    raise Exception(msg)
 
     if dataset_name in _DATASET_PATHS:
         paths = _DATASET_PATHS[dataset_name].copy()
@@ -437,11 +443,11 @@ def get_local_dataset_paths(uname: str,
 
         def get_split_jsonl_with_warning(top_dir: Path, local_dataset_name: str, split: str) -> Optional[Path]:
             path = get_split_jsonl(top_dir, split)
-            if path is None:
-                logger.warning('dataset split="%s" name="%s" not found under "%s"',
-                               split,
-                               local_dataset_name,
-                               str(top_dir))
+            # if path is None:
+            #     logger.warning('dataset split="%s" name="%s" not found under "%s"',
+            #                    split,
+            #                    local_dataset_name,
+            #                    str(top_dir))
             return path
 
         # We must use glob to follow symbolic links
@@ -1028,8 +1034,8 @@ LEARNING_SETTINGS = {
         'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
-        'max_steps': 200,
-        'eval_steps': 200,
+        'max_steps': 300,
+        'eval_steps': 300,
         'warmup_steps': 0,
     },
 

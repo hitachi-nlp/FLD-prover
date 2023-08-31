@@ -53,8 +53,11 @@ def main():
     # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230710.update_translation.7485fef')
     # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230710.update_translation.7485fef')
 
-    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
-    output_top_dir = Path('./outputs/13.analyze_llm_errors/20230711.refactor_distractors')
+    # input_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230711.refactor_distractors')
+    # output_top_dir = Path('./outputs/13.analyze_llm_errors/20230711.refactor_distractors')
+
+    input_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-08-31.jpn/')
+    output_top_dir = Path('./outputs/13.analyze_llm_errors/2023-08-31.jpn/')
 
     # ----------------- settings ---------------------
     engine = SubprocessEngine()   # for debug
