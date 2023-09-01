@@ -75,8 +75,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
     # output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
+    output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     dataset_unames = [
         # 'FLD.debug.2023-05-13',
@@ -143,8 +144,12 @@ def main():
         # 'hf.hitachi-nlp/FLD-star.v2',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
-        '20230826.jpn.D3',
+        # '20230826.jpn.D3',
         # '20230826.jpn.D8',
+
+        # ---------------------------------- 202320230901.random_transitive_verbs.D3 ------------------------------------
+        '20230901.random_transitive_verbs.D3',
+        # '20230901.random_transitive_verbs.D8',
     ]
 
     DATASETS_DIRS = [
@@ -171,32 +176,39 @@ def main():
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
         './outputs.FLD/00.create_corpus/20230826.jpn',
+        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
     ]
 
     model_settings = [
-        # ---------------------------- English models ----------------------------
-        # ('t5-base', 'seq2seq', 't5-base'),
+        # ============================ english      ============================
+        ('t5-base', 'seq2seq', 't5-base'),
         # ('t5-large', 'seq2seq', 't5-base'),
 
-        # ---------------------------- Japanese models ----------------------------
+        # ============================ multilingual ============================
         # ('google/mt5-base', 'causal', 't5-base'),
+
+        # ============================ japanese     ============================
+
+        # -------------- < 1B params --------------
+        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
+
+        # -------------- > 1B params --------------
+        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('retrieva-jp/t5-base-long', 'seq2seq', 't5-base'),
         # ('retrieva-jp/t5-large-long', 'seq2seq', 't5-base'),
         # ('retrieva-jp/t5-xl', 'seq2seq', 't5-base'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
-        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
-        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
-
         # ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
 
-        ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
 
-        # ('matsuo-lab/weblab-10b', 'causal', 't5-base'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 't5-base'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 't5-base'),
         # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 't5-base'),
@@ -220,37 +232,35 @@ def main():
     ]
 
     # learning = 'debug.ZS'
-    learning = 'debug.micro'
+    # learning = 'debug.micro'
+    # learning = 'debug.step-10'
     # learning = 'debug.tiny'
     # learning = 'FS.shot-0'
     # learning = 'FS.shot-10'
     # learning = 'FS.shot-100'
     # learning = 'FT.step-5000'
     # learning = 'FT.step-8100'
-    # learning = 'FT.step-20000'   # 20k steps are not enough wrt the qualitative analysis
+    learning = 'FT.step-20000'
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
 
-    use_test_as_train = True   # debug
+    use_test_as_train = False   # debug
     use_test_as_val = True
 
-    # proof_sampling = 'stepwise'
-    proof_sampling = 'all_at_once'
+    seq2seq_proof_sampling = 'stepwise'
+    # seq2seq_proof_sampling = 'all_at_once'
 
-    lora = False
-    # lora = True
-
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
     # n_gpus = 1  # debug
     n_gpus = 4
 
-    gpu_name_for_batch_size = 'A100_48_1'
+    gpu_name_for_batch_size = 'V100_16_4'
 
     # run_mode = 'debug'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
 
     dry_run = False
 
@@ -329,6 +339,11 @@ def main():
 
             for seed in seeds:
                 for model_name, lm_type, model_name_for_batch_size in model_settings:
+                    if lm_type == 'causal':
+                        proof_sampling = 'all_at_once'
+                    else:
+                        proof_sampling = seq2seq_proof_sampling
+
                     for _lrate in lrates:
                         setting = {}
 
@@ -390,8 +405,6 @@ def main():
                             'sample_negative_proof': sample_negative_proof,
 
                             'learning_rate': _lrate,
-
-                            'lora': lora,
 
                             # 'n_gpu': 1,
                             'dataloader_num_workers': 0,

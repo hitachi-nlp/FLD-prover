@@ -639,6 +639,17 @@ def main():
             'pad_token_id': tokenizer.pad_token_id,
         }
 
+    # Override the decoding parameters of Seq2SeqTrainer
+    # + 1 to be compatible with beam search
+    training_args.generation_max_length = (
+        training_args.generation_max_length + 1
+        if training_args.generation_max_length is not None
+        else data_args.val_max_target_length + 1
+    )
+    training_args.generation_num_beams = (
+        data_args.num_beams if data_args.num_beams is not None else training_args.generation_num_beams
+    )
+
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
     embedding_size = model.get_input_embeddings().weight.shape[0]
@@ -824,11 +835,13 @@ def main():
             tensor = tensor.detach().cpu().numpy()
         return np.where(tensor != ignore_index, tensor, tokenizer.pad_token_id)
 
+    whole_proof_max_length = (
+        data_args.max_target_length * 20 if data_args.proof_sampling == 'stepwise' and lm_type == LMType.SEQ_2_SEQ
+        else data_args.max_target_length
+    )
+
     @profile
-    def preprocess_function(examples: Dict[str, List[Any]],
-                            split: str,
-                            max_source_length: int,
-                            max_target_length: int) -> Dict[str, List[Any]]:
+    def preprocess_function(examples: Dict[str, List[Any]], split: str) -> Dict[str, List[Any]]:
         examples = serialize_transform(
             examples,
             split,
@@ -842,7 +855,8 @@ def main():
 
         # check whther the tokenizer can recognize stance markers
         a_gold_proof = gold_proofs[0]
-        a_gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([a_gold_proof], max_target_length)["input_ids"][0])
+        a_gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([a_gold_proof],
+                                                                      whole_proof_max_length)["input_ids"][0])
         if len(get_stance_markers(a_gold_proof_dec)) == 0:
             raise ValueError(
                 '\n'.join([
@@ -860,9 +874,10 @@ def main():
                 raise ValueError()
 
             if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts, max_source_length))
+                forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
 
-                forward_inputs["labels"] = prepare_tokenized_targets(_proof_steps_w_eos, max_target_length)["input_ids"]
+                forward_inputs["labels"] = prepare_tokenized_targets(_proof_steps_w_eos,
+                                                                     data_args.max_target_length)["input_ids"]
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
 
             elif lm_type == LMType.CAUSAL:
@@ -871,7 +886,7 @@ def main():
                 prompt_ids = [
                     prepare_tokenized_inputs(
                         prompt,
-                        max_source_length,
+                        data_args.max_source_length,
                         padding='longest',
                         return_length=True,
                         # add_special_tokens=False,
@@ -880,8 +895,9 @@ def main():
                 ]
                 prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
 
-                inputs_with_targets = [f'{prompt}{proof_step}' for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
-                forward_inputs.update(prepare_tokenized_inputs(inputs_with_targets, max_source_length))
+                inputs_with_targets = [f'{prompt}{proof_step}'
+                                       for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
+                forward_inputs.update(prepare_tokenized_inputs(inputs_with_targets, data_args.max_source_length))
                 forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"],
                                                                        mask_lengths=prompt_lengths)
@@ -892,9 +908,9 @@ def main():
                 raise Exception('Why pass here? might be a bug?')
 
             if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts, max_source_length))
+                forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
                 forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
-                                                                     max_target_length)["input_ids"]
+                                                                     whole_proof_max_length)["input_ids"]
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
 
             elif lm_type == LMType.CAUSAL:
@@ -904,13 +920,14 @@ def main():
                 forward_inputs.update(
                     prepare_tokenized_inputs(
                         _prompts,
-                        max_source_length,
+                        data_args.max_source_length,
                         # add_special_tokens=False
                     ))
                 generation_exit()
 
                 # the padding is arbitrary
-                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs, max_target_length)["input_ids"]
+                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
+                                                                     whole_proof_max_length)["input_ids"]
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
             else:
                 raise NotImplementedError()
@@ -941,11 +958,7 @@ def main():
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
             train_dataset = train_dataset.select(range(max_train_samples))
         train_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'train',
-                                                 max_source_length=data_args.max_source_length,
-                                                 max_target_length=data_args.max_target_length))
-
-    generation_max_target_length_factor = 20 if data_args.proof_sampling == 'stepwise' else 1
+            lambda examples: preprocess_function(examples, 'train'))
 
     if training_args.do_eval:
         eval_dataset = raw_datasets["validation"]
@@ -953,9 +966,7 @@ def main():
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
         eval_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'eval',
-                                                 max_source_length=data_args.max_source_length,
-                                                 max_target_length=data_args.max_target_length * generation_max_target_length_factor))
+            lambda examples: preprocess_function(examples, 'eval'))
 
     if training_args.do_predict:
         predict_dataset = raw_datasets["test"]
@@ -963,9 +974,7 @@ def main():
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
             predict_dataset = predict_dataset.select(range(max_predict_samples))
         predict_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'eval',
-                                                 max_source_length=data_args.max_source_length,
-                                                 max_target_length=data_args.max_target_length * generation_max_target_length_factor))
+            lambda examples: preprocess_function(examples, 'eval'))
 
     # Data collator
     label_pad_token_id = ignore_index if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
@@ -1112,16 +1121,6 @@ def main():
 
         return results
 
-    # Override the decoding parameters of Seq2SeqTrainer
-    training_args.generation_max_length = (
-        training_args.generation_max_length
-        if training_args.generation_max_length is not None
-        else data_args.val_max_target_length
-    )
-    training_args.generation_num_beams = (
-        data_args.num_beams if data_args.num_beams is not None else training_args.generation_num_beams
-    )
-
     # Initialize our Trainer
     if training_args.remove_unused_columns:
         raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augumentation.')
@@ -1129,6 +1128,8 @@ def main():
         preprocess_logits_for_metrics = None
     elif lm_type == LMType.CAUSAL:
         preprocess_logits_for_metrics = None
+        if data_args.proof_sampling == 'stepwise':
+            raise ValueError('proof_sampling = "stepwise" is not suitable for LMType.CAUSAL')
     else:
         raise NotImplementedError()
 
@@ -1238,9 +1239,7 @@ def main():
                 use_auth_token=True if model_args.use_auth_token else None,
             )['tmp']
             user_input_dataset.set_transform(
-                lambda examples: preprocess_function(examples, 'eval',
-                                                     max_source_length=data_args.max_source_length,
-                                                     max_target_length=data_args.max_target_length * generation_max_target_length_factor))
+                lambda examples: preprocess_function(examples, 'eval'))
             generation_init()
             results = trainer.predict(user_input_dataset,
                                       metric_key_prefix="predict",

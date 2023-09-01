@@ -38,7 +38,7 @@ _BATCH_SETTINGS = {
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
     # thus, we can measure the maxmum usage of memory.
 
-    'A100_48_1': {
+    'V100_16_4': {
 
         't5-base': {
             'max_source_length': 1700,
@@ -70,37 +70,111 @@ _BATCH_SETTINGS = {
         # 'google/mt5-base': {}
 
         'cyberagent/open-calm-small.all_at_once': {
-            'max_source_length': 1000,
-            'max_target_length': 1000,
+            'tokenizer_padding': 'max_length',
+            # 'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 8,
+            'gradient_checkpointing': False,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'cyberagent/open-calm-medium.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
 
             'per_device_train_batch_size': 4,
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': False,
 
-            'generation_num_beams': 10,
-            'generation_top_k': 10,
-            'generation_max_proof_steps': 1,
-
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
         },
 
+        'cyberagent/open-calm-large.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
-        'abeja/gpt2-large-japanese.all_at_once': {
-            'max_source_length': 1000,
-            'max_target_length': 1000,
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'cyberagent/open-calm-1b.all_at_once': {
+            'tokenizer_padding': 'max_length',
+            # 'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': True,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'cyberagent/open-calm-3b.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': True,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'cyberagent/open-calm-7b.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
 
             'per_device_train_batch_size': 1,
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'generation_num_beams': 1,
-            'generation_top_k': 1,
-            'generation_max_proof_steps': 1,
+            'lora': True,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
 
+        'matsuo-lab/weblab-10b.all_at_once': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': True,
+            'generation_num_beams': 2,   # to align with weblab-10b
         },
+
+
 
 
 
@@ -1023,6 +1097,19 @@ LEARNING_SETTINGS = {
         'train_effective_batch_size': 64,
         'max_steps': 1,
         'eval_steps': 1,
+        'warmup_steps': 999999,
+    },
+
+    'debug.step-10': {
+        'max_train_samples': 1,
+        'max_eval_samples': 1,
+        'max_predict_samples': 1,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10,
+        'eval_steps': 10,
         'warmup_steps': 999999,
     },
 
