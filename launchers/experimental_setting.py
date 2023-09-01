@@ -1115,14 +1115,14 @@ LEARNING_SETTINGS = {
 
     'debug.micro': {
         'max_train_samples': 1,
-        'max_eval_samples': 1,
+        'max_eval_samples': 2,
         'max_predict_samples': 1,
 
         'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
-        'max_steps': 300,
-        'eval_steps': 300,
+        'max_steps': 50,
+        'eval_steps': 50,
         'warmup_steps': 0,
     },
 

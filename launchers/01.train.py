@@ -75,9 +75,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
     # output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
+    # output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     dataset_unames = [
         # 'FLD.debug.2023-05-13',
@@ -232,7 +232,7 @@ def main():
     ]
 
     # learning = 'debug.ZS'
-    # learning = 'debug.micro'
+    learning = 'debug.micro'
     # learning = 'debug.step-10'
     # learning = 'debug.tiny'
     # learning = 'FS.shot-0'
@@ -240,7 +240,7 @@ def main():
     # learning = 'FS.shot-100'
     # learning = 'FT.step-5000'
     # learning = 'FT.step-8100'
-    learning = 'FT.step-20000'
+    # learning = 'FT.step-20000'
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
 
@@ -250,16 +250,16 @@ def main():
     seq2seq_proof_sampling = 'stepwise'
     # seq2seq_proof_sampling = 'all_at_once'
 
-    # engine = SubprocessEngine()   # debug
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()   # debug
+    # engine = QsubEngine('ABCI', 'rt_G.large')
 
     # n_gpus = 1  # debug
     n_gpus = 4
 
     gpu_name_for_batch_size = 'V100_16_4'
 
-    # run_mode = 'debug'
-    run_mode = 'torchrun'
+    run_mode = 'debug'
+    # run_mode = 'torchrun'
     # run_mode = 'deepspeed'
 
     dry_run = False
