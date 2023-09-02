@@ -78,6 +78,82 @@ _BATCH_SETTINGS = {
 
 
 
+        'google/mt5-base': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'google/mt5-large': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+
+        'retrieva-jp/t5-base-long': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 8,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'retrieva-jp/t5-large-long': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
+        'retrieva-jp/t5-xl': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,   # to align with weblab-10b
+        },
+
         'cyberagent/open-calm-small.all_at_once': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
@@ -124,8 +200,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -1139,6 +1215,22 @@ LEARNING_SETTINGS = {
         'use_test_as_val': True,
     },
 
+    'debug.step-10': {
+        'max_train_samples': 1,
+        'max_eval_samples': 1,
+        'max_predict_samples': 1,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10,
+        'eval_steps': 1,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
     'debug.micro': {
         'max_train_samples': 1,
         'max_eval_samples': 1,
@@ -1165,6 +1257,22 @@ LEARNING_SETTINGS = {
         'train_effective_batch_size': 64,
         'max_steps': 300,
         'eval_steps': 300,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
+    'debug.find_batch_size': {
+        'max_train_samples': 32,
+        'max_eval_samples': 32,
+        'max_predict_samples': 32,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10,
+        'eval_steps': 10,
         'warmup_steps': 0,
 
         'use_test_as_train': True,

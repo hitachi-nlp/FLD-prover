@@ -836,7 +836,7 @@ def main():
         return np.where(tensor != ignore_index, tensor, tokenizer.pad_token_id)
 
     whole_proof_max_length = (
-        data_args.max_target_length * 20 if data_args.proof_sampling == 'stepwise' and lm_type == LMType.SEQ_2_SEQ
+        data_args.max_target_length * 200 if data_args.proof_sampling == 'stepwise' and lm_type == LMType.SEQ_2_SEQ
         else data_args.max_target_length
     )
     proof_col = 'gold_proofs'
