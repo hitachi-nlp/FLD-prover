@@ -52,7 +52,8 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 10,
+            # 'generation_num_beams': 10,
+            'generation_num_beams': 2,
         },
 
         't5-base.all_at_once': {
@@ -67,7 +68,8 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 10,
+            # 'generation_num_beams': 10,
+            'generation_num_beams': 2,
         },
         # 'allenai/led-base-16384': {}
         # 'allenai/led-large-16384': {}

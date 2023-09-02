@@ -74,9 +74,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
     # output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
+    output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     dataset_unames = [
         # 'FLD.debug.2023-05-13',
@@ -143,11 +143,11 @@ def main():
         # 'hf.hitachi-nlp/FLD-star.v2',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
-        '20230826.jpn.D3',
+        # '20230826.jpn.D3',
         # '20230826.jpn.D8',
 
         # ---------------------------------- 202320230901.random_transitive_verbs.D3 ------------------------------------
-        # '20230901.random_transitive_verbs.D3',
+        '20230901.random_transitive_verbs.D3',
         # '20230901.random_transitive_verbs.D8',
     ]
 
@@ -180,7 +180,7 @@ def main():
 
     model_settings = [
         # ============================ english      ============================
-        # ('t5-base', 'seq2seq', 't5-base'),
+        ('t5-base', 'seq2seq', 't5-base'),
         # ('t5-large', 'seq2seq', 't5-base'),
 
         # ============================ multilingual ============================
@@ -191,55 +191,55 @@ def main():
 
         # -------------- < 1B params --------------
 
-        ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
 
-        ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-large-long'),
 
-        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
-        ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
+        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
-        ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
 
-        ('ku-nlp/gpt2-small-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
-        ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
 
-        ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
-        ('rinna/japanese-gpt-neox-small', 'causal', 't5-base'),
-        ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
-        ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt-neox-small', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-small'),
 
-        ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'abeja/gpt2-large-japanese'),
 
         # -------------- > 1B params --------------
 
-        ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
-        ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
+        # ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
 
-        ('abeja/gpt-neox-japanese-2.7b', 'causal', 'abeja/gpt2-large-japanese'),
+        # ('abeja/gpt-neox-japanese-2.7b', 'causal', 'abeja/gpt2-large-japanese'),
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 't5-base'),
-        ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 't5-base'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 't5-base'),
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 't5-base'),
 
-        ('line-corporation/japanese-large-lm-1.7b', 'causal', 't5-base'),
-        ('line-corporation/japanese-large-lm-3.6b', 'causal', 't5-base'),
-        ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 't5-base'),
-        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-1.7b', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 't5-base'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 't5-base'),
 
-        ('rinna/japanese-gpt-1b', 'causal', 't5-base'),
-        ('rinna/japanese-gpt-neox-3.6b', 'causal', 't5-base'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 't5-base'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-1b', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 't5-base'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 't5-base'),
 
 
         # ---------------------------- rejected models ----------------------------
@@ -252,21 +252,21 @@ def main():
     # learning = 'debug.step-10'
     # learning = 'debug.micro'
     # learning = 'debug.tiny'
-    learning = 'debug.find_batch_size'
+    # learning = 'debug.find_batch_size'
     # learning = 'FS.shot-0'
     # learning = 'FS.shot-10'
     # learning = 'FS.shot-100'
     # learning = 'FT.step-5000'
     # learning = 'FT.step-8100'
-    # learning = 'FT.step-20000'
+    learning = 'FT.step-20000'
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
 
     seq2seq_proof_sampling = 'stepwise'
     # seq2seq_proof_sampling = 'all_at_once'
 
-    engine = SubprocessEngine()   # debug
-    # engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = SubprocessEngine()   # debug
+    engine = QsubEngine('ABCI', 'rt_G.large')
 
     # n_gpus = 1  # debug
     n_gpus = 4
@@ -274,8 +274,8 @@ def main():
     gpu_name_for_batch_size = 'V100_16_4'
 
     # run_mode = 'debug'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
 
     dry_run = False
 
@@ -395,7 +395,7 @@ def main():
                         )
 
                         accum_steps = int(learning_setting['train_effective_batch_size']
-                                          / (setting['per_device_train_batch_size'] * n_gpus))
+                                          / (modelwise_setting['per_device_train_batch_size'] * (1 if run_mode == 'deepspeed' else n_gpus)))
                         if accum_steps < 1:
                             raise ValueError()
                         setting['gradient_accumulation_steps'] = accum_steps
