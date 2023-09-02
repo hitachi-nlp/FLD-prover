@@ -27,7 +27,6 @@ from experimental_setting import (
 logger = logging.getLogger(__name__)
 
 
-
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
@@ -129,7 +128,7 @@ def main():
         # '20230718.case_study.D3.dist-mixture',
         # '20230718.case_study.D3.num_dist-wide',
         # '20230718.case_study.D8.dist-mixture.num_dist-wide',
-        
+
         # '20230718.case_study.D3.dist-mixture.num_dist-wide',
         # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_logE',
         # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10',
@@ -233,7 +232,6 @@ def main():
 
     # learning = 'debug.ZS'
     # learning = 'debug.micro'
-    # learning = 'debug.step-10'
     # learning = 'debug.tiny'
     # learning = 'FS.shot-0'
     # learning = 'FS.shot-10'
@@ -243,9 +241,6 @@ def main():
     learning = 'FT.step-20000'
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
-
-    use_test_as_train = False   # debug
-    use_test_as_val = True
 
     seq2seq_proof_sampling = 'stepwise'
     # seq2seq_proof_sampling = 'all_at_once'
@@ -271,13 +266,12 @@ def main():
     # XXX: Additionally, DO NOT DELETE THE REPOSITORY MANUALLY before pushing,
     #      as it will delete all the statistics such as # downloads and likes.
 
+    # learning = 'push_to_hub'  # XXX turn on
+
     dataset_push_to_hub_repo_name = None
     # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
     # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
 
-    # Specify as follows so that we push all the splits.
-    # use_test_as_train = False
-    # use_test_as_val = False
     # ------------------------------------------------------------
 
     # ------------------------ fixed ------------------------
@@ -297,10 +291,12 @@ def main():
             gpu_name_for_batch_size = 'A100_48_8'
         else:
             raise ValueError()
-   
+
     if dataset_push_to_hub_repo_name is not None:
         if n_gpus != 1 or run_mode != 'debug':
             # this does not work
+            raise ValueError()
+        if learning != 'push_to_hub':
             raise ValueError()
 
     hours = 72
@@ -315,7 +311,7 @@ def main():
     ]
 
     do_predict = False
-    
+
     sample_negative_proof_args = [
         # False,
         True
@@ -347,10 +343,18 @@ def main():
                     for _lrate in lrates:
                         setting = {}
 
-                        dataset_setting = get_dataset_setting(dataset_uname,
-                                                              DATASETS_DIRS,
-                                                              use_test_as_val=use_test_as_val,
-                                                              use_test_as_train=use_test_as_train)
+                        base_config_name = get_default_config_name(dataset_uname)
+                        base_setting = get_config(base_config_name)
+                        setting.update(base_setting)
+
+                        learning_setting = LEARNING_SETTINGS[learning].copy()
+                        setting.update(learning_setting)
+
+                        dataset_setting = get_dataset_setting(
+                            dataset_uname,
+                            DATASETS_DIRS,
+                            use_test_as_val=setting.get('use_test_as_val', False),
+                            use_test_as_train=setting.get('use_test_as_train', False))
                         setting.update(dataset_setting)
 
                         setting.update({
@@ -358,13 +362,6 @@ def main():
                             'do_eval': True,
                             'do_predict': do_predict,
                         })
-
-                        base_config_name = get_default_config_name(dataset_uname)
-                        base_setting = get_config(base_config_name)
-                        setting.update(base_setting)
-
-                        learning_setting = LEARNING_SETTINGS[learning].copy()
-                        setting.update(learning_setting)
 
                         setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                         setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
@@ -377,7 +374,7 @@ def main():
                             model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                         )
 
-                        accum_steps = int(learning_setting['train_effective_batch_size']\
+                        accum_steps = int(learning_setting['train_effective_batch_size']
                                           / (setting['per_device_train_batch_size'] * n_gpus))
                         if accum_steps < 1:
                             raise ValueError()

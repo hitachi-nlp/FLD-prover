@@ -41,43 +41,52 @@ _BATCH_SETTINGS = {
     'V100_16_4': {
 
         't5-base': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
             'max_source_length': 1700,
             'max_target_length': 100,
 
             'per_device_train_batch_size': 1,
             'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
 
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            'lora': False,
+            'generation_num_beams': 10,
         },
 
         't5-base.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
             'max_source_length': 1000,
             'max_target_length': 1000,
 
             'per_device_train_batch_size': 1,
             'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
 
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            'lora': False,
+            'generation_num_beams': 10,
         },
         # 'allenai/led-base-16384': {}
         # 'allenai/led-large-16384': {}
         # 'google/long-t5-tglobal-base': {}
         # 'google/long-t5-tglobal-large': {}
-
-
         # 'google/mt5-base': {}
 
+
+
+
         'cyberagent/open-calm-small.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
 
-            'per_device_train_batch_size': 8,
-            'per_device_eval_batch_size': 8,
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
             'gradient_checkpointing': False,
 
             'lora': False,
@@ -542,7 +551,7 @@ def get_local_dataset_paths(uname: str,
                     continue
 
                 if found_lab_path is not None:
-                    raise Exception(f'Multiple files for dataset "{ndataset_nameame}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
+                    raise Exception(f'Multiple files for dataset "{dataset_name}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
 
                 lab_path = Path(lab_path)
                 found_lab_path = lab_path
@@ -978,6 +987,9 @@ LEARNING_SETTINGS = {
         'train_effective_batch_size': 64,
         'max_steps': 1,
         'eval_steps': 1,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FS.shot-10': {
@@ -991,6 +1003,9 @@ LEARNING_SETTINGS = {
         'train_effective_batch_size': 64,
         'max_steps': 2000,
         'eval_steps': 100,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FS.shot-100': {
@@ -1004,6 +1019,9 @@ LEARNING_SETTINGS = {
         'train_effective_batch_size': 64,
         'max_steps': 2000,
         'eval_steps': 100,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     # -- pre-training: FLNL (arg-RT/arg-AA) / RuleTaker / EB
@@ -1018,6 +1036,9 @@ LEARNING_SETTINGS = {
         'max_steps': 5000,
         'eval_steps': 1000,
         'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FT.step-8100': {
@@ -1031,6 +1052,9 @@ LEARNING_SETTINGS = {
         'max_steps': 8100,
         'eval_steps': 4000,
         'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
@@ -1046,6 +1070,9 @@ LEARNING_SETTINGS = {
         'max_steps': 20000,
         'eval_steps': 5000,
         'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FT.step-50000': {
@@ -1059,6 +1086,9 @@ LEARNING_SETTINGS = {
         'max_steps': 50000,
         'eval_steps': 5000,
         'warmup_steps': 3000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FT.step-100000': {
@@ -1072,6 +1102,9 @@ LEARNING_SETTINGS = {
         'max_steps': 100000,
         'eval_steps': 10000,
         'warmup_steps': 3000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'FT.step-150000': {
@@ -1085,6 +1118,9 @@ LEARNING_SETTINGS = {
         'max_steps': 150000,
         'eval_steps': 10000,
         'warmup_steps': 3000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'debug.ZS': {
@@ -1098,19 +1134,9 @@ LEARNING_SETTINGS = {
         'max_steps': 1,
         'eval_steps': 1,
         'warmup_steps': 999999,
-    },
 
-    'debug.step-10': {
-        'max_train_samples': 1,
-        'max_eval_samples': 1,
-        'max_predict_samples': 1,
-
-        'num_train_epochs': None,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 10,
-        'eval_steps': 10,
-        'warmup_steps': 999999,
+        'use_test_as_train': True,
+        'use_test_as_val': True,
     },
 
     'debug.micro': {
@@ -1124,6 +1150,9 @@ LEARNING_SETTINGS = {
         'max_steps': 300,
         'eval_steps': 300,
         'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
     },
 
     'debug.tiny': {
@@ -1137,8 +1166,10 @@ LEARNING_SETTINGS = {
         'max_steps': 300,
         'eval_steps': 300,
         'warmup_steps': 0,
-    },
 
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
 
     # -------- LLM few-shot experiments for LREC --------------
     'LLM_FS.shot-0': {
@@ -1154,6 +1185,9 @@ LEARNING_SETTINGS = {
         'eval_steps': 1,
 
         'learning_rate': 1e-5,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
 
     'LLM_FS.shot-10': {
@@ -1182,7 +1216,29 @@ LEARNING_SETTINGS = {
         'eval_steps': int(40 * 100 / 32),
 
         'learning_rate': 1e-5,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
     },
+
+
+    'push_to_hub': {
+        'max_train_samples': 1,
+        'max_eval_samples': 1,
+        'max_predict_samples': 0,
+
+        'num_train_epochs': None,
+        'train_effective_batch_size': 32,
+        'warmup_steps': 0,
+        'max_steps': 1,
+        'eval_steps': 1,
+
+        'learning_rate': 1e-5,
+
+        'use_test_as_train': False,
+        'use_test_as_val': False,
+    },
+
 
 
 }
@@ -1323,6 +1379,9 @@ def make_command(output_dir: Union[str, Path],
         'max_proof_steps',
         'dataset_uname',
         'n_proc_per_node',
+
+        'use_test_as_train',
+        'use_test_as_val',
     ]
 
     commands: List[str] = []
