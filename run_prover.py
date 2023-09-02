@@ -839,6 +839,7 @@ def main():
         data_args.max_target_length * 20 if data_args.proof_sampling == 'stepwise' and lm_type == LMType.SEQ_2_SEQ
         else data_args.max_target_length
     )
+    proof_col = 'gold_proofs'
 
     @profile
     def preprocess_function(examples: Dict[str, List[Any]], split: str) -> Dict[str, List[Any]]:
@@ -875,7 +876,6 @@ def main():
 
             if lm_type == LMType.SEQ_2_SEQ:
                 forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
-
                 forward_inputs["labels"] = prepare_tokenized_targets(_proof_steps_w_eos,
                                                                      data_args.max_target_length)["input_ids"]
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
@@ -909,9 +909,10 @@ def main():
 
             if lm_type == LMType.SEQ_2_SEQ:
                 forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
-                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
-                                                                     whole_proof_max_length)["input_ids"]
-                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
+                forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
+                                                                      whole_proof_max_length)["input_ids"]
+                forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
+                # import pudb; pudb.set_trace()
 
             elif lm_type == LMType.CAUSAL:
                 _prompts = [prompt + causal_lm_sep_token for prompt in prompts]
@@ -926,9 +927,9 @@ def main():
                 generation_exit()
 
                 # the padding is arbitrary
-                forward_inputs["labels"] = prepare_tokenized_targets(gold_proofs,
-                                                                     whole_proof_max_length)["input_ids"]
-                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
+                forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
+                                                                      whole_proof_max_length)["input_ids"]
+                forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
             else:
                 raise NotImplementedError()
 
@@ -1048,7 +1049,7 @@ def main():
             for i in range(len(examples))
         ]
         decoded_labels_from_examples = [
-            tokenizer.decode(unmask_by_pad_token(examples[i]["labels"]), skip_special_tokens=True)
+            tokenizer.decode(unmask_by_pad_token(examples[i][proof_col]), skip_special_tokens=True)
             for i in range(len(examples))
         ]
         if decoded_labels is not None and tuple(decoded_labels) != tuple(decoded_labels_from_examples):
@@ -1145,7 +1146,7 @@ def main():
         texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
-        no_loss_when_eval=True,
+        # drop_labels_for_eval=True,
         log_generation=data_args.log_generation,
     )
 

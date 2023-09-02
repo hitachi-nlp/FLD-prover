@@ -244,7 +244,7 @@ def main():
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
 
-    use_test_as_train = False   # debug
+    use_test_as_train = True   # debug
     use_test_as_val = True
 
     seq2seq_proof_sampling = 'stepwise'

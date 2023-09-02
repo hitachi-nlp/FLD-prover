@@ -43,7 +43,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         max_steps: Optional[int] = 20,
         texts_to_inputs_func: Optional[Callable[[List[str]], Dict[str, Union[torch.Tensor, Any]]]] = None,
         is_finished_func: Optional[Callable[[str], bool]] = None,
-        no_loss_when_eval=False,
+        # drop_labels_for_eval=False,
         log_generation=False,
         **kwargs,
     ):
@@ -52,7 +52,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         self._texts_to_inputs_func = texts_to_inputs_func
         self._is_finished_func = is_finished_func
         self._log_generation = log_generation
-        self._no_loss_when_eval = no_loss_when_eval
+        # self._drop_labels_for_eval = drop_labels_for_eval
 
     def evaluation_loop(
         self,
@@ -439,8 +439,15 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             # shoud used inputs for i_step=0 to get labels
             extended_inputs = inputs.copy() if i_step == 0 else self._seqs_to_tensors(extended_input_seqs)
 
-            if self._no_loss_when_eval:
-                extended_inputs.pop('labels', None)
+            # # import pudb; pudb.set_trace()  # HONOKA: ここでlabelが消える
+            # if self._drop_labels_for_eval:
+            #     # extended_inputs.pop('labels', None)
+            #     gold_proofs = extended_inputs.pop('gold_proofs', None)
+            # else:
+            #     gold_proofs = None
+
+            # drop custom fields so that super() do not raise exception
+            gold_proofs = extended_inputs.pop('gold_proofs', None)
 
             _, _preds, _labels = super().prediction_step(
                 model,
@@ -448,6 +455,9 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                 prediction_loss_only,
                 ignore_keys=ignore_keys,
             )
+
+            if gold_proofs is not None:
+                extended_inputs['gold_proofs'] = gold_proofs
 
             # we need these option to get the scores. They are allowed only in the higher version of transformers.
             # However, if we use higher version of transformers, we need to re-implemente this class.
