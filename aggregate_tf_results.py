@@ -105,12 +105,18 @@ def main(input_dir, output_dir, log_level):
     df_dict = defaultdict(list)
     for _input_dir in input_dirs:
         for tensorboard_dir in _input_dir.glob('**/*/tensorboard_log'):
+            tf_df = read_as_dataframe(str(tensorboard_dir))
+            if 'step' not in tf_df.columns:
+                logger.warning('skip the results under "%s"', str(tensorboard_dir))
+                continue
+
             lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
+
             for name in LAB_ATTR_NAMES:
                 df_dict[name].append(lab_setting.get(name, None))
 
-            tf_df = read_as_dataframe(str(tensorboard_dir))
             max_step = tf_df['step'].max()
+
             max_step_df = tf_df[tf_df['step'] == max_step]
             logger.info('loading results from max_step=%d', max_step)
             for tf_name in TF_NAMES:

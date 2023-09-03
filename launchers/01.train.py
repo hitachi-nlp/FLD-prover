@@ -16,6 +16,7 @@ from experimental_setting import (
     get_dataset_setting,
     get_batch_setting,
     get_logging_step_setting,
+    get_model_name_settings,
     make_output_dir,
     make_command,
     run_by_engine,
@@ -74,7 +75,13 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
 
     # output_top_dir = Path('./outputs/01.train.py/20230826.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
+    # output_top_dir = Path('./outputs/01.train.py/20230901.random_transitive_verbs')
+
+    # output_top_dir = Path('./outputs/01.train.py/20230901.find_batch_size')
+    # output_top_dir = Path('./outputs/01.train.py/20230901.overfit')
+
+    output_top_dir = Path('./outputs/01.train.py/20230903.find_batch_size')
+    # output_top_dir = Path('./outputs/01.train.py/20230903.overfit')
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
@@ -143,11 +150,11 @@ def main():
         # 'hf.hitachi-nlp/FLD-star.v2',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
-        # '20230826.jpn.D3',
+        '20230826.jpn.D3',
         # '20230826.jpn.D8',
 
         # ---------------------------------- 202320230901.random_transitive_verbs.D3 ------------------------------------
-        '20230901.random_transitive_verbs.D3',
+        # '20230901.random_transitive_verbs.D3',
         # '20230901.random_transitive_verbs.D8',
     ]
 
@@ -180,69 +187,76 @@ def main():
 
     model_settings = [
         # ============================ english      ============================
-        ('t5-base', 'seq2seq', 't5-base'),
-        # ('t5-large', 'seq2seq', 't5-base'),
+        # ('t5-base', 'seq2seq', 't5-base'),
 
         # ============================ multilingual ============================
-        # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
-        # ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
+        ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
+        ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
 
-        # ============================ japanese     ============================
+        # # ============================ japanese     ============================
 
-        # -------------- < 1B params --------------
+        # # -------------- < 1B params --------------
 
-        # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
-        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
+        ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
-        # ('abeja/gpt2-large-japanese', 'causal', 'abeja/gpt2-large-japanese'),
+        # # # # -------------- > 1B params --------------
 
-        # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
-        # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'abeja/gpt2-large-japanese'),
+        ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
-        # ('rinna/japanese-gpt-neox-small', 'causal', 't5-base'),
-        # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
-        # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'abeja/gpt2-large-japanese'),
+        ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
+        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
-        # -------------- > 1B params --------------
+        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
-
-        # ('izumi-lab/stormy-7b-10ep', 'causal', 't5-base'),
-
-        # ('abeja/gpt-neox-japanese-2.7b', 'causal', 'abeja/gpt2-large-japanese'),
-
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 't5-base'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 't5-base'),
-
-        # ('line-corporation/japanese-large-lm-1.7b', 'causal', 't5-base'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 't5-base'),
-        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 't5-base'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 't5-base'),
-
-        # ('rinna/japanese-gpt-1b', 'causal', 't5-base'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 't5-base'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 't5-base'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 't5-base'),
-
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---------------------------- rejected models ----------------------------
+
+        # ---- reason = max length < 2k ----
+
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'cyberagent/open-calm-medium'),
+
+        # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
+
+        # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'cyberagent/open-calm-small'),
+        # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'cyberagent/open-calm-medium'),
+
+        # ('abeja/gpt2-large-japanese', 'causal', 'cyberagent/open-calm-large'),
+
+        # ('rinna/japanese-gpt-1b', 'causal', 'cyberagent/open-calm-1b'),  # XXX only support max_len=1000
+
+        # ---- reason = others ----
+
+        # somehow can not fit into memory.
+        # ('abeja/gpt-neox-japanese-2.7b', 'causal', 'cyberagent/open-calm-7b'),
+
+        # no config at hub
+        # ('izumi-lab/stormy-7b-10ep', 'causal', 'cyberagent/open-calm-7b'),
+
         # tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
         # [rejected] ('sonoisa/t5-base-japanese', 'seq2seq', 't5-base'),
         # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
@@ -251,33 +265,41 @@ def main():
     # learning = 'debug.ZS'
     # learning = 'debug.step-10'
     # learning = 'debug.micro'
+    # learning = 'debug.micro.deepspeed'
     # learning = 'debug.tiny'
-    # learning = 'debug.find_batch_size'
+    learning = 'debug.find_batch_size'
     # learning = 'FS.shot-0'
     # learning = 'FS.shot-10'
     # learning = 'FS.shot-100'
     # learning = 'FT.step-5000'
     # learning = 'FT.step-8100'
-    learning = 'FT.step-20000'
+    # learning = 'FT.step-20000'
     # learning = 'FT.step-50000'
     # learning = 'FT.step-100000'
 
-    seq2seq_proof_sampling = 'stepwise'
-    # seq2seq_proof_sampling = 'all_at_once'
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
 
-    # engine = SubprocessEngine()   # debug
+    # engine = SubprocessEngine()
     engine = QsubEngine('ABCI', 'rt_G.large')
+    # engine = QsubEngine('ABCI', 'rt_AG.small')
 
     # n_gpus = 1  # debug
     n_gpus = 4
 
-    gpu_name_for_batch_size = 'V100_16_4'
+    # gpu_name_for_batch_size = 'A100_48_1'
+    gpu_name_for_batch_size = 'V100_16_4.deepspeed'
 
-    # run_mode = 'debug'
-    run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
+
+    save_total_limit = 0
+    # save_total_limit = 1
 
     dry_run = False
+
+    hours = 72
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
@@ -302,7 +324,10 @@ def main():
             gpu_name_for_batch_size = 'V100_16_1'
         elif engine.resource == 'rt_G.large':
             n_gpus = 4
-            gpu_name_for_batch_size = 'V100_16_4'
+            if run_mode == 'deepspeed':
+                gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+            else:
+                gpu_name_for_batch_size = 'V100_16_4'
         elif engine.resource == 'rt_AG.small':
             n_gpus = 1
             gpu_name_for_batch_size = 'A100_48_1'
@@ -313,15 +338,14 @@ def main():
             raise ValueError()
 
     if dataset_push_to_hub_repo_name is not None:
-        if n_gpus != 1 or run_mode != 'debug':
+        if n_gpus != 1 or run_mode != 'vanilla':
             # this does not work
             raise ValueError()
         if learning != 'push_to_hub':
             raise ValueError()
 
-    hours = 72
-
     lrates = [
+        # 1.0,
         1e-4,
         # 5e-5,
     ]
@@ -402,6 +426,8 @@ def main():
 
                         setting.update(modelwise_setting)
 
+                        setting.update(get_model_name_settings(model_name))
+
                         setting.update({
                             'seed': seed,
 
@@ -410,11 +436,10 @@ def main():
 
                             'base_config_name': base_config_name,
 
-                            'model_name_or_path': model_name,
                             'lm_type': lm_type,
                             'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
-                            'save_total_limit': 1,
+                            'save_total_limit': save_total_limit,
 
                             # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                             'proof_sampling': proof_sampling,
@@ -425,6 +450,8 @@ def main():
 
                             # 'n_gpu': 1,
                             'dataloader_num_workers': 0,
+
+                            'use_auth_token': True,
 
                             'log_examples': True,
                         })

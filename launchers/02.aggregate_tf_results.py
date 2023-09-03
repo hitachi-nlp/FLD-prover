@@ -15,10 +15,21 @@ logger = logging.getLogger(__name__)
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20230826.jpn',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230826.jpn')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20230901.overfit',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230901.overfit')
+
     input_dirs = [
-        './outputs/01.train.py/20230826.jpn',
+        './outputs/01.train.py/20230903.overfit',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230826.jpn')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230903.overfit')
+
 
     command = ' '.join([
         'python ./aggregate_tf_results.py',

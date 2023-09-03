@@ -40,6 +40,7 @@ from transformers import (
     AutoModelForSeq2SeqLM,
     AutoModelForCausalLM,
     AutoTokenizer,
+    LlamaTokenizer,
     DataCollatorForSeq2Seq,
     HfArgumentParser,
     MBart50Tokenizer,
@@ -547,23 +548,32 @@ def main():
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
+    config_name = model_args.config_name or model_args.model_name_or_path
     config = AutoConfig.from_pretrained(
-        model_args.config_name if model_args.config_name else model_args.model_name_or_path,
+        config_name,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        trust_remote_code=True,
     )
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
-        cache_dir=model_args.cache_dir,
-        use_fast=model_args.use_fast_tokenizer,
-        revision=model_args.model_revision,
-        use_auth_token=True if model_args.use_auth_token else None,
 
-        # HONOKA: abejaの場合，'left'がデフォルトっぽい．
-        # leftにしても，calmでは出てこない．
-        # padding_side='left' if lm_type == LMType.CAUSAL else None,
-    )
+    tokenizer_name = model_args.tokenizer_name or model_args.model_name_or_path
+    if tokenizer_name.startswith('stabilityai'):
+        tokenizer = LlamaTokenizer.from_pretrained("novelai/nerdstash-tokenizer-v1",
+                                                   additional_special_tokens=['▁▁'],
+                                                   use_auth_token=True if model_args.use_auth_token else None) 
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_name,
+            cache_dir=model_args.cache_dir,
+            use_fast=model_args.use_fast_tokenizer,
+            revision=model_args.model_revision,
+            use_auth_token=True if model_args.use_auth_token else None,
+
+            # HONOKA: abejaの場合，'left'がデフォルトっぽい．
+            # leftにしても，calmでは出てこない．
+            # padding_side='left' if lm_type == LMType.CAUSAL else None,
+        )
 
     if lm_type == LMType.SEQ_2_SEQ:
         auto_model_class = AutoModelForSeq2SeqLM
@@ -578,6 +588,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        trust_remote_code=True,
         # torch_dtype=torch.float16 if training_args.fp16 else None,
     )
     # torch._C._dynamo.disable
@@ -600,7 +611,14 @@ def main():
         # [RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn](https://github.com/huggingface/peft/issues/137)
         model.enable_input_require_grads()
 
-        model = get_peft_model(model, peft_config)
+        try:
+            model = get_peft_model(model, peft_config)
+        except ValueError as e:
+            if str(e).find('Please specify `target_modules` in `peft_config`') >= 0:
+                peft_config.target_modules = ['query_key_value']
+                model = get_peft_model(model, peft_config)
+            else:
+                raise
         logger.info('train LoRA model with the following parameters:')
         model.print_trainable_parameters()
 
@@ -646,6 +664,7 @@ def main():
         if training_args.generation_max_length is not None
         else data_args.val_max_target_length + 1
     )
+
     training_args.generation_num_beams = (
         data_args.num_beams if data_args.num_beams is not None else training_args.generation_num_beams
     )

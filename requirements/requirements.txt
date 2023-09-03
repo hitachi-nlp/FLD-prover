@@ -13,6 +13,9 @@ evaluate
 huggingface_hub
 peft
 deepspeed
+einops
+fugashi
+unidic_lite
 
 tqdm
 pydantic
