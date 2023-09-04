@@ -41,8 +41,8 @@ _BATCH_SETTINGS = {
     'V100_16_4.deepspeed': {
 
         't5-base': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1700,
             'max_target_length': 100,
@@ -57,8 +57,8 @@ _BATCH_SETTINGS = {
         },
 
         't5-base.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -81,8 +81,8 @@ _BATCH_SETTINGS = {
 
 
         'google/mt5-base': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -96,8 +96,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-base.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -111,8 +111,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -126,8 +126,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -141,8 +141,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -156,8 +156,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -171,8 +171,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -186,8 +186,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -201,8 +201,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-xl': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -216,8 +216,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-xl.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -231,8 +231,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-small.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -246,8 +246,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -261,8 +261,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-large.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -276,8 +276,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -291,8 +291,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-3b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -306,8 +306,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -321,8 +321,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -346,8 +346,8 @@ _BATCH_SETTINGS = {
     'A100_48_1': {
 
         't5-base': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1700,
             'max_target_length': 100,
@@ -362,8 +362,8 @@ _BATCH_SETTINGS = {
         },
 
         't5-base.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -386,8 +386,8 @@ _BATCH_SETTINGS = {
 
 
         'google/mt5-base': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -401,8 +401,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-base.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -416,8 +416,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -431,96 +431,6 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 1000,
-            'max_target_length': 1000,
-
-            'per_device_train_batch_size': 1,
-            'per_device_eval_batch_size': 1,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-base-long': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 2000,
-            'max_target_length': 100,
-
-            'per_device_train_batch_size': 8,
-            'per_device_eval_batch_size': 8,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-base-long.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 1000,
-            'max_target_length': 1000,
-
-            'per_device_train_batch_size': 8,
-            'per_device_eval_batch_size': 8,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-large-long': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 2000,
-            'max_target_length': 100,
-
-            'per_device_train_batch_size': 4,
-            'per_device_eval_batch_size': 4,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-large-long.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 1000,
-            'max_target_length': 1000,
-
-            'per_device_train_batch_size': 2,
-            'per_device_eval_batch_size': 2,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-xl': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
-
-            'max_source_length': 2000,
-            'max_target_length': 100,
-
-            'per_device_train_batch_size': 2,
-            'per_device_eval_batch_size': 2,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 2,
-        },
-
-        'retrieva-jp/t5-xl.all_at_once': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
 
@@ -535,9 +445,99 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 2,
         },
 
+        'retrieva-jp/t5-base-long': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 8,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
+        'retrieva-jp/t5-base-long.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 8,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
+        'retrieva-jp/t5-large-long': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
+        'retrieva-jp/t5-large-long.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
+        'retrieva-jp/t5-xl': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
+        'retrieva-jp/t5-xl.all_at_once': {
+            # # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 2,
+        },
+
         'cyberagent/open-calm-small.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -551,8 +551,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -566,8 +566,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-large.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -581,8 +581,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -596,8 +596,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-3b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -611,8 +611,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -626,8 +626,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -662,7 +662,7 @@ _VERIFIER_BATCH_SETTINGS = {
 
         'per_device_train_batch_size': 16,
 
-        # 'tokenizer_padding': 'max_length',
+        # # 'tokenizer_padding': 'max_length',
         'tokenizer_padding': 'longest',
     },
 }
@@ -679,232 +679,6 @@ _DATASET_PATHS = {
         'validation_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
         'test_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
     },
-
-
-
-
-    'ruletaker': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-train.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-dev.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-test.jsonl',
-
-    },
-
-
-    'ruletaker.include_all_answers': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-train.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-dev.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-test.jsonl',
-    },
-
-    'ruletaker.D5.include_all_answers': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-5/meta-train.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-5/meta-dev.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-5/meta-test.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-train.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-dev.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-test.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.jsonl',
-    },
-
-
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/train.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/val.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/test.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/train.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/val.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/test.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers.unknown_with_collapsed_proof': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/train.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/val.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/test.jsonl',
-    },
-
-
-    'EB-task1': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/train.jsonl',
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/test.jsonl',
-    },
-
-    'EB-task2': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/train.jsonl',
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/test.jsonl',
-    },
-
-    'EB-task3': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/train.jsonl',  # The NLProofS paper uses task2's data for task3.
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_3/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_3/test.jsonl',
-    },
-
-
-
-
-
-
-    'ruletaker.shuffled': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-train.shuffled.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-dev.shuffled.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA/depth-3ext/meta-test.shuffled.jsonl',
-
-    },
-
-
-    'ruletaker.include_all_answers.shuffled': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-train.shuffled.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-dev.shuffled.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext/meta-test.shuffled.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers.shuffled': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-train.shuffled.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-dev.shuffled.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/depth-3ext-NatLang/meta-test.shuffled.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers.shuffled': {
-        'train_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.shuffled.jsonl',
-        'validation_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.shuffled.jsonl',
-        'test_file': './data/proofwriter-dataset-V2020.12.3/preprocessed_OWA.include_all_answers/birds-electricity/meta-test.shuffled.jsonl',
-    },
-
-
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.include_all_answers/sd=0/unk_rt=0.333/test.shuffled.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.NatLang.include_all_answers/sd=0/unk_rt=0.333/test.shuffled.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers.unknown_with_collapsed_proof.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221129.wo_hypothesis/local_dataset_name=ruletaker.birds-electricity.include_all_answers/sd=0/unk_rt=0.333/test.shuffled.jsonl',
-    },
-
-
-
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-    'ruletaker.D5.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/test.shuffled.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-
-
-    'ruletaker.ours.20221202': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-    'ruletaker.D5.ours.20221202': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.D5.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=None/test.shuffled.jsonl',
-    },
-
-    'ruletaker.NL.ours.20221202': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-    'ruletaker.BE.ours.20221202': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.0/mx_dpth=3/test.shuffled.jsonl',
-    },
-
-
-
-
-    'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.5.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/test.shuffled.jsonl',
-    },
-
-    'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.5.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.NatLang.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/test.shuffled.jsonl',
-    },
-
-    'ruletaker.birds-electricity.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.5.shuffled': {
-        'train_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/train.shuffled.jsonl',
-        'validation_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/val.shuffled.jsonl',
-        'test_file': './outputs/00.create_unknown_with_collapsed_proof_corpus.py/20221202.negative_proof/local_dataset_name=ruletaker.birds-electricity.include_all_answers/unk_ratio=0.333/reference_unknown_proof_ratio=0.3/negative_proof_prob=0.5/test.shuffled.jsonl',
-    },
-
-
-
-
-    # XXX do not shuffle the test and validation split since the scorer referes to the unshuffled versions
-    'EB-task1.shuffled': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/train.shuffled.jsonl',
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_1/test.jsonl',
-    },
-
-    'EB-task2.shuffled': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/train.shuffled.jsonl',
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/test.jsonl',
-    },
-
-    'EB-task3.shuffled': {
-        'train_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_2/train.shuffled.jsonl',  # The NLProofS paper uses task2's data for task3.
-        'validation_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_3/dev.jsonl',
-        'test_file': './data/entailment_trees_emnlp2021_data_v3/dataset/task_3/test.jsonl',
-    },
-
-
-    'FLD.debug.2023-05-13': {
-        'train_file': './outputs/00.fix_FLD_schema.py/2023-05-15/20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP/test.jsonl',
-        'validation_file': './outputs/00.fix_FLD_schema.py/2023-05-15/20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP/test.jsonl',
-        'test_file': './outputs/00.fix_FLD_schema.py/2023-05-15/20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP/test.jsonl',
-    },
-
 }
 
 
@@ -1042,42 +816,7 @@ def _parse_dataset_name(name: str) -> Tuple[str, str]:
         return 'local', name
 
 
-# _PROVER_CONFIGS = {
-#     # -- official --
-#     # 'ruletaker'   : './configs/prover/cli_ruletaker_stepwise_t5-large.yaml',
-#     # 'EB-task1'   : './configs/prover/cli_task1_stepwise_t5-large.yaml',
-#     # 'EB-task2': './configs/prover/cli_task2_stepwise_t5-large.yaml',
-#
-#     # -- (old) aacorpus --
-#     # 'aacorpus_20220702.trial': './configs/prover/cli_aacorpus_20220702.trial_stepwise_t5-large.yaml',
-#     # 'aacorpus_20220707.small': './configs/prover/cli_aacorpus_20220707.small_stepwise_t5-large.yaml',
-#
-#     # -- our setting --
-#     # 'ruletaker.20220922.base': './configs/prover/ruletaker.20220922.base.yaml',
-#
-#     'FLNLcorpus.20220827.base': './configs/prover/FLNLcorpus.20220827.base.yaml',
-#
-#     'ruletaker.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
-#     'ruletaker.D5.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
-#     'ruletaker.NatLang.include_all_answers.20220922.base': './configs/prover/ruletaker.NatLang.include_all_answers.20220922.base.yaml',
-#     'ruletaker.birds-electricity.include_all_answers.20220922.base': './configs/prover/ruletaker.birds-electricity.include_all_answers.20220922.base.yaml',
-#
-#     'EB-task1.20220922.base': './configs/prover/EB-task1.20220922.base.yaml',
-#     'EB-task2.20220922.base': './configs/prover/EB-task2.20220922.base.yaml',
-#     'EB-task3.20220922.base': './configs/prover/EB-task3.20220922.base.yaml',
-# }
 _PROVER_CONFIGS = {
-    # -- official --
-    # 'ruletaker'   : './configs/prover/cli_ruletaker_stepwise_t5-large.yaml',
-    # 'EB-task1'   : './configs/prover/cli_task1_stepwise_t5-large.yaml',
-    # 'EB-task2': './configs/prover/cli_task2_stepwise_t5-large.yaml',
-
-    # -- (old) aacorpus --
-    # 'aacorpus_20220702.trial': './configs/prover/cli_aacorpus_20220702.trial_stepwise_t5-large.yaml',
-    # 'aacorpus_20220707.small': './configs/prover/cli_aacorpus_20220707.small_stepwise_t5-large.yaml',
-
-    # -- our setting --
-    # 'ruletaker.20220922.base': './configs/prover/ruletaker.20220922.base.yaml',
 
     'FLNLcorpus.20220827.base': {
         'seed': 42,
@@ -1145,32 +884,6 @@ _PROVER_CONFIGS = {
         'logging_strategy': 'steps',
 
     },
-
-    # 'ruletaker.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
-    # 'ruletaker.D5.include_all_answers.20220922.base': './configs/prover/ruletaker.include_all_answers.20220922.base.yaml',
-    # 'ruletaker.NatLang.include_all_answers.20220922.base': './configs/prover/ruletaker.NatLang.include_all_answers.20220922.base.yaml',
-    # 'ruletaker.birds-electricity.include_all_answers.20220922.base': './configs/prover/ruletaker.birds-electricity.include_all_answers.20220922.base.yaml',
-
-    # 'EB-task1.20220922.base': './configs/prover/EB-task1.20220922.base.yaml',
-    # 'EB-task2.20220922.base': './configs/prover/EB-task2.20220922.base.yaml',
-    # 'EB-task3.20220922.base': './configs/prover/EB-task3.20220922.base.yaml',
-}
-
-
-_VERIFIER_CONFIGS = {
-    # -- official --
-    # 'ruletaker': './configs/verifier/cli_ruletaker.yaml',
-    # 'EB-task1': './configs/verifier/cli_entailmentbank_task1.yaml',
-    # 'EB-task2': './configs/verifier/cli_entailmentbank_task2.yaml',
-
-    # -- our setting --
-    # 'ruletaker.20220922.base': './configs/verifier/ruletaker.20220922.base.yaml',
-
-    'FLNLcorpus.20220827.base': './configs/verifier/FLNLcorpus.20220827.base.yaml',
-    'ruletaker.include_all_answers.20220922.base': './configs/verifier/ruletaker.include_all_answers.20220922.base.yaml',
-    'EB-task1.20220922.base': './configs/verifier/EB-task1.20220922.base.yaml',
-    'EB-task2.20220922.base': './configs/verifier/EB-task2.20220922.base.yaml',
-    'EB-task3.20220922.base': './configs/verifier/EB-task3.20220922.base.yaml',
 }
 
 
@@ -1203,233 +916,11 @@ _PROVER_CHECKPOINTS = {
     # official
     'ruletaker.NLProofS'   : './checkpoints/RuleTaker/NLProofS/prover/epoch=19-step=16940.ckpt',
 
-    'aacorpus_20220702.trial': './outputs/10.train.py/20220707.aacorpus/task=aacorpus_20220702.trial/component=prover/checkpoint_type=None/btch_sz_pr_gp=None/lr=None/mx_epchs=3/mdl_nm=None/lightning_logs/version_0/checkpoints/epoch=2-step=3.ckpt',
-    'aacorpus_20220707.small': './outputs/10.train.py/aacorpus_20220707.small/task=aacorpus_20220707.small/component=prover/checkpoint_type=None/btch_sz_pr_gp=None/lr=None/mx_epchs=10/mdl_nm=None/lightning_logs/version_0/checkpoints/epoch=3-step=956.ckpt',
-
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-P.arg-basic.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=prover/local_dataset_name=20220916.atmf-P.arg-basic.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=0.0001/mx_epchs=5/mx_inpt_ln=1500/mx_outpt_ln=100/smpl_gl=intermediates/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=60000.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-basic.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=prover/local_dataset_name=20220916.atmf-PA.arg-basic.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=0.0001/mx_epchs=5/mx_inpt_ln=1500/mx_outpt_ln=100/smpl_gl=intermediates/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=60000.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=prover/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=0.0001/mx_epchs=5/mx_inpt_ln=1500/mx_outpt_ln=100/smpl_gl=intermediates/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=60000.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=prover/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=0.0001/mx_epchs=5/mx_inpt_ln=1500/mx_outpt_ln=100/smpl_gl=intermediates/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=59996.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=prover/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=0.0001/mx_epchs=5/mx_inpt_ln=1500/mx_outpt_ln=100/smpl_gl=intermediates/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=59992.ckpt',
-
-    '20220925.pre_train.large_epochs.large_accum__local_dataset_name=local_dataset_name=ruletaker.include_all_answers': './outputs/10.train.py/20220925.pre_train.large_epochs.large_accum/component=prover/local_dataset_name=ruletaker.include_all_answers/base_config_name=ruletaker.include_all_answers.20220922.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=None/mx_btchs=None/mx_epchs=None/mx_inpt_ln=1000/mx_outpt_ln=100/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=19-step=30120.ckpt',
-    '20220925.pre_train.large_epochs.large_accum__local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN': './outputs/10.train.py/20220925.pre_train.large_epochs.large_accum/component=prover/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=None/mx_btchs=None/mx_epchs=None/mx_inpt_ln=1000/mx_outpt_ln=100/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=19-step=31260.ckpt',
-    '20220925.pre_train.large_epochs.large_accum__local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN': './outputs/10.train.py/20220925.pre_train.large_epochs.large_accum/component=prover/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/gps=1/lrt=None/mx_btchs=None/mx_epchs=None/mx_inpt_ln=1000/mx_outpt_ln=100/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=19-step=31260.ckpt',
-
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=1e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-06/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-1e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=1e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-06': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-06/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-1e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=1e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-06': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-06/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=1e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-05/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-    '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06': './outputs/10.train.py/20221112.various_negatives.epoch-1.lrate-small.sweep/system_name=None/component=prover/local_dataset_name=20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000/local_dataset_1_name=None/EB_task=None/split=None/base_config_name=FLNLcorpus.20220827.base/model_name=google@long-t5-tglobal-base/checkpoint_name=None/dtst_1_nm=None/gps=1/lg_exmpls=True/lrt=3e-06/mx_epchs=1/mx_evl_btchs=1/mx_inpt_ln=2000/mx_outpt_ln=100/mx_trn_btchs=None/n_smlrty_thrshld=False/sd=1/sht=FT/shffl_trn=True/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/wrmp_stps=1000/lightning_logs/version_0/checkpoints/epoch=0-step=1515.ckpt',
-
-
 }
 
 _VERIFIER_CHECKPOINTS = {
     'ruletaker.NLProofS': './checkpoints/RuleTaker/NLProofS/verifier/epoch=49-step=93000.ckpt',
-
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-P.arg-basic.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-P.arg-basic.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=1-step=19538.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-basic.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-PA.arg-basic.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=68116.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-1.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-1.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=4-step=67152.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-3.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=0-step=45000.ckpt',
-    '20220919.UNKNOWN.fix_translation.local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN': './outputs/10.train.py/20220919.UNKNOWN.fix_translation/component=verifier/local_dataset_name=20220916.atmf-PA.arg-compl.dpth-5.UNKNOWN/base_config_name=FLNLcorpus.20220827.base/model_name=roberta-large/checkpoint_name=None/gps=1/lrt=None/mx_epchs=5/mx_inpt_ln=400/stnc_indctn_mthd=STANCE_MARKER_IN_PROOF/lightning_logs/version_0/checkpoints/epoch=0-step=45000.ckpt',
-
 }
-
-
-ICML_2023_NL_TRANSFER_MAJOR_DATASETS = [
-    # '20221101__arg-basic__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-True__voc_limit-100__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-True__voc_limit-100__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-0__reuse-0.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-300000',
-
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000.local_dataset_1_name--ruletaker.include_all_answers',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000.local_dataset_1_name--cc100.20221103.small',
-
-    # '20221107__arg-base__dpth-03__dist-00__transl-nrrw__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-00__transl-nrrw__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-00__transl-wide__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-10__transl-wide__size-100000',
-    # '20221107__arg-cmpl__dpth-10__dist-10__transl-wide__size-100000',
-
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000',
-
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-
-    # '20221117__arg-RT__frml-cmpl__tree-tiny__dist-0__transl_dist--20__transl-wide__size-100000',
-
-    # '20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-100000',
-
-    # '20221123.and__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221124.and__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221125.full__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221126.transl__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-30000',
-
-    # '20221203.first_exp__arg-RT__frml-smpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-AA__frml-cmpl__dist-20__transl-nrrw__tree-1__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000',
-
-    # ---------------------------------- 20221216 additional experiments ------------------------------------
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-smpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000',
-
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-8__dataset_size-30000.G_MP',
-
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT',
-
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000.G_MP',
-    '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.G_MP',
-
-    # ---------------------------------- multitask ------------------------------------
-    # XXX: missing!
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--ruletaker.ours.20221202',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--cc100.20221103.small',
-
-    # ---------------------------------- 20221217.back_to_the_past ------------------------------------
-    # '20221217.back_to_the_past__arg-FLNL__frml-cmpl__dist-10__transl-wide__tree-10__dataset_size-100000',
-
-    # ---------------------------------- baselines ------------------------------------
-    # 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.D5.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    # 'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-
-    # -- for multitask --
-    # 'ruletaker.ours.20221202',
-    # 'ruletaker.NL.ours.20221202',
-
-    # 'EB-task1.shuffled',
-    # 'EB-task2.shuffled',
-
-    # None,
-]
-
-
-ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH = [
-    # '20221101__arg-basic__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-True__voc_limit-100__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-True__voc_limit-100__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-3__bx-3__dist-var__dist_size-0__reuse-0.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-0__reuse-0.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-300000',
-
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000.local_dataset_1_name--ruletaker.include_all_answers',
-    # '20221101__arg-cmpl__dpth-10__bx-5__dist-var__dist_size-10__reuse-1.0__fixed_transl-False__voc_limit-None__dataset_size-100000.local_dataset_1_name--cc100.20221103.small',
-
-    # '20221107__arg-base__dpth-03__dist-00__transl-nrrw__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-00__transl-nrrw__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-00__transl-wide__size-100000',
-    # '20221107__arg-cmpl__dpth-03__dist-10__transl-wide__size-100000',
-    # '20221107__arg-cmpl__dpth-10__dist-10__transl-wide__size-100000',
-
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000',
-
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--0__transl-wide__unk-0.65__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-10__dist-5__transl_dist--10__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-1e-05',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-05',
-    # '20221112__arg-cmpl__dpth-3__dist-5__transl_dist--0__transl-wide__unk-0.33__size-100000.lrt-3e-06',
-
-    # '20221117__arg-RT__frml-cmpl__tree-tiny__dist-0__transl_dist--20__transl-wide__size-100000',
-
-    # '20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-100000',
-
-    # '20221123.and__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221124.and__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221125.full__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-10000',
-
-    # '20221126.transl__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-30000',
-
-    # '20221203.first_exp__arg-RT__frml-smpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-AA__frml-cmpl__dist-20__transl-nrrw__tree-1__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000',
-
-    # ---------------------------------- 20221216 additional experiments ------------------------------------
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-0__transl-nrrw__tree-3__dataset_size-30000',
-    # '20221203.first_exp__arg-FLNL__frml-smpl__dist-20__transl-nrrw__tree-3__dataset_size-30000',
-    '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000',
-
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-8__dataset_size-30000.G_MP',
-
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT',
-
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-5__dataset_size-30000.G_MP',
-    # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.G_MP',
-
-    # ---------------------------------- multitask ------------------------------------
-    # XXX: missing!
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--ruletaker.ours.20221202',
-    # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-100000.local_dataset_1_name--cc100.20221103.small',
-
-    # ---------------------------------- 20221217.back_to_the_past ------------------------------------
-    # '20221217.back_to_the_past__arg-FLNL__frml-cmpl__dist-10__transl-wide__tree-10__dataset_size-100000',
-
-    # ---------------------------------- baselines ------------------------------------
-    # 'ruletaker.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    'ruletaker.D5.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-    # 'ruletaker.NatLang.include_all_answers.unknown_with_collapsed_proof.reference_unknown_proof_ratio=0.3.negative_proof_prob=0.0.shuffled',
-
-    # -- for multitask --
-    # 'ruletaker.ours.20221202',
-    # 'ruletaker.NL.ours.20221202',
-
-    # 'EB-task1.shuffled',
-    # 'EB-task2.shuffled',
-
-    # None,
-]
 
 
 LEARNING_SETTINGS = {
@@ -1660,6 +1151,22 @@ LEARNING_SETTINGS = {
         'use_test_as_val': True,
     },
 
+    'debug.middle': {
+        'max_train_samples': 100,
+        'max_eval_samples': 100,
+        'max_predict_samples': 100,
+
+        'num_train_epochs': None,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 300,
+        'eval_steps': 300,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
     'debug.find_batch_size': {
         'max_train_samples': 16,
         'max_eval_samples': 16,
@@ -1675,57 +1182,6 @@ LEARNING_SETTINGS = {
         'use_test_as_train': True,
         'use_test_as_val': True,
     },
-
-    # -------- LLM few-shot experiments for LREC --------------
-    'LLM_FS.shot-0': {
-        'max_train_samples': 100,
-        'max_eval_samples': 500,
-        'max_predict_samples': 0,
-
-        'num_train_epochs': None,
-
-        'train_effective_batch_size': 32,
-        'warmup_steps': 1000000,
-        'max_steps': 1,
-        'eval_steps': 1,
-
-        'learning_rate': 1e-5,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    'LLM_FS.shot-10': {
-        'max_train_samples': 10,
-        'max_eval_samples': 100,
-        'max_predict_samples': 0,
-
-        'num_train_epochs': None,
-        'train_effective_batch_size': 32,
-        'warmup_steps': int(0.1 * 40 * 10 / 32),
-        'max_steps': int(40 * 10 / 32),
-        'eval_steps': int(40 * 10 / 32),
-
-        'learning_rate': 1e-5,
-    },
-
-    'LLM_FS.shot-100': {
-        'max_train_samples': 100,
-        'max_eval_samples': 100,
-        'max_predict_samples': 0,
-
-        'num_train_epochs': None,
-        'train_effective_batch_size': 32,
-        'warmup_steps': int(0.1 * 40 * 100 / 32),
-        'max_steps': int(40 * 100 / 32),
-        'eval_steps': int(40 * 100 / 32),
-
-        'learning_rate': 1e-5,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
 
     'push_to_hub': {
         'max_train_samples': 1,
@@ -1747,6 +1203,35 @@ LEARNING_SETTINGS = {
 
 
 }
+
+
+def get_learning_setting(name: str, epoch: Optional[int] = None) -> Dict[str, Any]:
+    if name.startswith('LLM_FS.shot-'):
+
+        shot = int(name[len('LLM_FS.shot-'):])
+        train_effective_batch_size = 32
+        total_steps = int(epoch * max(1, shot / train_effective_batch_size))
+        max_eval_samples = 30
+
+        return {
+            'max_train_samples': shot,
+            'max_eval_samples': max_eval_samples,
+            'max_predict_samples': 0,
+
+            'num_train_epochs': None,
+            'train_effective_batch_size': train_effective_batch_size,
+            'warmup_steps': int(0.1 * total_steps),
+            'max_steps': int(total_steps),
+            'eval_steps': int(total_steps / 5),
+
+            'use_test_as_train': False,
+            'use_test_as_val': True,
+        }
+
+    else:
+        if epoch is not None:
+            raise ValueError()
+        return LEARNING_SETTINGS[name].copy()
 
 
 class CheckpointSpec(BaseModel):

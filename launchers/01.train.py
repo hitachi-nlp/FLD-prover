@@ -17,6 +17,7 @@ from experimental_setting import (
     get_batch_setting,
     get_logging_step_setting,
     get_model_name_settings,
+    get_learning_setting,
     make_output_dir,
     make_command,
     run_by_engine,
@@ -31,40 +32,6 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-15')
-    # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.no_torchrun')
-    # output_top_dir = Path('./outputs/01.train.py/debug/2023-05-13.torchrun.large_steps')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64')
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.no_negative_proof')
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl.batch_size-64.lrate-5e-5')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.sFLD-impl')
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-16.FLD-impl')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-17.sFLD-impl.large_steps')
-    # output_top_dir = Path('./outputs/01.train.py/2023-05-17.FLD-impl.large_steps')
-    # output_top_dir = Path('./outputs/01.train.py/FLD.2.large_steps')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230626.many_bugs_fixed')
-    # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder')
-    # output_top_dir = Path('./outputs/01.train.py/20230628.make_harder.scoring_disallow_any_proof_for_unknown')
-    # output_top_dir = Path('./outputs/01.train.py/20230701.finalize')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230707.finalize')
-    # output_top_dir = Path('./outputs/01.train.py/20230707.finalize.max_train_samples=15000')
-    # output_top_dir = Path('./outputs/01.train.py//20230711.refactor_distractors')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230711.finalize')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
-    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
-    # output_top_dir = Path('./outputs/01.train.py/20230718.case_study')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models')
-    # output_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps')
 
     # output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
     # output_top_dir = Path('./outputs/01.train.py/20230801.case_study_finalize.fix')
@@ -80,67 +47,13 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230901.find_batch_size')
     # output_top_dir = Path('./outputs/01.train.py/20230901.overfit')
 
-    output_top_dir = Path('./outputs/01.train.py/20230903.find_batch_size')
+    # output_top_dir = Path('./outputs/01.train.py/20230903.find_batch_size')
     # output_top_dir = Path('./outputs/01.train.py/20230903.overfit')
+    # output_top_dir = Path('./outputs/01.train.py/20230903.LLM_FS')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
 
     dataset_unames = [
-        # 'FLD.debug.2023-05-13',
-
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
-        # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
-
-        # ---------------------------------- 20230626.many_bugs_fixed ------------------------------------
-        # '20230626.many_bugs_fixed.20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',
-        # '20230626.many_bugs_fixed.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.plus_quantifiers',
-
-
-        # ---------------------------------- 20230628.make_harder ------------------------------------
-        # '20230626.many_bugs_fixed.D3.hard',
-        # '20230626.many_bugs_fixed.D3.hard.dist-trees',
-        # '20230626.many_bugs_fixed.D3.hard.unk-0.1',
-        # '20230626.many_bugs_fixed.D3.hard.brnch-high',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-1.0',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.5',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
-        # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
-
-        # '20230626.many_bugs_fixed.D8.hard',
-        # '20230626.many_bugs_fixed.D8.hard.dist-trees',
-
-        # ---------------------------------- 20230701.finalize ------------------------------------
-        # '20230701.D3.default',
-        # '20230701.D3.wo_transl_dist',
-        # '20230701.D3.brnch-small',
-        # '20230701.D3.dist-small',
-        # '20230701.D8.default',
-
-        # ---------------------------------- 20230707.finalize ------------------------------------
-        # '20230707.finalize.D3.dist-double',
-        # '20230707.finalize.D3.dist-triple',
-        # '20230707.finalize.D3.dist-quadruple',
-
-        # '20230707.finalize.D8.dist-double',
-        # '20230707.finalize.D8.dist-triple',
-        # '20230707.finalize.D8.dist-quadruple',
-
-        # ---------------------------------- 20230711 ------------------------------------
-        # '20230711.dist-fallback',
-        # '20230711.finalize.D3',
-        # '20230711.finalize.D8',
-
-        # ---------------------------------- 20230718.case_study ------------------------------------
-        # '20230718.case_study.D3.dist-mixture',
-        # '20230718.case_study.D3.num_dist-wide',
-        # '20230718.case_study.D8.dist-mixture.num_dist-wide',
-
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide',
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_logE',
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10',
-        # '20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal',
-
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         # '20230729.case_study_finalize.D3',
@@ -150,39 +63,23 @@ def main():
         # 'hf.hitachi-nlp/FLD-star.v2',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
-        '20230826.jpn.D3',
+        # '20230826.jpn.D3',
         # '20230826.jpn.D8',
 
         # ---------------------------------- 202320230901.random_transitive_verbs.D3 ------------------------------------
         # '20230901.random_transitive_verbs.D3',
         # '20230901.random_transitive_verbs.D8',
+
+        # ---------------------------------- 20230904.jpn ------------------------------------
+        '20230904.jpn.D1.wo_brnch.wo_dstrct',
     ]
 
     DATASETS_DIRS = [
-        # './outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
-        # './outputs.FLD/10.create_FLD_corpus/20221217.back_to_the_past',
-        # './NLProofS/outputs/00.create_cc100_corpus.py/',
-
-        # './outputs.FLD/10.create_FLD_corpus/20230626.many_bugs_fixed',
-        # './outputs.FLD/10.create_FLD_corpus/20230628.make_harder',
-        # './outputs.FLD/10.create_FLD_corpus/20230701.finalize',
-
-        # './outputs.FLD/10.create_FLD_corpus/20230707.finalize',
-
-        # './outputs.FLD/00.create_corpus/20230710.update_translation',
-        # './outputs.FLD/00.create_corpus/20230710.update_translation.bf51eb2',
-        # './outputs.FLD/00.create_corpus/20230710.update_translation.7485fef',
-
-        # './outputs.FLD/00.create_corpus/20230711.refactor_distractors',
-        # './outputs.FLD/00.create_corpus/20230711.finalize',
-
-        # './outputs.FLD/00.create_corpus/20230718.case_study',
-        # './outputs.FLD/00.create_corpus/2023-07-27.compare_models',
-
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
         './outputs.FLD/00.create_corpus/20230826.jpn',
         './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+        './outputs.FLD/00.create_corpus/20230904.jpn',
     ]
 
     model_settings = [
@@ -190,45 +87,45 @@ def main():
         # ('t5-base', 'seq2seq', 't5-base'),
 
         # ============================ multilingual ============================
-        ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
-        ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
+        # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
+        # ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
 
-        # # ============================ japanese     ============================
+        # # # ============================ japanese     ============================
 
-        # # -------------- < 1B params --------------
+        # # # -------------- < 1B params --------------
 
-        ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
-        ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
+        # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
+        # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
-        ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
+        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
-        ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
-        # # # # -------------- > 1B params --------------
+        # # # # # -------------- > 1B params --------------
 
-        ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
-        ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
-        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
-        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---------------------------- rejected models ----------------------------
 
@@ -262,20 +159,42 @@ def main():
         # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
     ]
 
-    # learning = 'debug.ZS'
-    # learning = 'debug.step-10'
-    # learning = 'debug.micro'
-    # learning = 'debug.micro.deepspeed'
-    # learning = 'debug.tiny'
-    learning = 'debug.find_batch_size'
-    # learning = 'FS.shot-0'
-    # learning = 'FS.shot-10'
-    # learning = 'FS.shot-100'
-    # learning = 'FT.step-5000'
-    # learning = 'FT.step-8100'
-    # learning = 'FT.step-20000'
-    # learning = 'FT.step-50000'
-    # learning = 'FT.step-100000'
+    learnings = [
+        # 'debug.ZS',
+        # 'debug.step-10',
+        # 'debug.micro',
+        # 'debug.micro.deepspeed',
+        # 'debug.tiny',
+        # 'debug.middle',
+        # 'debug.find_batch_size',
+
+        # 'FS.shot-0',
+        # 'FS.shot-10',
+        # 'FS.shot-100',
+        # 'FT.step-5000',
+        # 'FT.step-8100',
+        # 'FT.step-20000',
+        # 'FT.step-50000',
+        # 'FT.step-100000',
+
+        # 'LLM_FS.shot-1',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
+    ]
+
+    lrates = [
+        # 1.0,
+        1e-4,
+        1e-5,
+    ]
+
+    epochs = [
+        # None,
+
+        100,
+        # 200,
+    ]
 
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
@@ -308,7 +227,7 @@ def main():
     # XXX: Additionally, DO NOT DELETE THE REPOSITORY MANUALLY before pushing,
     #      as it will delete all the statistics such as # downloads and likes.
 
-    # learning = 'push_to_hub'  # XXX turn on
+    # learning = ['push_to_hub']  # XXX turn on
 
     dataset_push_to_hub_repo_name = None
     # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
@@ -337,19 +256,6 @@ def main():
         else:
             raise ValueError()
 
-    if dataset_push_to_hub_repo_name is not None:
-        if n_gpus != 1 or run_mode != 'vanilla':
-            # this does not work
-            raise ValueError()
-        if learning != 'push_to_hub':
-            raise ValueError()
-
-    lrates = [
-        # 1.0,
-        1e-4,
-        # 5e-5,
-    ]
-
     seeds = [
         0,
     ]
@@ -375,100 +281,109 @@ def main():
 
     for dataset_uname in dataset_unames:
 
-        for sample_negative_proof in sample_negative_proof_args:
+        for learning in learnings:
+            for epoch in epochs:
+                if dataset_push_to_hub_repo_name is not None:
+                    if n_gpus != 1 or run_mode != 'vanilla':
+                        # this does not work
+                        raise ValueError()
+                    if learning != 'push_to_hub':
+                        raise ValueError()
 
-            for seed in seeds:
-                for model_name, lm_type, model_name_for_batch_size in model_settings:
-                    if lm_type == 'causal':
-                        proof_sampling = 'all_at_once'
-                    else:
-                        proof_sampling = seq2seq_proof_sampling
+                for sample_negative_proof in sample_negative_proof_args:
 
-                    for _lrate in lrates:
-                        setting = {}
+                    for seed in seeds:
+                        for model_name, lm_type, model_name_for_batch_size in model_settings:
+                            if lm_type == 'causal':
+                                proof_sampling = 'all_at_once'
+                            else:
+                                proof_sampling = seq2seq_proof_sampling
 
-                        base_config_name = get_default_config_name(dataset_uname)
-                        base_setting = get_config(base_config_name)
-                        setting.update(base_setting)
+                            for _lrate in lrates:
+                                setting = {}
 
-                        learning_setting = LEARNING_SETTINGS[learning].copy()
-                        setting.update(learning_setting)
+                                base_config_name = get_default_config_name(dataset_uname)
+                                base_setting = get_config(base_config_name)
+                                setting.update(base_setting)
 
-                        dataset_setting = get_dataset_setting(
-                            dataset_uname,
-                            DATASETS_DIRS,
-                            use_test_as_val=setting.get('use_test_as_val', False),
-                            use_test_as_train=setting.get('use_test_as_train', False))
-                        setting.update(dataset_setting)
+                                learning_setting = get_learning_setting(learning, epoch)
+                                setting.update(learning_setting)
 
-                        setting.update({
-                            'do_train': True,
-                            'do_eval': True,
-                            'do_predict': do_predict,
-                        })
+                                dataset_setting = get_dataset_setting(
+                                    dataset_uname,
+                                    DATASETS_DIRS,
+                                    use_test_as_val=setting.get('use_test_as_val', False),
+                                    use_test_as_train=setting.get('use_test_as_train', False))
+                                setting.update(dataset_setting)
 
-                        setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
-                        setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
+                                setting.update({
+                                    'do_train': True,
+                                    'do_eval': True,
+                                    'do_predict': do_predict,
+                                })
 
-                        setting.update(get_logging_step_setting(max_steps=max_steps,
-                                                                eval_steps=eval_steps))
+                                setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
+                                setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
-                        modelwise_setting = get_batch_setting(
-                            gpu_name_for_batch_size,
-                            model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
-                        )
+                                setting.update(get_logging_step_setting(max_steps=max_steps,
+                                                                        eval_steps=eval_steps))
 
-                        accum_steps = int(learning_setting['train_effective_batch_size']
-                                          / (modelwise_setting['per_device_train_batch_size'] * (1 if run_mode == 'deepspeed' else n_gpus)))
-                        if accum_steps < 1:
-                            raise ValueError()
-                        setting['gradient_accumulation_steps'] = accum_steps
+                                modelwise_setting = get_batch_setting(
+                                    gpu_name_for_batch_size,
+                                    model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
+                                )
 
-                        setting.update(modelwise_setting)
+                                accum_steps = int(learning_setting['train_effective_batch_size']
+                                                  / (modelwise_setting['per_device_train_batch_size'] * (1 if run_mode == 'deepspeed' else n_gpus)))
+                                if accum_steps < 1:
+                                    raise ValueError()
+                                setting['gradient_accumulation_steps'] = accum_steps
 
-                        setting.update(get_model_name_settings(model_name))
+                                setting.update(modelwise_setting)
 
-                        setting.update({
-                            'seed': seed,
+                                setting.update(get_model_name_settings(model_name))
 
-                            'dataset_uname': dataset_uname,
-                            'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
+                                setting.update({
+                                    'seed': seed,
 
-                            'base_config_name': base_config_name,
+                                    'dataset_uname': dataset_uname,
+                                    'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
 
-                            'lm_type': lm_type,
-                            'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
+                                    'base_config_name': base_config_name,
 
-                            'save_total_limit': save_total_limit,
+                                    'lm_type': lm_type,
+                                    'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
-                            # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                            'proof_sampling': proof_sampling,
-                            'learning': learning,
-                            'sample_negative_proof': sample_negative_proof,
+                                    'save_total_limit': save_total_limit,
 
-                            'learning_rate': _lrate,
+                                    # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                    'proof_sampling': proof_sampling,
+                                    'learning': learning,
+                                    'sample_negative_proof': sample_negative_proof,
 
-                            # 'n_gpu': 1,
-                            'dataloader_num_workers': 0,
+                                    'learning_rate': _lrate,
 
-                            'use_auth_token': True,
+                                    # 'n_gpu': 1,
+                                    'dataloader_num_workers': 0,
 
-                            'log_examples': True,
-                        })
+                                    'use_auth_token': True,
 
-                        output_dir = make_output_dir(setting, output_top_dir)
-                        command = make_command(output_dir,
-                                               setting,
-                                               run_mode,
-                                               n_gpus=n_gpus)
+                                    'log_examples': True,
+                                })
 
-                        run_by_engine(
-                            engine,
-                            command,
-                            output_dir,
-                            hours=hours,
-                            dry_run=dry_run
-                        )
+                                output_dir = make_output_dir(setting, output_top_dir)
+                                command = make_command(output_dir,
+                                                       setting,
+                                                       run_mode,
+                                                       n_gpus=n_gpus)
+
+                                run_by_engine(
+                                    engine,
+                                    command,
+                                    output_dir,
+                                    hours=hours,
+                                    dry_run=dry_run
+                                )
 
     logger.info('------------- ./01.train.py finished !! -----------')
 

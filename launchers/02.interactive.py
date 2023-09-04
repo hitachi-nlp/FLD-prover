@@ -34,7 +34,7 @@ def main():
 
     # output_top_dir = Path('./outputs/02.interactive.py/dev_null')
     # output_top_dir = Path('./outputs/02.interactive.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
-    output_top_dir = Path('./outputs/02.interactive.py/tmp')
+    # output_top_dir = Path('./outputs/02.interactive.py/tmp')
 
     # # -- D3 --
     # checkpoint_top_dir = Path('./outputs/01.train.py/20230711.finalize/dtst_nm=20230711.finalize.D3/dtst_1_nm=None/bs_cnfg_nm=FLNLcorpus.20220827.base/chckpnt_nm=t5-base/ckpt_lrt=None/ckpt_mdl_nm=None/gnrtn_nm_bms=10/gnrtn_tp_k=10/lrnng_rt=0.0001/mx_stps=20000/mdl_nm_or_pth=t5-base/prf_smplng=stepwise/smpl_ngtv_prf=True/sd=0/sht=FT.step-20000/wrmp_stps=1000/checkpoint-19500')

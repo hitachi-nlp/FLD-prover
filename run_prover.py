@@ -931,7 +931,6 @@ def main():
                 forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
                                                                       whole_proof_max_length)["input_ids"]
                 forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
-                # import pudb; pudb.set_trace()
 
             elif lm_type == LMType.CAUSAL:
                 _prompts = [prompt + causal_lm_sep_token for prompt in prompts]
@@ -1120,7 +1119,8 @@ def main():
                         proof_pred,
                         context=context,
                     )
-                    depths = ['all', str(example['depth'])] if example.get('depth', None) is not None else ['all']
+                    depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
+                              else ['all', 'None'])
                     for depth in depths:
                         for metric_name, metric_val in _metrics.items():
                             metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
@@ -1165,7 +1165,6 @@ def main():
         texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
-        # drop_labels_for_eval=True,
         log_generation=data_args.log_generation,
     )
 
@@ -1177,7 +1176,7 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        trainer.save_model()  # Saves the tokenizer too for easy upload
+        # trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
         max_train_samples = (
