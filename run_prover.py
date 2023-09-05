@@ -846,8 +846,8 @@ def main():
 
                 try:
                     logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
-                except:
-                    logger.fatal('prettify_context failed for the following context. This is unexpected:%s', context)
+                except Exception as e:
+                    logger.warning('prettify_context() failed for the following context:\n%s\nThe exception is the following:%s', context, str(e))
 
                 logger.info('------------ hypothesis ------------\n\n    %s\n', hypothesis)
 
