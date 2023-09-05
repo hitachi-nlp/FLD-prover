@@ -53,7 +53,7 @@ _BATCH_SETTINGS = {
 
             'lora': False,
             # 'generation_num_beams': 10,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         't5-base.all_at_once': {
@@ -69,7 +69,7 @@ _BATCH_SETTINGS = {
 
             'lora': False,
             # 'generation_num_beams': 10,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
         # 'allenai/led-base-16384': {}
         # 'allenai/led-large-16384': {}
@@ -92,7 +92,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-base.all_at_once': {
@@ -107,7 +107,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-large': {
@@ -122,7 +122,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-large.all_at_once': {
@@ -137,7 +137,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-base-long': {
@@ -152,7 +152,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
@@ -167,7 +167,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-large-long': {
@@ -182,7 +182,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-large-long.all_at_once': {
@@ -197,7 +197,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-xl': {
@@ -212,7 +212,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-xl.all_at_once': {
@@ -227,7 +227,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-small.all_at_once': {
@@ -242,7 +242,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
@@ -257,7 +257,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-large.all_at_once': {
@@ -272,7 +272,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
@@ -287,7 +287,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-3b.all_at_once': {
@@ -302,7 +302,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
@@ -317,7 +317,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
@@ -331,8 +331,8 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
-            'generation_num_beams': 2,
+            'lora': True,    # XXX lora=False does not fit into the memory even we set batch_size=1 and num_beams=1
+            'generation_num_beams': 1,
         },
 
 
@@ -358,7 +358,7 @@ _BATCH_SETTINGS = {
 
             'lora': False,
             # 'generation_num_beams': 10,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         't5-base.all_at_once': {
@@ -374,7 +374,7 @@ _BATCH_SETTINGS = {
 
             'lora': False,
             # 'generation_num_beams': 10,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
         # 'allenai/led-base-16384': {}
         # 'allenai/led-large-16384': {}
@@ -397,7 +397,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-base.all_at_once': {
@@ -412,7 +412,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-large': {
@@ -427,7 +427,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'google/mt5-large.all_at_once': {
@@ -442,7 +442,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-base-long': {
@@ -457,7 +457,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
@@ -472,7 +472,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-large-long': {
@@ -487,7 +487,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-large-long.all_at_once': {
@@ -502,7 +502,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-xl': {
@@ -517,7 +517,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'retrieva-jp/t5-xl.all_at_once': {
@@ -532,7 +532,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-small.all_at_once': {
@@ -547,7 +547,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
@@ -562,7 +562,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': False,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-large.all_at_once': {
@@ -577,7 +577,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
@@ -592,7 +592,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-3b.all_at_once': {
@@ -607,7 +607,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
@@ -622,7 +622,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
@@ -637,7 +637,7 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': True,
-            'generation_num_beams': 2,
+            'generation_num_beams': 1,
         },
 
 
@@ -1200,17 +1200,41 @@ LEARNING_SETTINGS = {
         'use_test_as_val': False,
     },
 
-
-
 }
 
 
-def get_learning_setting(name: str, epoch: Optional[int] = None) -> Dict[str, Any]:
+def get_learning_setting(name: str,
+                         epoch: Optional[int] = None,
+                         steps: Optional[int] = None,
+                         max_steps_upper: Optional[int] = None) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
+        if epoch is not None and steps is not None:
+            raise ValueError()
+        if epoch is None and steps is None:
+            raise ValueError()
+
+        # see[here](https://github.com/huggingface/transformers/issues/22751)
+        hf_bug_zero_lr_offset = 10
 
         shot = int(name[len('LLM_FS.shot-'):])
         train_effective_batch_size = 32
-        total_steps = int(epoch * max(1, shot / train_effective_batch_size))
+        if epoch is not None:
+            total_steps = max(int(epoch * shot / train_effective_batch_size), 1)
+        else:
+            total_steps = steps
+        if max_steps_upper is not None:
+            total_steps = min(total_steps, max_steps_upper)
+
+        total_steps = total_steps + hf_bug_zero_lr_offset
+
+        warmup_steps = int(0.1 * total_steps) + hf_bug_zero_lr_offset
+
+        num_evals = 3
+        eval_steps = int(total_steps / num_evals)
+        if eval_steps <= warmup_steps:
+            # evaluation before warmup is slow due to the repetitions
+            eval_steps = total_steps
+
         max_eval_samples = 30
 
         return {
@@ -1220,9 +1244,12 @@ def get_learning_setting(name: str, epoch: Optional[int] = None) -> Dict[str, An
 
             'num_train_epochs': None,
             'train_effective_batch_size': train_effective_batch_size,
-            'warmup_steps': int(0.1 * total_steps),
+
             'max_steps': int(total_steps),
-            'eval_steps': int(total_steps / 5),
+            'warmup_steps': warmup_steps,
+            'eval_steps': eval_steps,
+
+            'logging_steps': 1,
 
             'use_test_as_train': False,
             'use_test_as_val': True,
@@ -1230,6 +1257,8 @@ def get_learning_setting(name: str, epoch: Optional[int] = None) -> Dict[str, An
 
     else:
         if epoch is not None:
+            raise ValueError()
+        if steps is not None:
             raise ValueError()
         return LEARNING_SETTINGS[name].copy()
 
@@ -1310,11 +1339,10 @@ def get_model_name_settings(model_name_or_path: str) -> Dict[str, Any]:
         return {'model_name_or_path': model_name_or_path}
 
 
-def get_logging_step_setting(max_steps: Optional[int] = None,
-                             eval_steps: Optional[int] = None) -> Dict[str, Any]:
+def get_save_eval_step_setting(max_steps: Optional[int] = None,
+                               eval_steps: Optional[int] = None) -> Dict[str, Any]:
     setting = {}
     if max_steps is not None:
-        setting['max_steps'] = max_steps
         if eval_steps is not None:
             setting['eval_steps'] = eval_steps
         if setting['eval_steps'] > max_steps:

@@ -15,7 +15,7 @@ from experimental_setting import (
     get_checkpoints,
     get_dataset_setting,
     get_batch_setting,
-    get_logging_step_setting,
+    get_save_eval_step_setting,
     get_model_name_settings,
     get_learning_setting,
     make_output_dir,
@@ -51,7 +51,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230903.overfit')
     # output_top_dir = Path('./outputs/01.train.py/20230903.LLM_FS')
 
-    output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
+    # output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
+    output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
 
     dataset_unames = [
 
@@ -72,6 +73,8 @@ def main():
 
         # ---------------------------------- 20230904.jpn ------------------------------------
         '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch',
+        # '20230904.jpn.D1',
     ]
 
     DATASETS_DIRS = [
@@ -123,7 +126,7 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -178,23 +181,23 @@ def main():
         # 'FT.step-100000',
 
         # 'LLM_FS.shot-1',
-        # 'LLM_FS.shot-10',
+        'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-1000',
     ]
 
     lrates = [
-        # 1.0,
-        1e-4,
+        # 1e-4,   # faster convergence
         1e-5,
     ]
 
-    epochs = [
+    epochs_list = [
         # None,
 
-        100,
-        # 200,
+        # 100,
+        50,
     ]
+    max_steps_upper = 300
 
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
@@ -218,7 +221,7 @@ def main():
 
     dry_run = False
 
-    hours = 72
+    hours = 24
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
@@ -267,12 +270,6 @@ def main():
         True
     ]
 
-    # max_steps = 100
-    max_steps = None
-
-    # eval_steps = 100
-    eval_steps = None
-
     # max_train_samples = 15000
     max_train_samples = None
 
@@ -282,7 +279,7 @@ def main():
     for dataset_uname in dataset_unames:
 
         for learning in learnings:
-            for epoch in epochs:
+            for epoch in epochs_list:
                 if dataset_push_to_hub_repo_name is not None:
                     if n_gpus != 1 or run_mode != 'vanilla':
                         # this does not work
@@ -306,7 +303,7 @@ def main():
                                 base_setting = get_config(base_config_name)
                                 setting.update(base_setting)
 
-                                learning_setting = get_learning_setting(learning, epoch)
+                                learning_setting = get_learning_setting(learning, epoch=epoch, max_steps_upper=max_steps_upper)
                                 setting.update(learning_setting)
 
                                 dataset_setting = get_dataset_setting(
@@ -325,8 +322,8 @@ def main():
                                 setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                                 setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
-                                setting.update(get_logging_step_setting(max_steps=max_steps,
-                                                                        eval_steps=eval_steps))
+                                setting.update(get_save_eval_step_setting(max_steps=setting['max_steps'],
+                                                                          eval_steps=setting['eval_steps']))
 
                                 modelwise_setting = get_batch_setting(
                                     gpu_name_for_batch_size,
@@ -334,7 +331,7 @@ def main():
                                 )
 
                                 accum_steps = int(learning_setting['train_effective_batch_size']
-                                                  / (modelwise_setting['per_device_train_batch_size'] * (1 if run_mode == 'deepspeed' else n_gpus)))
+                                                  / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
                                 if accum_steps < 1:
                                     raise ValueError()
                                 setting['gradient_accumulation_steps'] = accum_steps
