@@ -1,4 +1,6 @@
-git+https://github.com/huggingface/transformers@006da469dd5a465f4551f4245f780e3b1e92b76c
+# git+https://github.com/huggingface/transformers@006da469dd5a465f4551f4245f780e3b1e92b76c
+transformers==4.33.0
+
 git+https://github.com/google-research/bleurt.git
 
 accelerate >= 0.21.0

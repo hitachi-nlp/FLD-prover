@@ -52,12 +52,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230903.LLM_FS')
 
     # output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
-    output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
+    # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2',
@@ -72,7 +74,7 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
         # '20230904.jpn.D1.wo_brnch',
         # '20230904.jpn.D1',
     ]
@@ -102,7 +104,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
@@ -125,7 +127,7 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
@@ -165,7 +167,7 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
-        # 'debug.micro',
+        'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
         # 'debug.middle',
@@ -181,40 +183,40 @@ def main():
         # 'FT.step-100000',
 
         # 'LLM_FS.shot-1',
-        'LLM_FS.shot-10',
+        # 'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
         # 'LLM_FS.shot-1000',
     ]
 
     lrates = [
-        # 1e-4,   # faster convergence
-        1e-5,
+        1e-4,   # faster convergence
+        # 1e-5,
     ]
 
     epochs_list = [
-        # None,
+        None,
 
         # 100,
-        50,
+        # 50,
     ]
     max_steps_upper = 300
 
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
 
-    # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.large')
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
     # gpu_name_for_batch_size = 'A100_48_1'
     gpu_name_for_batch_size = 'V100_16_4.deepspeed'
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
     save_total_limit = 0
     # save_total_limit = 1
