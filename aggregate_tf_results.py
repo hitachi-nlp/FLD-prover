@@ -24,13 +24,18 @@ def main(input_dir, output_dir, log_level):
     output_dir = Path(output_dir) if output_dir is not None else None
 
     LAB_ATTR_NAMES = [
-        'base_config_name',
         'dataset_uname',
+        'learning',
+
+        'model_name_or_path',
+        'learning_rate',
+        'seed',
+
+        'base_config_name',
         'generation_max_proof_steps',
         'generation_num_beams',
         'generation_input_k',
         'gradient_accumulation_steps',
-        'learning_rate',
         'lm_type',
         'lora',
         'max_grad_norm',
@@ -40,13 +45,10 @@ def main(input_dir, output_dir, log_level):
         'max_steps',
         'max_target_length',
         'max_train_samples',
-        'model_name_or_path',
         'per_device_eval_batch_size',
         'per_device_train_batch_size',
         'proof_sampling',
         'sample_negative_proof',
-        'seed',
-        'shot',
         'source_prefix',
         'tokenizer_padding',
         'warmup_steps',

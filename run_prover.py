@@ -19,6 +19,7 @@ Fine-tuning the library models for sequence to sequence.
 # You can also adapt this script on your own sequence to sequence task. Pointers for this are left as comments.
 
 import line_profiling
+import time
 from FLD_task.hf_dataset import serialize_transform
 from FLD_prover import (
     StepWiseGenerationTrainer,
@@ -55,6 +56,7 @@ from transformers import (
     default_data_collator,
     is_torch_tpu_available,
 )
+from transformers.generation.stopping_criteria import StoppingCriteria
 import transformers
 import gradio as gr
 from filelock import FileLock
@@ -319,6 +321,10 @@ class DataTrainingArguments:
         default=1,
     )
 
+    generation_timeout: int = field(
+        default=60,
+    )
+
     interactive_mode: str = field(
         default=None,
     )
@@ -401,6 +407,20 @@ class RemoveUnusedColumnsCollator:
         return default_data_collator(features,
                                      return_tensors=return_tensors or self.return_tensors)
 
+
+class MaxTimeCriteriaWithWarning(StoppingCriteria):
+    def __init__(self, max_time: float, initial_timestamp: Optional[float] = None):
+        self.max_time = max_time
+        self.initial_timestamp = time.time() if initial_timestamp is None else initial_timestamp
+
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+        elapsed = time.time() - self.initial_timestamp
+        do_timeout = elapsed > self.max_time
+        if do_timeout:
+            logger.warning('generation timeout with %d sec', self.max_time)
+            return True
+        else:
+            return False
 
 def main():
     logging.getLogger().handlers.clear()  # remove handler automatically added
@@ -569,10 +589,6 @@ def main():
             use_fast=model_args.use_fast_tokenizer,
             revision=model_args.model_revision,
             use_auth_token=True if model_args.use_auth_token else None,
-
-            # HONOKA: abejaの場合，'left'がデフォルトっぽい．
-            # leftにしても，calmでは出てこない．
-            # padding_side='left' if lm_type == LMType.CAUSAL else None,
         )
 
     if lm_type == LMType.SEQ_2_SEQ:
@@ -622,40 +638,6 @@ def main():
         logger.info('train LoRA model with the following parameters:')
         model.print_trainable_parameters()
 
-    if lm_type == LMType.CAUSAL:
-        # model.generate() with batchsize >= 2 require additional preparation
-        # [Batch generation](https://discuss.huggingface.co/t/batch-generation-with-gpt2/1517/2)
-
-        padding_side_org = tokenizer.padding_side
-        pad_token_org = tokenizer.pad_token
-        pad_token_id_org = model.config.eos_token_id
-
-        def generation_init():
-            tokenizer.padding_side = 'left'
-            tokenizer.pad_token = tokenizer.eos_token
-            model.config.pad_token_id = model.config.eos_token_id
-
-        def generation_exit():
-            tokenizer.padding_side = padding_side_org
-            tokenizer.pad_token = pad_token_org
-            model.config.pad_token_id = pad_token_id_org
-    else:
-        def generation_init():
-            pass
-
-        def generation_exit():
-            pass
-
-    def make_gen_kwargs():
-        # dynamically generation gen_kwargs because it dependes on the tokenizers state,
-        # which as pad_token_id changed at generation_init()
-        return {
-            'top_k': data_args.generation_top_k,
-            # 'do_sample': True,
-
-            'num_return_sequences': data_args.generation_num_return_sequences,
-            'pad_token_id': tokenizer.pad_token_id,
-        }
 
     # Override the decoding parameters of Seq2SeqTrainer
     # + 1 to be compatible with beam search
@@ -935,14 +917,15 @@ def main():
             elif lm_type == LMType.CAUSAL:
                 _prompts = [prompt + causal_lm_sep_token for prompt in prompts]
 
-                generation_init()
+                # generation_init()
+                # trainer.gen_kwargs = make_gen_kwargs()
                 forward_inputs.update(
                     prepare_tokenized_inputs(
                         _prompts,
                         data_args.max_source_length,
                         # add_special_tokens=False
                     ))
-                generation_exit()
+                # generation_exit()
 
                 # the padding is arbitrary
                 forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
@@ -1153,6 +1136,58 @@ def main():
     else:
         raise NotImplementedError()
 
+    if lm_type == LMType.CAUSAL:
+        """
+            model.generate() with batch size >= 2 require hacks on special tokens.
+            this preparation must be exactly when entering/exiting evaluate()/predict(),
+            as other functions such as train() should not respect this hack.
+            See [here](https://discuss.huggingface.co/t/batch-generation-with-gpt2/1517/2)
+        """
+
+        padding_side_org = tokenizer.padding_side
+        pad_token_org = tokenizer.pad_token
+        pad_token_id_org = model.config.eos_token_id
+
+        def generation_init_special_tokens():
+            tokenizer.padding_side = 'left'
+            tokenizer.pad_token = tokenizer.eos_token
+            model.config.pad_token_id = model.config.eos_token_id
+
+        def generation_exit_special_tokens():
+            tokenizer.padding_side = padding_side_org
+            tokenizer.pad_token = pad_token_org
+            model.config.pad_token_id = pad_token_id_org
+    else:
+        def generation_init_special_tokens():
+            pass
+
+        def generation_exit_special_tokens():
+            pass
+
+    def make_gen_kwargs():
+        """
+            As generation_init_special_tokens()/generation_exit_special_tokens() dynamically change
+            tokenizer special tokens, we also have to generate gen_kwargs dynamically.
+        """
+        stopping_criteria = MaxTimeCriteriaWithWarning(data_args.generation_timeout)
+        return {
+            'top_k': data_args.generation_top_k,
+            'stopping_criteria': [stopping_criteria],
+            'num_return_sequences': data_args.generation_num_return_sequences,
+            'pad_token_id': tokenizer.pad_token_id,
+        }
+
+    def generation_handled(func):
+        def inner(self, *args, **kwargs):
+            generation_init_special_tokens()
+            results = func(self, *args, **kwargs, **make_gen_kwargs())
+            generation_exit_special_tokens()
+            return results
+        return inner
+
+    StepWiseGenerationTrainer.evaluate = generation_handled(StepWiseGenerationTrainer.evaluate)
+    StepWiseGenerationTrainer.predict = generation_handled(StepWiseGenerationTrainer.predict)
+
     trainer = StepWiseGenerationTrainer(
         model=model,
         args=training_args,
@@ -1193,9 +1228,7 @@ def main():
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
 
-        generation_init()
-        metrics = trainer.evaluate(metric_key_prefix="eval", **make_gen_kwargs())
-        generation_exit()
+        metrics = trainer.evaluate(metric_key_prefix="eval")
 
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
@@ -1209,9 +1242,7 @@ def main():
         if data_args.num_return_sequences > 1:
             raise NotImplementedError()
 
-        generation_init()
-        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict", **make_gen_kwargs())
-        generation_exit()
+        predict_results = trainer.predict(predict_dataset, metric_key_prefix="predict")
 
         metrics = predict_results.metrics
         max_predict_samples = (
@@ -1259,11 +1290,8 @@ def main():
             )['tmp']
             user_input_dataset.set_transform(
                 lambda examples: preprocess_function(examples, 'eval'))
-            generation_init()
             results = trainer.predict(user_input_dataset,
-                                      metric_key_prefix="predict",
-                                      **make_gen_kwargs())
-            generation_exit()
+                                      metric_key_prefix="predict")
 
             if trainer.is_world_process_zero():
                 if training_args.predict_with_generate:

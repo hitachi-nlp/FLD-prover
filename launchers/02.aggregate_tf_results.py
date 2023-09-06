@@ -30,10 +30,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230903.overfit')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20230904.LLM_FS',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230904.LLM_FS')
+
     input_dirs = [
-        './outputs/01.train.py/20230904.LLM_FS',
+        './outputs/01.train.py/20230905.LLM_FS',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230904.LLM_FS')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230905.LLM_FS')
 
     command = ' '.join([
         'python ./aggregate_tf_results.py',

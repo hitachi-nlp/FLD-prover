@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, Callable
 import logging
+import time
 
 import numpy as np
 import torch
@@ -52,6 +53,8 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         self._texts_to_inputs_func = texts_to_inputs_func
         self._is_finished_func = is_finished_func
         self._log_generation = log_generation
+
+        # self.gen_kwargs = {}
         # self._drop_labels_for_eval = drop_labels_for_eval
 
     def evaluation_loop(
@@ -63,7 +66,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         metric_key_prefix: str = "eval",
     ) -> EvalLoopOutput:
         """
-        Taken from trainer.py of transformers.
+        Taken from trainer.py and seq2seq_trainer.py of transformers.
         The code change is minimul: just passing data_loader to self.compute_metrics.
         """
         args = self.args
@@ -168,7 +171,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                     else nested_concat(inputs_host, inputs_decode, padding_index=-100)
                 )
             if logits is not None:
-                logits = self.accelerator.pad_across_processes(logits, dim=1, pad_index=-100)
+                logits = self.accelerator.pad_across_processes(logits, dim=1, pad_index=-100)   # hang here!
                 if self.preprocess_logits_for_metrics is not None:
                     logits = self.preprocess_logits_for_metrics(logits, labels)
                 logits = self.accelerator.gather_for_metrics((logits))
@@ -245,7 +248,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
 
         # Metrics!
         # if self.compute_metrics is not None and all_preds is not None and all_labels is not None:
-        if self.compute_metrics is not None and all_preds is not None:
+        if self.compute_metrics is not None:
             if args.include_inputs_for_metrics:
                 metrics = self.compute_metrics(
                     EvalPrediction(predictions=all_preds, label_ids=all_labels, inputs=all_inputs),
@@ -278,7 +281,7 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
         inputs: Dict[str, Union[torch.Tensor, Any]],
         prediction_loss_only: bool,
         ignore_keys: Optional[List[str]] = None,
-        **gen_kwargs,
+        # **gen_kwargs,
     ) -> Tuple[Optional[float], Optional[torch.Tensor], Optional[torch.Tensor]]:
         labels = None
         n_examples = len(list(inputs.values())[0])
@@ -291,13 +294,6 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             # shoud used inputs for i_step=0 to get labels
             extended_inputs = inputs.copy() if i_step == 0 else self._seqs_to_tensors(extended_input_seqs)
 
-            # # import pudb; pudb.set_trace()  # HONOKA: ここでlabelが消える
-            # if self._drop_labels_for_eval:
-            #     # extended_inputs.pop('labels', None)
-            #     gold_proofs = extended_inputs.pop('gold_proofs', None)
-            # else:
-            #     gold_proofs = None
-
             # drop custom fields so that super() do not raise exception
             gold_proofs = extended_inputs.pop('gold_proofs', None)
 
@@ -306,7 +302,6 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
                 extended_inputs,
                 prediction_loss_only,
                 ignore_keys=ignore_keys,
-                **gen_kwargs,
             )
 
             if gold_proofs is not None:

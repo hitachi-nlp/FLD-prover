@@ -1073,7 +1073,7 @@ LEARNING_SETTINGS = {
 
     'debug.ZS': {
         'max_train_samples': 1,
-        'max_eval_samples': 1,
+        'max_eval_samples': 100,
         'max_predict_samples': 1,
 
         'num_train_epochs': None,
@@ -1214,12 +1214,12 @@ def get_learning_setting(name: str,
             raise ValueError()
 
         # see[here](https://github.com/huggingface/transformers/issues/22751)
-        hf_bug_zero_lr_offset = 10
+        hf_bug_zero_lr_offset = 20
 
         shot = int(name[len('LLM_FS.shot-'):])
         train_effective_batch_size = 32
         if epoch is not None:
-            total_steps = max(int(epoch * shot / train_effective_batch_size), 1)
+            total_steps = epoch * max(1, math.floor(shot / train_effective_batch_size))
         else:
             total_steps = steps
         if max_steps_upper is not None:
@@ -1227,11 +1227,11 @@ def get_learning_setting(name: str,
 
         total_steps = total_steps + hf_bug_zero_lr_offset
 
-        warmup_steps = int(0.1 * total_steps) + hf_bug_zero_lr_offset
+        warmup_steps = int(0.1 * total_steps)
 
         num_evals = 3
         eval_steps = int(total_steps / num_evals)
-        if eval_steps <= warmup_steps:
+        if eval_steps <= warmup_steps + hf_bug_zero_lr_offset:
             # evaluation before warmup is slow due to the repetitions
             eval_steps = total_steps
 
@@ -1555,6 +1555,7 @@ def make_output_dir(setting: Dict,
             'max_proof_steps',
             'fp16',
             'generation_max_proof_steps',
+            'generation_timeout',
             'source_prefix',
             'logging_strategy',
 

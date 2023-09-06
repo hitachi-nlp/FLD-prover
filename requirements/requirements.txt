@@ -14,7 +14,7 @@ numpy
 evaluate
 huggingface_hub
 peft
-deepspeed
+deepspeed==0.10.2
 einops
 fugashi
 unidic_lite
