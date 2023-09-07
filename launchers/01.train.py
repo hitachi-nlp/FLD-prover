@@ -74,9 +74,10 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        '20230904.jpn.D1.wo_brnch',
-        '20230904.jpn.D1',
+        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch',
+        # '20230904.jpn.D1',
+        '20230904.jpn.D3',
     ]
 
     DATASETS_DIRS = [
@@ -95,6 +96,8 @@ def main():
         # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
         # ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
 
+        # TODO: other models such as mBART
+
         # # # ============================ japanese     ============================
 
         # # # -------------- < 1B params --------------
@@ -111,6 +114,9 @@ def main():
         # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
         # # # # # -------------- > 1B params --------------
+
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
@@ -132,36 +138,6 @@ def main():
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ---------------------------- rejected models ----------------------------
-
-        # ---- reason = max length < 2k ----
-
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'cyberagent/open-calm-medium'),
-
-        # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
-        # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
-
-        # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'cyberagent/open-calm-small'),
-        # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'cyberagent/open-calm-medium'),
-
-        # ('abeja/gpt2-large-japanese', 'causal', 'cyberagent/open-calm-large'),
-
-        # ('rinna/japanese-gpt-1b', 'causal', 'cyberagent/open-calm-1b'),  # XXX only support max_len=1000
-
-        # ---- reason = others ----
-
-        # somehow can not fit into memory.
-        # ('abeja/gpt-neox-japanese-2.7b', 'causal', 'cyberagent/open-calm-7b'),
-
-        # no config at hub
-        # ('izumi-lab/stormy-7b-10ep', 'causal', 'cyberagent/open-calm-7b'),
-
-        # tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
-        # [rejected] ('sonoisa/t5-base-japanese', 'seq2seq', 't5-base'),
-        # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
     ]
 
     learnings = [
@@ -184,20 +160,19 @@ def main():
 
         # 'LLM_FS.shot-1',
         'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
     ]
 
-    lrates = [
-        1e-4,   # faster convergence
-        # 1e-5,
+    seeds = [
+        0,
+        # 1,
     ]
 
     epochs_list = [
         # None,
 
         50,
-        # 100,
     ]
     max_steps_upper = 300
 
@@ -222,7 +197,7 @@ def main():
     # save_total_limit = 1
 
     # generation_timeout = 0
-    generation_timeout = 60   # slow generatoin is most likely the repetitions coming from underfitting.
+    generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
 
     dry_run = False
 
@@ -264,8 +239,9 @@ def main():
         else:
             raise ValueError()
 
-    seeds = [
-        0,
+    lrates = [
+        1e-4,   # faster convergence
+        # 1e-5,
     ]
 
     sample_negative_proof_args = [
@@ -306,7 +282,9 @@ def main():
                                 base_setting = get_config(base_config_name)
                                 setting.update(base_setting)
 
-                                learning_setting = get_learning_setting(learning, epoch=epoch, max_steps_upper=max_steps_upper)
+                                learning_setting = get_learning_setting(learning,
+                                                                        epoch=epoch,
+                                                                        max_steps_upper=max_steps_upper)
                                 setting.update(learning_setting)
 
                                 dataset_setting = get_dataset_setting(

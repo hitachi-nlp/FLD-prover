@@ -28,13 +28,13 @@ def main(input_dir, output_dir, log_level):
         'learning',
 
         'model_name_or_path',
-        'learning_rate',
         'seed',
+        'learning_rate',
 
         'base_config_name',
         'generation_max_proof_steps',
         'generation_num_beams',
-        'generation_input_k',
+        'generation_top_k',
         'gradient_accumulation_steps',
         'lm_type',
         'lora',

@@ -1619,3 +1619,40 @@ def run_by_engine(engine: EngineBase,
         dry_run=dry_run,
         wait_until_finish=wait_until_finish,
     )
+
+
+_REJECTED_MODELS = [
+    # ---------------------------- rejected models ----------------------------
+
+    # ---- reason = max length < 2k ----
+
+    # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+
+    # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'cyberagent/open-calm-medium'),
+
+    # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
+    # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
+    # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
+
+    # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'cyberagent/open-calm-small'),
+    # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'cyberagent/open-calm-medium'),
+
+    # ('abeja/gpt2-large-japanese', 'causal', 'cyberagent/open-calm-large'),
+
+    # ('rinna/japanese-gpt-1b', 'causal', 'cyberagent/open-calm-1b'),  # XXX only support max_len=1000
+
+    # ---- reason = others ----
+
+    # somehow can not fit into memory.
+    # ('abeja/gpt-neox-japanese-2.7b', 'causal', 'cyberagent/open-calm-7b'),
+
+    # no config at hub
+    # ('izumi-lab/stormy-7b-10ep', 'causal', 'cyberagent/open-calm-7b'),
+
+    # tokenizer have too many unknowns for alphabet, e.g., "U" and "l"
+    # [rejected] ('sonoisa/t5-base-japanese', 'seq2seq', 't5-base'),
+    # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
+]
+
+
+
