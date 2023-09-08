@@ -20,7 +20,6 @@ Fine-tuning the library models for sequence to sequence.
 
 import line_profiling
 import time
-from FLD_task.hf_dataset import serialize_transform
 from FLD_prover import (
     StepWiseGenerationTrainer,
     preprocess_examples_train,
@@ -28,7 +27,14 @@ from FLD_prover import (
 )
 from FLD_prover.utils import tokenize_with_log
 from FLD_task.proof import get_stance_markers
-from FLD_task import load_deduction, build_metrics, prettify_context_text, prettify_proof_text
+from FLD_task import (
+    load_deduction,
+    serialize,
+    build_metrics,
+    prettify_context_text,
+    prettify_proof_text,
+    log_example,
+)
 from logger_setup import setup as setup_logger
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 import huggingface_hub
@@ -844,29 +850,47 @@ def main():
 
     @profile
     def preprocess_function(examples: Dict[str, List[Any]], split: str) -> Dict[str, List[Any]]:
-        examples = serialize_transform(
-            examples,
-            split,
-            proof_sampling=data_args.proof_sampling,
-            sample_negative_proof=data_args.sample_negative_proof if data_args.proof_sampling == 'stepwise' else False,
-        )
+        batch_size = len(list(examples.values())[0])
+        unbatched_examples = [{key: examples[key][i] for key in examples.keys()}
+                              for i in range(batch_size)]
 
-        # collate
-        prompts, proof_steps, gold_proofs = extract_serials(examples)
-        _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
-
-        # check whther the tokenizer can recognize stance markers
-        a_gold_proof = gold_proofs[0]
-        a_gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([a_gold_proof],
-                                                                      whole_proof_max_length)["input_ids"][0])
-        if len(get_stance_markers(a_gold_proof_dec)) == 0:
-            raise ValueError(
-                '\n'.join([
-                    'The tokenizer could not recognized the stance markers.',
-                    f'The original proof: "{a_gold_proof}"',
-                    f'The tokenized proof: "{a_gold_proof_dec}"',
-                ])
+        prompts_w_partial_proof: List[str] = []
+        proof_steps: List[str] = []
+        gold_proofs: List[str] = []
+        for i_example, example in enumerate(unbatched_examples):
+            deduction = load_deduction(example)
+            serial = serialize(
+                deduction,
+                stepwise = (data_args.proof_sampling == 'stepwise'),
+                sample_negative_proof=data_args.sample_negative_proof if data_args.proof_sampling == 'stepwise' else False,
             )
+
+            prompt_with_partial_proof = prefix + serial.prompt + (serial.partial_proof or '')
+
+            gold_proof = serial.proofs[0]
+            # check whther the tokenizer can recognize stance markers
+            gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([gold_proof],
+                                                                          whole_proof_max_length)["input_ids"][0])
+            if len(get_stance_markers(gold_proof_dec)) == 0:
+                raise ValueError(
+                    '\n'.join([
+                        'The tokenizer could not recognized the stance markers.',
+                        f'The original proof: "{gold_proof}"',
+                        f'The tokenized proof: "{gold_proof_dec}"',
+                    ])
+                )
+
+            prompts_w_partial_proof.append(prompt_with_partial_proof)
+            proof_steps.append(serial.next_proof_step)
+            gold_proofs.append(gold_proof)
+
+            if data_args.log_examples:
+                logger.info('------------------------------ preprocess_function [example=%d] ------------------------------', i_example)
+                logger.info('prompt             : "%s"', prompt_with_partial_proof)
+                logger.info('next proof step    : "%s"', serial.next_proof_step)
+                logger.info('gold proof         : "%s"', gold_proof)
+
+        _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
 
         # without this additional token, we can not accurately calculate the prompt length
         causal_lm_sep_token = '::'
@@ -876,14 +900,14 @@ def main():
                 raise ValueError()
 
             if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
+                forward_inputs.update(prepare_tokenized_inputs(prompts_w_partial_proof, data_args.max_source_length))
                 forward_inputs["labels"] = prepare_tokenized_targets(_proof_steps_w_eos,
                                                                      data_args.max_target_length)["input_ids"]
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
 
             elif lm_type == LMType.CAUSAL:
                 # just for getting length
-                _prompts = [prompt + causal_lm_sep_token for prompt in prompts]
+                _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
                 prompt_ids = [
                     prepare_tokenized_inputs(
                         prompt,
@@ -909,13 +933,13 @@ def main():
                 raise Exception('Why pass here? might be a bug?')
 
             if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts, data_args.max_source_length))
+                forward_inputs.update(prepare_tokenized_inputs(prompts_w_partial_proof, data_args.max_source_length))
                 forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
                                                                       whole_proof_max_length)["input_ids"]
                 forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
 
             elif lm_type == LMType.CAUSAL:
-                _prompts = [prompt + causal_lm_sep_token for prompt in prompts]
+                _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
 
                 # generation_init()
                 # trainer.gen_kwargs = make_gen_kwargs()
@@ -1085,16 +1109,13 @@ def main():
                 context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
                 hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
 
-                try:
-                    logger.info('------------ context ------------\n\n%s\n', prettify_context_text(context, indent=4))
-                except:
-                    logger.fatal('prettify_context failed for the following context. This is unexpected:%s', context)
-
-                logger.info('------------ hypothesis ------------\n\n    %s\n', hypothesis)
-
-                logger.info('------------ proof_gold ------------\n\n%s\n', prettify_proof_text(proof_gt, indent=4))
-
-                logger.info('------------ proof_pred ------------\n\n%s\n', prettify_proof_text(proof_pred, indent=4))
+                log_example(
+                    context=context,
+                    hypothesis=hypothesis,
+                    gold_proofs=[proof_gt],
+                    pred_proof=proof_pred,
+                    logger=logger,
+                )
 
                 for metric_type, calc_metrics in metric_funcs.items():
                     _metrics = calc_metrics(
@@ -1314,16 +1335,12 @@ def main():
 
                 proof = get_prediction(context, hypothesis)
                 proof = prettify_proof_text(proof)
-                print('\n------------------ context ------------------')
-                try:
-                    print(prettify_context_text(context))
-                except Exception as e:
-                    logger.warning('could not prettify context.')
-                    print(context)
-                print('\n------------------ hypothesis ------------------')
-                print(hypothesis)
-                print('\n------------------ prediction ------------------')
-                print(proof)
+
+                log_example(
+                    context=context,
+                    hypothesis=hypothesis,
+                    pred_proof=proof,
+                )
 
         elif data_args.interactive_mode == 'gradio':
 
