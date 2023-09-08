@@ -15,10 +15,15 @@ logger = logging.getLogger(__name__)
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/2023-08-31.jpn/',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/2023-08-31.jpn/')
+
     input_dirs = [
-        './outputs/12.evaluate_llm_proofs/2023-08-31.jpn/',
+        './outputs/12.evaluate_llm_proofs/20230905.LLM_FS/',
     ]
-    output_dir = Path('./outputs/13.aggregate_llm_results.py/2023-08-31.jpn/')
+    output_dir = Path('./outputs/13.aggregate_llm_results.py/20230905.LLM_FS/')
 
     command = ' '.join([
         'python ./aggregate_llm_results.py',

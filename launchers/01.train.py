@@ -56,6 +56,14 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
+    DATASETS_DIRS = [
+        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+        './outputs.FLD/00.create_corpus/20230826.jpn',
+        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+        './outputs.FLD/00.create_corpus/20230904.jpn',
+    ]
+
     dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
@@ -74,18 +82,10 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        # '20230904.jpn.D1.wo_brnch',
-        # '20230904.jpn.D1',
+        '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        '20230904.jpn.D1.wo_brnch',
+        '20230904.jpn.D1',
         '20230904.jpn.D3',
-    ]
-
-    DATASETS_DIRS = [
-        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
-        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
-        './outputs.FLD/00.create_corpus/20230826.jpn',
-        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
-        './outputs.FLD/00.create_corpus/20230904.jpn',
     ]
 
     model_settings = [
@@ -120,9 +120,9 @@ def main():
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
@@ -133,8 +133,8 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -314,7 +314,14 @@ def main():
                                 accum_steps = int(learning_setting['train_effective_batch_size']
                                                   / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
                                 if accum_steps < 1:
-                                    raise ValueError()
+                                    _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
+                                    logger.warning(
+                                        'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
+                                        modelwise_setting['per_device_train_batch_size'],
+                                        _per_device_train_batch_size,
+                                        learning_setting['train_effective_batch_size'],
+                                    )
+                                    modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
                                 setting['gradient_accumulation_steps'] = accum_steps
 
                                 setting.update(modelwise_setting)

@@ -36,7 +36,9 @@ def main():
 
     # output_top_dir = Path('./outputs/10.make_prompts.py/20230711.refactor_distractors')
 
-    output_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn')
+
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -61,56 +63,11 @@ def main():
 
         './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
         './outputs.FLD/00.create_corpus/20230826.jpn',
+        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+        './outputs.FLD/00.create_corpus/20230904.jpn',
     ]
 
     dataset_unames = [
-        # 'FLD.debug.2023-05-13',
-
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',   # sFLD-impl
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000.G_MP',              # FLD-impl
-        # '20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000'                   # FLD.2
-
-        # ---------------------------------- 20230529.use_fixed_translation_for_LLM ------------------------------------
-        # '20221203.first_exp__arg-RT__frml-cmpl__dist-20__transl-nrrw__tree-3__dataset_size-30000__dpth-RT.G_MP',
-        # '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-        # '20230529.use_fixed_translation_for_LLM.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-8__dataset_size-30000',
-
-        # ---------------------------------- 20230615.formula_checkers ------------------------------------
-        # '20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000',
-        # '20230615.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
-
-        # ---------------------------------- 20230621.formula_checkers ------------------------------------
-        # '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems',
-        # '20230621.formula_checkers.20221203.first_exp__arg-FLNL__frml-cmpl__dist-20__transl-wide__tree-3__dataset_size-30000.wo_theorems.wo_translation_dist',
-
-
-        # ---------------------------------- 20230628.make_harder ------------------------------------
-        # '20230626.many_bugs_fixed.D3.hard',
-        # '20230626.many_bugs_fixed.D3.hard.dist-trees',
-        # '20230626.many_bugs_fixed.D3.hard.unk-0.1',
-        # '20230626.many_bugs_fixed.D3.hard.brnch-high',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-1.0',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.5',
-        # '20230626.many_bugs_fixed.D3.hard.dist-neg-0.0',
-        # '20230626.many_bugs_fixed.D3.hard.dist-trees-only',
-
-        # '20230626.many_bugs_fixed.D8.hard',
-        # '20230626.many_bugs_fixed.D8.hard.dist-trees',
-
-        # ---------------------------------- 20230707.finalize ------------------------------------
-        # '20230707.finalize.D3.dist-double',
-        # '20230707.finalize.D3.dist-triple',
-        # '20230707.finalize.D3.dist-quadruple',
-
-        # '20230707.finalize.D8.dist-double',
-        # '20230707.finalize.D8.dist-triple',
-        # '20230707.finalize.D8.dist-quadruple',
-
-        # ---------------------------------- 20230711 ------------------------------------
-        # '20230711.dist-fallback',
-        # '20230711.finalize.D3',
-        # '20230711.finalize.D8',
-
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
@@ -119,8 +76,14 @@ def main():
         # 'hf.hitachi-nlp/FLD-star.v2',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
-        '20230826.jpn.D3',
+        # '20230826.jpn.D3',
         # '20230826.jpn.D8',
+
+        # ---------------------------------- 20230904.jpn ------------------------------------
+        '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        '20230904.jpn.D1.wo_brnch',
+        '20230904.jpn.D1',
+        '20230904.jpn.D3',
     ]
 
     prompt_types = [
@@ -134,7 +97,8 @@ def main():
         # 3,
         # 6,  # for chatGPT web, which have limited context length.
 
-        10,
+        8,
+        # 10,
         # 12,
 
         # -- over token limit = 8k token --
