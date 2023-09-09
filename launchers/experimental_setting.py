@@ -200,35 +200,6 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
-        'retrieva-jp/t5-xl': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
-
-            'max_source_length': 2000,
-            'max_target_length': 100,
-
-            'per_device_train_batch_size': 16,
-            'per_device_eval_batch_size': 2,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 1,
-        },
-
-        'retrieva-jp/t5-xl.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
-
-            'max_source_length': 1000,
-            'max_target_length': 1000,
-
-            'per_device_train_batch_size': 4,
-            'per_device_eval_batch_size': 1,
-            'gradient_checkpointing': True,
-
-            'lora': False,
-            'generation_num_beams': 1,
-        },
 
         'cyberagent/open-calm-small.all_at_once': {
             # 'tokenizer_padding': 'max_length',
@@ -272,6 +243,42 @@ _BATCH_SETTINGS = {
             'gradient_checkpointing': True,
 
             'lora': False,
+            'generation_num_beams': 1,
+        },
+
+
+
+
+
+
+
+        'retrieva-jp/t5-xl': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 16,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': True,
+            'generation_num_beams': 1,
+        },
+
+        'retrieva-jp/t5-xl.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': True,  # to align with 1B> models
             'generation_num_beams': 1,
         },
 
@@ -1414,15 +1421,22 @@ def make_command(output_dir: Union[str, Path],
     commands: List[str] = []
 
     commands.append('source ./set-envs.sh &&')
+    
+
+    torchrun_err_file = str(output_dir / 'torchrun_err.txt')
 
     if run_mode == 'vanilla':
         commands.append('python ./run_prover.py')
+
     elif run_mode == 'profile':
         commands.append('kernprof -lv ./run_prover.py')
+
     elif run_mode == 'torchrun':
         if n_gpus is None:
             raise ValueError()
-        commands.append(f'torchrun --nproc_per_node {n_gpus} ./run_prover.py')
+        commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
+                        f' torchrun --nproc_per_node {n_gpus} ./run_prover.py')
+
     elif run_mode == 'deepspeed':
         # import os
         # cuda_devices_org = os.environ.get('CUDA_VISIBLE_DEVICES', None)
@@ -1445,8 +1459,10 @@ def make_command(output_dir: Union[str, Path],
         # if cuda_devices_org is not None:
         #     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_devices_org
 
-        commands.append(f'torchrun --nproc_per_node {n_gpus} ./run_prover.py'
+        commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
+                        f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
                         ' --deepspeed ds_config/ds_config_zero3.json')
+
     else:
         ValueError()
 

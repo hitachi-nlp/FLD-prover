@@ -36,6 +36,7 @@ from FLD_task import (
     log_example,
 )
 from logger_setup import setup as setup_logger
+from torch.distributed.elastic.multiprocessing.errors import record
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 import huggingface_hub
 from transformers.utils.versions import require_version
@@ -428,6 +429,7 @@ class MaxTimeCriteriaWithWarning(StoppingCriteria):
         else:
             return False
 
+@record
 def main():
     logging.getLogger().handlers.clear()  # remove handler automatically added
     setup_logger(do_stderr=True, level=logging.INFO)
@@ -1118,11 +1120,15 @@ def main():
                 )
 
                 for metric_type, calc_metrics in metric_funcs.items():
-                    _metrics = calc_metrics(
-                        [proof_gt],
-                        proof_pred,
-                        context=context,
-                    )
+                    try:
+                        _metrics = calc_metrics(
+                            [proof_gt],
+                            proof_pred,
+                            context=context,
+                        )
+                    except Exception as e:
+                        print(e)
+                        _metrics = {}
                     depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
                               else ['all', 'None'])
                     for depth in depths:

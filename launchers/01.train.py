@@ -52,7 +52,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230903.LLM_FS')
 
     # output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
-    output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
+    # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
+    output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS.max_steps_upper=1000')
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
@@ -82,9 +83,9 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        '20230904.jpn.D1.wo_brnch',
-        '20230904.jpn.D1',
+        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch',
+        # '20230904.jpn.D1',
         '20230904.jpn.D3',
     ]
 
@@ -120,9 +121,9 @@ def main():
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
@@ -159,8 +160,8 @@ def main():
         # 'FT.step-100000',
 
         # 'LLM_FS.shot-1',
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
         'LLM_FS.shot-1000',
     ]
 
@@ -174,10 +175,8 @@ def main():
 
         50,
     ]
-    max_steps_upper = 300
-
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
+    # max_steps_upper = 300
+    max_steps_upper = 1000
 
     # engine = SubprocessEngine()
     engine = QsubEngine('ABCI', 'rt_G.large')
@@ -219,6 +218,8 @@ def main():
     # ------------------------------------------------------------
 
     # ------------------------ fixed ------------------------
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
 
     if isinstance(engine, QsubEngine):
         if engine.resource == 'rt_G.small':
@@ -322,6 +323,7 @@ def main():
                                         learning_setting['train_effective_batch_size'],
                                     )
                                     modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
+                                    accum_steps = 1
                                 setting['gradient_accumulation_steps'] = accum_steps
 
                                 setting.update(modelwise_setting)
