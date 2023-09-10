@@ -53,7 +53,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230904.LLM_FS')
     # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
-    output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS.max_steps_upper=1000')
+    # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS.max_steps_upper=1000')
+    # output_top_dir = Path('./outputs/01.train.py/20230910.find_bugs')
+    output_top_dir = Path('./outputs/01.train.py/20230910.rigid_comparison')
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
@@ -83,10 +85,10 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        '20230904.jpn.D1.wo_brnch.wo_dstrct',
         # '20230904.jpn.D1.wo_brnch',
-        # '20230904.jpn.D1',
-        '20230904.jpn.D3',
+        '20230904.jpn.D1',
+        # '20230904.jpn.D3',
     ]
 
     model_settings = [
@@ -161,8 +163,9 @@ def main():
 
         # 'LLM_FS.shot-1',
         # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
+        'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
     ]
 
     seeds = [
@@ -175,15 +178,27 @@ def main():
 
         50,
     ]
-    # max_steps_upper = 300
-    max_steps_upper = 1000
+    max_steps_upper = 300
+
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
+
+    sample_negative_proof_args = [
+        # True,
+        False,
+    ]
+
+    no_subproof_for_unknown_args = [
+        True,   # better
+        # False,
+    ]
 
     # engine = SubprocessEngine()
     engine = QsubEngine('ABCI', 'rt_G.large')
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    # n_gpus = 1  # debug
-    n_gpus = 4
+    n_gpus = 1  # debug
+    # n_gpus = 4
 
     # gpu_name_for_batch_size = 'A100_48_1'
     gpu_name_for_batch_size = 'V100_16_4.deepspeed'
@@ -217,9 +232,6 @@ def main():
 
     # ------------------------------------------------------------
 
-    # ------------------------ fixed ------------------------
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
 
     if isinstance(engine, QsubEngine):
         if engine.resource == 'rt_G.small':
@@ -245,11 +257,6 @@ def main():
         # 1e-5,
     ]
 
-    sample_negative_proof_args = [
-        # False,
-        True
-    ]
-
     # max_train_samples = 15000
     max_train_samples = None
 
@@ -268,111 +275,112 @@ def main():
                         raise ValueError()
 
                 for sample_negative_proof in sample_negative_proof_args:
+                    for no_subproof_for_unknown in no_subproof_for_unknown_args:
+                        for seed in seeds:
+                            for model_name, lm_type, model_name_for_batch_size in model_settings:
+                                if lm_type == 'causal':
+                                    proof_sampling = 'all_at_once'
+                                else:
+                                    proof_sampling = seq2seq_proof_sampling
 
-                    for seed in seeds:
-                        for model_name, lm_type, model_name_for_batch_size in model_settings:
-                            if lm_type == 'causal':
-                                proof_sampling = 'all_at_once'
-                            else:
-                                proof_sampling = seq2seq_proof_sampling
+                                for _lrate in lrates:
+                                    setting = {}
 
-                            for _lrate in lrates:
-                                setting = {}
+                                    base_config_name = get_default_config_name(dataset_uname)
+                                    base_setting = get_config(base_config_name)
+                                    setting.update(base_setting)
 
-                                base_config_name = get_default_config_name(dataset_uname)
-                                base_setting = get_config(base_config_name)
-                                setting.update(base_setting)
+                                    learning_setting = get_learning_setting(learning,
+                                                                            epoch=epoch,
+                                                                            max_steps_upper=max_steps_upper)
+                                    setting.update(learning_setting)
 
-                                learning_setting = get_learning_setting(learning,
-                                                                        epoch=epoch,
-                                                                        max_steps_upper=max_steps_upper)
-                                setting.update(learning_setting)
+                                    dataset_setting = get_dataset_setting(
+                                        dataset_uname,
+                                        DATASETS_DIRS,
+                                        use_test_as_val=setting.get('use_test_as_val', False),
+                                        use_test_as_train=setting.get('use_test_as_train', False))
+                                    setting.update(dataset_setting)
 
-                                dataset_setting = get_dataset_setting(
-                                    dataset_uname,
-                                    DATASETS_DIRS,
-                                    use_test_as_val=setting.get('use_test_as_val', False),
-                                    use_test_as_train=setting.get('use_test_as_train', False))
-                                setting.update(dataset_setting)
+                                    setting.update({
+                                        'do_train': True,
+                                        'do_eval': False,
+                                        'do_predict': False,
+                                    })
 
-                                setting.update({
-                                    'do_train': True,
-                                    'do_eval': False,
-                                    'do_predict': False,
-                                })
+                                    setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
+                                    setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
-                                setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
-                                setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
+                                    setting.update(get_save_eval_step_setting(max_steps=setting['max_steps'],
+                                                                              eval_steps=setting['eval_steps']))
 
-                                setting.update(get_save_eval_step_setting(max_steps=setting['max_steps'],
-                                                                          eval_steps=setting['eval_steps']))
-
-                                modelwise_setting = get_batch_setting(
-                                    gpu_name_for_batch_size,
-                                    model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
-                                )
-
-                                accum_steps = int(learning_setting['train_effective_batch_size']
-                                                  / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
-                                if accum_steps < 1:
-                                    _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
-                                    logger.warning(
-                                        'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
-                                        modelwise_setting['per_device_train_batch_size'],
-                                        _per_device_train_batch_size,
-                                        learning_setting['train_effective_batch_size'],
+                                    modelwise_setting = get_batch_setting(
+                                        gpu_name_for_batch_size,
+                                        model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                                     )
-                                    modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
-                                    accum_steps = 1
-                                setting['gradient_accumulation_steps'] = accum_steps
 
-                                setting.update(modelwise_setting)
+                                    accum_steps = int(learning_setting['train_effective_batch_size']
+                                                      / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
+                                    if accum_steps < 1:
+                                        _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
+                                        logger.warning(
+                                            'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
+                                            modelwise_setting['per_device_train_batch_size'],
+                                            _per_device_train_batch_size,
+                                            learning_setting['train_effective_batch_size'],
+                                        )
+                                        modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
+                                        accum_steps = 1
+                                    setting['gradient_accumulation_steps'] = accum_steps
 
-                                setting.update(get_model_name_settings(model_name))
+                                    setting.update(modelwise_setting)
 
-                                setting.update({
-                                    'seed': seed,
+                                    setting.update(get_model_name_settings(model_name))
 
-                                    'dataset_uname': dataset_uname,
-                                    'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
+                                    setting.update({
+                                        'seed': seed,
 
-                                    'base_config_name': base_config_name,
+                                        'dataset_uname': dataset_uname,
+                                        'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
 
-                                    'lm_type': lm_type,
-                                    'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
+                                        'base_config_name': base_config_name,
 
-                                    'save_total_limit': save_total_limit,
+                                        'lm_type': lm_type,
+                                        'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
-                                    # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                    'proof_sampling': proof_sampling,
-                                    'learning': learning,
-                                    'sample_negative_proof': sample_negative_proof,
+                                        'save_total_limit': save_total_limit,
 
-                                    'learning_rate': _lrate,
+                                        # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                        'proof_sampling': proof_sampling,
+                                        'learning': learning,
+                                        'sample_negative_proof': sample_negative_proof,
+                                        'no_subproof_for_unknown': no_subproof_for_unknown,
 
-                                    # 'n_gpu': 1,
-                                    'dataloader_num_workers': 0,
+                                        'learning_rate': _lrate,
 
-                                    'generation_timeout': generation_timeout,
+                                        # 'n_gpu': 1,
+                                        'dataloader_num_workers': 0,
 
-                                    'use_auth_token': True,
+                                        'generation_timeout': generation_timeout,
 
-                                    'log_examples': True,
-                                })
+                                        'use_auth_token': True,
 
-                                output_dir = make_output_dir(setting, output_top_dir)
-                                command = make_command(output_dir,
-                                                       setting,
-                                                       run_mode,
-                                                       n_gpus=n_gpus)
+                                        'log_examples': True,
+                                    })
 
-                                run_by_engine(
-                                    engine,
-                                    command,
-                                    output_dir,
-                                    hours=hours,
-                                    dry_run=dry_run
-                                )
+                                    output_dir = make_output_dir(setting, output_top_dir)
+                                    command = make_command(output_dir,
+                                                           setting,
+                                                           run_mode,
+                                                           n_gpus=n_gpus)
+
+                                    run_by_engine(
+                                        engine,
+                                        command,
+                                        output_dir,
+                                        hours=hours,
+                                        dry_run=dry_run
+                                    )
 
     logger.info('------------- ./01.train.py finished !! -----------')
 

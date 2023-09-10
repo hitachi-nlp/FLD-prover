@@ -297,6 +297,21 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
+        # 'cyberagent/open-calm-1b.all_at_once': {
+        #     # 'tokenizer_padding': 'max_length',
+        #     'tokenizer_padding': 'longest',
+
+        #     'max_source_length': 2000,
+        #     'max_target_length': 2000,
+
+        #     'per_device_train_batch_size': 4,
+        #     'per_device_eval_batch_size': 2,
+        #     'gradient_checkpointing': True,
+
+        #     'lora': False,
+        #     'generation_num_beams': 1,
+        # },
+
         'cyberagent/open-calm-3b.all_at_once': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
@@ -871,6 +886,7 @@ _PROVER_CONFIGS = {
         # 'subtree_proved_prob': 0.75,
         # 'subtree_proved_all_or_none': False,
         'sample_negative_proof': False,
+        'no_subproof_for_unknown': False,
         'per_device_train_batch_size': 3,
         'per_device_eval_batch_size': 3,
         'dataloader_num_workers': 2,

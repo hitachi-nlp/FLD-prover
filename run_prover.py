@@ -316,6 +316,10 @@ class DataTrainingArguments:
         default=False,
     )
 
+    no_subproof_for_unknown: bool = field(
+        default=False,
+    )
+
     generation_max_proof_steps: int = field(
         default=20,
     )
@@ -864,7 +868,8 @@ def main():
             serial = serialize(
                 deduction,
                 stepwise = (data_args.proof_sampling == 'stepwise'),
-                sample_negative_proof=data_args.sample_negative_proof if data_args.proof_sampling == 'stepwise' else False,
+                sample_negative_proof = data_args.sample_negative_proof if split == 'train' else False,
+                include_max_subproof_for_unknown = not data_args.no_subproof_for_unknown,
             )
 
             prompt_with_partial_proof = prefix + serial.prompt + (serial.partial_proof or '')
@@ -872,7 +877,7 @@ def main():
             gold_proof = serial.proofs[0]
             # check whther the tokenizer can recognize stance markers
             gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([gold_proof],
-                                                                          whole_proof_max_length)["input_ids"][0])
+                                                                        whole_proof_max_length)["input_ids"][0])
             if len(get_stance_markers(gold_proof_dec)) == 0:
                 raise ValueError(
                     '\n'.join([
@@ -885,6 +890,7 @@ def main():
             prompts_w_partial_proof.append(prompt_with_partial_proof)
             proof_steps.append(serial.next_proof_step)
             gold_proofs.append(gold_proof)
+
 
             if data_args.log_examples:
                 logger.info('------------------------------ preprocess_function [example=%d] ------------------------------', i_example)
