@@ -55,7 +55,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS')
     # output_top_dir = Path('./outputs/01.train.py/20230905.LLM_FS.max_steps_upper=1000')
     # output_top_dir = Path('./outputs/01.train.py/20230910.find_bugs')
-    output_top_dir = Path('./outputs/01.train.py/20230910.rigid_comparison')
+    # output_top_dir = Path('./outputs/01.train.py/20230910.rigid_comparison')
+
+    output_top_dir = Path('./outputs/01.train.py/20230910.preliminary')
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
@@ -86,9 +88,9 @@ def main():
 
         # ---------------------------------- 20230904.jpn ------------------------------------
         '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        # '20230904.jpn.D1.wo_brnch',
+        '20230904.jpn.D1.wo_brnch',
         '20230904.jpn.D1',
-        # '20230904.jpn.D3',
+        '20230904.jpn.D3',
     ]
 
     model_settings = [
@@ -123,20 +125,20 @@ def main():
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
@@ -162,9 +164,9 @@ def main():
         # 'FT.step-100000',
 
         # 'LLM_FS.shot-1',
-        # 'LLM_FS.shot-10',
+        'LLM_FS.shot-10',
         'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
+        'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
     ]
 
@@ -180,25 +182,12 @@ def main():
     ]
     max_steps_upper = 300
 
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
-
-    sample_negative_proof_args = [
-        # True,
-        False,
-    ]
-
-    no_subproof_for_unknown_args = [
-        True,   # better
-        # False,
-    ]
-
     # engine = SubprocessEngine()
     engine = QsubEngine('ABCI', 'rt_G.large')
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    n_gpus = 1  # debug
-    # n_gpus = 4
+    # n_gpus = 1  # debug
+    n_gpus = 4
 
     # gpu_name_for_batch_size = 'A100_48_1'
     gpu_name_for_batch_size = 'V100_16_4.deepspeed'
@@ -232,6 +221,18 @@ def main():
 
     # ------------------------------------------------------------
 
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
+
+    sample_negative_proof_args = [
+        # True,
+        False,
+    ]
+
+    no_subproof_for_unknown_args = [
+        True,   # better
+        # False,
+    ]
 
     if isinstance(engine, QsubEngine):
         if engine.resource == 'rt_G.small':
