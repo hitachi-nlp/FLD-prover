@@ -57,7 +57,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230910.find_bugs')
     # output_top_dir = Path('./outputs/01.train.py/20230910.rigid_comparison')
 
-    output_top_dir = Path('./outputs/01.train.py/20230910.preliminary')
+    # output_top_dir = Path('./outputs/01.train.py/20230910.preliminary')
+    # output_top_dir = Path('./outputs/01.train.py/20230911.FT.gpt')
+
+    output_top_dir = Path('./outputs/01.train.py/20230912.FT.gpt')
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
@@ -87,9 +90,9 @@ def main():
         # '20230901.random_transitive_verbs.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        '20230904.jpn.D1.wo_brnch',
-        '20230904.jpn.D1',
+        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch',
+        # '20230904.jpn.D1',
         '20230904.jpn.D3',
     ]
 
@@ -113,10 +116,10 @@ def main():
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
         # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
-        # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
+        ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
         # # # # # -------------- > 1B params --------------
 
@@ -125,9 +128,9 @@ def main():
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
@@ -138,8 +141,8 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -159,14 +162,14 @@ def main():
         # 'FS.shot-100',
         # 'FT.step-5000',
         # 'FT.step-8100',
-        # 'FT.step-20000',
+        'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
 
         # 'LLM_FS.shot-1',
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
     ]
 
@@ -176,9 +179,9 @@ def main():
     ]
 
     epochs_list = [
-        # None,
+        None,
 
-        50,
+        # 50,
     ]
     max_steps_upper = 300
 
@@ -187,24 +190,29 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
     # n_gpus = 1  # debug
-    n_gpus = 4
+    # n_gpus = 4
+    n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
-    gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+    # gpu_name_for_batch_size = 'V100_16_4'
+    # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-    save_total_limit = 0
-    # save_total_limit = 1
+    # save_model = True
+    save_model = False
 
     # generation_timeout = 0
     generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
 
     dry_run = False
 
-    hours = 24
+    # hours = 12
+    hours = 72
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
@@ -235,6 +243,11 @@ def main():
     ]
 
     if isinstance(engine, QsubEngine):
+        if gpu_name_for_batch_size is not None:
+            raise ValueError()
+        if n_gpus is not None:
+            raise ValueError()
+
         if engine.resource == 'rt_G.small':
             n_gpus = 1
             gpu_name_for_batch_size = 'V100_16_1'
@@ -312,8 +325,11 @@ def main():
                                     setting['max_train_samples'] = max_train_samples or setting['max_train_samples']
                                     setting['max_eval_samples'] = max_eval_samples or setting['max_eval_samples']
 
-                                    setting.update(get_save_eval_step_setting(max_steps=setting['max_steps'],
-                                                                              eval_steps=setting['eval_steps']))
+                                    setting.update(get_save_eval_step_setting(
+                                        max_steps=setting['max_steps'],
+                                        eval_steps=setting['eval_steps'],
+                                        do_save_model=save_model,
+                                    ))
 
                                     modelwise_setting = get_batch_setting(
                                         gpu_name_for_batch_size,
@@ -349,7 +365,7 @@ def main():
                                         'lm_type': lm_type,
                                         'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
-                                        'save_total_limit': save_total_limit,
+                                        # 'save_total_limit': save_total_limit,
 
                                         # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
                                         'proof_sampling': proof_sampling,

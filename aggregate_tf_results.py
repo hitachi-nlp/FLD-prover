@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 import json
 from collections import defaultdict
+import re
 
 import pandas as pd
 from logger_setup import setup as setup_logger
@@ -54,7 +55,7 @@ def main(input_dir, output_dir, log_level):
         'warmup_steps',
     ]
 
-    TF_NAMES = [
+    METRIC_NAMES = [
         'eval/extr_stps.D-0.proof_accuracy.zero_one',
         'eval/extr_stps.D-1.proof_accuracy.zero_one',
         'eval/extr_stps.D-2.proof_accuracy.zero_one',
@@ -104,34 +105,47 @@ def main(input_dir, output_dir, log_level):
         'eval/strct.D-all.answer_accuracy',
     ]
 
+    read_from_eval_json = True
     df_dict = defaultdict(list)
     for _input_dir in input_dirs:
         for tensorboard_dir in _input_dir.glob('**/*/tensorboard_log'):
-            tf_df = read_as_dataframe(str(tensorboard_dir))
-            if 'step' not in tf_df.columns:
-                logger.warning('skip the results under "%s"', str(tensorboard_dir))
-                continue
 
-            lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
+            if read_from_eval_json:
+                lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
+                for name in LAB_ATTR_NAMES:
+                    df_dict[name].append(lab_setting.get(name, None))
 
-            for name in LAB_ATTR_NAMES:
-                df_dict[name].append(lab_setting.get(name, None))
+                eval_results = json.load(open(tensorboard_dir.parent / 'eval_results.json'))
+                for metric_name in METRIC_NAMES:
+                    json_metric_name = re.sub('eval/', 'eval_', metric_name)
+                    df_dict[metric_name].append(eval_results.get(json_metric_name, None))
 
-            max_step = tf_df['step'].max()
+            else:
 
-            max_step_df = tf_df[tf_df['step'] == max_step]
-            logger.info('loading results from max_step=%d', max_step)
-            for tf_name in TF_NAMES:
-                tag_df = max_step_df[max_step_df['tag'] == tf_name]
-                if len(tag_df) == 0:
-                    df_dict[tf_name].append(None)
-                elif len(tag_df) == 1:
-                    df_dict[tf_name].append(tag_df.iloc[0]['value'])
-                elif len(tag_df) >= 2:
-                    first_value = tag_df['value'].iloc[0]
-                    if not tag_df['value'].map(lambda val: val == first_value).all():
-                        raise ValueError()
-                    df_dict[tf_name].append(first_value)
+                tf_df = read_as_dataframe(str(tensorboard_dir))
+                if 'step' not in tf_df.columns:
+                    logger.warning('skip the results under "%s"', str(tensorboard_dir))
+                    continue
+
+                lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
+                for name in LAB_ATTR_NAMES:
+                    df_dict[name].append(lab_setting.get(name, None))
+
+                max_step = tf_df['step'].max()
+
+                max_step_df = tf_df[tf_df['step'] == max_step]
+                logger.info('loading results from max_step=%d', max_step)
+                for metric_name in METRIC_NAMES:
+                    tag_df = max_step_df[max_step_df['tag'] == metric_name]
+                    if len(tag_df) == 0:
+                        df_dict[metric_name].append(None)
+                    elif len(tag_df) == 1:
+                        df_dict[metric_name].append(tag_df.iloc[0]['value'])
+                    elif len(tag_df) >= 2:
+                        first_value = tag_df['value'].iloc[0]
+                        if not tag_df['value'].map(lambda val: val == first_value).all():
+                            raise ValueError()
+                        df_dict[metric_name].append(first_value)
 
     merged_df = pd.DataFrame(df_dict)
     print(merged_df)

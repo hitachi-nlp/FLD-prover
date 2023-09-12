@@ -38,6 +38,42 @@ _BATCH_SETTINGS = {
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
     # thus, we can measure the maxmum usage of memory.
 
+
+    'V100_16_4': {
+        'cyberagent/open-calm-small.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+
+        'cyberagent/open-calm-medium.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+    },
+
+
+
+
     'V100_16_4.deepspeed': {
 
         't5-base': {
@@ -901,9 +937,8 @@ _PROVER_CONFIGS = {
         'log_examples': False,
         # 'no_lower': True,
 
-        'evaluation_strategy': 'steps',
-        'save_strategy': 'steps',
-
+        # 'evaluation_strategy': 'steps',
+        # 'save_strategy': 'steps',
         'logging_strategy': 'steps',
 
     },
@@ -1276,6 +1311,8 @@ def get_learning_setting(name: str,
 
             'use_test_as_train': False,
             'use_test_as_val': True,
+
+            'no_lr_decay': True,
         }
 
     else:
@@ -1362,15 +1399,23 @@ def get_model_name_settings(model_name_or_path: str) -> Dict[str, Any]:
         return {'model_name_or_path': model_name_or_path}
 
 
-def get_save_eval_step_setting(max_steps: Optional[int] = None,
-                               eval_steps: Optional[int] = None) -> Dict[str, Any]:
+def get_save_eval_step_setting(eval_steps: Optional[int] = None,
+                               do_save_model=False,
+                               max_steps: Optional[int] = None) -> Dict[str, Any]:
     setting = {}
-    if max_steps is not None:
-        if eval_steps is not None:
-            setting['eval_steps'] = eval_steps
-        if setting['eval_steps'] > max_steps:
-            setting['eval_steps'] = max_steps
-    setting['save_steps'] = setting.get('eval_steps', None)
+
+    if eval_steps is not None:
+        setting['eval_steps'] = eval_steps
+        setting['evaluation_strategy'] = 'steps'
+
+    if max_steps is not None and setting['eval_steps'] > max_steps:
+        setting['eval_steps'] = max_steps
+
+    if do_save_model:
+        setting['save_steps'] = setting.get('eval_steps', None)
+        setting['save_strategy'] = 'steps'
+        setting['save_total_limit'] = 1  # XXX "0" saves all the checkpoints
+
     return setting
 
 
@@ -1432,6 +1477,8 @@ def make_command(output_dir: Union[str, Path],
 
         'use_test_as_train',
         'use_test_as_val',
+
+        'no_lr_decay',
     ]
 
     commands: List[str] = []
@@ -1475,9 +1522,14 @@ def make_command(output_dir: Union[str, Path],
         # if cuda_devices_org is not None:
         #     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_devices_org
 
+        if setting.get('no_lr_decay', False):
+            ds_config = 'ds_config/ds_config_zero3.json'
+        else:
+            ds_config = 'ds_config/ds_config_zero3.lr_decay.json'
+
         commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
                         f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
-                        ' --deepspeed ds_config/ds_config_zero3.json')
+                        f' --deepspeed {ds_config}')
 
     else:
         ValueError()
