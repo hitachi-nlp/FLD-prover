@@ -40,6 +40,37 @@ _BATCH_SETTINGS = {
 
 
     'V100_16_4': {
+
+        'retrieva-jp/t5-base-long': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 2,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+
+        'retrieva-jp/t5-base-long.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+
         'cyberagent/open-calm-small.all_at_once': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
@@ -1047,22 +1078,6 @@ LEARNING_SETTINGS = {
         'use_test_as_val': True,
     },
 
-    'FT.step-8100': {
-        'max_train_samples': None,
-        # 'max_eval_samples': 2000,
-        # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
-        'max_predict_samples': 1000,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 8100,
-        'eval_steps': 4000,
-        'warmup_steps': 1000,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
     # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
     # -- pre-training: FLNL (arg-FLNL)
     'FT.step-20000': {
@@ -1169,8 +1184,8 @@ LEARNING_SETTINGS = {
         'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
-        'max_steps': 300,
-        'eval_steps': 300,
+        'max_steps': 100,
+        'eval_steps': 100,
         'warmup_steps': 0,
 
         'use_test_as_train': True,
@@ -1543,10 +1558,11 @@ def make_command(output_dir: Union[str, Path],
         if name in unused_option_names:
             continue
 
-        if isinstance(value, bool):
-            commands.append(maybe_option_flag(f'--{name}', setting.get(name, False)))
-        else:
-            commands.append(maybe_option_value(f'--{name}', setting.get(name, None)))
+        # if isinstance(value, bool):
+        #     commands.append(f'--{name}={str(value)}')
+        # else:
+        #     commands.append(maybe_option_value(f'--{name}', value))
+        commands.append(maybe_option_value(f'--{name}', value))
 
     return ' '.join(commands)
 
@@ -1613,6 +1629,7 @@ def make_output_dir(setting: Dict,
 
             'do_train',
             'do_eval',
+            'do_eval_in_outerloop',
             'do_predict',
 
             'estimated_batches_per_epoch',

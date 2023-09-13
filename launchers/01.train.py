@@ -60,9 +60,12 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230910.preliminary')
     # output_top_dir = Path('./outputs/01.train.py/20230911.FT.gpt')
 
-    output_top_dir = Path('./outputs/01.train.py/20230912.FT.gpt')
+    # output_top_dir = Path('./outputs/01.train.py/20230912.FT.gpt')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/20230912.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20230913.log_generation')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -70,6 +73,7 @@ def main():
         './outputs.FLD/00.create_corpus/20230826.jpn',
         './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
         './outputs.FLD/00.create_corpus/20230904.jpn',
+        './outputs.FLD/00.create_corpus/20230912.jpn',
     ]
 
     dataset_unames = [
@@ -93,7 +97,10 @@ def main():
         # '20230904.jpn.D1.wo_brnch.wo_dstrct',
         # '20230904.jpn.D1.wo_brnch',
         # '20230904.jpn.D1',
-        '20230904.jpn.D3',
+        # '20230904.jpn.D3',
+
+        # ---------------------------------- 20230912.jpn ------------------------------------
+        '20230912.jpn.D3',
     ]
 
     model_settings = [
@@ -116,7 +123,7 @@ def main():
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
         # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
         ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
@@ -148,10 +155,13 @@ def main():
 
     ]
 
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
+
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
-        # 'debug.micro',
+        'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
         # 'debug.middle',
@@ -161,8 +171,7 @@ def main():
         # 'FS.shot-10',
         # 'FS.shot-100',
         # 'FT.step-5000',
-        # 'FT.step-8100',
-        'FT.step-20000',
+        # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
 
@@ -185,26 +194,35 @@ def main():
     ]
     max_steps_upper = 300
 
-    # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large')
+    engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.large')
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
     # n_gpus = 1  # debug
-    # n_gpus = 4
-    n_gpus = None  # specify this when running through QsubEngine
+    n_gpus = 4
+    # n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
-    # gpu_name_for_batch_size = 'V100_16_4'
+    gpu_name_for_batch_size = 'V100_16_4'
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
-
+    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
 
     # save_model = True
     save_model = False
+
+    sample_negative_proof_args = [
+        # True,
+        False,
+    ]
+
+    no_subproof_for_unknown_args = [
+        True,   # better
+        # False,
+    ]
 
     # generation_timeout = 0
     generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
@@ -228,19 +246,6 @@ def main():
     # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
 
     # ------------------------------------------------------------
-
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
-
-    sample_negative_proof_args = [
-        # True,
-        False,
-    ]
-
-    no_subproof_for_unknown_args = [
-        True,   # better
-        # False,
-    ]
 
     if isinstance(engine, QsubEngine):
         if gpu_name_for_batch_size is not None:
@@ -278,7 +283,6 @@ def main():
     max_eval_samples = None
 
     for dataset_uname in dataset_unames:
-
         for learning in learnings:
             for epoch in epochs_list:
                 if dataset_push_to_hub_repo_name is not None:
@@ -318,7 +322,8 @@ def main():
 
                                     setting.update({
                                         'do_train': True,
-                                        'do_eval': False,
+                                        # 'do_eval': True,   # automatically set by evaluation_strategy=step
+                                        'do_eval_in_outerloop': False,
                                         'do_predict': False,
                                     })
 

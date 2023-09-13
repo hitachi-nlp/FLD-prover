@@ -184,6 +184,9 @@ class DataTrainingArguments:
             )
         },
     )
+    do_eval_in_outerloop: bool = field(
+        default=False,
+    )
     test_file: Optional[str] = field(
         default=None,
         metadata={
@@ -700,26 +703,6 @@ def main():
 
     prefix = data_args.source_prefix if data_args.source_prefix is not None else ""
 
-    # Preprocessing the datasets.
-    # We need to tokenize inputs and targets.
-    if training_args.do_train:
-        if "train" not in raw_datasets:
-            raise ValueError("--do_train requires a train dataset")
-        # column_names = raw_datasets["train"].column_names
-    elif training_args.do_eval:
-        if "validation" not in raw_datasets:
-            raise ValueError("--do_eval requires a validation dataset")
-        # column_names = raw_datasets["validation"].column_names
-    elif training_args.do_predict:
-        if "test" not in raw_datasets:
-            raise ValueError("--do_predict requires a test dataset")
-        # column_names = raw_datasets["test"].column_names
-    elif data_args.interactive_mode is not None:
-        pass
-    else:
-        logger.info("There is nothing to do. Please pass `do_train`, `do_eval` and/or `do_predict`.")
-        return
-
     if isinstance(tokenizer, tuple(MULTILINGUAL_TOKENIZERS)):
         assert (
             data_args.lang is not None
@@ -735,24 +718,6 @@ def main():
         )
         model.config.forced_bos_token_id = forced_bos_token_id
 
-    # Get the column names for input/target.
-    # dataset_columns = summarization_name_mapping.get(data_args.dataset_name, None)
-    # if data_args.text_column is None:
-    #     text_column = dataset_columns[0] if dataset_columns is not None else column_names[0]
-    # else:
-    #     text_column = data_args.text_column
-    #     if text_column not in column_names:
-    #         raise ValueError(
-    #             f"--text_column' value '{data_args.text_column}' needs to be one of: {', '.join(column_names)}"
-    #         )
-    # if data_args.summary_column is None:
-    #     summary_column = dataset_columns[1] if dataset_columns is not None else column_names[1]
-    # else:
-    #     summary_column = data_args.summary_column
-    #     if summary_column not in column_names:
-    #         raise ValueError(
-    #             f"--summary_column' value '{data_args.summary_column}' needs to be one of: {', '.join(column_names)}"
-    #         )
     context_column = 'context'
     next_step_column = 'next_step'
     gold_proof_column = 'gold_proof'
@@ -949,15 +914,12 @@ def main():
             elif lm_type == LMType.CAUSAL:
                 _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
 
-                # generation_init()
-                # trainer.gen_kwargs = make_gen_kwargs()
                 forward_inputs.update(
                     prepare_tokenized_inputs(
                         _prompts,
                         data_args.max_source_length,
                         # add_special_tokens=False
                     ))
-                # generation_exit()
 
                 # the padding is arbitrary
                 forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
@@ -993,14 +955,18 @@ def main():
             train_dataset = train_dataset.select(range(max_train_samples))
         train_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'train'))
+    else:
+        train_dataset = None
 
-    if training_args.do_eval:
+    if training_args.do_eval or data_args.do_eval_in_outerloop:
         eval_dataset = raw_datasets["validation"]
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
         eval_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval'))
+    else:
+        eval_dataset = None
 
     if training_args.do_predict:
         predict_dataset = raw_datasets["test"]
@@ -1009,6 +975,8 @@ def main():
             predict_dataset = predict_dataset.select(range(max_predict_samples))
         predict_dataset.set_transform(
             lambda examples: preprocess_function(examples, 'eval'))
+    else:
+         predict_dataset = None
 
     # Data collator
     label_pad_token_id = ignore_index if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
@@ -1133,7 +1101,7 @@ def main():
                             context=context,
                         )
                     except Exception as e:
-                        print(e)
+                        logger.warning('calc_metrics() failed due to the following error. this sample will be skipped from metrics: %s', str(e))
                         _metrics = {}
                     depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
                               else ['all', 'None'])
@@ -1182,11 +1150,13 @@ def main():
         pad_token_id_org = model.config.eos_token_id
 
         def generation_init_special_tokens():
+            logger.info('generation_init_special_tokens() called!')
             tokenizer.padding_side = 'left'
             tokenizer.pad_token = tokenizer.eos_token
             model.config.pad_token_id = model.config.eos_token_id
 
         def generation_exit_special_tokens():
+            logger.info('generation_exit_special_tokens() called!')
             tokenizer.padding_side = padding_side_org
             tokenizer.pad_token = pad_token_org
             model.config.pad_token_id = pad_token_id_org
@@ -1224,8 +1194,8 @@ def main():
     trainer = StepWiseGenerationTrainer(
         model=model,
         args=training_args,
-        train_dataset=train_dataset if training_args.do_train else None,
-        eval_dataset=eval_dataset if training_args.do_eval else None,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         data_collator=data_collator,
         tokenizer=tokenizer,
         max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
@@ -1258,7 +1228,7 @@ def main():
 
     # Evaluation
     results = {}
-    if training_args.do_eval:
+    if data_args.do_eval_in_outerloop:
         logger.info("*** Evaluate ***")
 
         metrics = trainer.evaluate(metric_key_prefix="eval")
