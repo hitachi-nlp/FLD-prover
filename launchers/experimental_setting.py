@@ -41,6 +41,21 @@ _BATCH_SETTINGS = {
 
     'V100_16_4': {
 
+        'google/mt5-base.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+
         'retrieva-jp/t5-base-long': {
             # 'tokenizer_padding': 'max_length',
             'tokenizer_padding': 'longest',
@@ -100,6 +115,22 @@ _BATCH_SETTINGS = {
             'lora': False,
             'generation_num_beams': 1,
         },
+
+        'gpt2-medium.max_pos_1000.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 8,
+            'per_device_eval_batch_size': 4,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
+
     },
 
 
@@ -313,6 +344,20 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
+        'facebook/xglm-564M.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'lora': False,
+            'generation_num_beams': 1,
+        },
 
 
 
@@ -1078,13 +1123,106 @@ LEARNING_SETTINGS = {
         'use_test_as_val': True,
     },
 
+    'FT.step-5000.LLM': {
+        'max_train_samples': None,
+        'max_eval_samples': 100,
+        'max_predict_samples': 100,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 5000,
+        'eval_steps': 1600,
+        'warmup_steps': 100,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+    'FT.step-10000.LLM': {
+        'max_train_samples': None,
+        'max_eval_samples': 100,
+        'max_predict_samples': 100,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10000,
+        'eval_steps': 2000,
+        'warmup_steps': 100,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
     # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
     # -- pre-training: FLNL (arg-FLNL)
+    'FT.step-10000.mx_evl-100': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 100,
+        'max_predict_samples': 1000,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10000,
+        'eval_steps': 1000,
+        'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+    'FT.step-10000.mx_evl-100.btch_sz-8': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 100,
+        'max_predict_samples': 1000,
+
+        'train_effective_batch_size': 8,
+        'max_steps': 10000,
+        'eval_steps': 1000,
+        'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+    'FT.step-100000.mx_evl-100.btch_sz-8': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 100,
+        'max_predict_samples': 1000,
+
+        'train_effective_batch_size': 8,
+        'max_steps': 100000,
+        'eval_steps': 10000,
+        'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+
     'FT.step-20000': {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
         'max_eval_samples': 500,
+        'max_predict_samples': 1000,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 20000,
+        'eval_steps': 5000,
+        'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+    'FT.step-20000.max_eval_300': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 300,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1256,6 +1394,21 @@ LEARNING_SETTINGS = {
         'use_test_as_val': True,
     },
 
+    'debug.20000.zero_warmup': {
+        'max_train_samples': None,
+        'max_eval_samples': 100,
+        'max_predict_samples': 100,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10000,
+        'eval_steps': 2000,
+        'warmup_steps': 0,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
+
     'push_to_hub': {
         'max_train_samples': 1,
         'max_eval_samples': 1,
@@ -1279,7 +1432,8 @@ LEARNING_SETTINGS = {
 def get_learning_setting(name: str,
                          epoch: Optional[int] = None,
                          steps: Optional[int] = None,
-                         max_steps_upper: Optional[int] = None) -> Dict[str, Any]:
+                         max_steps_upper: Optional[int] = None,
+                         max_eval_samples: Optional[int] = None) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
         if epoch is not None and steps is not None:
             raise ValueError()
@@ -1308,9 +1462,7 @@ def get_learning_setting(name: str,
             # evaluation before warmup is slow due to the repetitions
             eval_steps = total_steps
 
-        max_eval_samples = 30
-
-        return {
+        setting = {
             'max_train_samples': shot,
             'max_eval_samples': max_eval_samples,
             'max_predict_samples': 0,
@@ -1326,8 +1478,6 @@ def get_learning_setting(name: str,
 
             'use_test_as_train': False,
             'use_test_as_val': True,
-
-            'no_lr_decay': True,
         }
 
     else:
@@ -1335,7 +1485,12 @@ def get_learning_setting(name: str,
             raise ValueError()
         if steps is not None:
             raise ValueError()
-        return LEARNING_SETTINGS[name].copy()
+        setting = LEARNING_SETTINGS[name].copy()
+
+    if max_eval_samples is not None:
+        setting['max_eval_samples'] = max_eval_samples
+
+    return setting
 
 
 class CheckpointSpec(BaseModel):
@@ -1493,7 +1648,7 @@ def make_command(output_dir: Union[str, Path],
         'use_test_as_train',
         'use_test_as_val',
 
-        'no_lr_decay',
+        'deepspeed_no_lr_decay',
     ]
 
     commands: List[str] = []
@@ -1537,7 +1692,7 @@ def make_command(output_dir: Union[str, Path],
         # if cuda_devices_org is not None:
         #     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_devices_org
 
-        if setting.get('no_lr_decay', False):
+        if setting.get('deepspeed_no_lr_decay', False):
             ds_config = 'ds_config/ds_config_zero3.json'
         else:
             ds_config = 'ds_config/ds_config_zero3.lr_decay.json'
@@ -1657,6 +1812,7 @@ def make_output_dir(setting: Dict,
             'fp16',
             'generation_max_proof_steps',
             'generation_timeout',
+            ''
             'source_prefix',
             'logging_strategy',
 
@@ -1729,12 +1885,14 @@ _REJECTED_MODELS = [
 
     # ('stabilityai/japanese-stablelm-instruct-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
-    # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'cyberagent/open-calm-medium'),
+    # something wrong with tokenizer
+    # ('okazaki-lab/japanese-gpt2-medium-unidic', 'causal', 'gpt2-medium.max_pos_1000'),
 
     # ('rinna/japanese-gpt2-xsmall', 'causal', 'cyberagent/open-calm-small'),
     # ('rinna/japanese-gpt2-small', 'causal', 'cyberagent/open-calm-small'),
     # ('rinna/japanese-gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
 
+    # something wrong with tokenizer
     # ('ku-nlp/gpt2-small-japanese-char', 'causal', 'cyberagent/open-calm-small'),
     # ('ku-nlp/gpt2-medium-japanese-char', 'causal', 'cyberagent/open-calm-medium'),
 

@@ -248,6 +248,9 @@ class DataTrainingArguments:
     tokenizer_padding: Optional[str] = field(
         default=False,
     )
+    no_prompt_mask: Optional[bool] = field(
+        default=False,
+    )
 
     max_train_samples: Optional[int] = field(
         default=None,
@@ -440,6 +443,7 @@ class MaxTimeCriteriaWithWarning(StoppingCriteria):
 def main():
     logging.getLogger().handlers.clear()  # remove handler automatically added
     setup_logger(do_stderr=True, level=logging.INFO)
+    logging.getLogger('absl').setLevel(logging.WARNING)
     # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
@@ -844,7 +848,7 @@ def main():
             gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([gold_proof],
                                                                         whole_proof_max_length)["input_ids"][0])
             if len(get_stance_markers(gold_proof_dec)) == 0:
-                raise ValueError(
+                logger.warning(
                     '\n'.join([
                         'The tokenizer could not recognized the stance markers.',
                         f'The original proof: "{gold_proof}"',
@@ -881,22 +885,27 @@ def main():
             elif lm_type == LMType.CAUSAL:
                 # just for getting length
                 _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
-                prompt_ids = [
-                    prepare_tokenized_inputs(
-                        prompt,
-                        data_args.max_source_length,
-                        padding='longest',
-                        return_length=True,
-                        # add_special_tokens=False,
-                    )
-                    for prompt in _prompts
-                ]
-                prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
+
+                if data_args.no_prompt_mask:
+                    prompt_lengths = None
+                else:
+                    prompt_ids = [
+                        prepare_tokenized_inputs(
+                            prompt,
+                            data_args.max_source_length,
+                            padding='longest',
+                            return_length=True,
+                            # add_special_tokens=False,
+                        )
+                        for prompt in _prompts
+                    ]
+                    prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
 
                 inputs_with_targets = [f'{prompt}{proof_step}'
                                        for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
                 forward_inputs.update(prepare_tokenized_inputs(inputs_with_targets, data_args.max_source_length))
                 forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
+
                 forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"],
                                                                        mask_lengths=prompt_lengths)
             else:
@@ -1131,6 +1140,13 @@ def main():
     if lm_type == LMType.SEQ_2_SEQ:
         preprocess_logits_for_metrics = None
     elif lm_type == LMType.CAUSAL:
+        #def preprocess_logits_for_metrics(logits, labels):
+        #    if isinstance(logits, tuple):
+        #        # Depending on the model and config, logits may contain extra tensors,
+        #        # like past_key_values, but logits always come first
+        #        logits = logits[0]
+        #    return logits.argmax(dim=-1)
+
         preprocess_logits_for_metrics = None
         if data_args.proof_sampling == 'stepwise':
             raise ValueError('proof_sampling = "stepwise" is not suitable for LMType.CAUSAL')
