@@ -1153,6 +1153,22 @@ LEARNING_SETTINGS = {
 
     # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
     # -- pre-training: FLNL (arg-FLNL)
+    'FT.step-10000': {
+        'max_train_samples': None,
+        # 'max_eval_samples': 2000,
+        # 'max_predict_samples': 2000,
+        'max_eval_samples': 500,
+        'max_predict_samples': 1000,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 10000,
+        'eval_steps': 1000,
+        'warmup_steps': 1000,
+
+        'use_test_as_train': False,
+        'use_test_as_val': True,
+    },
+
     'FT.step-10000.mx_evl-100': {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,

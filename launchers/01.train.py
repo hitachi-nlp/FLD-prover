@@ -69,7 +69,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/zero_loss_check')
     # output_top_dir = Path('./outputs/01.train.py/20230914.prevent_overfitting')
 
-    output_top_dir = Path('./outputs/01.train.py/20230916.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20230916.jpn')
+    output_top_dir = Path('./outputs/01.train.py/20230916.jpn.FT')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -131,7 +132,7 @@ def main():
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
         # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
+        ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
         # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
@@ -141,28 +142,28 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+        # # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        # # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
 
-        # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
+        # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
+        # # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        # # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -182,7 +183,7 @@ def main():
         # 'FS.shot-10',
         # 'FS.shot-100',
         # 'FT.step-5000',
-        # 'FT.step-10000',
+        'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-20000.max_eval_300',
         # 'FT.step-50000',
@@ -191,11 +192,11 @@ def main():
         # 'FT.step-5000.LLM',
         # 'FT.step-10000.LLM',
 
-        'LLM_FS.shot-1',
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-1',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -208,12 +209,12 @@ def main():
     ]
 
     epochs_list = [
-        50,
-        # None,
+        # 50,
+        None,
     ]
 
-    max_steps_upper = 300
-    # max_steps_upper = None
+    # max_steps_upper = 300
+    max_steps_upper = None
 
     max_eval_samples = 100
     # max_eval_samples = None
@@ -232,8 +233,8 @@ def main():
     gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
 
     dry_run = False
 
