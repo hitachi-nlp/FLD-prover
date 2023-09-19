@@ -50,10 +50,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230911.FT.gpt')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20230916.jpn',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230916.jpn')
+
     input_dirs = [
-        './outputs/01.train.py/20230916.jpn',
+        './outputs/01.train.py/20230919.jpn',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230916.jpn')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230919.jpn')
 
     command = ' '.join([
         'python ./aggregate_tf_results.py',

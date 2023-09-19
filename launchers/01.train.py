@@ -73,7 +73,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.FT')
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting')
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.find_setting')
-    output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.no_lora')
+    # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.no_lora')
+
+    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -145,7 +148,7 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        # # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
         # # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
@@ -164,9 +167,9 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -216,12 +219,11 @@ def main():
         # None,
     ]
 
+    # TODO: make these options default of get_learning_setting()
     train_effective_batch_size = 32
-    # train_effective_batch_size = 8
     # train_effective_batch_size = None
 
     steps_upper = 300
-    # steps_upper = 1000
     # steps_upper = None
 
     warmup_ratio = 0.3
