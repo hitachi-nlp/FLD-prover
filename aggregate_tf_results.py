@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 @click.option('--input_dir', multiple=True, default=[])
 @click.option('--output_dir', default=None)
 @click.option('--log-level', default='INFO')
-def main(input_dir, output_dir, log_level):
+@click.option('--read-from-eval-json', is_flag=True, default=False)
+def main(input_dir, output_dir, log_level, read_from_eval_json):
     setup_logger(level=log_level)
     input_dirs = [Path(_input_dir) for _input_dir in input_dir]
     output_dir = Path(output_dir) if output_dir is not None else None
@@ -105,7 +106,6 @@ def main(input_dir, output_dir, log_level):
         'eval/strct.D-all.answer_accuracy',
     ]
 
-    read_from_eval_json = True
     df_dict = defaultdict(list)
     for _input_dir in input_dirs:
         for tensorboard_dir in _input_dir.glob('**/*/tensorboard_log'):
@@ -131,12 +131,15 @@ def main(input_dir, output_dir, log_level):
                 for name in LAB_ATTR_NAMES:
                     df_dict[name].append(lab_setting.get(name, None))
 
-                max_step = tf_df['step'].max()
+                evaluated_metric = [metric_name for metric_name in METRIC_NAMES
+                                    if metric_name in tf_df['tag'].values][0]
+                final_evalation_step = tf_df[tf_df['tag'] == evaluated_metric]['step'].max()
+                final_evalation_df = tf_df[tf_df['step'] == final_evalation_step]
+                logger.info('loading metirc results from the final evaluation step = %d', final_evalation_step)
 
-                max_step_df = tf_df[tf_df['step'] == max_step]
-                logger.info('loading results from max_step=%d', max_step)
                 for metric_name in METRIC_NAMES:
-                    tag_df = max_step_df[max_step_df['tag'] == metric_name]
+                    tag_df = final_evalation_df[final_evalation_df['tag'] == metric_name]
+
                     if len(tag_df) == 0:
                         df_dict[metric_name].append(None)
                     elif len(tag_df) == 1:

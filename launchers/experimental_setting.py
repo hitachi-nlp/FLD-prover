@@ -52,7 +52,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -67,7 +66,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -82,7 +80,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -97,7 +94,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -112,7 +108,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -127,7 +122,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -149,7 +143,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             # 'generation_num_beams': 10,
             'generation_num_beams': 1,
         },
@@ -165,7 +158,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             # 'generation_num_beams': 10,
             'generation_num_beams': 1,
         },
@@ -189,7 +181,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -204,7 +195,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -219,7 +209,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -234,7 +223,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -249,7 +237,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 8,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -264,7 +251,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 8,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -279,7 +265,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -294,7 +279,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -310,7 +294,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -325,7 +308,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -340,7 +322,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -355,7 +336,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -375,7 +355,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -390,7 +369,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,  # to align with 1B> models
             'generation_num_beams': 1,
         },
 
@@ -405,7 +383,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -420,7 +397,6 @@ _BATCH_SETTINGS = {
         #     'per_device_eval_batch_size': 2,
         #     'gradient_checkpointing': True,
 
-        #     'lora': False,
         #     'generation_num_beams': 1,
         # },
 
@@ -435,7 +411,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -450,7 +425,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -465,7 +439,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,    # XXX lora=False does not fit into the memory even we set batch_size=1 and num_beams=1
             'generation_num_beams': 1,
         },
 
@@ -490,7 +463,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             # 'generation_num_beams': 10,
             'generation_num_beams': 1,
         },
@@ -506,7 +478,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             # 'generation_num_beams': 10,
             'generation_num_beams': 1,
         },
@@ -530,7 +501,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -545,7 +515,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 8,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -560,7 +529,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -575,7 +543,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -590,7 +557,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 8,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -605,7 +571,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 8,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -620,7 +585,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 4,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -635,7 +599,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -650,7 +613,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -665,7 +627,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -680,7 +641,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -695,7 +655,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': False,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -710,7 +669,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': False,
             'generation_num_beams': 1,
         },
 
@@ -725,7 +683,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 2,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -740,7 +697,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -755,7 +711,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -770,7 +725,6 @@ _BATCH_SETTINGS = {
             'per_device_eval_batch_size': 1,
             'gradient_checkpointing': True,
 
-            'lora': True,
             'generation_num_beams': 1,
         },
 
@@ -956,7 +910,7 @@ _PROVER_CONFIGS = {
         'seed': 42,
         # 'n_gpu': 1,
         'max_grad_norm': 0.5,
-        # 'num_train_epochs': 10,
+        'num_train_epochs': None,
         'max_steps': 10000,
         'gradient_accumulation_steps': 11,
         # 'check_val_every_n_epoch': 1,
@@ -1057,13 +1011,12 @@ _VERIFIER_CHECKPOINTS = {
 }
 
 
-LEARNING_SETTINGS = {
+LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
     'FS.shot-0': {
         'max_train_samples': 0,
         'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
-        'num_train_epochs': None,
         'warmup_steps': 0,
 
         'train_effective_batch_size': 64,
@@ -1079,7 +1032,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
-        'num_train_epochs': None,
         'warmup_steps': 500,
 
         'train_effective_batch_size': 64,
@@ -1095,7 +1047,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 500,
         'max_predict_samples': 2000,
 
-        'num_train_epochs': None,
         'warmup_steps': 500,
 
         'train_effective_batch_size': 64,
@@ -1303,8 +1254,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 100,
         'max_predict_samples': 1,
 
-        'num_train_epochs': None,
-
         'train_effective_batch_size': 64,
         'max_steps': 1,
         'eval_steps': 1,
@@ -1318,8 +1267,6 @@ LEARNING_SETTINGS = {
         'max_train_samples': 1,
         'max_eval_samples': 1,
         'max_predict_samples': 1,
-
-        'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
         'max_steps': 10,
@@ -1335,8 +1282,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 1,
         'max_predict_samples': 1,
 
-        'num_train_epochs': None,
-
         'train_effective_batch_size': 64,
         'max_steps': 100,
         'eval_steps': 100,
@@ -1350,8 +1295,6 @@ LEARNING_SETTINGS = {
         'max_train_samples': 1,
         'max_eval_samples': 1,
         'max_predict_samples': 1,
-
-        'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
         'max_steps': 3000,    # need more steps for convergence
@@ -1367,8 +1310,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 10,
         'max_predict_samples': 10,
 
-        'num_train_epochs': None,
-
         'train_effective_batch_size': 64,
         'max_steps': 300,
         'eval_steps': 300,
@@ -1383,8 +1324,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 100,
         'max_predict_samples': 100,
 
-        'num_train_epochs': None,
-
         'train_effective_batch_size': 64,
         'max_steps': 300,
         'eval_steps': 300,
@@ -1398,8 +1337,6 @@ LEARNING_SETTINGS = {
         'max_train_samples': 16,
         'max_eval_samples': 16,
         'max_predict_samples': 16,
-
-        'num_train_epochs': None,
 
         'train_effective_batch_size': 64,
         'max_steps': 10,
@@ -1430,7 +1367,6 @@ LEARNING_SETTINGS = {
         'max_eval_samples': 1,
         'max_predict_samples': 0,
 
-        'num_train_epochs': None,
         'train_effective_batch_size': 32,
         'warmup_steps': 0,
         'max_steps': 1,
@@ -1448,50 +1384,50 @@ LEARNING_SETTINGS = {
 def get_learning_setting(name: str,
                          epoch: Optional[int] = None,
                          steps: Optional[int] = None,
-                         max_steps_upper: Optional[int] = None,
-                         max_eval_samples: Optional[int] = None) -> Dict[str, Any]:
+                         steps_upper: Optional[int] = None,
+                         warmup_steps: Optional[int] = None,
+                         warmup_ratio: Optional[float] = None,
+                         train_effective_batch_size: Optional[int] = None,
+                         num_evals: Optional[int] = None,
+                         max_eval_samples: Optional[int] = None,
+                         ) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
         if epoch is not None and steps is not None:
             raise ValueError()
         if epoch is None and steps is None:
             raise ValueError()
 
+        max_train_samples = int(name[len('LLM_FS.shot-'):])
+
+        train_effective_batch_size = train_effective_batch_size or 32
+
+        if epoch is not None:
+            max_steps = int(epoch * max(1, math.floor(max_train_samples / train_effective_batch_size)))
+        else:
+            max_steps = steps
+
         # see[here](https://github.com/huggingface/transformers/issues/22751)
         hf_bug_zero_lr_offset = 20
+        max_steps = max_steps + hf_bug_zero_lr_offset
+        if steps_upper is not None:
+            max_steps = min(max_steps, steps_upper)
 
-        shot = int(name[len('LLM_FS.shot-'):])
-        train_effective_batch_size = 32
-        if epoch is not None:
-            total_steps = epoch * max(1, math.floor(shot / train_effective_batch_size))
-        else:
-            total_steps = steps
-        if max_steps_upper is not None:
-            total_steps = min(total_steps, max_steps_upper)
+        warmup_ratio = warmup_ratio or 0.1
+        warmup_steps = warmup_steps or int(warmup_ratio * max_steps)
 
-        total_steps = total_steps + hf_bug_zero_lr_offset
+        num_evals = num_evals or 3
+        for _num_evals in range(num_evals, 0, -1):
+            eval_steps = int(max_steps / _num_evals)
+            if eval_steps >= 50:
+                # do evaluation only after 50 steps
+                # because early evaluation is extremely slow due to the repetitions
+                break
 
-        warmup_steps = int(0.1 * total_steps)
+        max_eval_samples = max_eval_samples or 100
 
-        num_evals = 3
-        eval_steps = int(total_steps / num_evals)
-        if eval_steps <= warmup_steps + hf_bug_zero_lr_offset:
-            # evaluation before warmup is slow due to the repetitions
-            eval_steps = total_steps
-
-        setting = {
-            'max_train_samples': shot,
-            'max_eval_samples': max_eval_samples,
-            'max_predict_samples': 0,
-
-            'num_train_epochs': None,
-            'train_effective_batch_size': train_effective_batch_size,
-
-            'max_steps': int(total_steps),
-            'warmup_steps': warmup_steps,
-            'eval_steps': eval_steps,
-
+        base_setting = {
+            'max_train_samples': max_train_samples,
             'logging_steps': 1,
-
             'use_test_as_train': False,
             'use_test_as_val': True,
         }
@@ -1499,14 +1435,29 @@ def get_learning_setting(name: str,
     else:
         if epoch is not None:
             raise ValueError()
-        if steps is not None:
-            raise ValueError()
-        setting = LEARNING_SETTINGS[name].copy()
 
-    if max_eval_samples is not None:
-        setting['max_eval_samples'] = max_eval_samples
+        base_setting = LEARNING_SETTINGS[name].copy()
 
-    return setting
+        max_steps = steps or base_setting['max_steps']
+        if steps_upper is not None:
+            max_steps = min(max_steps, steps_upper)
+
+        warmup_steps = warmup_steps\
+            or int(warmup_ratio * max_steps) if warmup_ratio is not None else base_setting['warmup_steps']
+
+        train_effective_batch_size = train_effective_batch_size or base_setting['train_effective_batch_size']
+
+        eval_steps = int(max_steps / num_evals) if num_evals is not None else base_setting['eval_steps']
+
+        max_eval_samples = max_eval_samples or base_setting['max_eval_samples']
+
+    base_setting['max_steps'] = max_steps
+    base_setting['warmup_steps'] = warmup_steps
+    base_setting['train_effective_batch_size'] = train_effective_batch_size
+    base_setting['eval_steps'] = eval_steps
+    base_setting['max_eval_samples'] = max_eval_samples
+
+    return base_setting
 
 
 class CheckpointSpec(BaseModel):
@@ -1663,8 +1614,6 @@ def make_command(output_dir: Union[str, Path],
 
         'use_test_as_train',
         'use_test_as_val',
-
-        'deepspeed_no_lr_decay',
     ]
 
     commands: List[str] = []
@@ -1687,32 +1636,7 @@ def make_command(output_dir: Union[str, Path],
                         f' torchrun --nproc_per_node {n_gpus} ./run_prover.py')
 
     elif run_mode == 'deepspeed':
-        # import os
-        # cuda_devices_org = os.environ.get('CUDA_VISIBLE_DEVICES', None)
-        # gpu_archs: Set[str] = set([])
-        # for i in range(100):
-        #     import torch
-        #     try:
-        #         os.environ['CUDA_VISIBLE_DEVICES'] = str(i)
-        #         arch_ = torch.cuda.get_device_capability()
-        #         gpu_archs.add(f'{arch_[0]}.{arch_[1]}')
-        #     except RuntimeError:
-        #         # no device "i"
-        #         break
-
-        # if len(gpu_archs) == 0:
-        #     raise ValueError()
-        # else:
-        #     os.environ['TORCH_CUDA_ARCH_LIST'] = ';'.join(sorted(gpu_archs))
-
-        # if cuda_devices_org is not None:
-        #     os.environ['CUDA_VISIBLE_DEVICES'] = cuda_devices_org
-
-        if setting.get('deepspeed_no_lr_decay', False):
-            ds_config = 'ds_config/ds_config_zero3.json'
-        else:
-            ds_config = 'ds_config/ds_config_zero3.lr_decay.json'
-
+        ds_config = 'ds_config/ds_config_zero3.json'
         commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
                         f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
                         f' --deepspeed {ds_config}')
