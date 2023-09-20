@@ -38,7 +38,9 @@ def main():
 
     # output_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn')
 
-    output_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS')
+    # output_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS')
+
+    output_top_dir = Path('./outputs/10.make_prompts.py/20230919.jpn')
 
     DATASETS_DIRS = [
         # './NLProofS/outputs.FLD/10.create_FLD_corpus/20221203.first_exp',
@@ -65,6 +67,8 @@ def main():
         './outputs.FLD/00.create_corpus/20230826.jpn',
         './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
         './outputs.FLD/00.create_corpus/20230904.jpn',
+        './outputs.FLD/00.create_corpus/20230912.jpn',
+        './outputs.FLD/00.create_corpus/20230916.jpn',
     ]
 
     dataset_unames = [
@@ -80,10 +84,16 @@ def main():
         # '20230826.jpn.D8',
 
         # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        '20230904.jpn.D1.wo_brnch',
-        '20230904.jpn.D1',
-        '20230904.jpn.D3',
+        # '20230904.jpn.D1.wo_brnch.wo_dstrct',
+        # '20230904.jpn.D1.wo_brnch',
+        # '20230904.jpn.D1',
+        # '20230904.jpn.D3',
+
+        # ---------------------------------- 20230916.jpn ------------------------------------
+        '20230916.jpn.D1_wo_dist',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
+        '20230916.jpn.D5',
     ]
 
     prompt_types = [

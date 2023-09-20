@@ -19,6 +19,7 @@ Fine-tuning the library models for sequence to sequence.
 # You can also adapt this script on your own sequence to sequence task. Pointers for this are left as comments.
 
 import line_profiling
+import deepspeed
 import time
 from FLD_prover import (
     StepWiseGenerationTrainer,
@@ -89,7 +90,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.29.0.dev0")
+# check_min_version("4.29.0.dev0")
 
 require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/summarization/requirements.txt")
 
@@ -441,6 +442,7 @@ class MaxTimeCriteriaWithWarning(StoppingCriteria):
 
 @record
 def main():
+    # TODO we placed here to avoid error but want to place later 
     logging.getLogger().handlers.clear()  # remove handler automatically added
     setup_logger(do_stderr=True, level=logging.INFO)
     logging.getLogger('absl').setLevel(logging.WARNING)
@@ -458,6 +460,10 @@ def main():
         sys.argv = sys.argv[:arg_idx] + sys.argv[arg_idx + 2:]
     else:
         lm_type = 'seq2seq'
+
+    # must be placed at top, so we extract string from sys.argv directry
+    if any(arg.find('deepspeed') >= 0 for arg in sys.argv):
+        deepspeed.init_distributed()
 
     # Seq2SeqTrainingArguments is a sub-class of TrainingArguments, therefore simply loading as Seq2SeqTrainingArguments is enough
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))

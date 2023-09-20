@@ -23,8 +23,11 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/2023-08-31.jpn/')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/2023-08-31.jpn/')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230905.LLM_FS/')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230905.LLM_FS/')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/220230919.jpn/')
 
     # ----------------- settings ---------------------
 

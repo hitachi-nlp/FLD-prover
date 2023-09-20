@@ -20,10 +20,16 @@ def main():
     # ]
     # output_dir = Path('./outputs/13.aggregate_llm_results.py/2023-08-31.jpn/')
 
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/20230905.LLM_FS/',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/20230905.LLM_FS/')
+
     input_dirs = [
-        './outputs/12.evaluate_llm_proofs/20230905.LLM_FS/',
+        './outputs/12.evaluate_llm_proofs/220230919.jpn/',
     ]
-    output_dir = Path('./outputs/13.aggregate_llm_results.py/20230905.LLM_FS/')
+    output_dir = Path('./outputs/13.aggregate_llm_results.py/220230919.jpn/')
+
 
     command = ' '.join([
         'python ./aggregate_llm_results.py',

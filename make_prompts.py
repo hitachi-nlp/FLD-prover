@@ -156,12 +156,17 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
 
     def dump_serial(serial: SerializedDeduction,
                     no_label=False) -> str:
+
+        serial_input_text = serial.prompt
+        if serial.partial_proof is not None:
+            serial_input_text += serial.partial_proof
+
         example_text = '============ an example ============'
-        input_text = f'---- input ----\n{serial.input}'
+        input_text = f'---- input ----\n{serial_input_text}'
         if no_label:
             output_text = '---- output ----\n'
         else:
-            output_text = f'---- output ----\n{serial.next_step}'
+            output_text = f'---- output ----\n{serial.next_proof_step}'
         return '\n\n'.join([example_text, input_text, output_text])
 
     def join_serial_dumps(serial_dumps: List[str]) -> str:
@@ -195,14 +200,14 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
 
             prompt += dump_serial(eval_serial, no_label=True)
 
-            if len(eval_serial.gold_proofs) > 1:
+            if len(eval_serial.proofs) > 1:
                 raise ValueError()
             instance = {
                 'example': eval_ex.dict(),
                 'fewshot_examples': [fewshot_ex.dict()
                                      for fewshot_ex in fewshot_exs],
 
-                'gold_proofs': eval_serial.gold_proofs,
+                'gold_proofs': eval_serial.proofs,
 
                 'serial': eval_serial.dict(),
                 'fewshot_serials': [fewshot_serial.dict()
@@ -222,7 +227,7 @@ def main(eval_path, output_dir, train_path, n_shot, prompt_type, seed, log_level
             f_txt.write('\n\n\n************************ [meta comment] this is the prompt ************************\n\n')
             f_txt.write(prompt)
             f_txt.write('\n\n\n************************ [meta comment] this is the gold output ************************\n\n')
-            f_txt.write(eval_serial.next_step)
+            f_txt.write(eval_serial.next_proof_step)
 
 
 if __name__ == '__main__':

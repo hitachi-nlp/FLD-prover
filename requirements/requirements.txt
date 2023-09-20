@@ -1,10 +1,18 @@
-# git+https://github.com/huggingface/transformers@006da469dd5a465f4551f4245f780e3b1e92b76c
-transformers==4.31.0
 # transformers==4.29.2
-
-git+https://github.com/google-research/bleurt.git
+transformers==4.31.0
+# transformers==4.29.1
+# transformers==4.28.1
 
 accelerate >= 0.21.0
+# accelerate==0.18.0
+
+# deepspeed==0.10.2
+deepspeed==0.10.3
+# deepspeed==0.8.3
+
+# peft==0.5.0
+peft==0.4.0
+
 datasets >= 1.8.0
 sentencepiece != 0.1.92
 protobuf==3.20.0
@@ -14,8 +22,6 @@ ete3==3.1.2
 numpy
 evaluate
 huggingface_hub
-peft
-deepspeed==0.10.2
 einops
 fugashi
 unidic_lite
@@ -23,5 +29,7 @@ unidic_lite
 tqdm
 pydantic
 colorlog
+
+git+https://github.com/google-research/bleurt.git
 
 line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main

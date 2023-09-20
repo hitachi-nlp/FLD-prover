@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from typing import List, Union, Dict, Tuple, Optional
 import json
+import time
 
 from logger_setup import setup as setup_logger
 import click
@@ -71,11 +72,18 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
                                     openai_api_key=api_key)
 
             def get_reply(prompt: str) -> Optional[str]:
-                try:
-                    return chat_model([HumanMessage(content=prompt)]).content
-                except openai.error.InvalidRequestError as e:
-                    logger.critical(e)
-                    return None
+                last_exception = None
+                for i in range(0, 3):
+                    try:
+                        return chat_model([HumanMessage(content=prompt)]).content
+                    # except openai.error.InvalidRequestError as e:
+                    #     logger.critical(e)
+                    #     return None
+                    except openai.error.RateLimitError as e:
+                        last_exception = e
+                        logger.info('getting a reply failed due to the following rate limit exception. will sleep  1min and retry:\n%s', str(e))
+                        time.sleep(60)
+                raise Exception('Could not get any reply. The last exception is the following:\n' + str(last_exception))
 
     with open(output_path, 'w') as f_out:
         for i_sample, line in tqdm(enumerate(open(input_path))):
@@ -86,11 +94,13 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
 
             logger.info('-- running the LLM on a example ... --')
             logger.info('prompt # words: %d', len(prompt.split()))
+            logger.info('prompt # chars: %d', len(prompt))
 
             reply = get_reply(prompt)
 
             if reply is not None:
                 logger.info('reply # words: %d', len(reply.split()))
+                logger.info('reply # chars: %d', len(reply))
 
             sample['reply'] = reply
             f_out.write(json.dumps(sample) + '\n')

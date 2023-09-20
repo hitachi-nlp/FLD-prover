@@ -109,7 +109,6 @@ def main(input_dir, output_dir, log_level, read_from_eval_json):
     df_dict = defaultdict(list)
     for _input_dir in input_dirs:
         for tensorboard_dir in _input_dir.glob('**/*/tensorboard_log'):
-
             if read_from_eval_json:
                 lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
                 for name in LAB_ATTR_NAMES:
@@ -147,8 +146,12 @@ def main(input_dir, output_dir, log_level, read_from_eval_json):
                     elif len(tag_df) >= 2:
                         first_value = tag_df['value'].iloc[0]
                         if not tag_df['value'].map(lambda val: val == first_value).all():
-                            raise ValueError()
-                        df_dict[metric_name].append(first_value)
+                            logger.warning('multiple values found for metric=%s under directory="%s"',
+                                           metric_name,
+                                           str(tensorboard_dir))
+                            df_dict[metric_name].append(tag_df['value'].mean())
+                        else:
+                            df_dict[metric_name].append(first_value)
 
     merged_df = pd.DataFrame(df_dict)
     print(merged_df)

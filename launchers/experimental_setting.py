@@ -9,6 +9,9 @@ from pydantic import BaseModel
 from lab import build_dir
 from script_engine import QsubEngine, SubprocessEngine
 from script_engine.base import EngineBase
+from tempfile import mktemp
+import os
+
 # from pytorch_lightning import Trainer
 
 
@@ -429,8 +432,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            'tokenizer_padding': 'max_length',
+            # 'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -1600,7 +1603,8 @@ def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> D
 def make_command(output_dir: Union[str, Path],
                  setting: Dict,
                  run_mode: str,
-                 n_gpus: Optional[int] = None) -> str:
+                 n_gpus: Optional[int] = None,
+                 n_deepspeed_nodes: int = 1) -> str:
 
     unused_option_names = [
         'base_config_name',
@@ -1636,10 +1640,60 @@ def make_command(output_dir: Union[str, Path],
                         f' torchrun --nproc_per_node {n_gpus} ./run_prover.py')
 
     elif run_mode == 'deepspeed':
+        # For deepspeed settings, see [here](https://github.com/ohtaman/abci-examples/tree/main/202307#deepspeed-を用いた-multi-node-multi-gpu-訓練分散訓練の例)
+
         ds_config = 'ds_config/ds_config_zero3.json'
-        commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
-                        f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
-                        f' --deepspeed {ds_config}')
+
+        # commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
+        #                 f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
+        #                 f' --deepspeed {ds_config}')
+
+        # """
+        # MASTER_ADDR=$HOSNAME deepspeed \
+        #   --master_addr $HOSTNAME \
+        #   --hostfile $hostfile \
+        #   --no_ssh_check \
+        #   --launcher OpenMPI \
+        #   --launcher_args "-mca coll ^hcoll" \
+        #   src/finetune_lora_distribute.py \
+        #   --model_name $MODEL \
+        #   --config_file $CONFIG
+        # """
+        # hostfile = mktemp()
+        # with open(hostfile, 'w') as f_out:
+        #     for line in os.environ['SGE_JOB_HOSTLIST'].split('\n'):
+        #         f_out.write(line + f' slots={n_gpus}')
+
+        commands.append(
+            ' && '.join([
+                # 'module load python/3.11 cuda/11.7 cudnn/8.6 nccl/2.12 hpcx/2.12',
+                # 'source /etc/profile.d/modules.sh && module load hpcx/2.12',
+
+                'source /etc/profile.d/modules.sh',
+                'module load python/3.11 cuda/11.7 cudnn/8.6 nccl/2.12 hpcx/2.12',
+
+                # load open-mpi
+                # 'source $PROJECTS/spack/share/spack/setup-env.sh 1>err.txt 2>&1',
+                # 'echo "hoge" > hoge.txt',
+                # 'spack load openmpi@4.1.4',
+
+                f'export hostfile=$(mktemp) && for l in `cat $SGE_JOB_HOSTLIST`; do echo $l slots={n_gpus}; done > $hostfile',
+            ])
+        )
+
+        commands.append(
+            ' '.join([
+                '&& MASTER_ADDR=$HOSTNAME',
+                'deepspeed',
+                '--master_addr $HOSTNAME',
+                '--hostfile ${hostfile}',
+                '--no_ssh_check',
+                '--launcher OpenMPI',
+                '--launcher_args "-mca coll ^hcoll"',
+                './run_prover.py',
+                f'--deepspeed {ds_config}'
+            ])
+        )
 
     else:
         ValueError()
@@ -1653,11 +1707,11 @@ def make_command(output_dir: Union[str, Path],
         if name in unused_option_names:
             continue
 
-        # if isinstance(value, bool):
-        #     commands.append(f'--{name}={str(value)}')
-        # else:
-        #     commands.append(maybe_option_value(f'--{name}', value))
-        commands.append(maybe_option_value(f'--{name}', value))
+        option_str = maybe_option_value(f'--{name}', value)
+        # if run_mode == 'deepspeed':
+        #     option_str = option_str.replace('"', '\\"')
+        #     option_str = option_str.replace('\'', '\\\'')
+        commands.append(option_str)
 
     return ' '.join(commands)
 
@@ -1752,7 +1806,6 @@ def make_output_dir(setting: Dict,
             'fp16',
             'generation_max_proof_steps',
             'generation_timeout',
-            ''
             'source_prefix',
             'logging_strategy',
 

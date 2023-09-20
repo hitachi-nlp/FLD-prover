@@ -24,8 +24,11 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/2023-08-31.jpn/')
     # output_top_dir = Path('./outputs/11.reason_by_llm/2023-08-31.jpn/')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS/')
-    output_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/20230919.jpn/')
+    output_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
 
     # ----------------- settings ---------------------
 
@@ -41,11 +44,11 @@ def main():
         # '20230826.jpn.D3',
         # '20230826.jpn.D8',
 
-        # ---------------------------------- 20230904.jpn ------------------------------------
-        '20230904.jpn.D1.wo_brnch.wo_dstrct',
-        '20230904.jpn.D1.wo_brnch',
-        '20230904.jpn.D1',
-        '20230904.jpn.D3',
+        # ---------------------------------- 20230916.jpn ------------------------------------
+        # '20230916.jpn.D1_wo_dist',
+        # '20230916.jpn.D1',
+        # '20230916.jpn.D3',
+        '20230916.jpn.D5',
     ]
 
     engine = SubprocessEngine()   # for debug
@@ -65,8 +68,10 @@ def main():
     # max_samples = 1
     # max_samples = 5
     # max_samples = 10
-    max_samples = 30
+    # max_samples = 30
+    # max_samples = 30
     # max_samples = 50
+    max_samples = 60
     # max_samples = 100
     # max_samples = None
 
