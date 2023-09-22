@@ -432,8 +432,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            'tokenizer_padding': 'max_length',
-            # 'tokenizer_padding': 'longest',
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,

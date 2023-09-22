@@ -113,9 +113,9 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         '20230916.jpn.D1_wo_dist',
-        # '20230916.jpn.D1',
-        # '20230916.jpn.D3',
-        # '20230916.jpn.D5',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
+        '20230916.jpn.D5',
     ]
 
     model_settings = [
@@ -171,7 +171,7 @@ def main():
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -201,9 +201,9 @@ def main():
         # 'FT.step-10000.LLM',
 
         'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
