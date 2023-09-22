@@ -1,10 +1,10 @@
 # FLD-Prover
-This repository includes the code for training language models on FLD corpora.  
+This repository includes the code to train and evaluate language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
 ## Release notes
-* **2024-xx-xx**: We made it possible to train and evaluate LLMs. See [Using LLMs](#using-llms).
+* **2024-xx-xx**: We made it possible to fine-tune and evaluate LLMs. See [Using LLMs](#using-llms).
 * 2023-08-22: Official release v2.
     * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
     * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
@@ -98,10 +98,13 @@ We think both metrics have their Pros/Cons and both are OK for use as long as th
 Note that the previous studies have used the metric colse to `extra_steps` regarding the `unknown` labels.
 
 ## Using LLMs
-LLMs are mostly encoder-only models, which can be used with additional options (`--lm_type` ) as follows:
+LLMs are mostly encoder-only models, which can be used with additional options (`--lm_type causal --proof_sampling all_at_once --sample_negative_proof False --no_subproof_for_unknown True`) as follows:
 ```console
 $ python ./run_prover.py \
   --lm_type causal \
+  --proof_sampling all_at_once \
+  --sample_negative_proof False \
+  --no_subproof_for_unknown True \
   --model_name_or_path <<model_name>> \
   --output_dir <<output_dir>> \\
   --logging_dir <<logging_dir>> \\
@@ -112,7 +115,6 @@ $ python ./run_prover.py \
   --max_steps 70 \
   --gradient_accumulation_steps 8 \
   --max_eval_samples 100 \
-  --proof_sampling all_at_once \
   --learning_rate 1e-05 \
   --warmup_steps 21 \
   --source_prefix "Solve FLD task: " \
@@ -125,8 +127,6 @@ $ python ./run_prover.py \
   --logging_steps 1 \
   --overwrite_output_dir True \
   --log_generation True \
-  --sample_negative_proof False \
-  --no_subproof_for_unknown True \
   --per_device_train_batch_size 1 \
   --per_device_eval_batch_size 1 \
   --dataloader_num_workers 0     \
