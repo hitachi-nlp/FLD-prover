@@ -75,8 +75,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.find_setting')
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.no_lora')
 
-    output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -112,10 +112,10 @@ def main():
         # '20230904.jpn.D3',
 
         # ---------------------------------- 20230916.jpn ------------------------------------
-        '20230916.jpn.D1_wo_dist',
+        # '20230916.jpn.D1_wo_dist',
         '20230916.jpn.D1',
-        '20230916.jpn.D3',
-        '20230916.jpn.D5',
+        # '20230916.jpn.D3',
+        # '20230916.jpn.D5',
     ]
 
     model_settings = [
@@ -171,7 +171,7 @@ def main():
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -201,9 +201,9 @@ def main():
         # 'FT.step-10000.LLM',
 
         'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -254,7 +254,7 @@ def main():
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
     gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    dry_run = False
+    dry_run = True
 
     # hours = 12
     hours = 24
