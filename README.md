@@ -1,4 +1,4 @@
-# FLD-Prover
+# FLD Prover
 This repository includes the code to train and evaluate language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
