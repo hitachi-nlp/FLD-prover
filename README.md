@@ -10,7 +10,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
     * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
 ## Installation
-The code has been tested on Python 3.8.5.
+The code has been tested on Python 3.11.5
 ```console
 $ pip install -r ./requirements/requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task

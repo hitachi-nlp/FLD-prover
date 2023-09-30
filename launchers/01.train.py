@@ -75,8 +75,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.find_setting')
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.no_lora')
 
-    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
+    output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -171,8 +171,9 @@ def main():
 
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -212,8 +213,8 @@ def main():
     ]
 
     seeds = [
-        # 0,
-        1,
+        0,
+        # 1,
     ]
 
     epochs_list = [
