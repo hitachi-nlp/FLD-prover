@@ -213,8 +213,8 @@ def main():
     ]
 
     seeds = [
-        0,
-        # 1,
+        # 0,
+        1,
     ]
 
     epochs_list = [
@@ -259,8 +259,8 @@ def main():
     # dry_run = True
     dry_run = False
 
-    # hours = 12
-    hours = 24
+    hours = 12
+    # hours = 24
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
@@ -302,7 +302,8 @@ def main():
             raise ValueError()
 
     # generation_timeout = 0
-    generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
+    # generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
+    generation_timeout = 60 * 10  # slow generatoin is most likely the repetitions coming from underfitting.
 
     no_prompt_mask_args = [
         False,   # much better
