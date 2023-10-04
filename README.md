@@ -1,16 +1,14 @@
-# FLD Prover
-This repository includes the code to train and evaluate language models on FLD corpora.  
+# FLD-Prover
+This repository includes the code for training language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
-## Release notes
-* **2024-xx-xx**: We made it possible to [Fine-tune LLMs](#fine-tune-llms). 
-* 2023-08-22: Official release v2.
-    * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
-    * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
+## About this release
+* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
+* Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
 ## Installation
-The code has been tested on Python 3.11.5
+The code has been tested on Python 3.8.5.
 ```console
 $ pip install -r ./requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task
@@ -93,60 +91,7 @@ As seen above, we have defined the two types of metrics:
 * `extra_steps` (shown as `extr_stps.*`)
     * Allows such extra steps.
 
-The difference in the two metrics is the most noticeable for a dataset instance with an `unknown` label, on which the `strict` metric allows the model to output only `__UNKNOWN__` marker while the `extra_steps` metric allows the model to output some logical steps to investigate whether the hypothesis can be (dis-) proved or not.
+The difference in the two metrics is the most noticeable for a dataset instance with an `unknown` label, on which the `strict` metric allows the model to output *only* `__UNKNOWN__` marker while the `extra_steps` metric allows the model to output some logical steps to investigate whether the hypothesis can be (dis-) proved or not.
 
 We think both metrics have their Pros/Cons and both are OK for use as long as they are not contaminated.
 Note that the previous studies have used the metric colse to `extra_steps` regarding the `unknown` labels.
-
-## Fine-tune LLMs
-LLMs are mostly encoder-only models, which can be used with additional options (`--lm_type causal --proof_sampling all_at_once --sample_negative_proof False --no_subproof_for_unknown True`) as follows:
-```console
-$ python ./run_prover.py \
-  --lm_type causal \
-  --proof_sampling all_at_once \
-  --sample_negative_proof False \
-  --no_subproof_for_unknown True \
-  --model_name_or_path <<model_name>> \
-  --output_dir <<output_dir>> \\
-  --logging_dir <<logging_dir>> \\
-  --dataset_name <<dataset_name>> \\
-  --deepspeed ds_config/ds_config_zero3.json \\
-  --seed 0 \
-  --max_grad_norm 0.5  \
-  --max_steps 70 \
-  --gradient_accumulation_steps 8 \
-  --max_eval_samples 100 \
-  --learning_rate 1e-05 \
-  --warmup_steps 21 \
-  --source_prefix "Solve FLD task: " \
-  --generation_num_beams 1 \
-  --generation_top_k 10 \
-  --generation_max_proof_steps 20 \
-  --max_source_length 2000 \
-  --max_target_length 2000 \
-  --logging_strategy steps \
-  --logging_steps 1 \
-  --overwrite_output_dir True \
-  --log_generation True \
-  --per_device_train_batch_size 1 \
-  --per_device_eval_batch_size 1 \
-  --dataloader_num_workers 0     \
-  --log_examples True \
-  --max_train_samples 10 \
-  --eval_steps 70 \
-  --predict_with_generate True \
-  --remove_unused_columns False \
-  --file_type json \
-  --do_train True \
-  --do_eval_in_outerloop False \
-  --do_predict False \
-  --evaluation_strategy steps \
-  --tokenizer_padding longest \
-  --gradient_checkpointing True  \
-  --fp16 True \
-  --lr_scheduler_type linear \
-  --weight_decay 0.0 \
-  --lora False \
-  --generation_timeout 300 \
-  --use_auth_token True
-  ```
