@@ -3,7 +3,7 @@ git+https://github.com/huggingface/transformers@006da469dd5a465f4551f4245f780e3b
 git+https://github.com/google-research/bleurt.git
 
 accelerate >= 0.12.0
-datasets >= 1.8.0
+datasets==2.14.5
 sentencepiece != 0.1.92
 protobuf
 py7zr
