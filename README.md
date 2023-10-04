@@ -12,7 +12,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 ## Installation
 The code has been tested on Python 3.11.5
 ```console
-$ pip install -r ./requirements/requirements.txt
+$ pip install -r ./requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task
 ```
 
