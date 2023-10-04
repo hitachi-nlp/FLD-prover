@@ -4,6 +4,7 @@ import glob
 from pathlib import Path
 import json
 import math
+import re
 
 from pydantic import BaseModel
 from lab import build_dir
@@ -777,7 +778,7 @@ def get_dataset_setting(uname: str,
                         top_dirs: List[str],
                         use_test_as_train=False,
                         use_test_as_val=False) -> Dict[str, Any]:
-    type_, dataset_name = _parse_dataset_name(uname)
+    type_, dataset_name, dataset_config_name = _parse_dataset_name(uname)
 
     setting: Dict[str, Any] = {
         'predict_with_generate': True,
@@ -791,9 +792,12 @@ def get_dataset_setting(uname: str,
         setting['file_type'] = 'json'
 
     elif type_ == 'hf':
-        if use_test_as_train or use_test_as_val:
-            raise ValueError()
+        if use_test_as_train:
+            logger.warning('use_test_as_train=True does not work with datasets hosted on huggingface.')
+        if use_test_as_val:
+            logger.warning('use_test_as_val=True does not work with datasets hosted on huggingface.')
         setting['dataset_name'] = dataset_name
+        setting['dataset_config_name'] = dataset_config_name
 
     else:
         raise ValueError()
@@ -806,7 +810,7 @@ def get_local_dataset_paths(uname: str,
                             use_test_as_train=False,
                             use_test_as_val=False,
                             allow_not_found_splits=False) -> Dict[str, Optional[str]]:
-    type_, dataset_name = _parse_dataset_name(uname)
+    type_, dataset_name, _ = _parse_dataset_name(uname)
     if type_ != 'local':
         raise ValueError()
 
@@ -900,11 +904,11 @@ def get_local_dataset_paths(uname: str,
     raise ValueError(f'Dataset {dataset_name} not found under {top_dirs}.')
 
 
-def _parse_dataset_name(name: str) -> Tuple[str, str]:
+def _parse_dataset_name(name: str) -> Tuple[str, str, Optional[str]]:
     if name.startswith('hf.'):
-        return name.split('.', 1)
+        return 'hf', *re.sub(r'^hf\.', '', name).split('__')
     else:
-        return 'local', name
+        return 'local', name, None
 
 
 _PROVER_CONFIGS = {
@@ -1746,6 +1750,7 @@ def make_output_dir(setting: Dict,
             'config_name',
 
             'dataset_uname',
+            'dataset_config_name',
             'local_dataset_1_name',
             'dataset_1',
             'train_file_1',

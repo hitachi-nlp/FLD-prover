@@ -24,6 +24,7 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
     $ python\
         ./run_prover.py\
         --dataset_name hitachi-nlp/FLD.v2\
+        --dataset_config_name default\
         --output_dir outputs/\
         --logging_dir outputs/tensorboard/\
         --file_type json\
@@ -62,9 +63,9 @@ $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-
         --eval_steps 5000\
         --tokenizer_padding longest
     ```
+    or, if you want to use **FLD★**(FLD.4 in the paper), specify `--dataset_config_name star`.
 
-    Or, if you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
-
+    If you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
     ```console
         --train_file ./data/FLD.v2/FLD.v2/train.jsonl\
         --validation_file ./data/FLD.v2/FLD.v2/valid.jsonl\

@@ -95,8 +95,8 @@ def main():
         # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.v2',
-        # 'hf.hitachi-nlp/FLD-star.v2',
+        'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         # '20230826.jpn.D3',
