@@ -575,6 +575,7 @@ def main():
             raw_datasets = {}
 
     if data_args.dataset_push_to_hub_repo_name is not None:
+        raise DeprecationWarning('Use FLD-task scripts to push to hub.')
         raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
         return
 
@@ -850,7 +851,7 @@ def main():
 
             prompt_with_partial_proof = prefix + serial.prompt + (serial.partial_proof or '')
 
-            gold_proof = serial.proofs[0]
+            gold_proof = serial.proof
             # check whther the tokenizer can recognize stance markers
             gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([gold_proof],
                                                                         whole_proof_max_length)["input_ids"][0])
