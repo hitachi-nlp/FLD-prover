@@ -116,9 +116,9 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         '20230916.jpn.D1_wo_dist',
-        # '20230916.jpn.D1',
-        # '20230916.jpn.D3',
-        # '20230916.jpn.D5',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
+        '20230916.jpn.D5',
     ]
 
     model_settings = [
@@ -235,12 +235,8 @@ def main():
     # warmup_ratio = None
 
     lrates = [
-        1e-6,
-        # 3e-6,
-        # 1e-5,     # best for few-shot LLMs
-        # 3e-5,
-        1e-4,   # could be best for fully fine-tuning LMs?
-
+        1e-5,     # best for few-shot LLMs
+        # 1e-4,   # could be best for fully fine-tuning LMs?
         # 1e-3,
     ]
 
@@ -260,8 +256,8 @@ def main():
     # gpu_name_for_batch_size = 'A100_48_1'
     # gpu_name_for_batch_size = 'V100_16_1'
     # gpu_name_for_batch_size = 'V100_16_4'
-    # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+    gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # dry_run = True
     dry_run = False

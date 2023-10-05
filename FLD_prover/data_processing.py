@@ -1,13 +1,18 @@
 from typing import Optional, Union, Any
 import logging
 from enum import Enum
+import re
+from pprint import pformat
 
+from collections import defaultdict
 import numpy as np
 import torch
 from typing import List, Dict
 from FLD_task import (
     load_deduction,
     serialize,
+    build_metrics,
+    log_example,
 )
 from FLD_task.proof import get_stance_markers
 
@@ -33,7 +38,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
                         sample_negative_proof=False,
                         no_subproof_for_unknown=False,
                         ignore_pad_token_for_loss=True,
-                        ignore_prompt_for_causal_lm_loss=False,
+                        ignore_prompt_for_causal_lm_loss=True,
                         log_examples=False) -> Dict[str, List[Any]]:
 
     def _prepare_tokenized_targets(targets, max_length, **kwargs):
@@ -119,8 +124,6 @@ def preprocess_function(examples: Dict[str, List[Any]],
             _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
 
             if ignore_prompt_for_causal_lm_loss:
-                prompt_lengths = None
-            else:
                 prompt_ids = [
                     _prepare_tokenized_inputs(
                         prompt,
@@ -132,6 +135,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
                     for prompt in _prompts
                 ]
                 prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
+            else:
+                prompt_lengths = None
 
             inputs_with_targets = [f'{prompt}{proof_step}'
                                    for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
@@ -192,6 +197,111 @@ def preprocess_function(examples: Dict[str, List[Any]],
             logger.info(label_decoded)
 
     return forward_inputs
+
+
+def compute_metrics(eval_preds,
+                    tokenizer,
+                    eval_dataset,
+                    lm_type: LMType,
+                    ignore_index=-100) -> Dict[str, Any]:
+
+    def _unmask_by_pad_token(tensor):
+        return unmask_by_pad_token(tensor, tokenizer.pad_token_id, mask_id=ignore_index)
+
+    metric_funcs = {
+        'strct': build_metrics('strict'),
+        'extr_stps': build_metrics('allow_extra_steps'),
+    }
+
+    preds, labels = eval_preds
+    if isinstance(preds, tuple):
+        preds = preds[0]
+
+    examples = eval_dataset
+
+    # Replace ignore_indexs used for padding as we can't decode them
+    preds = _unmask_by_pad_token(preds)
+    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+
+    decoded_prompts_from_examples = [
+        tokenizer.decode(_unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
+        for i in range(len(examples))
+    ]
+    decoded_labels_from_examples = [
+        tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
+        for i in range(len(examples))
+    ]
+
+    results = {}
+
+    prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+    results["gen_len"] = np.mean(prediction_lens)
+
+    metrics: Dict[str, List[Any]] = defaultdict(list)
+    for i_example, (prompt, proof_gt, proof_pred, example) in enumerate(zip(
+            decoded_prompts_from_examples,
+            decoded_labels_from_examples,
+            decoded_preds,
+            examples)):
+
+        logger.info('')
+        logger.info('')
+        logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
+
+        if lm_type == LMType.CAUSAL and prompt in proof_pred:
+            # the results from model generation include also the prompt
+            proof_pred = proof_pred[len(prompt):]
+
+        if example is not None:
+            input_ids = example['input_ids']
+            input_ids = _unmask_by_pad_token(input_ids)
+            decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
+
+            context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
+            hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
+
+            log_example(
+                context=context,
+                hypothesis=hypothesis,
+                gold_proofs=[proof_gt],
+                pred_proof=proof_pred,
+                logger=logger,
+            )
+
+            for metric_type, calc_metrics in metric_funcs.items():
+                try:
+                    _metrics = calc_metrics(
+                        [proof_gt],
+                        proof_pred,
+                        context=context,
+                    )
+                except Exception as e:
+                    logger.warning('calc_metrics() failed due to the following error. this sample will be skipped from metrics: %s', str(e))
+                    _metrics = {}
+                depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
+                          else ['all', 'None'])
+                for depth in depths:
+                    for metric_name, metric_val in _metrics.items():
+                        metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
+
+                log_texts, log_args = [], []
+                for metric_name, metric_val in sorted(_metrics.items()):
+                    log_texts.append('%-20s: %5.2f')
+                    log_args.extend([f"{metric_type}.{metric_name}", metric_val])
+                logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
+
+        else:
+            # XXX: why pass here?
+            context = None
+            hypothesis = None
+
+    for metric_name, metric_vals in metrics.items():
+        results[f"{metric_name}"] = np.mean(metric_vals)
+
+    logger.info('-------- compute_metrics() done! ------------------')
+    logger.info('\n' + pformat(results))
+
+    return results
 
 
 def prepare_tokenized_inputs(inputs: List[str],

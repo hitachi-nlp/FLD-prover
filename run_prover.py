@@ -23,12 +23,14 @@ import line_profiling
 import deepspeed
 import time
 from FLD_prover import StepWiseGenerationTrainer
-from FLD_prover.preprocess import (
+from FLD_prover.data_processing import (
     LMType,
     preprocess_function as FLD_preprocess_function,
     prepare_tokenized_inputs,
     unmask_by_pad_token,
+    compute_metrics as FLD_compute_metrics,
 )
+from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForSeq2Seq
 from FLD_task.proof import get_stance_markers
 from FLD_task import (
     load_deduction,
@@ -52,8 +54,6 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     LlamaTokenizer,
-    DataCollatorForSeq2Seq,
-    # DataCollatorForLanguageModeling,
     HfArgumentParser,
     MBart50Tokenizer,
     MBart50TokenizerFast,
@@ -64,7 +64,6 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     set_seed,
-    default_data_collator,
     is_torch_tpu_available,
 )
 from transformers.generation.stopping_criteria import StoppingCriteria
@@ -397,39 +396,6 @@ summarization_name_mapping = {
 }
 
 
-class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
-
-    def __call__(self, features, return_tensors=None):
-        for feature in features:
-            if "depth" in feature:
-                feature.pop("depth", None)
-        return super().__call__(features, return_tensors=return_tensors)
-
-
-# class RemoveUnusedColumnsCollator(DataCollatorForLanguageModeling):
-# 
-#     def __call__(self, features, return_tensors=None):
-#         for feature in features:
-#             if "depth" in feature:
-#                 feature.pop("depth", None)
-#         return super().__call__(features, return_tensors=return_tensors)
-
-
-class RemoveUnusedColumnsCollator:
-
-    def __init__(self, return_tensors: Optional[str] = None):
-        if return_tensors is None:
-            raise ValueError()
-        self.return_tensors = return_tensors
-
-    def __call__(self, features, return_tensors=None):
-        for feature in features:
-            if "depth" in feature:
-                feature.pop("depth", None)
-        return default_data_collator(features,
-                                     return_tensors=return_tensors or self.return_tensors)
-
-
 class MaxTimeCriteriaWithWarning(StoppingCriteria):
     def __init__(self, max_time: float, initial_timestamp: Optional[float] = None):
         self.max_time = max_time
@@ -620,6 +586,8 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
             trust_remote_code=True,
         )
+    if tokenizer.pad_token is None:
+        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
     if lm_type == LMType.SEQ_2_SEQ:
         auto_model_class = AutoModelForSeq2SeqLM
@@ -730,7 +698,6 @@ def main():
         )
         model.config.forced_bos_token_id = forced_bos_token_id
 
-    ignore_index = -100
 
     # Temporarily set max_target_length for training.
     # max_target_length = data_args.max_target_length
@@ -744,12 +711,6 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def _unmask_by_pad_token(tensor):
-        return unmask_by_pad_token(tensor, tokenizer.pad_token_id, mask_id=ignore_index)
-
-    def _prepare_tokenized_inputs(inputs, max_length, **kwargs):
-        return prepare_tokenized_inputs(inputs, tokenizer, padding, max_length, **kwargs)
-
     def _FLD_preprocess_function(examples: Dict[str, List[Any]], split: str):
         return FLD_preprocess_function(
             examples,
@@ -760,7 +721,6 @@ def main():
             padding=padding,
             max_source_length=data_args.max_source_length,
             max_target_length=data_args.max_target_length,
-            ignore_index=ignore_index,
             proof_sampling=data_args.proof_sampling,
             sample_negative_proof=data_args.sample_negative_proof,
             no_subproof_for_unknown=data_args.no_subproof_for_unknown,
@@ -797,10 +757,10 @@ def main():
         predict_dataset.set_transform(
             lambda examples: _FLD_preprocess_function(examples, 'eval'))
     else:
-         predict_dataset = None
+        predict_dataset = None
 
     # Data collator
-    label_pad_token_id = ignore_index if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
+    label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     if lm_type == LMType.SEQ_2_SEQ:
         data_collator = RemoveUnusedColumnsCollatorForSeq2Seq(
             tokenizer,
@@ -810,14 +770,7 @@ def main():
             return_tensors='pt',
         )
     elif lm_type == LMType.CAUSAL:
-        # data_collator = RemoveUnusedColumnsCollator(
-        #     tokenizer,
-        #     mlm=False,
-        #     return_tensors='pt',
-        # )
-        data_collator = RemoveUnusedColumnsCollator(
-            return_tensors='pt',
-        )
+        data_collator = RemoveUnusedColumnsCollator(return_tensors='pt')
     else:
         raise NotImplementedError()
 
@@ -841,105 +794,13 @@ def main():
         result = {k: round(v * 100, 4) for k, v in result.items()}
         return result
 
-    metric_funcs = {
-        'strct': build_metrics('strict'),
-        'extr_stps': build_metrics('allow_extra_steps'),
-    }
-
     def compute_metrics(eval_preds) -> Dict[str, Any]:
-        if lm_type == LMType.CAUSAL:
-            if padding == 'max_length':
-                logger.warning('The generated sequence would have only 1 token, as padding="max_length" is specified.')
-
-        preds, labels = eval_preds
-        if isinstance(preds, tuple):
-            preds = preds[0]
-
-        examples = eval_dataset
-
-        # Replace ignore_indexs used for padding as we can't decode them
-        preds = _unmask_by_pad_token(preds)
-        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-
-        decoded_prompts_from_examples = [
-            tokenizer.decode(_unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
-            for i in range(len(examples))
-        ]
-        decoded_labels_from_examples = [
-            tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
-            for i in range(len(examples))
-        ]
-
-        results = {}
-
-        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-        results["gen_len"] = np.mean(prediction_lens)
-
-        metrics: Dict[str, List[Any]] = defaultdict(list)
-        for i_example, (prompt, proof_gt, proof_pred, example) in enumerate(zip(
-                decoded_prompts_from_examples,
-                decoded_labels_from_examples,
-                decoded_preds,
-                examples)):
-
-            logger.info('')
-            logger.info('')
-            logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
-
-            if lm_type == LMType.CAUSAL and prompt in proof_pred:
-                # the results from model generation include also the prompt
-                proof_pred = proof_pred[len(prompt):]
-
-            if example is not None:
-                input_ids = example['input_ids']
-                input_ids = _unmask_by_pad_token(input_ids)
-                decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
-
-                context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
-                hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
-
-                log_example(
-                    context=context,
-                    hypothesis=hypothesis,
-                    gold_proofs=[proof_gt],
-                    pred_proof=proof_pred,
-                    logger=logger,
-                )
-
-                for metric_type, calc_metrics in metric_funcs.items():
-                    try:
-                        _metrics = calc_metrics(
-                            [proof_gt],
-                            proof_pred,
-                            context=context,
-                        )
-                    except Exception as e:
-                        logger.warning('calc_metrics() failed due to the following error. this sample will be skipped from metrics: %s', str(e))
-                        _metrics = {}
-                    depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
-                              else ['all', 'None'])
-                    for depth in depths:
-                        for metric_name, metric_val in _metrics.items():
-                            metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
-
-                    log_texts, log_args = [], []
-                    for metric_name, metric_val in sorted(_metrics.items()):
-                        log_texts.append('%-20s: %5.2f')
-                        log_args.extend([f"{metric_type}.{metric_name}", metric_val])
-                    logger.info('------------   metrics  ------------\n' + '\n'.join(log_texts), *log_args)
-
-            else:
-                # XXX: why pass here?
-                context = None
-                hypothesis = None
-
-        for metric_name, metric_vals in metrics.items():
-            results[f"{metric_name}"] = np.mean(metric_vals)
-
-        logger.info('-------- compute_metrics() done! ------------------')
-        logger.info('\n' + pformat(results))
-
-        return results
+        return FLD_compute_metrics(
+            eval_preds,
+            tokenizer,
+            eval_dataset,
+            lm_type,
+        )
 
     # Initialize our Trainer
     if training_args.remove_unused_columns:
@@ -949,13 +810,6 @@ def main():
         preprocess_logits_for_metrics = None
 
     elif lm_type == LMType.CAUSAL:
-        # def preprocess_logits_for_metrics(logits, labels):
-        #     if isinstance(logits, tuple):
-        #         # Depending on the model and config, logits may contain extra tensors,
-        #         # like past_key_values, but logits always come first
-        #         logits = logits[0]
-        #     return logits.argmax(dim=-1)
-
         preprocess_logits_for_metrics = None
         if data_args.proof_sampling == 'stepwise':
             raise ValueError('proof_sampling = "stepwise" is not suitable for LMType.CAUSAL')
@@ -1025,7 +879,7 @@ def main():
         tokenizer=tokenizer,
         max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
         compute_metrics=compute_metrics if training_args.predict_with_generate and not is_torch_tpu_available() else None,
-        texts_to_inputs_func=lambda texts: _prepare_tokenized_inputs(texts, data_args.max_source_length),
+        texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, tokenizer, padding, data_args.max_source_length, **kwargs),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         log_generation=data_args.log_generation,
@@ -1063,6 +917,9 @@ def main():
 
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
+
+    def _unmask_by_pad_token(tensor):
+        return unmask_by_pad_token(tensor, tokenizer.pad_token_id)
 
     if training_args.do_predict:
         logger.info("*** Predict ***")
