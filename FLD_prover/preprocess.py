@@ -29,9 +29,10 @@ def preprocess_function(examples: Dict[str, List[Any]],
                         max_source_length=1024,
                         max_target_length=1024,
                         ignore_index=-100,
-                        proof_sampling=False,
+                        proof_sampling='stepwise',
                         sample_negative_proof=False,
                         no_subproof_for_unknown=False,
+                        ignore_pad_token_for_loss=True,
                         ignore_prompt_for_causal_lm_loss=False,
                         log_examples=False) -> Dict[str, List[Any]]:
 
@@ -46,7 +47,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
                                            tokenizer.pad_token_id,
                                            mask_id=ignore_index,
                                            mask_lengths=mask_lengths,
-                                           mask_pad_tokens = padding == "max_length" and data_args.ignore_pad_token_for_loss)
+                                           # mask_pad_tokens = padding == "max_length" and ignore_pad_token_for_loss,
+                                           mask_pad_tokens=ignore_pad_token_for_loss)
 
     def _unmask_by_pad_token(tensor):
         return unmask_by_pad_token(tensor, tokenizer.pad_token_id, mask_id=ignore_index)

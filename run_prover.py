@@ -18,16 +18,15 @@ Fine-tuning the library models for sequence to sequence.
 """
 # You can also adapt this script on your own sequence to sequence task. Pointers for this are left as comments.
 
+from pprint import pformat
 import line_profiling
 import deepspeed
 import time
 from FLD_prover import StepWiseGenerationTrainer
 from FLD_prover.preprocess import (
     LMType,
-    preprocess_function,
+    preprocess_function as FLD_preprocess_function,
     prepare_tokenized_inputs,
-    prepare_tokenized_targets,
-    mask_labels_by_ignore_index,
     unmask_by_pad_token,
 )
 from FLD_task.proof import get_stance_markers
@@ -54,7 +53,7 @@ from transformers import (
     AutoTokenizer,
     LlamaTokenizer,
     DataCollatorForSeq2Seq,
-    DataCollatorForLanguageModeling,
+    # DataCollatorForLanguageModeling,
     HfArgumentParser,
     MBart50Tokenizer,
     MBart50TokenizerFast,
@@ -407,6 +406,15 @@ class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
         return super().__call__(features, return_tensors=return_tensors)
 
 
+# class RemoveUnusedColumnsCollator(DataCollatorForLanguageModeling):
+# 
+#     def __call__(self, features, return_tensors=None):
+#         for feature in features:
+#             if "depth" in feature:
+#                 feature.pop("depth", None)
+#         return super().__call__(features, return_tensors=return_tensors)
+
+
 class RemoveUnusedColumnsCollator:
 
     def __init__(self, return_tensors: Optional[str] = None):
@@ -742,8 +750,8 @@ def main():
     def _prepare_tokenized_inputs(inputs, max_length, **kwargs):
         return prepare_tokenized_inputs(inputs, tokenizer, padding, max_length, **kwargs)
 
-    def _preprocess_function(examples: Dict[str, List[Any]], split: str):
-        return preprocess_function(
+    def _FLD_preprocess_function(examples: Dict[str, List[Any]], split: str):
+        return FLD_preprocess_function(
             examples,
             split,
             lm_type,
@@ -756,6 +764,7 @@ def main():
             proof_sampling=data_args.proof_sampling,
             sample_negative_proof=data_args.sample_negative_proof,
             no_subproof_for_unknown=data_args.no_subproof_for_unknown,
+            ignore_pad_token_for_loss=data_args.ignore_pad_token_for_loss,
             ignore_prompt_for_causal_lm_loss=data_args.ignore_prompt_for_causal_lm_loss,
             log_examples=data_args.log_examples,
         )
@@ -766,7 +775,7 @@ def main():
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
             train_dataset = train_dataset.select(range(max_train_samples))
         train_dataset.set_transform(
-            lambda examples: _preprocess_function(examples, 'train'))
+            lambda examples: _FLD_preprocess_function(examples, 'train'))
     else:
         train_dataset = None
 
@@ -776,7 +785,7 @@ def main():
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
         eval_dataset.set_transform(
-            lambda examples: _preprocess_function(examples, 'eval'))
+            lambda examples: _FLD_preprocess_function(examples, 'eval'))
     else:
         eval_dataset = None
 
@@ -786,7 +795,7 @@ def main():
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
             predict_dataset = predict_dataset.select(range(max_predict_samples))
         predict_dataset.set_transform(
-            lambda examples: _preprocess_function(examples, 'eval'))
+            lambda examples: _FLD_preprocess_function(examples, 'eval'))
     else:
          predict_dataset = None
 
@@ -801,6 +810,11 @@ def main():
             return_tensors='pt',
         )
     elif lm_type == LMType.CAUSAL:
+        # data_collator = RemoveUnusedColumnsCollator(
+        #     tokenizer,
+        #     mlm=False,
+        #     return_tensors='pt',
+        # )
         data_collator = RemoveUnusedColumnsCollator(
             return_tensors='pt',
         )
@@ -846,6 +860,7 @@ def main():
         else:
             raise Exception('unexpected')
             examples = [None] * len(preds)
+        # examples = [example for example in eval_dataset]  # TODO
 
         # Replace ignore_indexs used for padding as we can't decode them
         preds = _unmask_by_pad_token(preds)
@@ -866,7 +881,9 @@ def main():
             for i in range(len(examples))
         ]
         if decoded_labels is not None and tuple(decoded_labels) != tuple(decoded_labels_from_examples):
+            # XXX: labelsにpromptしか入っていない．
             raise Exception('Unexcected, may be a bug')
+        # import pudb; pudb.set_trace()
 
         results = {}
 
@@ -933,6 +950,9 @@ def main():
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
+
+        logger.info('-------- compute_metrics() done! ------------------')
+        logger.info('\n' + pformat(results))
 
         return results
 
@@ -1112,7 +1132,7 @@ def main():
                 use_auth_token=True if model_args.use_auth_token else None,
             )['tmp']
             user_input_dataset.set_transform(
-                lambda examples: _preprocess_function(examples, 'eval'))
+                lambda examples: _FLD_preprocess_function(examples, 'eval'))
             results = trainer.predict(user_input_dataset,
                                       metric_key_prefix="predict")
 

@@ -92,7 +92,7 @@ def main():
     dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2__default',
@@ -113,7 +113,7 @@ def main():
         # '20230904.jpn.D3',
 
         # ---------------------------------- 20230916.jpn ------------------------------------
-        # '20230916.jpn.D1_wo_dist',
+        '20230916.jpn.D1_wo_dist',
         # '20230916.jpn.D1',
         # '20230916.jpn.D3',
         # '20230916.jpn.D5',
@@ -121,7 +121,7 @@ def main():
 
     model_settings = [
         # ============================ english      ============================
-        ('t5-base', 'seq2seq', 't5-base'),
+        # ('t5-base', 'seq2seq', 't5-base'),
 
         # ============================ multilingual ============================
         # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
@@ -138,7 +138,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
@@ -184,8 +184,8 @@ def main():
         # 'debug.step-10',
         # 'debug.micro',
         # 'debug.micro.deepspeed',
-        # 'debug.tiny',
-        'debug.middle',
+        'debug.tiny',
+        # 'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
 
@@ -233,8 +233,8 @@ def main():
     # warmup_ratio = None
 
     lrates = [
-        1e-5,     # best for few-shot LLMs
-        # 1e-4,   # could be best for fully fine-tuning LMs?
+        # 1e-5,     # best for few-shot LLMs
+        1e-4,   # could be best for fully fine-tuning LMs?
         # 1e-3,
     ]
 

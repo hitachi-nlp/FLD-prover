@@ -73,6 +73,21 @@ _BATCH_SETTINGS = {
             # 'generation_num_beams': 10,
             'generation_num_beams': 1,
         },
+
+        'cyberagent/open-calm-small.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'generation_num_beams': 1,
+        },
+
     },
 
 
