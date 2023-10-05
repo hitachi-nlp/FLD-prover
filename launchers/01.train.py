@@ -75,9 +75,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.find_setting')
     # output_top_dir = Path('./outputs/01.train.py/20230916.jpn.prevent_overfitting.no_lora')
 
-    output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -92,11 +92,11 @@ def main():
     dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        'hf.hitachi-nlp/FLD.v2__default',
-        'hf.hitachi-nlp/FLD.v2__star',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         # '20230826.jpn.D3',
@@ -113,15 +113,15 @@ def main():
         # '20230904.jpn.D3',
 
         # ---------------------------------- 20230916.jpn ------------------------------------
-        '20230916.jpn.D1_wo_dist',
-        '20230916.jpn.D1',
-        '20230916.jpn.D3',
-        '20230916.jpn.D5',
+        # '20230916.jpn.D1_wo_dist',
+        # '20230916.jpn.D1',
+        # '20230916.jpn.D3',
+        # '20230916.jpn.D5',
     ]
 
     model_settings = [
         # ============================ english      ============================
-        # ('t5-base', 'seq2seq', 't5-base'),
+        ('t5-base', 'seq2seq', 't5-base'),
 
         # ============================ multilingual ============================
         # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
@@ -173,7 +173,7 @@ def main():
         # XXX can not fit into V100 x 4. Use 2 nodes.
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -185,7 +185,7 @@ def main():
         # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
-        # 'debug.middle',
+        'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
 
@@ -202,10 +202,10 @@ def main():
         # 'FT.step-5000.LLM',
         # 'FT.step-10000.LLM',
 
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -218,8 +218,8 @@ def main():
     ]
 
     epochs_list = [
-        50,
-        # None,
+        # 50,
+        None,
     ]
 
     # TODO: make these options default of get_learning_setting()
@@ -238,29 +238,30 @@ def main():
         # 1e-3,
     ]
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    # n_gpus = 1  # debug
+    n_gpus = 1  # debug
     # n_gpus = 4
-    n_gpus = None  # specify this when running through QsubEngine
+    # n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
+    gpu_name_for_batch_size = 'V100_16_1'
     # gpu_name_for_batch_size = 'V100_16_4'
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # dry_run = True
     dry_run = False
 
-    hours = 12
-    # hours = 24
+    # hours = 12
+    hours = 24
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
@@ -305,11 +306,6 @@ def main():
     # generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
     generation_timeout = 60 * 10  # slow generatoin is most likely the repetitions coming from underfitting.
 
-    no_prompt_mask_args = [
-        False,   # much better
-        # True,
-    ]
-
     sample_negative_proof_args = [
         # True,
         False,    # better for 'all_at_once'
@@ -339,125 +335,123 @@ def main():
 
                 for sample_negative_proof in sample_negative_proof_args:
                     for no_subproof_for_unknown in no_subproof_for_unknown_args:
-                        for no_prompt_mask in no_prompt_mask_args:
-                            for seed in seeds:
-                                for model_name, lm_type, model_name_for_batch_size in model_settings:
-                                    if lm_type == 'causal':
-                                        proof_sampling = 'all_at_once'
-                                    else:
-                                        proof_sampling = seq2seq_proof_sampling
+                        for seed in seeds:
+                            for model_name, lm_type, model_name_for_batch_size in model_settings:
+                                if lm_type == 'causal':
+                                    proof_sampling = 'all_at_once'
+                                else:
+                                    proof_sampling = seq2seq_proof_sampling
 
-                                    for lrate in lrates:
-                                        setting = {}
+                                for lrate in lrates:
+                                    setting = {}
 
-                                        base_config_name = get_default_config_name(dataset_uname)
-                                        base_setting = get_config(base_config_name)
-                                        setting.update(base_setting)
+                                    base_config_name = get_default_config_name(dataset_uname)
+                                    base_setting = get_config(base_config_name)
+                                    setting.update(base_setting)
 
-                                        learning_setting = get_learning_setting(
-                                            learning,
-                                            epoch=epoch,
-                                            steps_upper=steps_upper,
-                                            warmup_steps=warmup_steps,
-                                            warmup_ratio=warmup_ratio,
-                                            train_effective_batch_size=train_effective_batch_size,
-                                            num_evals=num_evals,
-                                            max_eval_samples=max_eval_samples,
+                                    learning_setting = get_learning_setting(
+                                        learning,
+                                        epoch=epoch,
+                                        steps_upper=steps_upper,
+                                        warmup_steps=warmup_steps,
+                                        warmup_ratio=warmup_ratio,
+                                        train_effective_batch_size=train_effective_batch_size,
+                                        num_evals=num_evals,
+                                        max_eval_samples=max_eval_samples,
+                                    )
+                                    setting.update(learning_setting)
+
+                                    dataset_setting = get_dataset_setting(
+                                        dataset_uname,
+                                        DATASETS_DIRS,
+                                        use_test_as_val=setting.get('use_test_as_val', False),
+                                        use_test_as_train=setting.get('use_test_as_train', False))
+                                    setting.update(dataset_setting)
+
+                                    setting.update({
+                                        'do_train': True,
+                                        # 'do_eval': True,   # automatically set by evaluation_strategy=step
+                                        'do_eval_in_outerloop': False,
+                                        'do_predict': False,
+                                    })
+
+                                    setting.update(get_save_eval_step_setting(
+                                        max_steps=setting['max_steps'],
+                                        eval_steps=setting['eval_steps'],
+                                        do_save_model=save_model,
+                                    ))
+
+                                    modelwise_setting = get_batch_setting(
+                                        gpu_name_for_batch_size,
+                                        model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
+                                    )
+
+                                    accum_steps = int(learning_setting['train_effective_batch_size']
+                                                      / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
+                                    if accum_steps < 1:
+                                        _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
+                                        logger.warning(
+                                            'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
+                                            modelwise_setting['per_device_train_batch_size'],
+                                            _per_device_train_batch_size,
+                                            learning_setting['train_effective_batch_size'],
                                         )
-                                        setting.update(learning_setting)
+                                        modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
+                                        accum_steps = 1
+                                    setting['gradient_accumulation_steps'] = accum_steps
 
-                                        dataset_setting = get_dataset_setting(
-                                            dataset_uname,
-                                            DATASETS_DIRS,
-                                            use_test_as_val=setting.get('use_test_as_val', False),
-                                            use_test_as_train=setting.get('use_test_as_train', False))
-                                        setting.update(dataset_setting)
+                                    setting.update(modelwise_setting)
 
-                                        setting.update({
-                                            'do_train': True,
-                                            # 'do_eval': True,   # automatically set by evaluation_strategy=step
-                                            'do_eval_in_outerloop': False,
-                                            'do_predict': False,
-                                        })
+                                    setting.update(get_model_name_settings(model_name))
 
-                                        setting.update(get_save_eval_step_setting(
-                                            max_steps=setting['max_steps'],
-                                            eval_steps=setting['eval_steps'],
-                                            do_save_model=save_model,
-                                        ))
+                                    setting.update({
+                                        'seed': seed,
 
-                                        modelwise_setting = get_batch_setting(
-                                            gpu_name_for_batch_size,
-                                            model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
-                                        )
+                                        'dataset_uname': dataset_uname,
+                                        'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
 
-                                        accum_steps = int(learning_setting['train_effective_batch_size']
-                                                          / (modelwise_setting['per_device_train_batch_size'] * n_gpus))
-                                        if accum_steps < 1:
-                                            _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
-                                            logger.warning(
-                                                'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
-                                                modelwise_setting['per_device_train_batch_size'],
-                                                _per_device_train_batch_size,
-                                                learning_setting['train_effective_batch_size'],
-                                            )
-                                            modelwise_setting['per_device_train_batch_size'] = _per_device_train_batch_size
-                                            accum_steps = 1
-                                        setting['gradient_accumulation_steps'] = accum_steps
+                                        'base_config_name': base_config_name,
 
-                                        setting.update(modelwise_setting)
+                                        'lm_type': lm_type,
+                                        'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
 
-                                        setting.update(get_model_name_settings(model_name))
+                                        # 'save_total_limit': save_total_limit,
 
-                                        setting.update({
-                                            'seed': seed,
+                                        # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                        'proof_sampling': proof_sampling,
+                                        'learning': learning,
+                                        'sample_negative_proof': sample_negative_proof,
+                                        'no_subproof_for_unknown': no_subproof_for_unknown,
 
-                                            'dataset_uname': dataset_uname,
-                                            'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
+                                        'lr_scheduler_type': 'linear',
+                                        'learning_rate': lrate,
+                                        'weight_decay': 0.0,
 
-                                            'base_config_name': base_config_name,
+                                        # 'n_gpu': 1,
+                                        'dataloader_num_workers': 0,
 
-                                            'lm_type': lm_type,
-                                            'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
+                                        'lora': False,
 
-                                            # 'save_total_limit': save_total_limit,
+                                        'generation_timeout': generation_timeout,
 
-                                            # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                            'proof_sampling': proof_sampling,
-                                            'learning': learning,
-                                            'sample_negative_proof': sample_negative_proof,
-                                            'no_subproof_for_unknown': no_subproof_for_unknown,
-                                            'no_prompt_mask': no_prompt_mask,
+                                        'use_auth_token': True,
 
-                                            'lr_scheduler_type': 'linear',
-                                            'learning_rate': lrate,
-                                            'weight_decay': 0.0,
+                                        'log_examples': True,
+                                    })
 
-                                            # 'n_gpu': 1,
-                                            'dataloader_num_workers': 0,
+                                    output_dir = make_output_dir(setting, output_top_dir)
+                                    command = make_command(output_dir,
+                                                           setting,
+                                                           run_mode,
+                                                           n_gpus=n_gpus)
 
-                                            'lora': False,
-
-                                            'generation_timeout': generation_timeout,
-
-                                            'use_auth_token': True,
-
-                                            'log_examples': True,
-                                        })
-
-                                        output_dir = make_output_dir(setting, output_top_dir)
-                                        command = make_command(output_dir,
-                                                               setting,
-                                                               run_mode,
-                                                               n_gpus=n_gpus)
-
-                                        run_by_engine(
-                                            engine,
-                                            command,
-                                            output_dir,
-                                            hours=hours,
-                                            dry_run=dry_run
-                                        )
+                                    run_by_engine(
+                                        engine,
+                                        command,
+                                        output_dir,
+                                        hours=hours,
+                                        dry_run=dry_run
+                                    )
 
     logger.info('------------- ./01.train.py finished !! -----------')
 

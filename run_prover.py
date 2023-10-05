@@ -21,12 +21,15 @@ Fine-tuning the library models for sequence to sequence.
 import line_profiling
 import deepspeed
 import time
-from FLD_prover import (
-    StepWiseGenerationTrainer,
-    preprocess_examples_train,
-    preprocess_examples_eval,
+from FLD_prover import StepWiseGenerationTrainer
+from FLD_prover.preprocess import (
+    LMType,
+    preprocess_function,
+    prepare_tokenized_inputs,
+    prepare_tokenized_targets,
+    mask_labels_by_ignore_index,
+    unmask_by_pad_token,
 )
-from FLD_prover.utils import tokenize_with_log
 from FLD_task.proof import get_stance_markers
 from FLD_task import (
     load_deduction,
@@ -51,6 +54,7 @@ from transformers import (
     AutoTokenizer,
     LlamaTokenizer,
     DataCollatorForSeq2Seq,
+    DataCollatorForLanguageModeling,
     HfArgumentParser,
     MBart50Tokenizer,
     MBart50TokenizerFast,
@@ -249,9 +253,6 @@ class DataTrainingArguments:
     tokenizer_padding: Optional[str] = field(
         default=False,
     )
-    no_prompt_mask: Optional[bool] = field(
-        default=False,
-    )
 
     max_train_samples: Optional[int] = field(
         default=None,
@@ -381,11 +382,6 @@ class DataTrainingArguments:
             self.val_max_target_length = self.max_target_length
 
 
-class LMType(Enum):
-    SEQ_2_SEQ = 'seq2seq'
-    CAUSAL = 'causal'
-
-
 summarization_name_mapping = {
     "amazon_reviews_multi": ("review_body", "review_title"),
     "big_patent": ("description", "abstract"),
@@ -467,7 +463,6 @@ def main():
 
     # Seq2SeqTrainingArguments is a sub-class of TrainingArguments, therefore simply loading as Seq2SeqTrainingArguments is enough
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
-
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
@@ -549,10 +544,6 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
         )
     else:
-        extension = data_args.file_type
-        if extension is None or extension not in ['json', 'csv']:
-            raise ValueError()
-
         data_files = {}
         if data_args.train_file is not None:
             data_files["train"] = data_args.train_file
@@ -563,6 +554,10 @@ def main():
         if data_args.test_file is not None:
             data_files["test"] = data_args.test_file
             # extension = data_args.test_file.split(".")[-1]
+
+        extension = data_args.file_type
+        if extension is None or extension not in ['json', 'csv']:
+            raise ValueError()
 
         if len(data_files) > 0:
             raw_datasets = load_dataset(
@@ -665,7 +660,6 @@ def main():
         logger.info('train LoRA model with the following parameters:')
         model.print_trainable_parameters()
 
-
     # Override the decoding parameters of Seq2SeqTrainer
     # + 1 to be compatible with beam search
     training_args.generation_max_length = (
@@ -713,8 +707,6 @@ def main():
                 " model's position encodings by passing `--resize_position_embeddings`."
             )
 
-    prefix = data_args.source_prefix if data_args.source_prefix is not None else ""
-
     if isinstance(tokenizer, tuple(MULTILINGUAL_TOKENIZERS)):
         assert (
             data_args.lang is not None
@@ -730,15 +722,13 @@ def main():
         )
         model.config.forced_bos_token_id = forced_bos_token_id
 
-    context_column = 'context'
-    next_step_column = 'next_step'
-    gold_proof_column = 'gold_proof'
     ignore_index = -100
 
     # Temporarily set max_target_length for training.
     # max_target_length = data_args.max_target_length
     # padding = "max_length" if data_args.pad_to_max_length else False
     padding = data_args.tokenizer_padding or False
+    
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
         logger.warning(
@@ -746,224 +736,29 @@ def main():
             f"`{model.__class__.__name__}`. This will lead to loss being calculated twice and will take up more memory"
         )
 
-    def extract_serials(examples: Dict[str, List[Any]]) -> Tuple[List[str], List[str], List[str]]:
-        if data_args.log_examples:
-            logger.info('')
-            logger.info('============================= extract_inputs_targets() =============================')
+    def _unmask_by_pad_token(tensor):
+        return unmask_by_pad_token(tensor, tokenizer.pad_token_id, mask_id=ignore_index)
 
-        inputs: List[str] = []
-        targets: List[str] = []
-        gold_proofs: List[str] = []
-        for i_example in range(len(examples[context_column])):
-            context = examples[context_column][i_example]
-            next_step = examples[next_step_column][i_example]
-            gold_proof = examples[gold_proof_column][i_example]
+    def _prepare_tokenized_inputs(inputs, max_length, **kwargs):
+        return prepare_tokenized_inputs(inputs, tokenizer, padding, max_length, **kwargs)
 
-            inputs.append(context)
-            targets.append(next_step)
-            gold_proofs.append(gold_proof)
-            if data_args.log_examples:
-                logger.info('context    [%d] : "%s"', i_example, context)
-                logger.info('next_step [%d] : "%s"', i_example, next_step)
-                logger.info('gold_proof [%d] : "%s"', i_example, gold_proof)
-
-        inputs = [prefix + inp for inp in inputs]
-
-        return inputs, targets, gold_proofs
-
-    def prepare_tokenized_inputs(inputs: List[str],
-                                 max_length: int,
-                                 **kwargs) -> Dict[str, torch.Tensor]:
-        _padding = kwargs.pop('padding', padding)
-        tokenized = tokenize_with_log(tokenizer,
-                                      text=inputs,
-                                      max_length=max_length,
-                                      padding=_padding,
-                                      truncation=True,
-                                      return_tensors='pt',
-                                      add_special_tokens=False,
-                                      **kwargs)
-        return tokenized
-
-    def prepare_tokenized_targets(targets: List[str],
-                                  max_length: int,
-                                  **kwargs) -> Dict[str, torch.Tensor]:
-        tokenized = tokenize_with_log(tokenizer,
-                                      text_target=targets,
-                                      max_length=max_length,
-                                      padding=padding,
-                                      truncation=True,
-                                      return_tensors='pt',
-                                      add_special_tokens=False,
-                                      **kwargs)
-        return tokenized
-
-    def mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
-        """
-        [OpenCALM-7BをLoRAでinstruction tuningするための実装解説](https://qiita.com/m__k/items/173ade78990b7d6a4be4)
-        """
-
-        if mask_lengths is not None:
-            if data_args.ignore_prompt_for_causal_lm_loss:
-                for i_label, mask_length in enumerate(mask_lengths):
-                    non_pad_first_token = 0  # for the case of "left" padding
-                    for i_token, token_id in enumerate(labels[i_label].numpy().tolist()):
-                        if token_id != tokenizer.pad_token_id:
-                            non_pad_first_token = i_token
-                            break
-                    labels[i_label][non_pad_first_token : non_pad_first_token + mask_length] = ignore_index
-
-        if padding == "max_length" and data_args.ignore_pad_token_for_loss:
-            labels = torch.where(labels != tokenizer.pad_token_id, labels, ignore_index)
-
-        return labels
-
-    def unmask_by_pad_token(tensor: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
-        if not isinstance(tensor, (np.ndarray, torch.Tensor)):
-            raise ValueError()
-        if isinstance(tensor, torch.Tensor):
-            tensor = tensor.detach().cpu().numpy()
-        return np.where(tensor != ignore_index, tensor, tokenizer.pad_token_id)
-
-    whole_proof_max_length = (
-        data_args.max_target_length * 200 if data_args.proof_sampling == 'stepwise' and lm_type == LMType.SEQ_2_SEQ
-        else data_args.max_target_length
-    )
-    proof_col = 'gold_proofs'
-
-    @profile
-    def preprocess_function(examples: Dict[str, List[Any]], split: str) -> Dict[str, List[Any]]:
-        batch_size = len(list(examples.values())[0])
-        unbatched_examples = [{key: examples[key][i] for key in examples.keys()}
-                              for i in range(batch_size)]
-
-        prompts_w_partial_proof: List[str] = []
-        proof_steps: List[str] = []
-        gold_proofs: List[str] = []
-        for i_example, example in enumerate(unbatched_examples):
-            deduction = load_deduction(example)
-            serial = serialize(
-                deduction,
-                stepwise = (data_args.proof_sampling == 'stepwise'),
-                sample_negative_proof = data_args.sample_negative_proof if split == 'train' else False,
-                include_max_subproof_for_unknown = not data_args.no_subproof_for_unknown,
-            )
-
-            prompt_with_partial_proof = prefix + serial.prompt + (serial.partial_proof or '')
-
-            gold_proof = serial.proof
-            # check whther the tokenizer can recognize stance markers
-            gold_proof_dec = tokenizer.decode(prepare_tokenized_targets([gold_proof],
-                                                                        whole_proof_max_length)["input_ids"][0])
-            if len(get_stance_markers(gold_proof_dec)) == 0:
-                logger.warning(
-                    '\n'.join([
-                        'The tokenizer could not recognized the stance markers.',
-                        f'The original proof: "{gold_proof}"',
-                        f'The tokenized proof: "{gold_proof_dec}"',
-                    ])
-                )
-
-            prompts_w_partial_proof.append(prompt_with_partial_proof)
-            proof_steps.append(serial.next_proof_step)
-            gold_proofs.append(gold_proof)
-
-
-            if data_args.log_examples:
-                logger.info('------------------------------ preprocess_function [example=%d] ------------------------------', i_example)
-                logger.info('prompt             : "%s"', prompt_with_partial_proof)
-                logger.info('next proof step    : "%s"', serial.next_proof_step)
-                logger.info('gold proof         : "%s"', gold_proof)
-
-        _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
-
-        # without this additional token, we can not accurately calculate the prompt length
-        causal_lm_sep_token = '::'
-        forward_inputs: Dict[str, Any] = {}
-        if split == 'train':
-            if any(_targets is None for _targets in proof_steps):
-                raise ValueError()
-
-            if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts_w_partial_proof, data_args.max_source_length))
-                forward_inputs["labels"] = prepare_tokenized_targets(_proof_steps_w_eos,
-                                                                     data_args.max_target_length)["input_ids"]
-                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"])
-
-            elif lm_type == LMType.CAUSAL:
-                # just for getting length
-                _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
-
-                if data_args.no_prompt_mask:
-                    prompt_lengths = None
-                else:
-                    prompt_ids = [
-                        prepare_tokenized_inputs(
-                            prompt,
-                            data_args.max_source_length,
-                            padding='longest',
-                            return_length=True,
-                            # add_special_tokens=False,
-                        )
-                        for prompt in _prompts
-                    ]
-                    prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
-
-                inputs_with_targets = [f'{prompt}{proof_step}'
-                                       for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
-                forward_inputs.update(prepare_tokenized_inputs(inputs_with_targets, data_args.max_source_length))
-                forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
-
-                forward_inputs["labels"] = mask_labels_by_ignore_index(forward_inputs["labels"],
-                                                                       mask_lengths=prompt_lengths)
-            else:
-                raise NotImplementedError()
-        else:
-            if any(_gold_proofs is None for _gold_proofs in gold_proofs):
-                raise Exception('Why pass here? might be a bug?')
-
-            if lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(prepare_tokenized_inputs(prompts_w_partial_proof, data_args.max_source_length))
-                forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
-                                                                      whole_proof_max_length)["input_ids"]
-                forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
-
-            elif lm_type == LMType.CAUSAL:
-                _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
-
-                forward_inputs.update(
-                    prepare_tokenized_inputs(
-                        _prompts,
-                        data_args.max_source_length,
-                        # add_special_tokens=False
-                    ))
-
-                # the padding is arbitrary
-                forward_inputs[proof_col] = prepare_tokenized_targets(gold_proofs,
-                                                                      whole_proof_max_length)["input_ids"]
-                forward_inputs[proof_col] = mask_labels_by_ignore_index(forward_inputs[proof_col])
-            else:
-                raise NotImplementedError()
-
-        # some models do not accept 'token_type_ids' as inputs
-        if 'token_type_ids' in forward_inputs:
-            forward_inputs.pop('token_type_ids', None)
-        if "depth" in examples:
-            forward_inputs["depth"] = examples["depth"]
-
-        inputs_decoded = tokenizer.batch_decode(unmask_by_pad_token(forward_inputs['input_ids']))
-        if 'labels' in forward_inputs:
-            labels_decoded = tokenizer.batch_decode(unmask_by_pad_token(forward_inputs['labels']))
-        else:
-            labels_decoded = [None] * len(inputs_decoded)
-        for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
-            logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
-            logger.info(input_decoded)
-            if label_decoded is not None:
-                logger.info('------------ [example=%d] tokenized labels ----------------', i_example)
-                logger.info(label_decoded)
-
-        return forward_inputs
+    def _preprocess_function(examples: Dict[str, List[Any]], split: str):
+        return preprocess_function(
+            examples,
+            split,
+            lm_type,
+            tokenizer,
+            prompt_prefix=data_args.source_prefix,
+            padding=padding,
+            max_source_length=data_args.max_source_length,
+            max_target_length=data_args.max_target_length,
+            ignore_index=ignore_index,
+            proof_sampling=data_args.proof_sampling,
+            sample_negative_proof=data_args.sample_negative_proof,
+            no_subproof_for_unknown=data_args.no_subproof_for_unknown,
+            ignore_prompt_for_causal_lm_loss=data_args.ignore_prompt_for_causal_lm_loss,
+            log_examples=data_args.log_examples,
+        )
 
     if training_args.do_train:
         train_dataset = raw_datasets["train"]
@@ -971,7 +766,7 @@ def main():
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
             train_dataset = train_dataset.select(range(max_train_samples))
         train_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'train'))
+            lambda examples: _preprocess_function(examples, 'train'))
     else:
         train_dataset = None
 
@@ -981,7 +776,7 @@ def main():
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
         eval_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'eval'))
+            lambda examples: _preprocess_function(examples, 'eval'))
     else:
         eval_dataset = None
 
@@ -991,7 +786,7 @@ def main():
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
             predict_dataset = predict_dataset.select(range(max_predict_samples))
         predict_dataset.set_transform(
-            lambda examples: preprocess_function(examples, 'eval'))
+            lambda examples: _preprocess_function(examples, 'eval'))
     else:
          predict_dataset = None
 
@@ -1053,21 +848,21 @@ def main():
             examples = [None] * len(preds)
 
         # Replace ignore_indexs used for padding as we can't decode them
-        preds = unmask_by_pad_token(preds)
+        preds = _unmask_by_pad_token(preds)
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
 
         if labels is not None:
-            labels = unmask_by_pad_token(labels)
+            labels = _unmask_by_pad_token(labels)
             decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
         else:
             decoded_labels = None
 
         decoded_prompts_from_examples = [
-            tokenizer.decode(unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
+            tokenizer.decode(_unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
             for i in range(len(examples))
         ]
         decoded_labels_from_examples = [
-            tokenizer.decode(unmask_by_pad_token(examples[i][proof_col]), skip_special_tokens=True)
+            tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
             for i in range(len(examples))
         ]
         if decoded_labels is not None and tuple(decoded_labels) != tuple(decoded_labels_from_examples):
@@ -1095,8 +890,7 @@ def main():
 
             if example is not None:
                 input_ids = example['input_ids']
-                # input_ids = np.where(np.array(input_ids) != ignore_index, input_ids, tokenizer.pad_token_id)
-                input_ids = unmask_by_pad_token(input_ids)
+                input_ids = _unmask_by_pad_token(input_ids)
                 decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
 
                 context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
@@ -1145,15 +939,17 @@ def main():
     # Initialize our Trainer
     if training_args.remove_unused_columns:
         raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augumentation.')
+
     if lm_type == LMType.SEQ_2_SEQ:
         preprocess_logits_for_metrics = None
+
     elif lm_type == LMType.CAUSAL:
-        #def preprocess_logits_for_metrics(logits, labels):
-        #    if isinstance(logits, tuple):
-        #        # Depending on the model and config, logits may contain extra tensors,
-        #        # like past_key_values, but logits always come first
-        #        logits = logits[0]
-        #    return logits.argmax(dim=-1)
+        # def preprocess_logits_for_metrics(logits, labels):
+        #     if isinstance(logits, tuple):
+        #         # Depending on the model and config, logits may contain extra tensors,
+        #         # like past_key_values, but logits always come first
+        #         logits = logits[0]
+        #     return logits.argmax(dim=-1)
 
         preprocess_logits_for_metrics = None
         if data_args.proof_sampling == 'stepwise':
@@ -1224,7 +1020,7 @@ def main():
         tokenizer=tokenizer,
         max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
         compute_metrics=compute_metrics if training_args.predict_with_generate and not is_torch_tpu_available() else None,
-        texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, data_args.max_source_length),
+        texts_to_inputs_func=lambda texts: _prepare_tokenized_inputs(texts, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         log_generation=data_args.log_generation,
@@ -1283,7 +1079,7 @@ def main():
         if trainer.is_world_process_zero():
             if training_args.predict_with_generate:
                 predictions = predict_results.predictions
-                predictions = unmask_by_pad_token(predictions)
+                predictions = _unmask_by_pad_token(predictions)
                 predictions = tokenizer.batch_decode(
                     predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
                 )
@@ -1316,14 +1112,14 @@ def main():
                 use_auth_token=True if model_args.use_auth_token else None,
             )['tmp']
             user_input_dataset.set_transform(
-                lambda examples: preprocess_function(examples, 'eval'))
+                lambda examples: _preprocess_function(examples, 'eval'))
             results = trainer.predict(user_input_dataset,
                                       metric_key_prefix="predict")
 
             if trainer.is_world_process_zero():
                 if training_args.predict_with_generate:
                     predictions = results.predictions
-                    predictions = unmask_by_pad_token(predictions)
+                    predictions = _unmask_by_pad_token(predictions)
                     predictions = tokenizer.batch_decode(
                         predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
                     )

@@ -42,6 +42,39 @@ _BATCH_SETTINGS = {
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
     # thus, we can measure the maxmum usage of memory.
 
+    'V100_16_1': {
+
+        't5-base': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1700,
+            'max_target_length': 100,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            # 'generation_num_beams': 10,
+            'generation_num_beams': 1,
+        },
+
+        't5-base.all_at_once': {
+            # 'tokenizer_padding': 'max_length',
+            'tokenizer_padding': 'longest',
+
+            'max_source_length': 1000,
+            'max_target_length': 1000,
+
+            'per_device_train_batch_size': 4,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            # 'generation_num_beams': 10,
+            'generation_num_beams': 1,
+        },
+    },
+
 
     'V100_16_4': {
 
