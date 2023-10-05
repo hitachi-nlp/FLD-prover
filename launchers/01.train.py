@@ -116,9 +116,9 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         '20230916.jpn.D1_wo_dist',
-        '20230916.jpn.D1',
-        '20230916.jpn.D3',
-        '20230916.jpn.D5',
+        # '20230916.jpn.D1',
+        # '20230916.jpn.D3',
+        # '20230916.jpn.D5',
     ]
 
     model_settings = [
@@ -235,8 +235,12 @@ def main():
     # warmup_ratio = None
 
     lrates = [
-        1e-5,     # best for few-shot LLMs
-        # 1e-4,   # could be best for fully fine-tuning LMs?
+        1e-6,
+        # 3e-6,
+        # 1e-5,     # best for few-shot LLMs
+        # 3e-5,
+        1e-4,   # could be best for fully fine-tuning LMs?
+
         # 1e-3,
     ]
 

@@ -1185,6 +1185,10 @@ def main():
     else:
         trainer.create_model_card(**kwargs)
 
+    if lm_type == LMType.CAUSAL:
+        if padding == 'max_length':
+            logger.warning('The generated sequence could have only 1 token, as padding="max_length" is specified for caucal language models.')
+
     return results
 
 
