@@ -252,11 +252,13 @@ class StepWiseGenerationTrainer(Seq2SeqTrainer):
             if args.include_inputs_for_metrics:
                 metrics = self.compute_metrics(
                     EvalPrediction(predictions=all_preds, label_ids=all_labels, inputs=all_inputs),
-                    dataloader=dataloader,
+                    # dataloader=dataloader,
                 )
             else:
-                metrics = self.compute_metrics(EvalPrediction(predictions=all_preds, label_ids=all_labels),
-                                               dataloader=dataloader)
+                metrics = self.compute_metrics(
+                    EvalPrediction(predictions=all_preds, label_ids=all_labels),
+                    # dataloader=dataloader,
+                )
         else:
             metrics = {}
 

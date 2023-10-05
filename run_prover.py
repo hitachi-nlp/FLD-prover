@@ -846,7 +846,7 @@ def main():
         'extr_stps': build_metrics('allow_extra_steps'),
     }
 
-    def compute_metrics(eval_preds, dataloader=None) -> Dict[str, Any]:
+    def compute_metrics(eval_preds) -> Dict[str, Any]:
         if lm_type == LMType.CAUSAL:
             if padding == 'max_length':
                 logger.warning('The generated sequence would have only 1 token, as padding="max_length" is specified.')
@@ -855,22 +855,11 @@ def main():
         if isinstance(preds, tuple):
             preds = preds[0]
 
-        if dataloader is not None:
-            examples = [example for example in dataloader.dataset]  # before collating
-        else:
-            raise Exception('unexpected')
-            examples = [None] * len(preds)
-        # examples = [example for example in eval_dataset]  # TODO
+        examples = eval_dataset # TODO
 
         # Replace ignore_indexs used for padding as we can't decode them
         preds = _unmask_by_pad_token(preds)
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-
-        if labels is not None:
-            labels = _unmask_by_pad_token(labels)
-            decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-        else:
-            decoded_labels = None
 
         decoded_prompts_from_examples = [
             tokenizer.decode(_unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
@@ -880,10 +869,6 @@ def main():
             tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
             for i in range(len(examples))
         ]
-        if decoded_labels is not None and tuple(decoded_labels) != tuple(decoded_labels_from_examples):
-            # XXX: labelsにpromptしか入っていない．
-            raise Exception('Unexcected, may be a bug')
-        # import pudb; pudb.set_trace()
 
         results = {}
 
