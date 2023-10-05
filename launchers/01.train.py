@@ -77,7 +77,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -114,9 +116,9 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         '20230916.jpn.D1_wo_dist',
-        # '20230916.jpn.D1',
-        # '20230916.jpn.D3',
-        # '20230916.jpn.D5',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
+        '20230916.jpn.D5',
     ]
 
     model_settings = [
@@ -138,7 +140,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
@@ -161,11 +163,11 @@ def main():
         # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -184,7 +186,7 @@ def main():
         # 'debug.step-10',
         # 'debug.micro',
         # 'debug.micro.deepspeed',
-        'debug.tiny',
+        # 'debug.tiny',
         # 'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
@@ -202,10 +204,10 @@ def main():
         # 'FT.step-5000.LLM',
         # 'FT.step-10000.LLM',
 
-        # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        'LLM_FS.shot-10',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -213,13 +215,13 @@ def main():
     ]
 
     seeds = [
-        # 0,
-        1,
+        0,
+        # 1,
     ]
 
     epochs_list = [
-        # 50,
-        None,
+        50,
+        # None,
     ]
 
     # TODO: make these options default of get_learning_setting()
@@ -233,35 +235,35 @@ def main():
     # warmup_ratio = None
 
     lrates = [
-        # 1e-5,     # best for few-shot LLMs
-        1e-4,   # could be best for fully fine-tuning LMs?
+        1e-5,     # best for few-shot LLMs
+        # 1e-4,   # could be best for fully fine-tuning LMs?
         # 1e-3,
     ]
 
-    run_mode = 'vanilla'
+    # run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = SubprocessEngine()
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    n_gpus = 1  # debug
+    # n_gpus = 1  # debug
     # n_gpus = 4
-    # n_gpus = None  # specify this when running through QsubEngine
+    n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
-    gpu_name_for_batch_size = 'V100_16_1'
+    # gpu_name_for_batch_size = 'V100_16_1'
     # gpu_name_for_batch_size = 'V100_16_4'
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # dry_run = True
     dry_run = False
 
-    # hours = 12
-    hours = 24
+    hours = 12
+    # hours = 24
 
     # ---------------------- pushing datasets to hub -------------------
     # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.

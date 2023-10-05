@@ -855,7 +855,7 @@ def main():
         if isinstance(preds, tuple):
             preds = preds[0]
 
-        examples = eval_dataset # TODO
+        examples = eval_dataset
 
         # Replace ignore_indexs used for padding as we can't decode them
         preds = _unmask_by_pad_token(preds)
