@@ -879,7 +879,7 @@ def main():
         tokenizer=tokenizer,
         max_steps=data_args.generation_max_proof_steps if data_args.proof_sampling == 'stepwise' else 1,
         compute_metrics=compute_metrics if training_args.predict_with_generate and not is_torch_tpu_available() else None,
-        texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, tokenizer, padding, data_args.max_source_length, **kwargs),
+        texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, tokenizer, padding, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         log_generation=data_args.log_generation,
