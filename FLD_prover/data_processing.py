@@ -38,13 +38,13 @@ def preprocess_function(examples: Dict[str, List[Any]],
                         sample_negative_proof=False,
                         no_subproof_for_unknown=False,
                         ignore_pad_token_for_loss=True,
-                        ignore_prompt_for_causal_lm_loss=True,
+                        include_prompt_for_causal_lm_loss=False,
                         log_examples=False) -> Dict[str, List[Any]]:
 
     def _prepare_tokenized_targets(targets, max_length, **kwargs):
         return prepare_tokenized_targets(targets, tokenizer, padding, max_length, **kwargs)
 
-    def _prepare_tokenized_inputs(inputs, max_length, **kwargs):
+    def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
         return prepare_tokenized_inputs(inputs, tokenizer, padding, max_length, **kwargs)
 
     def _mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
@@ -123,7 +123,9 @@ def preprocess_function(examples: Dict[str, List[Any]],
             # just for getting length
             _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
 
-            if ignore_prompt_for_causal_lm_loss:
+            if include_prompt_for_causal_lm_loss:
+                prompt_lengths = None
+            else:
                 prompt_ids = [
                     _prepare_tokenized_inputs(
                         prompt,
@@ -135,8 +137,6 @@ def preprocess_function(examples: Dict[str, List[Any]],
                     for prompt in _prompts
                 ]
                 prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
-            else:
-                prompt_lengths = None
 
             inputs_with_targets = [f'{prompt}{proof_step}'
                                    for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
