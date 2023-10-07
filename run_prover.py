@@ -194,9 +194,6 @@ class DataTrainingArguments:
             "help": "An optional input test data file to evaluate the metrics (rouge) on (a jsonlines or csv file)."
         },
     )
-    dataset_push_to_hub_repo_name: str = field(
-        default=None,
-    )
     file_type: Optional[str] = field(
         default=None, metadata={"help": "The input file type such as 'json' or 'csv'"}
     )
@@ -540,11 +537,6 @@ def main():
             )
         else:
             raw_datasets = {}
-
-    if data_args.dataset_push_to_hub_repo_name is not None:
-        raise DeprecationWarning('Use FLD-task scripts to push to hub.')
-        raw_datasets.push_to_hub(data_args.dataset_push_to_hub_repo_name)
-        return
 
     # load and dump once to normalize the schema from different versions of datasets.
     raw_datasets = raw_datasets.map(

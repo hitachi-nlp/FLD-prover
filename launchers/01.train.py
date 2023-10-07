@@ -79,8 +79,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
 
-    output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
+    output_top_dir = Path('./outputs/01.train.py/20231007.run_causal_prover')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -92,10 +92,10 @@ def main():
         './outputs.FLD/00.create_corpus/20230916.jpn',
     ]
 
-    dataset_unames = [
+    FLD_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
+        '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2__default',
@@ -116,7 +116,7 @@ def main():
         # '20230904.jpn.D3',
 
         # ---------------------------------- 20230916.jpn ------------------------------------
-        '20230916.jpn.D1_wo_dist',
+        # '20230916.jpn.D1_wo_dist',
         # '20230916.jpn.D1',
         # '20230916.jpn.D3',
         # '20230916.jpn.D5',
@@ -125,6 +125,7 @@ def main():
     model_settings = [
         # ============================ english      ============================
         # ('t5-base', 'seq2seq', 't5-base'),
+        ('gpt2-medium', 'causal', 'gpt2-medium'),
 
         # ============================ multilingual ============================
         # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
@@ -179,6 +180,8 @@ def main():
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
+    script_type = 'run_causal_prover'
+
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
 
@@ -187,7 +190,7 @@ def main():
         # 'debug.step-10',
         # 'debug.micro',
         # 'debug.micro.deepspeed',
-        # 'debug.tiny',
+        'debug.tiny',
         # 'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
@@ -207,8 +210,8 @@ def main():
 
         # 'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -221,19 +224,9 @@ def main():
     ]
 
     epochs_list = [
-        50,
-        # None,
+        # 50,
+        None,
     ]
-
-    # TODO: make these options default of get_learning_setting()
-    train_effective_batch_size = 32
-    # train_effective_batch_size = None
-
-    steps_upper = 300
-    # steps_upper = None
-
-    warmup_ratio = 0.3
-    # warmup_ratio = None
 
     lrates = [
         # 3e-6,
@@ -264,26 +257,15 @@ def main():
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
     gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    # dry_run = True
-    dry_run = False
-
     hours = 12
     # hours = 24
 
-    # ---------------------- pushing datasets to hub -------------------
-    # XXX: BE CAREFUL specifying "dataset_push_to_hub_repo_name" will OVERWRITE the remote hub.
-    # if you push to hub:
-    # XXX: SPECIFY use_test_as_train = False, use_test_as_val = False
-    # XXX: Additionally, DO NOT DELETE THE REPOSITORY MANUALLY before pushing,
-    #      as it will delete all the statistics such as # downloads and likes.
+    save_model = False
 
-    # learning = ['push_to_hub']  # XXX turn on
+    # dry_run = True
+    dry_run = False
 
-    dataset_push_to_hub_repo_name = None
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD.v2'
-    # dataset_push_to_hub_repo_name = 'hitachi-nlp/FLD-star.v2'
-
-    # ------------------------------------------------------------
+    # --------------------------- fixed settings ---------------------------------
 
     if isinstance(engine, QsubEngine):
         if gpu_name_for_batch_size is not None:
@@ -323,22 +305,16 @@ def main():
         # False,
     ]
 
+    steps_upper = None
+    warmup_ratio = None
+    train_effective_batch_size = None
     warmup_steps = None
     max_eval_samples = None
     num_evals = None
 
-    # save_model = True
-    save_model = False
-
-    for dataset_uname in dataset_unames:
+    for FLD_dataset_uname in FLD_dataset_unames:
         for learning in learnings:
             for epoch in epochs_list:
-                if dataset_push_to_hub_repo_name is not None:
-                    if n_gpus != 1 or run_mode != 'vanilla':
-                        # this does not work
-                        raise ValueError()
-                    if learning != 'push_to_hub':
-                        raise ValueError()
 
                 for sample_negative_proof in sample_negative_proof_args:
                     for no_subproof_for_unknown in no_subproof_for_unknown_args:
@@ -352,7 +328,7 @@ def main():
                                 for lrate in lrates:
                                     setting = {}
 
-                                    base_config_name = get_default_config_name(dataset_uname)
+                                    base_config_name = get_default_config_name(FLD_dataset_uname)
                                     base_setting = get_config(base_config_name)
                                     setting.update(base_setting)
 
@@ -369,7 +345,7 @@ def main():
                                     setting.update(learning_setting)
 
                                     dataset_setting = get_dataset_setting(
-                                        dataset_uname,
+                                        FLD_dataset_uname,
                                         DATASETS_DIRS,
                                         use_test_as_val=setting.get('use_test_as_val', False),
                                         use_test_as_train=setting.get('use_test_as_train', False))
@@ -415,8 +391,7 @@ def main():
                                     setting.update({
                                         'seed': seed,
 
-                                        'dataset_uname': dataset_uname,
-                                        'dataset_push_to_hub_repo_name': dataset_push_to_hub_repo_name,
+                                        'FLD_dataset_uname': FLD_dataset_uname,
 
                                         'base_config_name': base_config_name,
 

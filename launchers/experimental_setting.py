@@ -1455,14 +1455,16 @@ def get_learning_setting(name: str,
                          max_eval_samples: Optional[int] = None,
                          ) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
+        train_effective_batch_size = train_effective_batch_size or 32
+        steps_upper = steps_upper or 300
+        warmup_ratio = warmup_ratio or 0.3
+
         if epoch is not None and steps is not None:
             raise ValueError()
         if epoch is None and steps is None:
             raise ValueError()
 
         max_train_samples = int(name[len('LLM_FS.shot-'):])
-
-        train_effective_batch_size = train_effective_batch_size or 32
 
         if epoch is not None:
             max_steps = int(epoch * max(1, math.floor(max_train_samples / train_effective_batch_size)))
@@ -1475,7 +1477,6 @@ def get_learning_setting(name: str,
         if steps_upper is not None:
             max_steps = min(max_steps, steps_upper)
 
-        warmup_ratio = warmup_ratio or 0.1
         warmup_steps = warmup_steps or int(warmup_ratio * max_steps)
 
         num_evals = num_evals or 3
@@ -1574,15 +1575,15 @@ def get_checkpoints(spec: CheckpointSpec,
                     continue
 
                 if name_or_local_dataset_name.find('.local_dataset_1_name--') >= 0:
-                    dataset_uname, local_dataset_1_name = name_or_local_dataset_name.split('.local_dataset_1_name--')
+                    FLD_dataset_uname, local_dataset_1_name = name_or_local_dataset_name.split('.local_dataset_1_name--')
                 else:
-                    dataset_uname = name_or_local_dataset_name
+                    FLD_dataset_uname = name_or_local_dataset_name
                     local_dataset_1_name = None
 
-                found_local_dataset_name = lab_setting['dataset_uname']
+                found_local_dataset_name = lab_setting['FLD_dataset_uname']
                 found_local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
 
-                if found_local_dataset_name == dataset_uname and found_local_dataset_1_name == local_dataset_1_name:
+                if found_local_dataset_name == FLD_dataset_uname and found_local_dataset_1_name == local_dataset_1_name:
                     found_spec = CheckpointSpec(**lab_setting)
                     found_spec.name_or_local_dataset_name = name_or_local_dataset_name
                     checkpoints.append((str(checkpoint), found_spec))
@@ -1680,7 +1681,7 @@ def make_command(output_dir: Union[str, Path],
         'learning',
         'train_effective_batch_size',
         'max_proof_steps',
-        'dataset_uname',
+        'FLD_dataset_uname',
         'n_proc_per_node',
 
         'use_test_as_train',
@@ -1793,7 +1794,7 @@ def make_output_dir(setting: Dict,
         top_dir=str(
             Path(top_dir)
             # / f'sstm_nm={setting.get("system_name", str(None))}'
-            / f'dtst_nm={setting.get("dataset_uname", None)}'
+            / f'dtst_nm={setting.get("FLD_dataset_uname", None)}'
             / f'dtst_1_nm={setting.get("local_dataset_1_name", None)}'
             # / f'excld_unknwn={setting.get("exclude_unknown", None)}'
             # / f'add_fnl_rfrc_t_prfs={setting.get("add_final_reference_to_proofs", None)}'
@@ -1812,7 +1813,7 @@ def make_output_dir(setting: Dict,
             'tokenizer_name',
             'config_name',
 
-            'dataset_uname',
+            'FLD_dataset_uname',
             'dataset_config_name',
             'local_dataset_1_name',
             'dataset_1',
@@ -1905,11 +1906,11 @@ def make_output_dir(setting: Dict,
 
 
 def make_system_name(lab_setting: Dict) -> str:
-    dataset_uname = lab_setting['dataset_uname']
+    FLD_dataset_uname = lab_setting['FLD_dataset_uname']
     # local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
     checkpoint_name = lab_setting['checkpoint_name']
 
-    return f'checkpoint_name--{checkpoint_name}__local_dataset_name--{dataset_uname}'
+    return f'checkpoint_name--{checkpoint_name}__local_dataset_name--{FLD_dataset_uname}'
 
 
 def run_by_engine(engine: EngineBase,
