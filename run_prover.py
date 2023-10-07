@@ -23,13 +23,15 @@ import line_profiling
 import deepspeed
 import time
 from FLD_prover import StepWiseGenerationTrainer
+from FLD_prover.lm_types import LMType
 from FLD_prover.data_processing import (
-    LMType,
     preprocess_function as FLD_preprocess_function,
     prepare_tokenized_inputs,
     unmask_by_pad_token,
     compute_metrics as FLD_compute_metrics,
 )
+from FLD_prover.tokenizers import load as load_tokenizer
+from FLD_prover.generation import generation_handled
 from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForSeq2Seq
 from FLD_task.proof import get_stance_markers
 from FLD_task import (
@@ -46,7 +48,6 @@ from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 import huggingface_hub
 from transformers.utils.versions import require_version
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
-from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_utils import get_last_checkpoint
 from transformers import (
     AutoConfig,
@@ -77,9 +78,6 @@ import nltk  # Here to have a nice missing dependency error message early on
 import evaluate
 import datasets
 import torch
-from enum import Enum
-import readline
-from collections import defaultdict
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 from dataclasses import dataclass, field
 import sys
@@ -248,7 +246,7 @@ class DataTrainingArguments:
     #         )
     #     },
     # )
-    tokenizer_padding: Optional[str] = field(
+    padding: Optional[str] = field(
         default=False,
     )
 
@@ -294,8 +292,8 @@ class DataTrainingArguments:
             "help": "Whether to ignore the tokens corresponding to padded labels in the loss computation or not."
         },
     )
-    ignore_prompt_for_causal_lm_loss: bool = field(
-        default=True,
+    include_prompt_for_causal_lm_loss: bool = field(
+        default=False,
         metadata={},
     )
     source_prefix: Optional[str] = field(
@@ -563,31 +561,22 @@ def main():
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
-    config_name = model_args.config_name or model_args.model_name_or_path
     config = AutoConfig.from_pretrained(
-        config_name,
+        model_args.config_name or model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
         trust_remote_code=True,
     )
 
-    tokenizer_name = model_args.tokenizer_name or model_args.model_name_or_path
-    if tokenizer_name.startswith('stabilityai'):
-        tokenizer = LlamaTokenizer.from_pretrained("novelai/nerdstash-tokenizer-v1",
-                                                   additional_special_tokens=['▁▁'],
-                                                   use_auth_token=True if model_args.use_auth_token else None) 
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(
-            tokenizer_name,
-            cache_dir=model_args.cache_dir,
-            use_fast=model_args.use_fast_tokenizer,
-            revision=model_args.model_revision,
-            use_auth_token=True if model_args.use_auth_token else None,
-            trust_remote_code=True,
-        )
-    if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    tokenizer = load_tokenizer(
+        model_args.tokenizer_name or model_args.model_name_or_path,
+        cache_dir=model_args.cache_dir,
+        use_auth_token=model_args.use_auth_token,
+        use_fast_tokenizer=model_args.use_fast_tokenizer,
+        revision=model_args.model_revision,
+        trust_remote_code=True,
+    )
 
     if lm_type == LMType.SEQ_2_SEQ:
         auto_model_class = AutoModelForSeq2SeqLM
@@ -698,11 +687,10 @@ def main():
         )
         model.config.forced_bos_token_id = forced_bos_token_id
 
-
     # Temporarily set max_target_length for training.
     # max_target_length = data_args.max_target_length
     # padding = "max_length" if data_args.pad_to_max_length else False
-    padding = data_args.tokenizer_padding or False
+    padding = data_args.padding or False
     
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
@@ -712,7 +700,7 @@ def main():
         )
 
     def _FLD_preprocess_function(examples: Dict[str, List[Any]], split: str):
-        return FLD_preprocess_function(
+        processed = FLD_preprocess_function(
             examples,
             split,
             lm_type,
@@ -725,9 +713,10 @@ def main():
             sample_negative_proof=data_args.sample_negative_proof,
             no_subproof_for_unknown=data_args.no_subproof_for_unknown,
             ignore_pad_token_for_loss=data_args.ignore_pad_token_for_loss,
-            ignore_prompt_for_causal_lm_loss=data_args.ignore_prompt_for_causal_lm_loss,
+            include_prompt_for_causal_lm_loss=data_args.include_prompt_for_causal_lm_loss,
             log_examples=data_args.log_examples,
         )
+        return processed
 
     if training_args.do_train:
         train_dataset = raw_datasets["train"]
@@ -816,59 +805,24 @@ def main():
     else:
         raise NotImplementedError()
 
-    if lm_type == LMType.CAUSAL:
-        """
-            model.generate() with batch size >= 2 require hacks on special tokens.
-            this preparation must be exactly when entering/exiting evaluate()/predict(),
-            as other functions such as train() should not respect this hack.
-            See [here](https://discuss.huggingface.co/t/batch-generation-with-gpt2/1517/2)
-        """
-
-        padding_side_org = tokenizer.padding_side
-        pad_token_org = tokenizer.pad_token
-        pad_token_id_org = model.config.eos_token_id
-
-        def generation_init_special_tokens():
-            logger.info('generation_init_special_tokens() called!')
-            tokenizer.padding_side = 'left'
-            tokenizer.pad_token = tokenizer.eos_token
-            model.config.pad_token_id = model.config.eos_token_id
-
-        def generation_exit_special_tokens():
-            logger.info('generation_exit_special_tokens() called!')
-            tokenizer.padding_side = padding_side_org
-            tokenizer.pad_token = pad_token_org
-            model.config.pad_token_id = pad_token_id_org
-    else:
-        def generation_init_special_tokens():
-            pass
-
-        def generation_exit_special_tokens():
-            pass
-
-    def make_gen_kwargs():
-        """
-            As generation_init_special_tokens()/generation_exit_special_tokens() dynamically change
-            tokenizer special tokens, we also have to generate gen_kwargs dynamically.
-        """
-        stopping_criteria = MaxTimeCriteriaWithWarning(data_args.generation_timeout)
-        return {
-            'top_k': data_args.generation_top_k,
-            'stopping_criteria': [stopping_criteria],
-            'num_return_sequences': data_args.generation_num_return_sequences,
-            'pad_token_id': tokenizer.pad_token_id,
-        }
-
-    def generation_handled(func):
-        def inner(self, *args, **kwargs):
-            generation_init_special_tokens()
-            results = func(self, *args, **kwargs, **make_gen_kwargs())
-            generation_exit_special_tokens()
-            return results
-        return inner
-
-    StepWiseGenerationTrainer.evaluate = generation_handled(StepWiseGenerationTrainer.evaluate)
-    StepWiseGenerationTrainer.predict = generation_handled(StepWiseGenerationTrainer.predict)
+    StepWiseGenerationTrainer.evaluate = generation_handled(
+        StepWiseGenerationTrainer.evaluate,
+        lm_type,
+        tokenizer,
+        model,
+        timeout=data_args.generation_timeout,
+        top_k=data_args.generation_top_k,
+        num_return_sequences=data_args.generation_num_return_sequences,
+    )
+    StepWiseGenerationTrainer.predict = generation_handled(
+        StepWiseGenerationTrainer.predict,
+        lm_type,
+        tokenizer,
+        model,
+        timeout=data_args.generation_timeout,
+        top_k=data_args.generation_top_k,
+        num_return_sequences=data_args.generation_num_return_sequences,
+    )
 
     trainer = StepWiseGenerationTrainer(
         model=model,

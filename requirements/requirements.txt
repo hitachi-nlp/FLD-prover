@@ -5,6 +5,8 @@ transformers==4.31.0
 # transformers==4.29.1
 # transformers==4.28.1
 
+tokenizers==v0.13.4.rc3
+
 accelerate >= 0.21.0
 # accelerate==0.18.0
 

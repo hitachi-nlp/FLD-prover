@@ -29,24 +29,18 @@ def maybe_option_value(option: str, value: Any) -> str:
             return f'{option} {value}'
 
 
-def maybe_option_flag(flag: str, value: bool) -> str:
-    if not isinstance(value, bool):
-        raise ValueError()
-    return f'{flag} {str(value)}'
-
-
 _BATCH_SETTINGS = {
 
     # XXX: if you change max_source_length or max_target_length,
-    # make sure that all the stuf fit into memory with tokenizer_padding='max_len' option.
+    # make sure that all the stuf fit into memory with padding='max_len' option.
     # The 'max_len' option guarantee that the model always use the max_len inputs without truncation
     # thus, we can measure the maxmum usage of memory.
 
     'V100_16_1': {
 
         't5-base': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1700,
             'max_target_length': 100,
@@ -60,8 +54,8 @@ _BATCH_SETTINGS = {
         },
 
         't5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -75,8 +69,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-small.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -88,14 +82,28 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
+        'cyberagent/open-calm-3b.all_at_once': {
+            # 'padding': 'max_length',
+            'padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': True,
+
+            'generation_num_beams': 1,
+        },
+
     },
 
 
     'V100_16_4': {
 
         'google/mt5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -108,8 +116,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -122,8 +130,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -136,8 +144,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-small.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -150,8 +158,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -164,8 +172,8 @@ _BATCH_SETTINGS = {
         },
 
         'gpt2-medium.max_pos_1000.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -185,8 +193,8 @@ _BATCH_SETTINGS = {
     'V100_16_4.deepspeed': {
 
         't5-base': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1700,
             'max_target_length': 100,
@@ -200,8 +208,8 @@ _BATCH_SETTINGS = {
         },
 
         't5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -223,8 +231,8 @@ _BATCH_SETTINGS = {
 
 
         'google/mt5-base': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -237,8 +245,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -251,8 +259,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -265,8 +273,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -279,8 +287,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -293,8 +301,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -307,8 +315,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -321,8 +329,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -336,8 +344,8 @@ _BATCH_SETTINGS = {
 
 
         'cyberagent/open-calm-small.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -350,8 +358,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -364,8 +372,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-large.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -378,8 +386,8 @@ _BATCH_SETTINGS = {
         },
 
         'facebook/xglm-564M.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -397,8 +405,8 @@ _BATCH_SETTINGS = {
 
 
         'retrieva-jp/t5-xl': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -411,8 +419,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-xl.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -425,8 +433,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -439,8 +447,8 @@ _BATCH_SETTINGS = {
         },
 
         # 'cyberagent/open-calm-1b.all_at_once': {
-        #     # 'tokenizer_padding': 'max_length',
-        #     'tokenizer_padding': 'longest',
+        #     # 'padding': 'max_length',
+        #     'padding': 'longest',
 
         #     'max_source_length': 2000,
         #     'max_target_length': 2000,
@@ -453,8 +461,8 @@ _BATCH_SETTINGS = {
         # },
 
         'cyberagent/open-calm-3b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -467,8 +475,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -481,8 +489,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -505,8 +513,8 @@ _BATCH_SETTINGS = {
     'A100_48_1': {
 
         't5-base': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1700,
             'max_target_length': 100,
@@ -520,8 +528,8 @@ _BATCH_SETTINGS = {
         },
 
         't5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -543,8 +551,8 @@ _BATCH_SETTINGS = {
 
 
         'google/mt5-base': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -557,8 +565,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-base.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -571,8 +579,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -585,8 +593,8 @@ _BATCH_SETTINGS = {
         },
 
         'google/mt5-large.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -599,8 +607,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -613,8 +621,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-base-long.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -627,8 +635,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -641,8 +649,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-large-long.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -655,8 +663,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-xl': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 100,
@@ -669,8 +677,8 @@ _BATCH_SETTINGS = {
         },
 
         'retrieva-jp/t5-xl.all_at_once': {
-            # # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 1000,
             'max_target_length': 1000,
@@ -683,8 +691,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-small.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -697,8 +705,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-medium.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -711,8 +719,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-large.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -725,8 +733,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-1b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -739,8 +747,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-3b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -753,8 +761,8 @@ _BATCH_SETTINGS = {
         },
 
         'cyberagent/open-calm-7b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -767,8 +775,8 @@ _BATCH_SETTINGS = {
         },
 
         'matsuo-lab/weblab-10b.all_at_once': {
-            # 'tokenizer_padding': 'max_length',
-            'tokenizer_padding': 'longest',
+            # 'padding': 'max_length',
+            'padding': 'longest',
 
             'max_source_length': 2000,
             'max_target_length': 2000,
@@ -802,8 +810,8 @@ _VERIFIER_BATCH_SETTINGS = {
 
         'per_device_train_batch_size': 16,
 
-        # # 'tokenizer_padding': 'max_length',
-        'tokenizer_padding': 'longest',
+        # # 'padding': 'max_length',
+        'padding': 'longest',
     },
 }
 
@@ -987,7 +995,7 @@ _PROVER_CONFIGS = {
         # 'oracle_prover': False,
         # 'oracle_verifier': False,
         'max_source_length': 512,
-        # 'tokenizer_padding': longest,
+        # 'padding': longest,
         'max_target_length': 64,
 
         'logging_strategy': 'steps',
@@ -1011,7 +1019,7 @@ _PROVER_CONFIGS = {
         'per_device_train_batch_size': 3,
         'per_device_eval_batch_size': 3,
         'dataloader_num_workers': 2,
-        # 'tokenizer_padding': longest,
+        # 'padding': longest,
         # 'shuffle_train': True,
 
         'dataset_1': None,
@@ -1591,6 +1599,13 @@ def get_model_name_settings(model_name_or_path: str) -> Dict[str, Any]:
         return {'model_name_or_path': model_name_or_path}
 
 
+def get_tokenizer_settings(model_name_or_path: str) -> Dict[str, Any]:
+    if model_name_or_path.startswith('line-corporation'):
+        return {'use_fast_tokenizer': False}
+    else:
+        return {}
+
+
 def get_save_eval_step_setting(eval_steps: Optional[int] = None,
                                do_save_model=False,
                                max_steps: Optional[int] = None) -> Dict[str, Any]:
@@ -1840,7 +1855,7 @@ def make_output_dir(setting: Dict,
             'per_device_train_batch_size',
             'gradient_accumulation_steps',
             'per_device_eval_batch_size',
-            'tokenizer_padding',
+            'padding',
             'limit_eval_batches',
             'num_val_stage_throught_training',
 

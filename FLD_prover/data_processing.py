@@ -1,6 +1,5 @@
 from typing import Optional, Union, Any
 import logging
-from enum import Enum
 import re
 from pprint import pformat
 
@@ -15,12 +14,7 @@ from FLD_task import (
     log_example,
 )
 from FLD_task.proof import get_stance_markers
-
-
-class LMType(Enum):
-    SEQ_2_SEQ = 'seq2seq'
-    CAUSAL = 'causal'
-
+from FLD_prover.lm_types import LMType
 
 logger = logging.getLogger()
 
@@ -187,8 +181,12 @@ def preprocess_function(examples: Dict[str, List[Any]],
     inputs_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
     if 'labels' in forward_inputs:
         labels_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))
+        # forward_inputs['labels']は [-100, -100, ..., 1, 4, 1, .., -100]
+        # HONOKA tokenizer.pad_token = </s> となっている．結果デコードすると，</s>が生み出される．
+        # もとはpadになっていたはず．なぜ？ -> generation_handled周り？
     else:
         labels_decoded = [None] * len(inputs_decoded)
+
     for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
         logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
         logger.info(input_decoded)

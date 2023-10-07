@@ -17,6 +17,7 @@ from experimental_setting import (
     get_batch_setting,
     get_save_eval_step_setting,
     get_model_name_settings,
+    get_tokenizer_settings,
     get_learning_setting,
     make_output_dir,
     make_command,
@@ -77,9 +78,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -167,7 +168,7 @@ def main():
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -204,8 +205,8 @@ def main():
         # 'FT.step-5000.LLM',
         # 'FT.step-10000.LLM',
 
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
         'LLM_FS.shot-1000',
         'LLM_FS.shot-10000',
 
@@ -235,7 +236,11 @@ def main():
     # warmup_ratio = None
 
     lrates = [
-        1e-5,     # best for few-shot LLMs
+        # 3e-6,
+        1e-5,
+        # 3e-5,
+
+
         # 1e-4,   # could be best for fully fine-tuning LMs?
         # 1e-3,
     ]
@@ -405,6 +410,7 @@ def main():
                                     setting.update(modelwise_setting)
 
                                     setting.update(get_model_name_settings(model_name))
+                                    setting.update(get_tokenizer_settings(model_name))
 
                                     setting.update({
                                         'seed': seed,
