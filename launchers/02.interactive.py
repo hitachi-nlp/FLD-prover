@@ -21,7 +21,7 @@ from experimental_setting import (
     CheckpointSpec,
     ICML_2023_NL_TRANSFER_MAJOR_DATASETS,
     ICML_2023_NL_TRANSFER_MAJOR_DATASETS_LARGE_DEPTH,
-    LEARNING_SETTINGS,
+    _PROVER_LEARNING_SETTINGS,
     make_val_interval_setting,
 )
 

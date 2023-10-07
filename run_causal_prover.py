@@ -69,6 +69,7 @@ from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
 from FLD_prover.generation import generation_handled
+from FLD_prover.interactive import launch
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -227,7 +228,7 @@ class DataTrainingArguments:
     FLD_max_eval_samples: Optional[int] = field(
         default=None,
     )
-    FLD_proof_eval_num_beams: Optional[int] = field(
+    FLD_proof_eval_generation_num_beams: Optional[int] = field(
         default=None,
         metadata={
             "help": (
@@ -296,17 +297,23 @@ class DataTrainingArguments:
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
 
-    generation_top_k: int = field(
+    FLD_proof_eval_generation_top_k: int = field(
         default=None,
     )
 
-    generation_num_return_sequences: int = field(
+    FLD_proof_eval_generation_num_return_sequences: int = field(
         default=1,
     )
 
-    generation_timeout: int = field(
+    FLD_proof_eval_generation_timeout: int = field(
         default=60,
     )
+
+    interactive_mode: str = field(
+        default=None,
+    )
+
+    gradio_port: int = 8010
 
     log_examples: bool = field(
         default=False,
@@ -612,22 +619,15 @@ def main():
 
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
-        if block_size > 1024:
-            logger.warning(
-                "The chosen tokenizer supports a `model_max_length` that is longer than the default `block_size` value"
-                " of 1024. If you would like to use a longer `block_size` up to `tokenizer.model_max_length` you can"
-                " override this default with `--block_size xxx`."
-            )
-            block_size = 1024
+        logger.info("block_size is set as %d, which is the model's max length")
     else:
+        block_size = data_args.block_size
         if data_args.block_size > tokenizer.model_max_length:
             msg = (
                 f"The block_size passed ({data_args.block_size}) is larger than the maximum length for the model"
                 f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
             )
-            # logger.warning(msg)
             raise ValueError(msg)
-        # block_size = min(data_args.block_size, tokenizer.model_max_length)
 
     # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
     tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
@@ -832,7 +832,7 @@ def main():
     # hack for the training_args to fit into Seq2SeqTrainer()
     training_args.generation_config = None  # For Seq2SeqTrainer
     training_args.generation_max_length = block_size
-    training_args.generation_num_beams = data_args.FLD_proof_eval_num_beams
+    training_args.generation_num_beams = data_args.FLD_proof_eval_generation_num_beams
     training_args.predict_with_generate = True
 
     Seq2SeqTrainer.evaluate = generation_handled(
@@ -840,18 +840,18 @@ def main():
         LMType.CAUSAL,
         tokenizer,
         model,
-        timeout=data_args.generation_timeout,
-        top_k=data_args.generation_top_k,
-        num_return_sequences=data_args.generation_num_return_sequences,
+        timeout=data_args.FLD_proof_eval_generation_timeout,
+        top_k=data_args.FLD_proof_eval_generation_top_k,
+        num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
     )
     Seq2SeqTrainer.predict = generation_handled(
         Seq2SeqTrainer.predict,
         LMType.CAUSAL,
         tokenizer,
         model,
-        timeout=data_args.generation_timeout,
-        top_k=data_args.generation_top_k,
-        num_return_sequences=data_args.generation_num_return_sequences,
+        timeout=data_args.FLD_proof_eval_generation_timeout,
+        top_k=data_args.FLD_proof_eval_generation_top_k,
+        num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
     )
 
     FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
@@ -945,6 +945,16 @@ def main():
 
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
+
+    if data_args.interactive_mode is not None:
+        launch(
+            trainer,
+            tokenizer,
+            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
+            data_args.interactive_mode,
+            gradio_port=data_args.gradio_port,
+        )
+        return
 
     # kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-generation"}
     # if data_args.dataset_name is not None:

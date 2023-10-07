@@ -33,6 +33,7 @@ from FLD_prover.data_processing import (
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.generation import generation_handled
 from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForSeq2Seq
+from FLD_prover.interactive import launch
 from FLD_task.proof import get_stance_markers
 from FLD_task import (
     load_deduction,
@@ -897,100 +898,35 @@ def main():
                     writer.write("\n".join(predictions))
 
     if data_args.interactive_mode is not None:
-
-        def get_prediction(context: str, hypothesis: str) -> str:
-            context = re.sub(r'\s+', ' ', re.sub(r'\n', ' ', context))
-            instance = {
-                'context': context,
-                'hypothesis': hypothesis,
-            }
-
-            tmp = tempfile.mktemp()
-            with open(tmp, 'w') as f_out:
-                f_out.write(json.dumps(instance))
-
-            extension = data_args.file_type
-            if extension is None or extension not in ['json', 'csv']:
-                raise ValueError()
-
-            user_input_dataset = load_dataset(
-                extension,
-                data_files={'tmp': tmp},
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-            )['tmp']
-            user_input_dataset.set_transform(
-                lambda examples: _FLD_preprocess_function(examples, 'eval'))
-            results = trainer.predict(user_input_dataset,
-                                      metric_key_prefix="predict")
-
-            if trainer.is_world_process_zero():
-                if training_args.predict_with_generate:
-                    predictions = results.predictions
-                    predictions = _unmask_by_pad_token(predictions)
-                    predictions = tokenizer.batch_decode(
-                        predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
-                    )
-                    predictions = [pred.strip() for pred in predictions]
-                    return predictions[0]
-
-            # TODO: implement the logic here
-            raise NotImplementedError()
-
-        if data_args.interactive_mode == 'console':
-            while True:
-                print('\n\n======================= interactive mode ========================')
-                context = input('\ncontext:\n\n')
-                hypothesis = input('\nhypothesis:\n\n')
-
-                proof = get_prediction(context, hypothesis)
-                proof = prettify_proof_text(proof)
-
-                log_example(
-                    context=context,
-                    hypothesis=hypothesis,
-                    pred_proof=proof,
-                )
-
-        elif data_args.interactive_mode == 'gradio':
-
-            def predict(context: str, hypothesis: str):
-                proof = get_prediction(context, hypothesis)
-                proof = prettify_proof_text(proof)
-                return proof
-
-            demo = gr.Interface(
-                fn=predict,
-                inputs=[gr.Textbox(lines=10, placeholder='sent1: Allen is red\nsent2: Allen is blue'),
-                        gr.Textbox(lines=1, placeholder='Allen is red')],
-                outputs=['text'],
-            )
-            demo.launch(share=True, server_name='0.0.0.0', server_port=data_args.gradio_port)
-        else:
-            raise ValueError()
-
+        launch(
+            trainer,
+            tokenizer,
+            lambda examples: _FLD_preprocess_function(examples, 'eval'),
+            data_args.interactive_mode,
+            gradio_port=data_args.gradio_port,
+        )
         return
 
-    kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "summarization"}
-    if data_args.dataset_name is not None:
-        kwargs["dataset_tags"] = data_args.dataset_name
-        if data_args.dataset_config_name is not None:
-            kwargs["dataset_args"] = data_args.dataset_config_name
-            kwargs["dataset"] = f"{data_args.dataset_name} {data_args.dataset_config_name}"
-        else:
-            kwargs["dataset"] = data_args.dataset_name
+    # kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "summarization"}
+    # if data_args.dataset_name is not None:
+    #     kwargs["dataset_tags"] = data_args.dataset_name
+    #     if data_args.dataset_config_name is not None:
+    #         kwargs["dataset_args"] = data_args.dataset_config_name
+    #         kwargs["dataset"] = f"{data_args.dataset_name} {data_args.dataset_config_name}"
+    #     else:
+    #         kwargs["dataset"] = data_args.dataset_name
 
-    if data_args.lang is not None:
-        kwargs["language"] = data_args.lang
+    # if data_args.lang is not None:
+    #     kwargs["language"] = data_args.lang
 
-    if training_args.push_to_hub:
-        trainer.push_to_hub(**kwargs)
-    else:
-        trainer.create_model_card(**kwargs)
+    # if training_args.push_to_hub:
+    #     trainer.push_to_hub(**kwargs)
+    # else:
+    #     trainer.create_model_card(**kwargs)
 
-    if lm_type == LMType.CAUSAL:
-        if padding == 'max_length':
-            logger.warning('The generated sequence could have only 1 token, as padding="max_length" is specified for caucal language models.')
+    # if lm_type == LMType.CAUSAL:
+    #     if padding == 'max_length':
+    #         logger.warning('The generated sequence could have only 1 token, as padding="max_length" is specified for caucal language models.')
 
     return results
 

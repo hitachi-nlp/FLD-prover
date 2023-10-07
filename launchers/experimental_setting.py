@@ -29,7 +29,7 @@ def maybe_option_value(option: str, value: Any) -> str:
             return f'{option} {value}'
 
 
-_BATCH_SETTINGS = {
+_PROVER_BATCH_SETTINGS = {
 
     # XXX: if you change max_source_length or max_target_length,
     # make sure that all the stuf fit into memory with padding='max_len' option.
@@ -68,6 +68,48 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
+        'gpt2-medium.all_at_once': {
+            # 'padding': 'max_length',
+            'padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'generation_num_beams': 1,
+        },
+
+        'gpt2-medium.short_cntx.all_at_once': {
+            # 'padding': 'max_length',
+            'padding': 'longest',
+
+            'max_source_length': 500,
+            'max_target_length': 500,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'generation_num_beams': 1,
+        },
+
+        'gpt2-large.all_at_once': {
+            # 'padding': 'max_length',
+            'padding': 'longest',
+
+            'max_source_length': 2000,
+            'max_target_length': 2000,
+
+            'per_device_train_batch_size': 1,
+            'per_device_eval_batch_size': 1,
+            'gradient_checkpointing': False,
+
+            'generation_num_beams': 1,
+        },
+
         'cyberagent/open-calm-small.all_at_once': {
             # 'padding': 'max_length',
             'padding': 'longest',
@@ -82,12 +124,12 @@ _BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
-        'cyberagent/open-calm-3b.all_at_once': {
+        'cyberagent/open-calm-1b-short-ctx.all_at_once': {
             # 'padding': 'max_length',
             'padding': 'longest',
 
-            'max_source_length': 2000,
-            'max_target_length': 2000,
+            'max_source_length': 500,
+            'max_target_length': 500,
 
             'per_device_train_batch_size': 1,
             'per_device_eval_batch_size': 1,
@@ -95,6 +137,7 @@ _BATCH_SETTINGS = {
 
             'generation_num_beams': 1,
         },
+
 
     },
 
@@ -797,28 +840,28 @@ _BATCH_SETTINGS = {
 
 }
 
-_VERIFIER_BATCH_SETTINGS = {
-    'roberta-base': {
-        # 'max_source_length': 400,
-        'max_source_length': 300,
-        'per_device_train_batch_size': 16,
-    },
 
-    'roberta-large': {
-        # 'max_source_length': 400,
-        'max_source_length': 300,
-
-        'per_device_train_batch_size': 16,
-
-        # # 'padding': 'max_length',
-        'padding': 'longest',
-    },
-}
+_CAUSAL_PROVER_BATCH_SETTINGS = {}
 
 
-def get_batch_setting(gpu_name: str, model_name) -> Dict[str, Any]:
-    setting = _BATCH_SETTINGS[gpu_name][model_name]
-    return setting
+def get_batch_setting(script_type: str, gpu_name: str, model_name) -> Dict[str, Any]:
+    if script_type == "run_prover":
+
+        return _PROVER_BATCH_SETTINGS[gpu_name][model_name]
+
+    elif script_type == "run_causal_prover":
+        if gpu_name in _CAUSAL_PROVER_BATCH_SETTINGS and model_name in _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name]:
+            setting = _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name][model_name]
+        else:
+            setting = _PROVER_BATCH_SETTINGS[gpu_name][model_name]
+            setting["block_size"] = setting["max_target_length"]
+            setting["FLD_proof_eval_generation_top_k"] = setting.pop("generation_top_k", None)
+            setting["FLD_proof_eval_generation_num_return_sequences"] = setting.pop("generation_num_return_sequences", None)
+            setting["FLD_proof_eval_generation_num_beams"] = setting.pop("generation_num_beams", None)
+            setting["FLD_proof_eval_padding"] = setting.pop("padding", None)
+            return setting
+    else:
+        raise ValueError()
 
 
 _DATASET_PATHS = {
@@ -830,8 +873,11 @@ _DATASET_PATHS = {
 }
 
 
-def get_dataset_setting(uname: str,
+def get_dataset_setting(script_type: str,
+                        uname: str,
                         top_dirs: List[str],
+                        other_dataset_name: Optional[str] = None,
+                        other_dataset_config_name: Optional[str] = None,
                         use_test_as_train=False,
                         use_test_as_val=False) -> Dict[str, Any]:
     type_, dataset_name, dataset_config_name = _parse_dataset_name(uname)
@@ -840,20 +886,33 @@ def get_dataset_setting(uname: str,
         'predict_with_generate': True,
         'remove_unused_columns': False,
     }
+
+    if script_type == "run_prover":
+        FLD_option_prefix = ""
+
+    elif script_type == "run_causal_prover":
+        setting["dataset_name"] = other_dataset_name
+        setting["dataset_config_name"] = other_dataset_config_name
+        FLD_option_prefix = "FLD_"
+
+    else:
+        raise ValueError()
+
     if type_ == 'local':
-        setting.update(get_local_dataset_paths(dataset_name,
-                                               top_dirs=top_dirs,
-                                               use_test_as_train=use_test_as_train,
-                                               use_test_as_val=use_test_as_val))
-        setting['file_type'] = 'json'
+        dataset_paths = get_local_dataset_paths(dataset_name,
+                                                top_dirs=top_dirs,
+                                                use_test_as_train=use_test_as_train,
+                                                use_test_as_val=use_test_as_val)
+        setting.update({f"{FLD_option_prefix}{key}": val for key, val in dataset_paths.items()})
+        setting[f'{FLD_option_prefix}file_type'] = 'json'
 
     elif type_ == 'hf':
         if use_test_as_train:
             logger.warning('use_test_as_train=True does not work with datasets hosted on huggingface.')
         if use_test_as_val:
             logger.warning('use_test_as_val=True does not work with datasets hosted on huggingface.')
-        setting['dataset_name'] = dataset_name
-        setting['dataset_config_name'] = dataset_config_name
+        setting[f'{FLD_option_prefix}dataset_name'] = dataset_name
+        setting[f'{FLD_option_prefix}dataset_config_name'] = dataset_config_name
 
     else:
         raise ValueError()
@@ -967,114 +1026,75 @@ def _parse_dataset_name(name: str) -> Tuple[str, str, Optional[str]]:
         return 'local', name, None
 
 
-_PROVER_CONFIGS = {
-
-    'FLNLcorpus.20220827.base': {
-        'seed': 42,
-        # 'n_gpu': 1,
-        'max_grad_norm': 0.5,
-        'num_train_epochs': None,
-        'max_steps': 10000,
-        'gradient_accumulation_steps': 11,
-        # 'check_val_every_n_epoch': 1,
-        'max_eval_samples': 2000,
-        'proof_sampling': 'stepwise',
-        'max_proof_steps': 30,
-        'learning_rate': 1e-4,
-        'warmup_steps': 1000,
-        'model_name_or_path': 't5-large',
-        # 'fp16': True,
-
-        'source_prefix': 'Solve FLD task: ',
-        'generation_num_beams': 10,
-        'generation_top_k': 10,
-        'generation_max_proof_steps': 20,
-        # 'verifier_ckpt': "",
-        # 'verifier_weight': 0,
-        # 'proof_search': False,
-        # 'oracle_prover': False,
-        # 'oracle_verifier': False,
-        'max_source_length': 512,
-        # 'padding': longest,
-        'max_target_length': 64,
-
-        'logging_strategy': 'steps',
-        'logging_steps': 25,
-        'overwrite_output_dir': True,
-
-        'log_generation': True,
-
-        # 'dataset': FLNL,
-        # 'path_train': specify_me,
-        # 'path_val': specify_me,
-        # 'path_test': specify_me,
-
-        # 'exclude_unknown': False,
-        # 'add_final_reference_to_proofs': False,
-        # 'sample_goal': intermediates # hypothesis | intermediates,
-        # 'subtree_proved_prob': 0.75,
-        # 'subtree_proved_all_or_none': False,
-        'sample_negative_proof': False,
-        'no_subproof_for_unknown': False,
-        'per_device_train_batch_size': 3,
-        'per_device_eval_batch_size': 3,
-        'dataloader_num_workers': 2,
-        # 'padding': longest,
-        # 'shuffle_train': True,
-
-        'dataset_1': None,
-        'path_train_1': None,
-        'path_val_1': None,
-        'path_test_1': None,
-
-        'log_examples': False,
-        # 'no_lower': True,
-
-        # 'evaluation_strategy': 'steps',
-        # 'save_strategy': 'steps',
-        'logging_strategy': 'steps',
-
-    },
-}
-
-
-def get_default_config_name(local_dataset_name: str) -> str:
-    if local_dataset_name.find('ruletaker.include_all_answers') >= 0:
-        return 'ruletaker.include_all_answers.20220922.base'
-    elif local_dataset_name.find('ruletaker.D5.include_all_answers') >= 0:
-        return 'ruletaker.D5.include_all_answers.20220922.base'
-    elif local_dataset_name.find('ruletaker.NatLang.include_all_answers') >= 0:
-        return 'ruletaker.NatLang.include_all_answers.20220922.base'
-    elif local_dataset_name.find('ruletaker.birds-electricity.include_all_answers') >= 0:
-        return 'ruletaker.birds-electricity.include_all_answers.20220922.base'
-    elif local_dataset_name.find('ruletaker') >= 0:
-        return 'ruletaker.20220922.base'
-    elif local_dataset_name.find('EB-task1') >= 0:
-        return 'EB-task1.20220922.base'
-    elif local_dataset_name.find('EB-task2') >= 0:
-        return 'EB-task2.20220922.base'
-    elif local_dataset_name.find('EB-task3') >= 0:
-        return 'EB-task3.20220922.base'
-    else:
-        return 'FLNLcorpus.20220827.base'
-
-
 def get_config(name: str) -> Dict[str, Any]:
-    return _PROVER_CONFIGS[name]
+    if name == 'default':
+        return {
+            'seed': 42,
+            # 'n_gpu': 1,
+            'max_grad_norm': 0.5,
+            'num_train_epochs': None,
+            'max_steps': 10000,
+            'gradient_accumulation_steps': 11,
+            # 'check_val_every_n_epoch': 1,
+            'max_eval_samples': 2000,
+            'proof_sampling': 'stepwise',
+            'max_proof_steps': 30,
+            'learning_rate': 1e-4,
+            'warmup_steps': 1000,
+            'model_name_or_path': 't5-large',
+            # 'fp16': True,
+
+            'source_prefix': 'Solve FLD task: ',
+            'generation_num_beams': 10,
+            'generation_top_k': 10,
+            'generation_max_proof_steps': 20,
+            # 'verifier_ckpt': "",
+            # 'verifier_weight': 0,
+            # 'proof_search': False,
+            # 'oracle_prover': False,
+            # 'oracle_verifier': False,
+            'max_source_length': 512,
+            # 'padding': longest,
+            'max_target_length': 64,
+
+            'logging_strategy': 'steps',
+            'logging_steps': 25,
+            'overwrite_output_dir': True,
+
+            'log_generation': True,
+
+            # 'dataset': FLNL,
+            # 'path_train': specify_me,
+            # 'path_val': specify_me,
+            # 'path_test': specify_me,
+
+            # 'exclude_unknown': False,
+            # 'add_final_reference_to_proofs': False,
+            # 'sample_goal': intermediates # hypothesis | intermediates,
+            # 'subtree_proved_prob': 0.75,
+            # 'subtree_proved_all_or_none': False,
+            'sample_negative_proof': False,
+            'no_subproof_for_unknown': False,
+            'per_device_train_batch_size': 3,
+            'per_device_eval_batch_size': 3,
+            'dataloader_num_workers': 2,
+            # 'padding': longest,
+            # 'shuffle_train': True,
+
+            'log_examples': False,
+            # 'no_lower': True,
+
+            # 'evaluation_strategy': 'steps',
+            # 'save_strategy': 'steps',
+            'logging_strategy': 'steps',
+
+        }
+    else:
+        raise NotImplementedError()
 
 
-_PROVER_CHECKPOINTS = {
-    # official
-    'ruletaker.NLProofS'   : './checkpoints/RuleTaker/NLProofS/prover/epoch=19-step=16940.ckpt',
+_PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
-}
-
-_VERIFIER_CHECKPOINTS = {
-    'ruletaker.NLProofS': './checkpoints/RuleTaker/NLProofS/verifier/epoch=49-step=93000.ckpt',
-}
-
-
-LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
     'FS.shot-0': {
         'max_train_samples': 0,
         'max_eval_samples': 500,
@@ -1444,20 +1464,64 @@ LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 }
 
 
-def get_learning_setting(name: str,
+_CAUSAL_PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
+
+    'debug.micro': {
+        'max_train_samples': 10,
+        'max_eval_samples': 5,
+        'FLD_dataset_prob': 0.5,
+        'FLD_max_eval_samples': 5,
+
+        'train_effective_batch_size': 32,
+        'max_steps': 100,
+        'eval_steps': 100,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
+    'debug.tiny': {
+        'max_train_samples': 20,
+        'max_eval_samples': 20,
+        'FLD_dataset_prob': 0.5,
+        'FLD_max_eval_samples': 10,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 300,
+        'eval_steps': 300,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
+}
+
+
+def get_learning_setting(script_type: str,
+                         name: str,
+
                          epoch: Optional[int] = None,
                          steps: Optional[int] = None,
+
                          steps_upper: Optional[int] = None,
+
                          warmup_steps: Optional[int] = None,
                          warmup_ratio: Optional[float] = None,
+
                          train_effective_batch_size: Optional[int] = None,
                          num_evals: Optional[int] = None,
                          max_eval_samples: Optional[int] = None,
                          ) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
-        train_effective_batch_size = train_effective_batch_size or 32
+        if script_type == "run_causal_prover":
+            raise NotImplementedError()
+
+        epoch = epoch or 50
         steps_upper = steps_upper or 300
         warmup_ratio = warmup_ratio or 0.3
+        train_effective_batch_size = train_effective_batch_size or 32
 
         if epoch is not None and steps is not None:
             raise ValueError()
@@ -1466,10 +1530,8 @@ def get_learning_setting(name: str,
 
         max_train_samples = int(name[len('LLM_FS.shot-'):])
 
-        if epoch is not None:
-            max_steps = int(epoch * max(1, math.floor(max_train_samples / train_effective_batch_size)))
-        else:
-            max_steps = steps
+        max_steps = steps\
+            or int(epoch * max(1, math.floor(max_train_samples / train_effective_batch_size)))
 
         # see[here](https://github.com/huggingface/transformers/issues/22751)
         hf_bug_zero_lr_offset = 20
@@ -1500,7 +1562,12 @@ def get_learning_setting(name: str,
         if epoch is not None:
             raise ValueError()
 
-        base_setting = LEARNING_SETTINGS[name].copy()
+        if script_type == "run_prover":
+            base_setting = _PROVER_LEARNING_SETTINGS[name].copy()
+        elif script_type == "run_causal_prover":
+            base_setting = _CAUSAL_PROVER_LEARNING_SETTINGS[name].copy()
+        else:
+            raise ValueError()
 
         max_steps = steps or base_setting['max_steps']
         if steps_upper is not None:
@@ -1543,58 +1610,49 @@ def get_checkpoints(spec: CheckpointSpec,
 
     name_or_local_dataset_name = spec.name_or_local_dataset_name
 
-    if name_or_local_dataset_name in _PROVER_CHECKPOINTS:
-        return [_PROVER_CHECKPOINTS[name_or_local_dataset_name], CheckpointSpec(name_or_local_dataset_name=name_or_local_dataset_name)]
-    else:
-        if check_point_dirs is None:
-            raise ValueError()
+    if check_point_dirs is None:
+        raise ValueError()
 
-        checkpoints: List[Tuple[str, CheckpointSpec]] = []
-        for check_point_dir in check_point_dirs:
-            for checkpoint in Path(check_point_dir).glob('**/*ckpt'):
-                lab_setting = json.load(open(checkpoint.parent.parent.parent.parent / 'lab.params.json'))
+    checkpoints: List[Tuple[str, CheckpointSpec]] = []
+    for check_point_dir in check_point_dirs:
+        for checkpoint in Path(check_point_dir).glob('**/*ckpt'):
+            lab_setting = json.load(open(checkpoint.parent.parent.parent.parent / 'lab.params.json'))
 
-                def check_spec(name: str) -> bool:
-                    lab_value = lab_setting.get(name, '<<default>>')
-                    if getattr(spec, name) is not None and lab_value != getattr(spec, name):
-                        return False
-                    else:
-                        return True
+            def check_spec(name: str) -> bool:
+                lab_value = lab_setting.get(name, '<<default>>')
+                if getattr(spec, name) is not None and lab_value != getattr(spec, name):
+                    return False
+                else:
+                    return True
 
-                not_met = False
-                for name in spec.dict().keys():
+            not_met = False
+            for name in spec.dict().keys():
 
-                    if name == 'name_or_local_dataset_name':
-                        continue
-
-                    if not check_spec(name):
-                        not_met = True
-                        break
-
-                if not_met:
+                if name == 'name_or_local_dataset_name':
                     continue
 
-                if name_or_local_dataset_name.find('.local_dataset_1_name--') >= 0:
-                    FLD_dataset_uname, local_dataset_1_name = name_or_local_dataset_name.split('.local_dataset_1_name--')
-                else:
-                    FLD_dataset_uname = name_or_local_dataset_name
-                    local_dataset_1_name = None
+                if not check_spec(name):
+                    not_met = True
+                    break
 
-                found_local_dataset_name = lab_setting['FLD_dataset_uname']
-                found_local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
+            if not_met:
+                continue
 
-                if found_local_dataset_name == FLD_dataset_uname and found_local_dataset_1_name == local_dataset_1_name:
-                    found_spec = CheckpointSpec(**lab_setting)
-                    found_spec.name_or_local_dataset_name = name_or_local_dataset_name
-                    checkpoints.append((str(checkpoint), found_spec))
+            FLD_dataset_uname = name_or_local_dataset_name
+
+            found_local_dataset_name = lab_setting['FLD_dataset_uname']
+
+            if found_local_dataset_name == FLD_dataset_uname:
+                found_spec = CheckpointSpec(**lab_setting)
+                found_spec.name_or_local_dataset_name = name_or_local_dataset_name
+                checkpoints.append((str(checkpoint), found_spec))
 
         return checkpoints
 
 
-def get_model_name_settings(model_name_or_path: str) -> Dict[str, Any]:
+def get_model_settings(model_name_or_path: str) -> Dict[str, Any]:
     if model_name_or_path == 'izumi-lab/stormy-7b-10ep':
         return {'model_name_or_path': model_name_or_path,
-                'tokenizer_name': 'cyberagent/open-calm-7b',
                 'config_name': 'cyberagent/open-calm-7b'}
     else:
         return {'model_name_or_path': model_name_or_path}
@@ -1603,6 +1661,8 @@ def get_model_name_settings(model_name_or_path: str) -> Dict[str, Any]:
 def get_tokenizer_settings(model_name_or_path: str) -> Dict[str, Any]:
     if model_name_or_path.startswith('line-corporation'):
         return {'use_fast_tokenizer': False}
+    elif model_name_or_path == 'izumi-lab/stormy-7b-10ep':
+        return {'tokenizer_name': 'cyberagent/open-calm-7b'}
     else:
         return {}
 
@@ -1660,7 +1720,7 @@ def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> D
                 check_val_every_n_epoch = max(int(train_epochs / num_val_stage_throught_training), 1)
             else:
                 val_check_interval_in_batch = max(int(max_steps * num_batches_per_grad_step / num_val_stage_throught_training), 1)
-                check_val_every_n_epoch = None
+                # check_val_every_n_epoch = None
 
             return {
                 'val_check_interval_in_batch': val_check_interval_in_batch,
@@ -1668,25 +1728,66 @@ def make_val_interval_setting(all_setting: Dict[str, Any], train_file: str) -> D
             }
 
 
-def make_command(output_dir: Union[str, Path],
+def make_command(script_type: str,
+                 output_dir: Union[str, Path],
                  setting: Dict,
                  run_mode: str,
-                 n_gpus: Optional[int] = None,
-                 n_deepspeed_nodes: int = 1) -> str:
+                 n_gpus: Optional[int] = None) -> str:
 
-    unused_option_names = [
-        'base_config_name',
-        'checkpoint_name',
-        'checkpoint_path',
-        'learning',
-        'train_effective_batch_size',
-        'max_proof_steps',
-        'FLD_dataset_uname',
-        'n_proc_per_node',
+    if script_type == 'run_prover':
+        script_path = './run_prover.py'
 
-        'use_test_as_train',
-        'use_test_as_val',
-    ]
+        unused_option_names = [
+            'base_config_name',
+            'checkpoint_name',
+            'checkpoint_path',
+            'learning',
+            'train_effective_batch_size',
+            'max_proof_steps',
+            'FLD_dataset_uname',
+            'n_proc_per_node',
+
+            'use_test_as_train',
+            'use_test_as_val',
+        ]
+
+    elif script_type == 'run_causal_prover':
+        script_path = './run_causal_prover.py'
+        unused_option_names = [
+            'base_config_name',
+            'checkpoint_name',
+            'checkpoint_path',
+            'learning',
+            'train_effective_batch_size',
+            'max_proof_steps',
+            'FLD_dataset_uname',
+            'n_proc_per_node',
+
+            'use_test_as_train',
+            'use_test_as_val',
+
+            'proof_sampling',
+            'generation_num_beams',
+            'generation_top_k',
+            'generation_max_proof_steps',
+            'max_source_length',
+
+            'log_generation',
+            'sample_negative_proof',
+            'no_subproof_for_unknown',
+            'predict_with_generate',
+            'other_dataset_config_name',
+            'FLD_test_file',
+            'FLD_file_type',
+            'do_eval_in_outerloop',
+            'script_type',
+            'other_dataset_name',
+            'lm_type',
+            'FLD_proof_eval_generation_timeout',
+        ]
+
+    else:
+        raise ValueError()
 
     commands: List[str] = []
 
@@ -1696,16 +1797,16 @@ def make_command(output_dir: Union[str, Path],
     torchrun_err_file = str(output_dir / 'torchrun_err.txt')
 
     if run_mode == 'vanilla':
-        commands.append('python ./run_prover.py')
+        commands.append(f'python {script_path}')
 
     elif run_mode == 'profile':
-        commands.append('kernprof -lv ./run_prover.py')
+        commands.append(f'kernprof -lv {script_path}')
 
     elif run_mode == 'torchrun':
         if n_gpus is None:
             raise ValueError()
         commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
-                        f' torchrun --nproc_per_node {n_gpus} ./run_prover.py')
+                        f' torchrun --nproc_per_node {n_gpus} {script_path}')
 
     elif run_mode == 'deepspeed':
         # For deepspeed settings, see [here](https://github.com/ohtaman/abci-examples/tree/main/202307#deepspeed-を用いた-multi-node-multi-gpu-訓練分散訓練の例)
@@ -1713,7 +1814,7 @@ def make_command(output_dir: Union[str, Path],
         ds_config = 'ds_config/ds_config_zero3.json'
 
         # commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
-        #                 f' torchrun --nproc_per_node {n_gpus} ./run_prover.py'
+        #                 f' torchrun --nproc_per_node {n_gpus} {script_path}'
         #                 f' --deepspeed {ds_config}')
 
         # """
@@ -1758,7 +1859,7 @@ def make_command(output_dir: Union[str, Path],
                 '--no_ssh_check',
                 '--launcher OpenMPI',
                 '--launcher_args "-mca coll ^hcoll"',
-                './run_prover.py',
+                f'{script_path}',
                 f'--deepspeed {ds_config}'
             ])
         )
@@ -1795,7 +1896,6 @@ def make_output_dir(setting: Dict,
             Path(top_dir)
             # / f'sstm_nm={setting.get("system_name", str(None))}'
             / f'dtst_nm={setting.get("FLD_dataset_uname", None)}'
-            / f'dtst_1_nm={setting.get("local_dataset_1_name", None)}'
             # / f'excld_unknwn={setting.get("exclude_unknown", None)}'
             # / f'add_fnl_rfrc_t_prfs={setting.get("add_final_reference_to_proofs", None)}'
             # / f'EB_tsk={setting.get("EB_task", None)}'
@@ -1813,9 +1913,7 @@ def make_output_dir(setting: Dict,
             'tokenizer_name',
             'config_name',
 
-            'FLD_dataset_uname',
             'dataset_config_name',
-            'local_dataset_1_name',
             'dataset_1',
             'train_file_1',
 
@@ -1874,6 +1972,7 @@ def make_output_dir(setting: Dict,
             'max_proof_steps',
             'fp16',
             'generation_max_proof_steps',
+            'generation_num_return_sequences',
             'generation_timeout',
             'source_prefix',
             'logging_strategy',
@@ -1900,6 +1999,23 @@ def make_output_dir(setting: Dict,
             'remove_unused_columns',
             'save_steps',
 
+            'FLD_dataset_uname',
+            'FLD_file_type',
+            'FLD_max_eval_samples',
+            'FLD_proof_eval_dataset',
+            'FLD_proof_eval_generation_top_k',
+            'FLD_proof_eval_padding',
+            'FLD_proof_eval_generation_timeout',
+            'FLD_proof_eval_generation_num_return_sequences',
+            'FLD_train_file',
+            'FLD_validation_file',
+            'FLD_test_file',
+
+            'gradient_checkpointing',
+            'lm_type',
+            'script_type',
+            'use_auth_token',
+
         ] + dataset_setting_names + (dirname_ignore_params or []),
         save_params=True
     )
@@ -1907,7 +2023,6 @@ def make_output_dir(setting: Dict,
 
 def make_system_name(lab_setting: Dict) -> str:
     FLD_dataset_uname = lab_setting['FLD_dataset_uname']
-    # local_dataset_1_name = lab_setting.get('local_dataset_1_name', None)
     checkpoint_name = lab_setting['checkpoint_name']
 
     return f'checkpoint_name--{checkpoint_name}__local_dataset_name--{FLD_dataset_uname}'
@@ -1974,6 +2089,3 @@ _REJECTED_MODELS = [
     # [rejected] ('sonoisa/t5-base-japanese', 'seq2seq', 't5-base'),
     # [rejected] ('sonoisa/t5-base-japanese-v1.1', 'seq2seq', 't5-base'),
 ]
-
-
-
