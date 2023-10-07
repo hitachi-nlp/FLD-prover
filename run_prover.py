@@ -22,7 +22,7 @@ from pprint import pformat
 import line_profiling
 import deepspeed
 import time
-from FLD_prover import StepWiseGenerationTrainer
+from FLD_prover.trainer import StepWiseGenerationTrainer
 from FLD_prover.lm_types import LMType
 from FLD_prover.data_processing import (
     preprocess_function as FLD_preprocess_function,

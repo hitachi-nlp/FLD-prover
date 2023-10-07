@@ -86,11 +86,11 @@ _PROVER_BATCH_SETTINGS = {
             # 'padding': 'max_length',
             'padding': 'longest',
 
-            'max_source_length': 500,
-            'max_target_length': 500,
+            'max_source_length': 700,
+            'max_target_length': 700,
 
-            'per_device_train_batch_size': 1,
-            'per_device_eval_batch_size': 1,
+            'per_device_train_batch_size': 2,
+            'per_device_eval_batch_size': 2,
             'gradient_checkpointing': False,
 
             'generation_num_beams': 1,

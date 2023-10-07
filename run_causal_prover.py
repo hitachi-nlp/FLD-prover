@@ -65,6 +65,7 @@ from FLD_prover.data_processing import (
     preprocess_function as FLD_preprocess_function,
     compute_metrics as FLD_compute_metrics,
 )
+from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
@@ -184,6 +185,9 @@ class DataTrainingArguments:
     validation_file: Optional[str] = field(
         default=None,
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
+    )
+    do_eval_in_outerloop: bool = field(
+        default=False,
     )
     file_type: Optional[str] = field(
         default=None, metadata={"help": "The input file type such as 'json' or 'csv'"}
@@ -360,13 +364,6 @@ def main():
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
     send_example_telemetry("run_clm", model_args, data_args)
-
-    # Setup logging
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(sys.stdout)],
-    )
 
     if training_args.should_log:
         # The default of training_args.log_level is passive, so we set log level at info here to have that default.
@@ -660,31 +657,41 @@ def main():
         return result
 
     def _maybe_FLD_preprocess(examples: Dict[str, List[Any]], mode: str):
-        major_key = list(examples.keys())[0]
-        major_vals = examples[major_key]
-        if len(major_vals) != 1:
-            # TODO: when batch_size > 1, we have to
-            # 1. split the examples int FLD- and non-FLD- examples
-            # 2. preprocess the FLD-examples
-            # 3. merge the two types of examples and return it
-            raise NotImplementedError()
+        if "hypothesis" not in examples:
+            return examples
 
-        maybe_FLD_example = "hypothesis" in examples\
-            and examples["hypothesis"][0] is not None
+        FLD_indexes = [i for i in range(len(examples["hypothesis"]))
+                       if examples["hypothesis"][i] is not None]
+        non_FLD_indexes = [i for i in range(len(examples["hypothesis"]))
+                           if i not in FLD_indexes]
+        num_FLD_examples = len(FLD_indexes)
+        num_non_FLD_examples = len(non_FLD_indexes)
+
+        FLD_examples = {
+            key: [values[i] for i in FLD_indexes]
+            for key, values in examples.items()
+        }
+        non_FLD_examples = {
+            key: [values[i] for i in non_FLD_indexes]
+            for key, values in examples.items()
+        }
 
         if mode in ["train", "eval"]:
             preproc_split = "train"
             padding = "max_length"
+            feature_names = ['input_ids', 'attention_mask', 'labels']
+
         elif mode == "FLD_proof_eval":
             preproc_split = "eval"
             padding = data_args.FLD_proof_eval_padding
+            feature_names = list(FLD_examples.keys())
+
         else:
             raise ValueError()
 
-        if maybe_FLD_example:
-            # padding = "max_length" if split == "train" else data_args.FLD_proof_eval_padding
-            processed = FLD_preprocess_function(
-                examples,
+        if num_FLD_examples > 0:
+            FLD_processed = FLD_preprocess_function(
+                FLD_examples,
                 preproc_split,
                 LMType.CAUSAL,
                 tokenizer,
@@ -699,11 +706,21 @@ def main():
                 log_examples=data_args.log_examples,
             )
         else:
-            processed = {
-                key: vals for key, vals in examples.items()
-                if key in ['input_ids', 'attention_mask', 'labels']
-            }
-        return processed
+            FLD_processed = {}
+
+        if mode == "FLD_proof_eval":
+            return FLD_processed
+        else:
+            if num_FLD_examples > 0 and num_non_FLD_examples > 0:
+                processed = {
+                    key: torch.concat((FLD_processed[key], torch.tensor(non_FLD_examples[key], dtype=FLD_processed[key].dtype)))
+                    for key in feature_names
+                }
+            elif num_FLD_examples > 0:
+                processed = {key: vals for key, vals in FLD_processed.items() if key in feature_names}
+            else:
+                processed = {key: vals for key, vals in non_FLD_examples.items() if key in feature_names}
+            return processed
 
     with training_args.main_process_first(desc="dataset map tokenization"):
         if not data_args.streaming:
@@ -789,7 +806,7 @@ def main():
     else:
         train_dataset = None
 
-    if training_args.do_eval:
+    if training_args.do_eval or data_args.do_eval_in_outerloop:
         if "validation" not in lm_datasets and "validation" not in FLD_lm_datasets:
             raise ValueError("--do_eval requires a validation dataset")
         eval_dataset = make_interleave_datasets(lm_datasets.get("validation", None),
@@ -835,8 +852,8 @@ def main():
     training_args.generation_num_beams = data_args.FLD_proof_eval_generation_num_beams
     training_args.predict_with_generate = True
 
-    Seq2SeqTrainer.evaluate = generation_handled(
-        Seq2SeqTrainer.evaluate,
+    ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
+        ForceCallMetricsSeq2SeqTrainer.evaluate,
         LMType.CAUSAL,
         tokenizer,
         model,
@@ -844,8 +861,8 @@ def main():
         top_k=data_args.FLD_proof_eval_generation_top_k,
         num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
     )
-    Seq2SeqTrainer.predict = generation_handled(
-        Seq2SeqTrainer.predict,
+    ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
+        ForceCallMetricsSeq2SeqTrainer.predict,
         LMType.CAUSAL,
         tokenizer,
         model,
@@ -865,14 +882,14 @@ def main():
         return FLD_compute_metrics(
             eval_preds,
             tokenizer,
-            eval_dataset,
+            FLD_proof_eval_dataset,
             LMType.CAUSAL,
         )
 
     class FLDEvaluationCallback(TrainerCallback):
 
         def __init__(self):
-            self._FLD_seq2seq_trainer = Seq2SeqTrainer(
+            self._FLD_seq2seq_trainer = ForceCallMetricsSeq2SeqTrainer(
                 model,
                 args=training_args,
                 data_collator=collator,
@@ -930,7 +947,7 @@ def main():
         trainer.save_state()
 
     # Evaluation
-    if training_args.do_eval:
+    if data_args.do_eval_in_outerloop:
         logger.info("*** Evaluate ***")
 
         metrics = trainer.evaluate()

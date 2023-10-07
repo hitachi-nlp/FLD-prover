@@ -77,6 +77,10 @@ def main():
     other_dataset_name = "wikitext"
     other_dataset_config_name = "wikitext-2-raw-v1"
 
+    # [cerebras/SlimPajama-627B](https://huggingface.co/datasets/cerebras/SlimPajama-627B)
+    # other_dataset_name = "cerebras/SlimPajama-627B"
+    # other_dataset_config_name = "None"
+
     model_settings = [
         # ============================ english      ============================
         # ('t5-base', 'seq2seq', 't5-base'),
@@ -147,9 +151,9 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
-        # 'debug.micro',
+        'debug.micro',
         # 'debug.micro.deepspeed',
-        'debug.tiny',
+        # 'debug.tiny',
         # 'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',

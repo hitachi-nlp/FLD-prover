@@ -122,7 +122,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
             else:
                 prompt_ids = [
                     _prepare_tokenized_inputs(
-                        prompt,
+                        [prompt],
                         max_source_length,
                         padding='longest',
                         return_length=True,
@@ -181,9 +181,6 @@ def preprocess_function(examples: Dict[str, List[Any]],
     inputs_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
     if 'labels' in forward_inputs:
         labels_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))
-        # forward_inputs['labels']は [-100, -100, ..., 1, 4, 1, .., -100]
-        # HONOKA tokenizer.pad_token = </s> となっている．結果デコードすると，</s>が生み出される．
-        # もとはpadになっていたはず．なぜ？ -> generation_handled周り？
     else:
         labels_decoded = [None] * len(inputs_decoded)
 
