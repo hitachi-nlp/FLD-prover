@@ -2,7 +2,12 @@ from typing import Optional
 from transformers import DataCollatorForSeq2Seq, default_data_collator
 
 # taken from data_processing.preprocess_function
-_REMOVE_NAMES = ["depth", "gold_proofs"]
+_REMOVE_NAMES = [
+    'depth',
+    'facts',
+    'hypothesis',
+    'gold_proofs',
+]
 
 
 class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):

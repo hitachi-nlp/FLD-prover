@@ -71,10 +71,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230919.jpn.seed--0-1')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20231005.jpn.seed--0',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231005.jpn.seed--0')
+
     input_dirs = [
-        './outputs/01.train.py/20231005.jpn.seed--0',
+        './outputs/01.train.py/20231008.jpn.run_causal_prover',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231005.jpn.seed--0')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231008.jpn.run_causal_prover')
 
     command = ' '.join([
         'python ./aggregate_tf_results.py',

@@ -1484,8 +1484,8 @@ def get_learning_setting(script_type: str,
                          max_eval_samples: Optional[int] = None,
                          ) -> Dict[str, Any]:
     if name.startswith('LLM_FS.shot-'):
-        if script_type == "run_causal_prover":
-            raise NotImplementedError()
+        # if script_type == "run_causal_prover":
+        #     raise NotImplementedError()
 
         epoch = epoch or 50
         steps_upper = steps_upper or 300
@@ -1518,7 +1518,7 @@ def get_learning_setting(script_type: str,
                 # because early evaluation is extremely slow due to the repetitions
                 break
 
-        max_eval_samples = max_eval_samples or 100
+        max_eval_samples = max_eval_samples or 101
 
         base_setting = {
             'max_train_samples': max_train_samples,
@@ -1527,19 +1527,25 @@ def get_learning_setting(script_type: str,
             'use_test_as_val': True,
         }
 
+        if script_type == "run_causal_prover":
+            base_setting.update({
+                'FLD_dataset_prob': 1.0,
+                'FLD_max_eval_samples': max_eval_samples,
+            })
+
     else:
         if epoch is not None:
             raise ValueError()
 
         if script_type == "run_prover":
             base_setting = _PROVER_LEARNING_SETTINGS[name].copy()
+
         elif script_type == "run_causal_prover":
             if name in _CAUSAL_PROVER_LEARNING_SETTINGS:
                 base_setting = _CAUSAL_PROVER_LEARNING_SETTINGS[name].copy()
             else:
                 base_setting = _PROVER_LEARNING_SETTINGS[name].copy()
                 base_setting.update({
-                    # 'FLD_dataset_prob': 1.0,
                     'FLD_dataset_prob': 1.0,
                     'FLD_max_eval_samples': base_setting["max_eval_samples"],
                 })

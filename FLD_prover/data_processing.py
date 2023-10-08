@@ -18,6 +18,8 @@ from FLD_prover.lm_types import LMType
 
 logger = logging.getLogger()
 
+_CAUSAL_LM_END_OF_PROMPT = '::'
+
 
 def preprocess_function(examples: Dict[str, List[Any]],
                         split: str,
@@ -101,7 +103,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
     _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
 
     # without this additional token, we can not accurately calculate the prompt length
-    causal_lm_sep_token = '::'
+    # as the token
     forward_inputs: Dict[str, Any] = {}
     if split == 'train':
         if any(_targets is None for _targets in proof_steps):
@@ -115,7 +117,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
 
         elif lm_type == LMType.CAUSAL:
             # just for getting length
-            _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
+            _prompts = [prompt + _CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
             if include_prompt_for_causal_lm_loss:
                 prompt_lengths = None
@@ -157,7 +159,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
             forward_inputs[proof_col] = _mask_labels_by_ignore_index(forward_inputs[proof_col])
 
         elif lm_type == LMType.CAUSAL:
-            _prompts = [prompt + causal_lm_sep_token for prompt in prompts_w_partial_proof]
+            _prompts = [prompt + _CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
             forward_inputs.update(
                 _prepare_tokenized_inputs(
@@ -179,8 +181,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
     # some models do not accept 'token_type_ids' as inputs
     if 'token_type_ids' in forward_inputs:
         forward_inputs.pop('token_type_ids', None)
-    if "depth" in examples:
-        forward_inputs["depth"] = examples["depth"]
+    for add_feature in ['depth', 'hypothesis', 'facts']:
+        forward_inputs[add_feature] = examples[add_feature]
 
     inputs_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
     if 'labels' in forward_inputs:
@@ -222,10 +224,7 @@ def compute_metrics(eval_preds,
     preds = _unmask_by_pad_token(preds)
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
 
-    decoded_prompts_from_examples = [
-        tokenizer.decode(_unmask_by_pad_token(examples[i]["input_ids"]), skip_special_tokens=True)
-        for i in range(len(examples))
-    ]
+    # XXX: ここら辺全部，exampleから直接取ることができそう．以下の"facts"のように．
     decoded_labels_from_examples = [
         tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
         for i in range(len(examples))
@@ -237,8 +236,7 @@ def compute_metrics(eval_preds,
     results["gen_len"] = np.mean(prediction_lens)
 
     metrics: Dict[str, List[Any]] = defaultdict(list)
-    for i_example, (prompt, proof_gt, proof_pred, example) in enumerate(zip(
-            decoded_prompts_from_examples,
+    for i_example, (proof_gt, proof_pred, example) in enumerate(zip(
             decoded_labels_from_examples,
             decoded_preds,
             examples)):
@@ -249,15 +247,19 @@ def compute_metrics(eval_preds,
 
         if lm_type == LMType.CAUSAL and prompt in proof_pred:
             # the results from model generation include also the prompt
+            prompt = tokenizer.decode(_unmask_by_pad_token(examples[i_example]["input_ids"]),
+                                      skip_special_tokens=True)
             proof_pred = proof_pred[len(prompt):]
 
         if example is not None:
             input_ids = example['input_ids']
             input_ids = _unmask_by_pad_token(input_ids)
-            decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
 
-            facts = re.sub(r'.*\$facts\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
-            hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$facts\$.*', '\g<1>', decoded_input_ids)
+            # decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
+            # facts = re.sub(r'.*\$facts\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
+            # hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$facts\$.*', '\g<1>', decoded_input_ids)
+            facts = example['facts']
+            hypothesis = example['hypothesis']
 
             log_example(
                 facts=facts,

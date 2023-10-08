@@ -71,6 +71,7 @@ from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
 from FLD_prover.generation import generation_handled
 from FLD_prover.interactive import launch
+from FLD_task import load_deduction
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -520,6 +521,12 @@ def main():
                                                      'json',
                                                      False,
                                                      data_args.streaming)
+    # load and dump once to normalize the schema from different versions of datasets.
+    FLD_raw_datasets = FLD_raw_datasets.map(
+        lambda example: load_deduction(example).dict(),
+        batched=False,
+        load_from_cache_file=False,  # to always reflect the modification of the preprocessing
+    )
 
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
@@ -881,11 +888,10 @@ def main():
     )
 
     FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
-    FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(
-        range(min(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples)),
-    )
     FLD_proof_eval_dataset.set_transform(
         lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
+    if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
+        FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(range(data_args.FLD_max_eval_samples))
 
     def _FLD_compute_metrics(eval_preds) -> Dict[str, Any]:
         return FLD_compute_metrics(

@@ -710,7 +710,8 @@ def main():
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
             train_dataset = train_dataset.select(range(max_train_samples))
         train_dataset.set_transform(
-            lambda examples: _FLD_preprocess_function(examples, 'train'))
+            lambda examples: _FLD_preprocess_function(examples, 'train'),
+        )
     else:
         train_dataset = None
 
@@ -720,7 +721,8 @@ def main():
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
             eval_dataset = eval_dataset.select(range(max_eval_samples))
         eval_dataset.set_transform(
-            lambda examples: _FLD_preprocess_function(examples, 'eval'))
+            lambda examples: _FLD_preprocess_function(examples, 'eval'),
+        )
     else:
         eval_dataset = None
 
@@ -730,7 +732,8 @@ def main():
             max_predict_samples = min(len(predict_dataset), data_args.max_predict_samples)
             predict_dataset = predict_dataset.select(range(max_predict_samples))
         predict_dataset.set_transform(
-            lambda examples: _FLD_preprocess_function(examples, 'eval'))
+            lambda examples: _FLD_preprocess_function(examples, 'eval'),
+        )
     else:
         predict_dataset = None
 
