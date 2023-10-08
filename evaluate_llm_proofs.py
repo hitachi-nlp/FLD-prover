@@ -49,14 +49,14 @@ def main(input_path,
             if pred is None:
                 logger.warning('The sample will be skipped because the prediction is None')
                 continue
-            context = sample['example']['context']
+            facts = sample['example']['facts']
 
             sample['metrics'] = {}
             for metric_type, calc_metrics in calc_metric_funcs.items():
                 metrics = calc_metrics(
                     golds,
                     pred,
-                    context=context,
+                    facts=facts,
                 )
 
                 sample['metrics'][metric_type] = metrics

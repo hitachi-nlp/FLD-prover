@@ -8,7 +8,7 @@ from FLD_task import (
     load_deduction,
     serialize,
     build_metrics,
-    prettify_context_text,
+    prettify_facts_text,
     prettify_proof_text,
     log_example,
 )
@@ -22,10 +22,10 @@ def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gra
     def _unmask_by_pad_token(tensor):
         return unmask_by_pad_token(tensor, tokenizer.pad_token_id)
 
-    def get_prediction(context: str, hypothesis: str) -> str:
-        context = re.sub(r'\s+', ' ', re.sub(r'\n', ' ', context))
+    def get_prediction(facts: str, hypothesis: str) -> str:
+        facts = re.sub(r'\s+', ' ', re.sub(r'\n', ' ', facts))
         instance = {
-            'context': context,
+            'facts': facts,
             'hypothesis': hypothesis,
         }
 
@@ -58,28 +58,28 @@ def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gra
     if mode == 'console':
         while True:
             print('\n\n======================= interactive mode ========================')
-            context = input('\ncontext:\n\n')
+            facts = input('\nfacts:\n\n')
             hypothesis = input('\nhypothesis:\n\n')
 
-            proof = get_prediction(context, hypothesis)
+            proof = get_prediction(facts, hypothesis)
             proof = prettify_proof_text(proof)
 
             log_example(
-                context=context,
+                facts=facts,
                 hypothesis=hypothesis,
                 pred_proof=proof,
             )
 
     elif mode == 'gradio':
 
-        def predict(context: str, hypothesis: str):
-            proof = get_prediction(context, hypothesis)
+        def predict(facts: str, hypothesis: str):
+            proof = get_prediction(facts, hypothesis)
             proof = prettify_proof_text(proof)
             return proof
 
         demo = gr.Interface(
             fn=predict,
-            inputs=[gr.Textbox(lines=10, placeholder='sent1: Allen is red\nsent2: Allen is blue'),
+            inputs=[gr.Textbox(lines=10, placeholder='fact1: Allen is red\nfact2: Allen is blue'),
                     gr.Textbox(lines=1, placeholder='Allen is red')],
             outputs=['text'],
         )

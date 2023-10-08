@@ -35,14 +35,7 @@ from FLD_prover.generation import generation_handled
 from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForSeq2Seq
 from FLD_prover.interactive import launch
 from FLD_task.proof import get_stance_markers
-from FLD_task import (
-    load_deduction,
-    serialize,
-    build_metrics,
-    prettify_context_text,
-    prettify_proof_text,
-    log_example,
-)
+from FLD_task import load_deduction
 from logger_setup import setup as setup_logger
 from torch.distributed.elastic.multiprocessing.errors import record
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model

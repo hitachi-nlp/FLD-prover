@@ -256,11 +256,11 @@ def compute_metrics(eval_preds,
             input_ids = _unmask_by_pad_token(input_ids)
             decoded_input_ids = tokenizer.decode(input_ids, skip_special_tokens=True)
 
-            context = re.sub(r'.*\$context\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
-            hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$context\$.*', '\g<1>', decoded_input_ids)
+            facts = re.sub(r'.*\$facts\$ = (.*) ; \$proof\$.*', '\g<1>', decoded_input_ids)
+            hypothesis = re.sub(r'.*\$hypothesis\$ = (.*) ; \$facts\$.*', '\g<1>', decoded_input_ids)
 
             log_example(
-                context=context,
+                facts=facts,
                 hypothesis=hypothesis,
                 gold_proofs=[proof_gt],
                 pred_proof=proof_pred,
@@ -272,7 +272,7 @@ def compute_metrics(eval_preds,
                     _metrics = calc_metrics(
                         [proof_gt],
                         proof_pred,
-                        context=context,
+                        facts=facts,
                     )
                 except Exception as e:
                     logger.warning('calc_metrics() failed due to the following error. this sample will be skipped from metrics: %s', str(e))
@@ -291,7 +291,7 @@ def compute_metrics(eval_preds,
 
         else:
             # XXX: why pass here?
-            context = None
+            facts = None
             hypothesis = None
 
     for metric_name, metric_vals in metrics.items():

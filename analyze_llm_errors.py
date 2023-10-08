@@ -8,7 +8,7 @@ from pprint import pprint
 
 from logger_setup import setup as setup_logger
 import click
-from FLD_task import prettify_proof_text, prettify_context_text
+from FLD_task import prettify_proof_text, prettify_facts_text
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ def main(input_path, output_dir, log_level):
                 if proof_accuracy > 0.0:
                     continue
 
-                context = sample['example']['context']
+                facts = sample['example']['facts']
                 hypothesis = sample['example']['hypothesis']
                 proof_golds = sample['gold_proofs']
                 if len(proof_golds) >= 2:
@@ -49,8 +49,8 @@ def main(input_path, output_dir, log_level):
                 f_err.write('\n\n\n\n\n')
                 f_err.write(f'****************************************** example-{i_sample} ******************************************')
 
-                f_err.write('\n\n===================== context =====================\n')
-                f_err.write(prettify_context_text(context))
+                f_err.write('\n\n===================== facts =====================\n')
+                f_err.write(prettify_facts_text(facts))
 
                 f_err.write('\n\n===================== hypothesis =====================\n')
                 f_err.write(hypothesis)

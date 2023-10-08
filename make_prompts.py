@@ -36,18 +36,18 @@ def load_examples(path: Union[str, Path])\
 
 _INTROS = {
 
-    'v0': '==== 1. First, we show some examples of deductive reasoning tasks as follows. In each example, the sentences after the "context" show a set of facts. Based on these facts, you have to either prove the "hypothesis", disprove it, or declare it as unknown if the facts are insufficient. You have to write the step-by-step thought after the "output".',
+    'v0': '==== 1. First, we show some examples of deductive reasoning tasks as follows. In each example, the sentences after the "facts" show a set of facts. Based on these facts, you have to either prove the "hypothesis", disprove it, or declare it as unknown if the facts are insufficient. You have to write the step-by-step thought after the "output".',
 
     'v1': """\
 ******** First, we show some examples of deductive reasoning tasks below. ********
 
 An example consists of an input part and an output part, shown after "---- input ----" and "---- output ----," respectively.
 
-In the input part, we have a set of facts shown after "$context$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
+In the input part, we have a set of facts shown after "$facts$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
 
 The output part shows the step-by-step thought to verify the hypothesis.
 
-Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "sent2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions.
+Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "fact2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions.
 
 After these steps, we conclude either the hypothesis can be proved (__PROVED__), disproved (__DISPROVED__), or neither (__UNKNOWN__) because the facts are insufficient.
 """,
@@ -58,11 +58,11 @@ After these steps, we conclude either the hypothesis can be proved (__PROVED__),
 
 An example consists of an input part and an output part, shown after "---- input ----" and "---- output ----," respectively.
 
-In the input part, we have a set of facts shown after "$context$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
+In the input part, we have a set of facts shown after "$facts$." Based on these facts, we want to verify a hypothesis written after "$hypothesis."
 
 The output part shows the step-by-step thought to verify the hypothesis.
 
-Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "sent2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions. For example, the following is not allowed: "sent3 -> int2: this is a sentence" where the content of "sent3" is "this is a sentence".
+Each line of the output part shows a fine-grained reasoning step. In each step, the left side of the arrow "->"  shows the set of premises to be used, such as "fact2 & int3" if the set includes the fact numbered as two and the intermediate conclusion numbered as three. The right side of the arrow "->" shows the conclusion that logically follows from the premises. Note that this conclusion should be new, i.e., not match any of the facts or the previously derived conclusions. For example, the following is not allowed: "fact3 -> int2: this is a sentence" where the content of "fact3" is "this is a sentence".
 
 After these steps, we conclude either the hypothesis can be proved (__PROVED__), disproved (__DISPROVED__), or neither (__UNKNOWN__) because the facts are insufficient.
 """
