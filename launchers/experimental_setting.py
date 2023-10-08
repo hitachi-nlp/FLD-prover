@@ -87,8 +87,8 @@ _PROVER_BATCH_SETTINGS = {
             # 'padding': 'max_length',
             'padding': 'longest',
 
-            'max_source_length': 700,
-            'max_target_length': 700,
+            'max_source_length': 800,
+            'max_target_length': 800,
 
             'per_device_train_batch_size': 2,
             'per_device_eval_batch_size': 2,

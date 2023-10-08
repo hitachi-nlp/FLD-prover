@@ -912,6 +912,7 @@ def main():
             )
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+            self._FLD_seq2seq_trainer.state = state
             self._FLD_seq2seq_trainer.evaluate(
                 metric_key_prefix="FLD_proof_eval"
             )
