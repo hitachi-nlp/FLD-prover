@@ -143,7 +143,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
             )
         else:
             raise NotImplementedError()
-    else:
+
+    elif split == 'eval':
         if any(_gold_proofs is None for _gold_proofs in gold_proofs):
             raise Exception('Why pass here? might be a bug?')
 
@@ -171,6 +172,9 @@ def preprocess_function(examples: Dict[str, List[Any]],
             forward_inputs[proof_col] = _mask_labels_by_ignore_index(forward_inputs[proof_col])
         else:
             raise NotImplementedError()
+
+    else:
+        raise ValueError()
 
     # some models do not accept 'token_type_ids' as inputs
     if 'token_type_ids' in forward_inputs:

@@ -41,7 +41,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
 
     # output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
-    output_top_dir = Path('./outputs/01.train.py/20231007.run_causal_prover')
+    output_top_dir = Path('./outputs/01.train.py/20231008.run_causal_prover')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -87,6 +87,8 @@ def main():
 
         # short context length
         ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
+        # ('gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
+
         # ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-1b-short-ctx')
         # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-1b-short-ctx')
 
@@ -143,6 +145,7 @@ def main():
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
+    # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
     # seq2seq_proof_sampling = 'stepwise'
@@ -151,7 +154,7 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
-        'debug.micro',
+        # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
         # 'debug.middle',
@@ -162,7 +165,7 @@ def main():
         # 'FS.shot-10',
         # 'FS.shot-100',
         # 'FT.step-5000',
-        # 'FT.step-10000',
+        'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-20000.max_eval_300',
         # 'FT.step-50000',
@@ -195,25 +198,26 @@ def main():
     # run_mode = 'torchrun'
     # run_mode = 'deepspeed'
 
-    engine = SubprocessEngine()
+    # engine = SubprocessEngine()
+    engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
     # engine = QsubEngine('ABCI', 'rt_AG.small')
 
-    n_gpus = 1  # debug
+    # n_gpus = 1  # debug
     # n_gpus = 4
-    # n_gpus = None  # specify this when running through QsubEngine
+    n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
-    gpu_name_for_batch_size = 'V100_16_1'
+    # gpu_name_for_batch_size = 'V100_16_1'
     # gpu_name_for_batch_size = 'V100_16_4'
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    hours = 12
-    # hours = 24
+    hours = 24
 
-    save_model = False
+    # save_model = False
+    save_model = True
 
     # dry_run = True
     dry_run = False

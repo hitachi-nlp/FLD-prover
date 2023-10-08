@@ -68,19 +68,20 @@ _PROVER_BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
-        'gpt2-medium.all_at_once': {
-            # 'padding': 'max_length',
-            'padding': 'longest',
+        # could not fit
+        # 'gpt2-medium.all_at_once': {
+        #     # 'padding': 'max_length',
+        #     'padding': 'longest',
 
-            'max_source_length': 2000,
-            'max_target_length': 2000,
+        #     'max_source_length': 2000,
+        #     'max_target_length': 2000,
 
-            'per_device_train_batch_size': 1,
-            'per_device_eval_batch_size': 1,
-            'gradient_checkpointing': False,
+        #     'per_device_train_batch_size': 1,
+        #     'per_device_eval_batch_size': 1,
+        #     'gradient_checkpointing': False,
 
-            'generation_num_beams': 1,
-        },
+        #     'generation_num_beams': 1,
+        # },
 
         'gpt2-medium.short_cntx.all_at_once': {
             # 'padding': 'max_length',
@@ -384,7 +385,6 @@ _PROVER_BATCH_SETTINGS = {
 
             'generation_num_beams': 1,
         },
-
 
         'cyberagent/open-calm-small.all_at_once': {
             # 'padding': 'max_length',
@@ -1097,7 +1097,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'FS.shot-0': {
         'max_train_samples': 0,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 2000,
 
         'warmup_steps': 0,
@@ -1112,7 +1112,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'FS.shot-10': {
         'max_train_samples': 10,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 2000,
 
         'warmup_steps': 500,
@@ -1127,7 +1127,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'FS.shot-100': {
         'max_train_samples': 100,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 2000,
 
         'warmup_steps': 500,
@@ -1145,7 +1145,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1191,7 +1191,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1256,7 +1256,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1288,7 +1288,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1304,7 +1304,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1320,7 +1320,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
-        'max_eval_samples': 500,
+        'max_eval_samples': 101,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1465,37 +1465,6 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
 
 _CAUSAL_PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
-
-    'debug.micro': {
-        'max_train_samples': 10,
-        'max_eval_samples': 5,
-        'FLD_dataset_prob': 0.5,
-        'FLD_max_eval_samples': 5,
-
-        'train_effective_batch_size': 32,
-        'max_steps': 100,
-        'eval_steps': 100,
-        'warmup_steps': 0,
-
-        'use_test_as_train': True,
-        'use_test_as_val': True,
-    },
-
-    'debug.tiny': {
-        'max_train_samples': 20,
-        'max_eval_samples': 20,
-        'FLD_dataset_prob': 0.5,
-        'FLD_max_eval_samples': 10,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 300,
-        'eval_steps': 300,
-        'warmup_steps': 0,
-
-        'use_test_as_train': True,
-        'use_test_as_val': True,
-    },
-
 }
 
 
@@ -1565,7 +1534,15 @@ def get_learning_setting(script_type: str,
         if script_type == "run_prover":
             base_setting = _PROVER_LEARNING_SETTINGS[name].copy()
         elif script_type == "run_causal_prover":
-            base_setting = _CAUSAL_PROVER_LEARNING_SETTINGS[name].copy()
+            if name in _CAUSAL_PROVER_LEARNING_SETTINGS:
+                base_setting = _CAUSAL_PROVER_LEARNING_SETTINGS[name].copy()
+            else:
+                base_setting = _PROVER_LEARNING_SETTINGS[name].copy()
+                base_setting.update({
+                    # 'FLD_dataset_prob': 1.0,
+                    'FLD_dataset_prob': 1.0,
+                    'FLD_max_eval_samples': base_setting["max_eval_samples"],
+                })
         else:
             raise ValueError()
 
@@ -1784,6 +1761,7 @@ def make_command(script_type: str,
             'other_dataset_name',
             'lm_type',
             'FLD_proof_eval_generation_timeout',
+            'max_predict_samples',
         ]
 
     else:

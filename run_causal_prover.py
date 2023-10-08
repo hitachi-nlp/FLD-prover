@@ -677,13 +677,13 @@ def main():
         }
 
         if mode in ["train", "eval"]:
-            preproc_split = "train"
-            padding = "max_length"
+            FLD_preproc_split = "train"
+            FLD_padding = "max_length" if data_args.FLD_dataset_prob != 1.0 else data_args.FLD_proof_eval_padding
             feature_names = ['input_ids', 'attention_mask', 'labels']
 
         elif mode == "FLD_proof_eval":
-            preproc_split = "eval"
-            padding = data_args.FLD_proof_eval_padding
+            FLD_preproc_split = "eval"
+            FLD_padding = data_args.FLD_proof_eval_padding
             feature_names = list(FLD_examples.keys())
 
         else:
@@ -692,11 +692,11 @@ def main():
         if num_FLD_examples > 0:
             FLD_processed = FLD_preprocess_function(
                 FLD_examples,
-                preproc_split,
+                FLD_preproc_split,
                 LMType.CAUSAL,
                 tokenizer,
                 prompt_prefix=data_args.source_prefix,
-                padding=padding,
+                padding=FLD_padding,
                 max_source_length=block_size,
                 max_target_length=block_size,
                 proof_sampling=False,
@@ -779,6 +779,15 @@ def main():
     #     )
 
     def make_interleave_datasets(dataset: Optional[Dataset], FLD_dataset: Optional[Dataset]):
+        if data_args.FLD_dataset_prob == 0.0:
+            if dataset is None:
+                raise ValueError()
+            return dataset
+        elif data_args.FLD_dataset_prob == 1.0:
+            if FLD_dataset is None:
+                raise ValueError()
+            return FLD_dataset
+
         datasets = []
         probs = []
         if dataset is not None:
