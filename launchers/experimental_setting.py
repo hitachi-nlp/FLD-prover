@@ -1714,7 +1714,7 @@ def make_command(script_type: str,
     if script_type == 'run_prover':
         script_path = './run_prover.py'
 
-        unused_option_names = [
+        ignore_option_names = [
             'base_config_name',
             'checkpoint_name',
             'checkpoint_path',
@@ -1726,11 +1726,15 @@ def make_command(script_type: str,
 
             'use_test_as_train',
             'use_test_as_val',
+
+            'script_type',
+            'other_dataset_name',
+            'other_dataset_config_name',
         ]
 
     elif script_type == 'run_causal_prover':
         script_path = './run_causal_prover.py'
-        unused_option_names = [
+        ignore_option_names = [
             'base_config_name',
             'checkpoint_name',
             'checkpoint_path',
@@ -1851,7 +1855,7 @@ def make_command(script_type: str,
     ])
 
     for name, value in setting.items():
-        if name in unused_option_names:
+        if name in ignore_option_names:
             continue
 
         option_str = maybe_option_value(f'--{name}', value)
