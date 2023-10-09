@@ -125,20 +125,6 @@ _PROVER_BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
-        'cyberagent/open-calm-1b-short-ctx.all_at_once': {
-            # 'padding': 'max_length',
-            'padding': 'longest',
-
-            'max_source_length': 500,
-            'max_target_length': 500,
-
-            'per_device_train_batch_size': 1,
-            'per_device_eval_batch_size': 1,
-            'gradient_checkpointing': True,
-
-            'generation_num_beams': 1,
-        },
-
 
     },
 
@@ -1525,7 +1511,7 @@ def get_learning_setting(script_type: str,
 
         max_eval_samples = max_eval_samples or 101
 
-        base_setting = {
+        base_setting: Dict[str, Any] = {
             'max_train_samples': max_train_samples,
             'logging_steps': 1,
             'use_test_as_train': False,
