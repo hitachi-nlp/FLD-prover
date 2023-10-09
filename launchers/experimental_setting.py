@@ -855,10 +855,10 @@ def get_batch_setting(script_type: str, gpu_name: str, model_name) -> Dict[str, 
         else:
             setting = _PROVER_BATCH_SETTINGS[gpu_name][model_name]
             setting["block_size"] = setting["max_target_length"]
-            setting["FLD_proof_eval_generation_top_k"] = setting.pop("generation_top_k", None)
-            setting["FLD_proof_eval_generation_num_return_sequences"] = setting.pop("generation_num_return_sequences", None)
-            setting["FLD_proof_eval_generation_num_beams"] = setting.pop("generation_num_beams", None)
-            setting["FLD_proof_eval_padding"] = setting.pop("padding", None)
+            setting["FLD_proof_eval_generation_top_k"] = setting.get("generation_top_k", None)
+            setting["FLD_proof_eval_generation_num_return_sequences"] = setting.get("generation_num_return_sequences", None)
+            setting["FLD_proof_eval_generation_num_beams"] = setting.get("generation_num_beams", None)
+            setting["FLD_proof_eval_padding"] = setting.get("padding", None)
             return setting
     else:
         raise ValueError()
@@ -1763,6 +1763,7 @@ def make_command(script_type: str,
             'generation_num_beams',
             'generation_top_k',
             'generation_max_proof_steps',
+            'generation_num_return_sequences',
             'max_source_length',
 
             'log_generation',
@@ -1778,6 +1779,7 @@ def make_command(script_type: str,
             'lm_type',
             'FLD_proof_eval_generation_timeout',
             'max_predict_samples',
+
         ]
 
     else:

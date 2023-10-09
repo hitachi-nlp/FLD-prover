@@ -74,7 +74,7 @@ def main():
         # ---------------------------------- 20230916.jpn ------------------------------------
         # '20230916.jpn.D1_wo_dist',
         '20230916.jpn.D1',
-        '20230916.jpn.D3',
+        # '20230916.jpn.D3',
         # '20230916.jpn.D5',
     ]
 
@@ -148,8 +148,8 @@ def main():
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
-    # script_type = 'run_prover'
-    script_type = 'run_causal_prover'
+    script_type = 'run_prover'
+    # script_type = 'run_causal_prover'
 
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
@@ -179,7 +179,7 @@ def main():
 
         # 'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-1000',
         'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
@@ -193,7 +193,9 @@ def main():
     ]
 
     lrates = [
+        3e-6,
         1e-5,   # For few-shot LLMs
+        3e-5,
         # 1e-4,
     ]
 
