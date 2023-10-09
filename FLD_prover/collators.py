@@ -6,7 +6,9 @@ _REMOVE_NAMES = [
     'depth',
     'facts',
     'hypothesis',
-    'gold_proofs',
+    'prompts_w_partial_proof',
+    'proof_step',
+    'gold_proof',
 ]
 
 

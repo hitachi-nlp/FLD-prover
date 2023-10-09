@@ -35,6 +35,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
                         no_subproof_for_unknown=False,
                         ignore_pad_token_for_loss=True,
                         include_prompt_for_causal_lm_loss=False,
+                        instruction=False,
                         log_examples=False) -> Dict[str, List[Any]]:
 
     def _prepare_tokenized_targets(targets, max_length, **kwargs):
@@ -73,6 +74,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
             stepwise = (proof_sampling == 'stepwise'),
             sample_negative_proof = sample_negative_proof if split == 'train' else False,
             include_max_subproof_for_unknown = not no_subproof_for_unknown,
+            instruction=instruction,
         )
 
         prompt_with_partial_proof = prompt_prefix + serial.prompt + (serial.partial_proof or '')
@@ -150,13 +152,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
         if any(_gold_proofs is None for _gold_proofs in gold_proofs):
             raise Exception('Why pass here? might be a bug?')
 
-        proof_col = 'gold_proofs'
-
         if lm_type == LMType.SEQ_2_SEQ:
             forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, max_source_length))
-            forward_inputs[proof_col] = _prepare_tokenized_targets(gold_proofs,
-                                                                   whole_proof_max_length)["input_ids"]
-            forward_inputs[proof_col] = _mask_labels_by_ignore_index(forward_inputs[proof_col])
 
         elif lm_type == LMType.CAUSAL:
             _prompts = [prompt + _CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
@@ -168,34 +165,36 @@ def preprocess_function(examples: Dict[str, List[Any]],
                     # add_special_tokens=False
                 ))
 
-            # the padding is arbitrary
-            forward_inputs[proof_col] = _prepare_tokenized_targets(gold_proofs,
-                                                                   whole_proof_max_length)["input_ids"]
-            forward_inputs[proof_col] = _mask_labels_by_ignore_index(forward_inputs[proof_col])
         else:
             raise NotImplementedError()
 
     else:
         raise ValueError()
 
-    # some models do not accept 'token_type_ids' as inputs
-    if 'token_type_ids' in forward_inputs:
-        forward_inputs.pop('token_type_ids', None)
     for add_feature in ['depth', 'hypothesis', 'facts']:
         forward_inputs[add_feature] = examples[add_feature]
 
-    inputs_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
-    if 'labels' in forward_inputs:
-        labels_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))
-    else:
-        labels_decoded = [None] * len(inputs_decoded)
+    forward_inputs['prompts_w_partial_proof'] = prompts_w_partial_proof
+    forward_inputs['proof_step'] = proof_steps
+    forward_inputs['gold_proof'] = gold_proofs
 
-    for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
-        logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
-        logger.info(input_decoded)
-        if label_decoded is not None:
-            logger.info('------------ [example=%d] tokenized labels ----------------', i_example)
-            logger.info(label_decoded)
+    # some models do not accept 'token_type_ids' as inputs
+    if 'token_type_ids' in forward_inputs:
+        forward_inputs.pop('token_type_ids', None)
+
+    if log_examples:
+        inputs_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
+        if 'labels' in forward_inputs:
+            labels_decoded = tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))
+        else:
+            labels_decoded = [None] * len(inputs_decoded)
+
+        for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
+            logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
+            logger.info(input_decoded)
+            if label_decoded is not None:
+                logger.info('------------ [example=%d] tokenized labels ----------------', i_example)
+                logger.info(label_decoded)
 
     return forward_inputs
 
@@ -224,32 +223,26 @@ def compute_metrics(eval_preds,
     preds = _unmask_by_pad_token(preds)
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
 
-    # XXX: ここら辺全部，exampleから直接取ることができそう．以下の"facts"のように．
-    decoded_labels_from_examples = [
-        tokenizer.decode(_unmask_by_pad_token(examples[i]['gold_proofs']), skip_special_tokens=True)
-        for i in range(len(examples))
-    ]
-
     results = {}
 
     prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
     results["gen_len"] = np.mean(prediction_lens)
 
     metrics: Dict[str, List[Any]] = defaultdict(list)
-    for i_example, (proof_gt, proof_pred, example) in enumerate(zip(
-            decoded_labels_from_examples,
-            decoded_preds,
-            examples)):
+    for i_example, (pred_proof, example) in enumerate(zip(decoded_preds, examples)):
 
         logger.info('')
         logger.info('')
         logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
-        if lm_type == LMType.CAUSAL and prompt in proof_pred:
+        gold_proof = example['gold_proof']
+
+        if lm_type == LMType.CAUSAL:
             # the results from model generation include also the prompt
             prompt = tokenizer.decode(_unmask_by_pad_token(examples[i_example]["input_ids"]),
                                       skip_special_tokens=True)
-            proof_pred = proof_pred[len(prompt):]
+            if prompt in pred_proof:
+                pred_proof = pred_proof[len(prompt):]
 
         if example is not None:
             input_ids = example['input_ids']
@@ -264,16 +257,16 @@ def compute_metrics(eval_preds,
             log_example(
                 facts=facts,
                 hypothesis=hypothesis,
-                gold_proofs=[proof_gt],
-                pred_proof=proof_pred,
+                gold_proofs=[gold_proof],
+                pred_proof=pred_proof,
                 logger=logger,
             )
 
             for metric_type, calc_metrics in metric_funcs.items():
                 try:
                     _metrics = calc_metrics(
-                        [proof_gt],
-                        proof_pred,
+                        [gold_proof],
+                        pred_proof,
                         facts=facts,
                     )
                 except Exception as e:

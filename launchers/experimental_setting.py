@@ -879,12 +879,16 @@ def get_dataset_setting(script_type: str,
                         other_dataset_name: Optional[str] = None,
                         other_dataset_config_name: Optional[str] = None,
                         use_test_as_train=False,
-                        use_test_as_val=False) -> Dict[str, Any]:
+                        use_test_as_val=False,
+                        streaming=False,
+                        instruction=False) -> Dict[str, Any]:
     type_, dataset_name, dataset_config_name = _parse_dataset_name(uname)
 
     setting: Dict[str, Any] = {
         'predict_with_generate': True,
         'remove_unused_columns': False,
+        'instruction': instruction,
+        'streaming': streaming,
     }
 
     if script_type == "run_prover":
@@ -1044,7 +1048,8 @@ def get_config(name: str) -> Dict[str, Any]:
             'model_name_or_path': 't5-large',
             # 'fp16': True,
 
-            'source_prefix': 'Solve FLD task: ',
+            # 'source_prefix': 'Solve FLD task: ',
+            'source_prefix': None,
             'generation_num_beams': 10,
             'generation_top_k': 10,
             'generation_max_proof_steps': 20,
@@ -1729,6 +1734,7 @@ def make_command(script_type: str,
             'max_proof_steps',
             'FLD_dataset_uname',
             'n_proc_per_node',
+            'streaming',
 
             'use_test_as_train',
             'use_test_as_val',

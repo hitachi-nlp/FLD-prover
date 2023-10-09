@@ -298,6 +298,11 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    instruction: bool = field(
+        default=False,
+        metadata={},
+    )
+
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
@@ -511,21 +516,25 @@ def main():
                                                  data_args.keep_linebreaks,
                                                  data_args.streaming)
 
+    FLD_dataset_streaming = data_args.streaming
     if data_args.FLD_dataset_name is not None:
         FLD_raw_datasets = load_raw_dataset_by_name(data_args.FLD_dataset_name,
                                                     data_args.FLD_dataset_config_name,
-                                                    False)
+                                                    FLD_dataset_streaming)
     else:
         FLD_raw_datasets = load_raw_dataset_by_files(data_args.FLD_train_file,
                                                      data_args.FLD_validation_file,
                                                      'json',
                                                      False,
-                                                     data_args.streaming)
+                                                     FLD_dataset_streaming)
     # load and dump once to normalize the schema from different versions of datasets.
+    # to always reflect the modification of the preprocessing
+    # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
+    FLD_dataset_map_config = {} if FLD_dataset_streaming else {'load_from_cache_file': False}
     FLD_raw_datasets = FLD_raw_datasets.map(
         lambda example: load_deduction(example).dict(),
         batched=False,
-        load_from_cache_file=False,  # to always reflect the modification of the preprocessing
+        **FLD_dataset_map_config,
     )
 
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
@@ -710,6 +719,7 @@ def main():
                 sample_negative_proof=False,
                 no_subproof_for_unknown=False,
                 include_prompt_for_causal_lm_loss=data_args.include_prompt_for_causal_lm_loss,
+                instruction=data_args.instruction,
                 log_examples=data_args.log_examples,
             )
         else:
