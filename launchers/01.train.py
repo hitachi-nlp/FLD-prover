@@ -44,8 +44,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231008.run_causal_prover')
 
     # output_top_dir = Path('./outputs/01.train.py/20231008.jpn.run_causal_prover')
-    # output_top_dir = Path('./outputs/01.train.py/20231009.jpn.run_causal_prover')
-    output_top_dir = Path('./outputs/01.train.py/20231009.run_causal_prover.large_models')
+    output_top_dir = Path('./outputs/01.train.py/20231009.jpn.run_causal_prover')
+    # output_top_dir = Path('./outputs/01.train.py/20231009.run_causal_prover.large_models')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -61,7 +61,7 @@ def main():
     FLD_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2__default',
@@ -74,8 +74,8 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         # '20230916.jpn.D1_wo_dist',
-        # '20230916.jpn.D1',
-        # '20230916.jpn.D3',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
         # '20230916.jpn.D5',
     ]
 
@@ -147,11 +147,11 @@ def main():
         # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -181,7 +181,7 @@ def main():
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        'FT.step-5000',
+        # 'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-20000.max_eval_300',
@@ -193,8 +193,8 @@ def main():
 
         # 'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -207,17 +207,32 @@ def main():
     ]
 
     lrates = [
-        # 3e-6,
-        1e-5,   # For few-shot LLMs
-        # 3e-5,
+        # ==== script_type = 'run_prover' =====
+
+        # -- learning = 'FT' ---
+        # 1e-4,
+
+        # -- learning = 'LLM_FS' ---
+        # 1e-5,
+
+
+        # ==== script_type = 'run_causal_prover' =====
+
+        # -- learning = 'FT' ---
+        # 1e-4,
+
+        # -- learning = 'LLM_FS' ---
+        1e-5,
+        3e-5,
         1e-4,
+
     ]
 
     streaming = False
     # streaming = True
 
-    # instruction = False
-    instruction = True
+    instruction = False
+    # instruction = True
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
@@ -241,8 +256,8 @@ def main():
     # hours = 12
     hours = 24
 
-    # save_model = False
-    save_model = True
+    save_model = False
+    # save_model = True
 
     # dry_run = True
     dry_run = False
