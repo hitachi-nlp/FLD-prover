@@ -44,8 +44,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231008.run_causal_prover')
 
     # output_top_dir = Path('./outputs/01.train.py/20231008.jpn.run_causal_prover')
-    # output_top_dir = Path('./outputs/01.train.py/20231009.jpn.run_causal_prover')
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    output_top_dir = Path('./outputs/01.train.py/20231009.jpn.run_causal_prover')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -60,7 +60,7 @@ def main():
     FLD_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2__default',
@@ -73,8 +73,8 @@ def main():
 
         # ---------------------------------- 20230916.jpn ------------------------------------
         # '20230916.jpn.D1_wo_dist',
-        # '20230916.jpn.D1',
-        # '20230916.jpn.D3',
+        '20230916.jpn.D1',
+        '20230916.jpn.D3',
         # '20230916.jpn.D5',
     ]
 
@@ -87,7 +87,7 @@ def main():
 
     model_settings = [
         # ============================ english      ============================
-        ('t5-base', 'seq2seq', 't5-base'),
+        # ('t5-base', 'seq2seq', 't5-base'),
 
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
         # ('gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
@@ -133,11 +133,11 @@ def main():
         # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -148,8 +148,8 @@ def main():
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
-    script_type = 'run_prover'
-    # script_type = 'run_causal_prover'
+    # script_type = 'run_prover'
+    script_type = 'run_causal_prover'
 
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
@@ -157,7 +157,7 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
-        'debug.micro',
+        # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
         # 'debug.middle',
@@ -179,8 +179,8 @@ def main():
 
         # 'LLM_FS.shot-10',
         # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
 
         # 'FT.step-10000.mx_evl-100',
         # 'FT.step-10000.mx_evl-100.btch_sz-8',
@@ -193,34 +193,34 @@ def main():
     ]
 
     lrates = [
-        # 1e-5,   # For few-shot LLMs
-        1e-4,
+        1e-5,   # For few-shot LLMs
+        # 1e-4,
     ]
 
     streaming = False
     # streaming = True
 
-    # instruction = False
-    instruction = True
+    instruction = False
+    # instruction = True
 
-    run_mode = 'vanilla'
+    # run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
-    engine = SubprocessEngine()
+    # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
-    n_gpus = 1  # debug
+    # n_gpus = 1  # debug
     # n_gpus = 4
-    # n_gpus = None  # specify this when running through QsubEngine
+    n_gpus = None  # specify this when running through QsubEngine
 
     # gpu_name_for_batch_size = 'A100_48_1'
-    gpu_name_for_batch_size = 'V100_16_1'
+    # gpu_name_for_batch_size = 'V100_16_1'
     # gpu_name_for_batch_size = 'V100_16_4'
     # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     hours = 12
     # hours = 24
