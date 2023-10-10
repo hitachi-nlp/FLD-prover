@@ -48,7 +48,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231009.run_causal_prover.large_models')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
-    output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
+    # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
+    output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -101,8 +102,8 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),
-        ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
+        ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
+        # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-1b-short-ctx')
@@ -219,8 +220,8 @@ def main():
         # ==== script_type = 'run_causal_prover' =====
 
         # -- learning = 'FT' ---
-        1e-4,
-        1e-5,
+        # 1e-5,
+        1e-4,   # much better than 1e-05
 
         # -- learning = 'LLM_FS' ---
         # 3e-5,   # 20230919.jpn
@@ -257,8 +258,8 @@ def main():
     # hours = 12
     hours = 24
 
-    save_model = False
-    # save_model = True
+    # save_model = False
+    save_model = True
 
     # dry_run = True
     dry_run = False
