@@ -65,6 +65,7 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230919.jpn')
 
+    # [!] ---------- JFLD submission -----------
     # input_dirs = [
     #     './outputs/01.train.py/20230919.jpn',
     #     './outputs/01.train.py/20230919.jpn.seed--1',
