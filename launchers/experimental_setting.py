@@ -87,8 +87,8 @@ _PROVER_BATCH_SETTINGS = {
             # 'padding': 'max_length',
             'padding': 'longest',
 
-            'max_source_length': 800,
-            'max_target_length': 800,
+            'max_source_length': 900,
+            'max_target_length': 900,
 
             'per_device_train_batch_size': 2,
             'per_device_eval_batch_size': 2,
@@ -1131,7 +1131,6 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'use_test_as_val': True,
     },
 
-    # -- pre-training: FLNL (arg-RT/arg-AA) / RuleTaker / EB
     'FT.step-5000': {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
@@ -1148,36 +1147,6 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'use_test_as_val': True,
     },
 
-    'FT.step-5000.LLM': {
-        'max_train_samples': None,
-        'max_eval_samples': 100,
-        'max_predict_samples': 100,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 5000,
-        'eval_steps': 1600,
-        'warmup_steps': 100,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    'FT.step-10000.LLM': {
-        'max_train_samples': None,
-        'max_eval_samples': 100,
-        'max_predict_samples': 100,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 10000,
-        'eval_steps': 2000,
-        'warmup_steps': 100,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    # -- pre-training (RT_large_steps): FLNL (arg-RT/arg-AA) / RuleTaker / EB
-    # -- pre-training: FLNL (arg-FLNL)
     'FT.step-10000': {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
@@ -1194,76 +1163,11 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'use_test_as_val': True,
     },
 
-    'FT.step-10000.mx_evl-100': {
-        'max_train_samples': None,
-        # 'max_eval_samples': 2000,
-        # 'max_predict_samples': 2000,
-        'max_eval_samples': 100,
-        'max_predict_samples': 1000,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 10000,
-        'eval_steps': 1000,
-        'warmup_steps': 1000,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    'FT.step-10000.mx_evl-100.btch_sz-8': {
-        'max_train_samples': None,
-        # 'max_eval_samples': 2000,
-        # 'max_predict_samples': 2000,
-        'max_eval_samples': 100,
-        'max_predict_samples': 1000,
-
-        'train_effective_batch_size': 8,
-        'max_steps': 10000,
-        'eval_steps': 1000,
-        'warmup_steps': 1000,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    'FT.step-100000.mx_evl-100.btch_sz-8': {
-        'max_train_samples': None,
-        # 'max_eval_samples': 2000,
-        # 'max_predict_samples': 2000,
-        'max_eval_samples': 100,
-        'max_predict_samples': 1000,
-
-        'train_effective_batch_size': 8,
-        'max_steps': 100000,
-        'eval_steps': 10000,
-        'warmup_steps': 1000,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-
     'FT.step-20000': {
         'max_train_samples': None,
         # 'max_eval_samples': 2000,
         # 'max_predict_samples': 2000,
         'max_eval_samples': 101,
-        'max_predict_samples': 1000,
-
-        'train_effective_batch_size': 64,
-        'max_steps': 20000,
-        'eval_steps': 5000,
-        'warmup_steps': 1000,
-
-        'use_test_as_train': False,
-        'use_test_as_val': True,
-    },
-
-    'FT.step-20000.max_eval_300': {
-        'max_train_samples': None,
-        # 'max_eval_samples': 2000,
-        # 'max_predict_samples': 2000,
-        'max_eval_samples': 300,
         'max_predict_samples': 1000,
 
         'train_effective_batch_size': 64,
@@ -1325,7 +1229,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'debug.ZS': {
         'max_train_samples': 1,
-        'max_eval_samples': 100,
+        'max_eval_samples': 101,
         'max_predict_samples': 1,
 
         'train_effective_batch_size': 64,
@@ -1395,7 +1299,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'debug.middle': {
         'max_train_samples': 100,
-        'max_eval_samples': 100,
+        'max_eval_samples': 101,
         'max_predict_samples': 100,
 
         'train_effective_batch_size': 64,
@@ -1423,7 +1327,7 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
 
     'debug.20000.zero_warmup': {
         'max_train_samples': None,
-        'max_eval_samples': 100,
+        'max_eval_samples': 101,
         'max_predict_samples': 100,
 
         'train_effective_batch_size': 64,
@@ -1765,6 +1669,7 @@ def make_command(script_type: str,
             'lm_type',
             'FLD_proof_eval_generation_timeout',
             'max_predict_samples',
+            'padding',
 
         ]
 
