@@ -1653,7 +1653,7 @@ def make_command(script_type: str,
             'script_type',
             'other_dataset_name',
             'lm_type',
-            'FLD_proof_eval_generation_timeout',
+            'generation_timeout',
             'max_predict_samples',
             'padding',
 
