@@ -7,19 +7,19 @@ from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 
 from experimental_setting import (
-    get_config,
+    get_base_setting,
     get_checkpoints,
     get_dataset_setting,
     get_batch_setting,
     get_save_eval_step_setting,
-    get_model_settings,
-    get_tokenizer_settings,
+    get_model_setting,
+    get_tokenizer_setting,
+    get_qsub_gpu_setting,
     get_learning_setting,
+    get_other_setting,
     make_output_dir,
     make_command,
     run_by_engine,
-    CheckpointSpec,
-    make_val_interval_setting,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
-    output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
+    # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
+    output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -60,12 +61,13 @@ def main():
         './outputs.FLD/00.create_corpus/20230904.jpn',
         './outputs.FLD/00.create_corpus/20230912.jpn',
         './outputs.FLD/00.create_corpus/20230916.jpn',
+        './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
     ]
 
     FLD_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        '20230729.case_study_finalize.D3',
+        # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
         # 'hf.hitachi-nlp/FLD.v2__default',
@@ -81,6 +83,11 @@ def main():
         # '20230916.jpn.D1',
         # '20230916.jpn.D3',
         # '20230916.jpn.D5',
+
+        # ---------------------------------- 20231010.D3.large_vocab ------------------------------------
+        '20231010.D3.large_vocab',
+        '20231010.D3.large_vocab.smpl_stncs',
+        '20231010.D3.large_vocab.smpl_stncs.transl_vrnts',
     ]
 
     other_dataset_name = "wikitext"
@@ -96,13 +103,13 @@ def main():
         # # # -------------- < 1B params --------------
         # ('t5-base', 'seq2seq', 't5-base'),
 
-        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
+        ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
         # ('gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
 
 
         # # # # # -------------- > 1B params --------------
 
-        ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
+        # ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
         # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
@@ -178,14 +185,14 @@ def main():
         # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
-        # 'debug.middle',
+        'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
 
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        'FT.step-5000',
+        # 'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
@@ -232,28 +239,29 @@ def main():
     # streaming = True
 
     instruction_args = [
-        False,
+        # False,
         True,
     ]
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
-    # n_gpus = 1  # debug
-    # n_gpus = 4
-    n_gpus = None  # specify this when running through QsubEngine
+    if isinstance(engine, SubprocessEngine):
+        n_gpus = 1  # debug
+        # n_gpus = 4
+        # n_gpus = None  # specify this when running through QsubEngine
 
-    # gpu_name_for_batch_size = 'A100_48_1'
-    # gpu_name_for_batch_size = 'V100_16_1'
-    # gpu_name_for_batch_size = 'V100_16_4'
-    # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-    gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+        # gpu_name_for_batch_size = 'A100_48_1'
+        gpu_name_for_batch_size = 'V100_16_1'
+        # gpu_name_for_batch_size = 'V100_16_4'
+        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     # hours = 12
     hours = 24
@@ -265,36 +273,13 @@ def main():
     dry_run = False
 
     # --------------------------- fixed settings ---------------------------------
-
     if isinstance(engine, QsubEngine):
-        if gpu_name_for_batch_size is not None:
-            raise ValueError()
-        if n_gpus is not None:
-            raise ValueError()
+        n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
-        if engine.resource == 'rt_G.small':
-            n_gpus = 1
-            gpu_name_for_batch_size = 'V100_16_1'
-        elif engine.resource in ['rt_G.large', 'rt_F']:
-            n_gpus = 4
-            if run_mode == 'deepspeed':
-                gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-            else:
-                gpu_name_for_batch_size = 'V100_16_4'
-        elif engine.resource == 'rt_AG.small':
-            n_gpus = 1
-            gpu_name_for_batch_size = 'A100_48_1'
-        elif engine.resource == 'rt_AF':
-            n_gpus = 8
-            gpu_name_for_batch_size = 'A100_48_8'
-        else:
-            raise ValueError()
+    base_setting_name = 'default'
 
-    base_config_name = 'default'
-
-    # generation_timeout = 0
-    # generation_timeout = 60 * 5  # slow generatoin is most likely the repetitions coming from underfitting.
-    generation_timeout = 60 * 10  # slow generatoin is most likely the repetitions coming from underfitting.
+    # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
+    generation_timeout = 60 * 10  # For LLMs
 
     sample_negative_proof_args = [
         # True,
@@ -327,33 +312,61 @@ def main():
 
                             for lrate in lrates:
                                 for instruction in instruction_args:
-                                    setting = get_config(base_config_name)
+                                    setting = {}
 
-                                    learning_setting = get_learning_setting(
-                                        script_type,
-                                        learning,
-                                        epoch=epoch,
-                                        steps_upper=steps_upper,
-                                        warmup_steps=warmup_steps,
-                                        warmup_ratio=warmup_ratio,
-                                        train_effective_batch_size=train_effective_batch_size,
-                                        num_evals=num_evals,
-                                        max_eval_samples=max_eval_samples,
-                                    )
-                                    setting.update(learning_setting)
+                                    setting.update(get_base_setting(base_setting_name))
 
-                                    dataset_setting = get_dataset_setting(
-                                        script_type,
-                                        FLD_dataset_uname,
-                                        DATASETS_DIRS,
-                                        other_dataset_name=other_dataset_name,
-                                        other_dataset_config_name=other_dataset_config_name,
-                                        use_test_as_val=setting.get('use_test_as_val', False),
-                                        use_test_as_train=setting.get('use_test_as_train', False),
-                                        streaming=streaming,
-                                        instruction=instruction,
+                                    setting.update(
+                                        get_learning_setting(
+                                            script_type,
+                                            learning,
+                                            epoch=epoch,
+                                            steps_upper=steps_upper,
+                                            warmup_steps=warmup_steps,
+                                            warmup_ratio=warmup_ratio,
+                                            train_effective_batch_size=train_effective_batch_size,
+                                            num_evals=num_evals,
+                                            max_eval_samples=max_eval_samples,
+                                        )
                                     )
-                                    setting.update(dataset_setting)
+
+                                    setting.update(
+                                        get_dataset_setting(
+                                            script_type,
+                                            dataset_uname=FLD_dataset_uname,
+                                            top_dirs=DATASETS_DIRS,
+                                            other_dataset_name=other_dataset_name,
+                                            other_dataset_config_name=other_dataset_config_name,
+                                            use_test_as_val=setting.get('use_test_as_val', False),
+                                            use_test_as_train=setting.get('use_test_as_train', False),
+                                            streaming=streaming,
+                                            instruction=instruction,
+                                        )
+                                    )
+
+                                    setting.update(
+                                        get_save_eval_step_setting(
+                                            max_steps=setting['max_steps'],
+                                            eval_steps=setting['eval_steps'],
+                                            do_save_model=save_model,
+                                        )
+                                    )
+
+                                    setting.update(
+                                        get_batch_setting(
+                                            script_type,
+                                            gpu_name=gpu_name_for_batch_size,
+                                            n_gpus=n_gpus,
+                                            model_name=model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
+                                            train_effective_batch_size=train_effective_batch_size,
+                                        )
+                                    )
+
+                                    setting.update(get_model_setting(model_name))
+
+                                    setting.update(get_tokenizer_setting(model_name))
+
+                                    setting.update(get_other_setting(script_type, generation_timeout))
 
                                     setting.update({
                                         'do_train': True,
@@ -361,38 +374,6 @@ def main():
                                         'do_eval_in_outerloop': False,
                                         'do_predict': False,
                                     })
-
-                                    step_setting = get_save_eval_step_setting(
-                                        max_steps=setting['max_steps'],
-                                        eval_steps=setting['eval_steps'],
-                                        do_save_model=save_model,
-                                    )
-                                    setting.update(step_setting)
-
-                                    batch_setting = get_batch_setting(
-                                        script_type,
-                                        gpu_name_for_batch_size,
-                                        model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
-                                    )
-
-                                    accum_steps = int(learning_setting['train_effective_batch_size']
-                                                      / (batch_setting['per_device_train_batch_size'] * n_gpus))
-                                    if accum_steps < 1:
-                                        _per_device_train_batch_size = int(learning_setting['train_effective_batch_size'] / n_gpus)
-                                        logger.warning(
-                                            'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
-                                            batch_setting['per_device_train_batch_size'],
-                                            _per_device_train_batch_size,
-                                            learning_setting['train_effective_batch_size'],
-                                        )
-                                        batch_setting['per_device_train_batch_size'] = _per_device_train_batch_size
-                                        accum_steps = 1
-                                    setting['gradient_accumulation_steps'] = accum_steps
-
-                                    setting.update(batch_setting)
-
-                                    setting.update(get_model_settings(model_name))
-                                    setting.update(get_tokenizer_settings(model_name))
 
                                     setting.update({
                                         'script_type': script_type,
@@ -402,7 +383,7 @@ def main():
                                         'other_dataset_name': other_dataset_name,
                                         'other_dataset_config_name': other_dataset_config_name,
 
-                                        'base_config_name': base_config_name,
+                                        'base_setting_name': base_setting_name,
 
                                         'lm_type': lm_type,
                                         'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
@@ -424,19 +405,9 @@ def main():
 
                                         'lora': False,
 
+                                        'gpu_name_for_batch_size': gpu_name_for_batch_size,
                                         'use_auth_token': True,
-
                                         'log_examples': True,
-                                    })
-
-                                    if script_type == "run_prover":
-                                        FLD_option_prefix = ""
-                                    elif script_type == "run_causal_prover":
-                                        FLD_option_prefix = "FLD_proof_eval_"
-                                    else:
-                                        raise ValueError()
-                                    setting.update({
-                                        f'{FLD_option_prefix}generation_timeout': generation_timeout,
                                     })
 
                                     output_dir = make_output_dir(setting, output_top_dir)

@@ -30,6 +30,7 @@ from FLD_prover.data_processing import (
     unmask_by_pad_token,
     compute_metrics as FLD_compute_metrics,
 )
+import readline
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.generation import generation_handled
 from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForSeq2Seq

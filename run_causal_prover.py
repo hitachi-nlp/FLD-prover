@@ -28,10 +28,11 @@ import sys
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
+import readline
 
 import deepspeed
 import datasets
-from datasets import interleave_datasets
+from datasets import interleave_datasets, DatasetDict
 import evaluate
 import torch
 from datasets import load_dataset
@@ -480,29 +481,30 @@ def main():
                 streaming=streaming,
                 **dataset_args,
             )
-        else:
-            raw_datasets = {}
 
-        # If no validation data is there, validation_split_percentage will be used to divide the dataset.
-        if "validation" not in raw_datasets.keys():
-            raw_datasets["validation"] = load_dataset(
-                extension,
-                data_files=data_files,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=streaming,
-                **dataset_args,
-            )
-            raw_datasets["train"] = load_dataset(
-                extension,
-                data_files=data_files,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=streaming,
-                **dataset_args,
-            )
+            # If no validation data is there, validation_split_percentage will be used to divide the dataset.
+            if "validation" not in raw_datasets.keys():
+                raw_datasets["validation"] = load_dataset(
+                    extension,
+                    data_files=data_files,
+                    split=f"train[:{data_args.validation_split_percentage}%]",
+                    cache_dir=model_args.cache_dir,
+                    use_auth_token=True if model_args.use_auth_token else None,
+                    streaming=streaming,
+                    **dataset_args,
+                )
+                raw_datasets["train"] = load_dataset(
+                    extension,
+                    data_files=data_files,
+                    split=f"train[{data_args.validation_split_percentage}%:]",
+                    cache_dir=model_args.cache_dir,
+                    use_auth_token=True if model_args.use_auth_token else None,
+                    streaming=streaming,
+                    **dataset_args,
+                )
+        else:
+            raw_datasets = DatasetDict()
+
         return raw_datasets
 
     if data_args.dataset_name is not None:
@@ -626,9 +628,12 @@ def main():
     # First we tokenize all the texts.
     if training_args.do_train:
         column_names = list(raw_datasets["train"].features)
-    else:
+    elif training_args.do_eval or data_args.do_eval_in_outerloop:
         column_names = list(raw_datasets["validation"].features)
-    text_column_name = data_args.text_column_name or ("text" if "text" in column_names else column_names[0])
+    else:
+        column_names = None
+    text_column_name = data_args.text_column_name\
+        or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
 
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
@@ -897,11 +902,14 @@ def main():
         num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
     )
 
-    FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
-    FLD_proof_eval_dataset.set_transform(
-        lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
-    if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
-        FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(range(data_args.FLD_max_eval_samples))
+    if "validation" in FLD_lm_datasets:
+        FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
+        FLD_proof_eval_dataset.set_transform(
+            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
+        if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
+            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(range(data_args.FLD_max_eval_samples))
+    else:
+        FLD_proof_eval_dataset = None
 
     def _FLD_compute_metrics(eval_preds) -> Dict[str, Any]:
         return FLD_compute_metrics(
@@ -911,21 +919,21 @@ def main():
             LMType.CAUSAL,
         )
 
+    def _build_FLD_seq2seq_trainer(do_compute_metrics=True):
+        return ForceCallMetricsSeq2SeqTrainer(
+            model,
+            args=training_args,
+            data_collator=collator,
+            train_dataset=None,
+            eval_dataset=FLD_proof_eval_dataset,
+            tokenizer=tokenizer,
+            compute_metrics=_FLD_compute_metrics if do_compute_metrics else None,
+        )
+
     class FLDEvaluationCallback(TrainerCallback):
 
         def __init__(self):
-            self._FLD_seq2seq_trainer = ForceCallMetricsSeq2SeqTrainer(
-                model,
-                args=training_args,
-                data_collator=collator,
-                train_dataset=None,
-                eval_dataset=FLD_proof_eval_dataset,
-                tokenizer=tokenizer,
-                compute_metrics=_FLD_compute_metrics,
-                # callbacks: Optional[List["TrainerCallback"]] = None,
-                # optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
-                # preprocess_logits_for_metrics: Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]] = None,
-            )
+            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
             self._FLD_seq2seq_trainer.state = state
@@ -991,7 +999,7 @@ def main():
 
     if data_args.interactive_mode is not None:
         launch(
-            trainer,
+            _build_FLD_seq2seq_trainer(do_compute_metrics=False),
             tokenizer,
             lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
             data_args.interactive_mode,

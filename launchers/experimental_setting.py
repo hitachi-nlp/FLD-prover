@@ -803,37 +803,77 @@ _PROVER_BATCH_SETTINGS = {
             'generation_num_beams': 1,
         },
 
-
-
-
-
-    }
-
+    },
 
 }
 
-
 _CAUSAL_PROVER_BATCH_SETTINGS = {}
 
+_PROVER_INTERACTIVE_BATCH_SETTING = {
+    # 'padding': 'max_length',
+    'padding': 'longest',
 
-def get_batch_setting(script_type: str, gpu_name: str, model_name) -> Dict[str, Any]:
+    'max_source_length': 2000,
+    'max_target_length': 2000,
+
+    'per_device_train_batch_size': 1,
+    'per_device_eval_batch_size': 1,
+    'gradient_checkpointing': True,
+
+    'generation_num_beams': 1,
+}
+
+
+def get_batch_setting(script_type: str,
+                      for_interactive=False,
+                      gpu_name: Optional[str] = None,
+                      model_name: Optional[str] = None,
+                      train_effective_batch_size: Optional[int] = None,
+                      n_gpus: Optional[int] = None,
+                      ) -> Dict[str, Any]:
     if script_type == "run_prover":
-
-        return _PROVER_BATCH_SETTINGS[gpu_name][model_name]
-
-    elif script_type == "run_causal_prover":
-        if gpu_name in _CAUSAL_PROVER_BATCH_SETTINGS and model_name in _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name]:
-            setting = _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name][model_name]
+        if for_interactive:
+            setting = _PROVER_INTERACTIVE_BATCH_SETTING.copy()
         else:
             setting = _PROVER_BATCH_SETTINGS[gpu_name][model_name]
+
+    elif script_type == "run_causal_prover":
+        def update_for_causal_prover(setting: Dict[str, Any]):
             setting["block_size"] = setting["max_target_length"]
             setting["FLD_proof_eval_generation_top_k"] = setting.get("generation_top_k", None)
             setting["FLD_proof_eval_generation_num_return_sequences"] = setting.get("generation_num_return_sequences", None)
             setting["FLD_proof_eval_generation_num_beams"] = setting.get("generation_num_beams", None)
             setting["FLD_proof_eval_padding"] = setting.get("padding", None)
-            return setting
+
+        if for_interactive:
+            setting = _PROVER_INTERACTIVE_BATCH_SETTING
+            update_for_causal_prover(setting)
+        else:
+            if gpu_name in _CAUSAL_PROVER_BATCH_SETTINGS and model_name in _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name]:
+                setting = _CAUSAL_PROVER_BATCH_SETTINGS[gpu_name][model_name]
+            else:
+                setting = _PROVER_BATCH_SETTINGS[gpu_name][model_name]
+                update_for_causal_prover(setting)
     else:
         raise ValueError()
+
+    if train_effective_batch_size is not None:
+        accum_steps = int(train_effective_batch_size / (setting['per_device_train_batch_size'] * n_gpus))
+        if accum_steps < 1:
+            _per_device_train_batch_size = int(train_effective_batch_size / n_gpus)
+            logger.warning(
+                'change per_device_train_batch_size from %d to %d so that the train_effective_batch_size becomes %d',
+                setting['per_device_train_batch_size'],
+                _per_device_train_batch_size,
+                train_effective_batch_size,
+            )
+            setting['per_device_train_batch_size'] = _per_device_train_batch_size
+            accum_steps = 1
+        setting['gradient_accumulation_steps'] = accum_steps
+
+    return setting
+    
+
 
 
 _DATASET_PATHS = {
@@ -846,16 +886,14 @@ _DATASET_PATHS = {
 
 
 def get_dataset_setting(script_type: str,
-                        uname: str,
-                        top_dirs: List[str],
+                        dataset_uname: Optional[str] = None,
+                        top_dirs: Optional[List[str]] = None,
                         other_dataset_name: Optional[str] = None,
                         other_dataset_config_name: Optional[str] = None,
                         use_test_as_train=False,
                         use_test_as_val=False,
                         streaming=False,
                         instruction=False) -> Dict[str, Any]:
-    type_, dataset_name, dataset_config_name = _parse_dataset_name(uname)
-
     setting: Dict[str, Any] = {
         'predict_with_generate': True,
         'remove_unused_columns': False,
@@ -870,28 +908,31 @@ def get_dataset_setting(script_type: str,
         setting["dataset_name"] = other_dataset_name
         setting["dataset_config_name"] = other_dataset_config_name
         FLD_option_prefix = "FLD_"
-
     else:
         raise ValueError()
 
-    if type_ == 'local':
-        dataset_paths = get_local_dataset_paths(dataset_name,
-                                                top_dirs=top_dirs,
-                                                use_test_as_train=use_test_as_train,
-                                                use_test_as_val=use_test_as_val)
-        setting.update({f"{FLD_option_prefix}{key}": val for key, val in dataset_paths.items()})
-        setting[f'{FLD_option_prefix}file_type'] = 'json'
+    if dataset_uname is not None:
+        type_, dataset_name, dataset_config_name = _parse_dataset_name(dataset_uname)
 
-    elif type_ == 'hf':
-        if use_test_as_train:
-            logger.warning('use_test_as_train=True does not work with datasets hosted on huggingface.')
-        if use_test_as_val:
-            logger.warning('use_test_as_val=True does not work with datasets hosted on huggingface.')
-        setting[f'{FLD_option_prefix}dataset_name'] = dataset_name
-        setting[f'{FLD_option_prefix}dataset_config_name'] = dataset_config_name
+        if type_ == 'local':
+            top_dirs = top_dirs or []
+            dataset_paths = get_local_dataset_paths(dataset_name,
+                                                    top_dirs=top_dirs,
+                                                    use_test_as_train=use_test_as_train,
+                                                    use_test_as_val=use_test_as_val)
+            setting.update({f"{FLD_option_prefix}{key}": val for key, val in dataset_paths.items()})
+            setting[f'{FLD_option_prefix}file_type'] = 'json'
 
-    else:
-        raise ValueError()
+        elif type_ == 'hf':
+            if use_test_as_train:
+                logger.warning('use_test_as_train=True does not work with datasets hosted on huggingface.')
+            if use_test_as_val:
+                logger.warning('use_test_as_val=True does not work with datasets hosted on huggingface.')
+            setting[f'{FLD_option_prefix}dataset_name'] = dataset_name
+            setting[f'{FLD_option_prefix}dataset_config_name'] = dataset_config_name
+
+        else:
+            raise ValueError()
 
     return setting
 
@@ -962,7 +1003,11 @@ def get_local_dataset_paths(uname: str,
                 if lab_path.find('job-') >= 0:
                     continue
 
-                setting = json.load(open(lab_path))
+                try:
+                    setting = json.load(open(lab_path))
+                except:
+                    print(lab_path)
+                    raise
 
                 if setting.get('dataset_name', None) != dataset_name:
                     continue
@@ -1002,7 +1047,7 @@ def _parse_dataset_name(name: str) -> Tuple[str, str, Optional[str]]:
         return 'local', name, None
 
 
-def get_config(name: str) -> Dict[str, Any]:
+def get_base_setting(name: str) -> Dict[str, Any]:
     if name == 'default':
         return {
             'seed': 42,
@@ -1514,7 +1559,7 @@ def get_checkpoints(spec: CheckpointSpec,
         return checkpoints
 
 
-def get_model_settings(model_name_or_path: str) -> Dict[str, Any]:
+def get_model_setting(model_name_or_path: str) -> Dict[str, Any]:
     if model_name_or_path == 'izumi-lab/stormy-7b-10ep':
         return {'model_name_or_path': model_name_or_path,
                 'config_name': 'cyberagent/open-calm-7b'}
@@ -1522,13 +1567,50 @@ def get_model_settings(model_name_or_path: str) -> Dict[str, Any]:
         return {'model_name_or_path': model_name_or_path}
 
 
-def get_tokenizer_settings(model_name_or_path: str) -> Dict[str, Any]:
+def get_tokenizer_setting(model_name_or_path: str) -> Dict[str, Any]:
     if model_name_or_path.startswith('line-corporation'):
         return {'use_fast_tokenizer': False}
     elif model_name_or_path == 'izumi-lab/stormy-7b-10ep':
         return {'tokenizer_name': 'cyberagent/open-calm-7b'}
     else:
         return {}
+
+
+def get_other_setting(script_type: str,
+                      generation_timeout=60) -> Dict[str, Any]:
+    setting = {}
+    if script_type == 'run_prover':
+        FLD_option_prefix = ''
+    elif script_type == 'run_causal_prover':
+        FLD_option_prefix = 'FLD_proof_eval_'
+    else:
+        raise ValueError()
+    setting.update({
+        f'{FLD_option_prefix}generation_timeout': generation_timeout,
+    })
+    return setting
+
+
+def get_qsub_gpu_setting(engine: QsubEngine, run_mode: str) -> Tuple[int, str]:
+    if engine.resource == 'rt_G.small':
+        n_gpus = 1
+        gpu_name_for_batch_size = 'V100_16_1'
+    elif engine.resource in ['rt_G.large', 'rt_F']:
+        n_gpus = 4
+        if run_mode == 'deepspeed':
+            gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        else:
+            gpu_name_for_batch_size = 'V100_16_4'
+    elif engine.resource == 'rt_AG.small':
+        n_gpus = 1
+        gpu_name_for_batch_size = 'A100_48_1'
+    elif engine.resource == 'rt_AF':
+        n_gpus = 8
+        gpu_name_for_batch_size = 'A100_48_8'
+    else:
+        raise ValueError()
+    return n_gpus, gpu_name_for_batch_size
+
 
 
 def get_save_eval_step_setting(eval_steps: Optional[int] = None,
@@ -1602,7 +1684,7 @@ def make_command(script_type: str,
         script_path = './run_prover.py'
 
         ignore_option_names = [
-            'base_config_name',
+            'base_setting_name',
             'checkpoint_name',
             'checkpoint_path',
             'learning',
@@ -1618,12 +1700,13 @@ def make_command(script_type: str,
             'script_type',
             'other_dataset_name',
             'other_dataset_config_name',
+            'gpu_name_for_batch_size',
         ]
 
     elif script_type == 'run_causal_prover':
         script_path = './run_causal_prover.py'
         ignore_option_names = [
-            'base_config_name',
+            'base_setting_name',
             'checkpoint_name',
             'checkpoint_path',
             'learning',
@@ -1656,6 +1739,7 @@ def make_command(script_type: str,
             'generation_timeout',
             'max_predict_samples',
             'padding',
+            'gpu_name_for_batch_size',
 
         ]
 
@@ -1664,69 +1748,38 @@ def make_command(script_type: str,
 
     commands: List[str] = []
 
-    commands.append('source ./set-envs.sh &&')
+    commands.append('source ./set-envs.sh')
     
 
     torchrun_err_file = str(output_dir / 'torchrun_err.txt')
 
     if run_mode == 'vanilla':
-        commands.append(f'python {script_path}')
+        commands.append(f' && python {script_path}')
 
     elif run_mode == 'profile':
-        commands.append(f'kernprof -lv {script_path}')
+        commands.append(f' && kernprof -lv {script_path}')
 
     elif run_mode == 'torchrun':
         if n_gpus is None:
             raise ValueError()
-        commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
+        commands.append(f' && TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
                         f' torchrun --nproc_per_node {n_gpus} {script_path}')
 
     elif run_mode == 'deepspeed':
-        # For deepspeed settings, see [here](https://github.com/ohtaman/abci-examples/tree/main/202307#deepspeed-を用いた-multi-node-multi-gpu-訓練分散訓練の例)
-
         ds_config = 'ds_config/ds_config_zero3.json'
-
-        # commands.append(f'TORCHELASTIC_ERROR_FILE={torchrun_err_file}'
-        #                 f' torchrun --nproc_per_node {n_gpus} {script_path}'
-        #                 f' --deepspeed {ds_config}')
-
-        # """
-        # MASTER_ADDR=$HOSNAME deepspeed \
-        #   --master_addr $HOSTNAME \
-        #   --hostfile $hostfile \
-        #   --no_ssh_check \
-        #   --launcher OpenMPI \
-        #   --launcher_args "-mca coll ^hcoll" \
-        #   src/finetune_lora_distribute.py \
-        #   --model_name $MODEL \
-        #   --config_file $CONFIG
-        # """
-        # hostfile = mktemp()
-        # with open(hostfile, 'w') as f_out:
-        #     for line in os.environ['SGE_JOB_HOSTLIST'].split('\n'):
-        #         f_out.write(line + f' slots={n_gpus}')
 
         commands.append(
             ' && '.join([
-                # 'module load python/3.11 cuda/11.7 cudnn/8.6 nccl/2.12 hpcx/2.12',
-                # 'source /etc/profile.d/modules.sh && module load hpcx/2.12',
-
-                'source /etc/profile.d/modules.sh',
+                ' && source /etc/profile.d/modules.sh',
                 'module load python/3.11 cuda/11.7 cudnn/8.6 nccl/2.12 hpcx/2.12',
-
-                # load open-mpi
-                # 'source $PROJECTS/spack/share/spack/setup-env.sh 1>err.txt 2>&1',
-                # 'echo "hoge" > hoge.txt',
-                # 'spack load openmpi@4.1.4',
-
                 f'export hostfile=$(mktemp) && for l in `cat $SGE_JOB_HOSTLIST`; do echo $l slots={n_gpus}; done > $hostfile',
+                'MASTER_ADDR=$HOSTNAME',
             ])
         )
 
         commands.append(
             ' '.join([
-                '&& MASTER_ADDR=$HOSTNAME',
-                'deepspeed',
+                '&& deepspeed',
                 '--master_addr $HOSTNAME',
                 '--hostfile ${hostfile}',
                 '--no_ssh_check',
@@ -1736,6 +1789,14 @@ def make_command(script_type: str,
                 f'--deepspeed {ds_config}'
             ])
         )
+
+        # commands.append(
+        #     ' '.join([
+        #         ' && deepspeed',
+        #         f'{script_path}',
+        #         f'--deepspeed {ds_config}'
+        #     ])
+        # )
 
     else:
         ValueError()
@@ -1750,9 +1811,6 @@ def make_command(script_type: str,
             continue
 
         option_str = maybe_option_value(f'--{name}', value)
-        # if run_mode == 'deepspeed':
-        #     option_str = option_str.replace('"', '\\"')
-        #     option_str = option_str.replace('\'', '\\\'')
         commands.append(option_str)
 
     return ' '.join(commands)
@@ -1773,7 +1831,7 @@ def make_output_dir(setting: Dict,
             # / f'add_fnl_rfrc_t_prfs={setting.get("add_final_reference_to_proofs", None)}'
             # / f'EB_tsk={setting.get("EB_task", None)}'
             # / f'splt={setting.get("split", str(None))}'
-            / f'bs_cnfg_nm={setting.get("base_config_name", None)}'
+            / f'bs_cnfg_nm={setting.get("base_setting_name", None)}'
             # / f'mdl_nm={setting["model_name"].replace("/", "@") if setting["model_name"] is not None else "None"}'
             / f'chckpnt_nm={setting.get("checkpoint_name", None)}'
         ),
@@ -1797,7 +1855,7 @@ def make_output_dir(setting: Dict,
             'prover_ckpt',
             'verifier_ckpt',
 
-            'base_config_name',
+            'base_setting_name',
             # 'base_config_path',
 
             'resume_from_checkpoint',
@@ -1888,6 +1946,7 @@ def make_output_dir(setting: Dict,
             'lm_type',
             'script_type',
             'use_auth_token',
+            'gpu_name_for_batch_size',
 
         ] + dataset_setting_names + (dirname_ignore_params or []),
         save_params=True

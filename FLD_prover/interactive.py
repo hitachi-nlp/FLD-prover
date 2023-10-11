@@ -8,12 +8,12 @@ from FLD_task import (
     load_deduction,
     serialize,
     build_metrics,
-    prettify_facts_text,
     prettify_proof_text,
     log_example,
 )
 from FLD_prover.data_processing import (
     unmask_by_pad_token,
+    CAUSAL_LM_END_OF_PROMPT,
 )
 
 
@@ -50,28 +50,33 @@ def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gra
                 predictions, skip_special_tokens=True, clean_up_tokenization_spaces=True
             )
             predictions = [pred.strip() for pred in predictions]
-            return predictions[0]
-
-        # TODO: implement the logic here
-        raise NotImplementedError()
+            prediction = predictions[0]
+            return re.sub(f'.*\$proof\$ = {CAUSAL_LM_END_OF_PROMPT}', '', prediction.replace('\n', ''))
+        else:
+            return None
 
     if mode == 'console':
         while True:
             print('\n\n======================= interactive mode ========================')
-            facts = input('\nfacts:\n\n')
-            hypothesis = input('\nhypothesis:\n\n')
+            # XXX TODO: to be compatible with deepspeed.
+            if seq2seq_trainer.is_world_process_zero():
+                facts = input('\nfacts:\n\n')
+                hypothesis = input('\nhypothesis:\n\n')
+            else:
+                # How can we get the user input from non- world-zero process?
+                raise NotImplementedError()
 
             proof = get_prediction(facts, hypothesis)
-            proof = prettify_proof_text(proof)
-
-            log_example(
-                facts=facts,
-                hypothesis=hypothesis,
-                pred_proof=proof,
-            )
+            if seq2seq_trainer.is_world_process_zero():
+                print('is_world_process_zero()', seq2seq_trainer.is_world_process_zero())
+                log_example(
+                    facts=facts,
+                    hypothesis=hypothesis,
+                    pred_proof=proof,
+                )
 
     elif mode == 'gradio':
-
+        # XXX TODO: to be compatible with deepspeed.
         def predict(facts: str, hypothesis: str):
             proof = get_prediction(facts, hypothesis)
             proof = prettify_proof_text(proof)

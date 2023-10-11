@@ -18,7 +18,7 @@ from FLD_prover.lm_types import LMType
 
 logger = logging.getLogger()
 
-_CAUSAL_LM_END_OF_PROMPT = '::'
+CAUSAL_LM_END_OF_PROMPT = '::'
 
 
 def preprocess_function(examples: Dict[str, List[Any]],
@@ -80,17 +80,18 @@ def preprocess_function(examples: Dict[str, List[Any]],
         prompt_with_partial_proof = prompt_prefix + serial.prompt + (serial.partial_proof or '')
 
         gold_proof = serial.proof
-        # check whther the tokenizer can recognize stance markers
-        gold_proof_dec = tokenizer.decode(_prepare_tokenized_targets([gold_proof],
-                                                                     whole_proof_max_length)["input_ids"][0])
-        if len(get_stance_markers(gold_proof_dec)) == 0:
-            logger.warning(
-                '\n'.join([
-                    'The tokenizer could not recognized the stance markers.',
-                    f'The original proof: "{gold_proof}"',
-                    f'The tokenized proof: "{gold_proof_dec}"',
-                ])
-            )
+        if gold_proof is not None:
+            # check whther the tokenizer can recognize stance markers
+            gold_proof_dec = tokenizer.decode(_prepare_tokenized_targets([gold_proof],
+                                                                         whole_proof_max_length)["input_ids"][0])
+            if len(get_stance_markers(gold_proof_dec)) == 0:
+                logger.warning(
+                    '\n'.join([
+                        'The tokenizer could not recognized the stance markers.',
+                        f'The original proof: "{gold_proof}"',
+                        f'The tokenized proof: "{gold_proof_dec}"',
+                    ])
+                )
 
         prompts_w_partial_proof.append(prompt_with_partial_proof)
         proof_steps.append(serial.next_proof_step)
@@ -102,12 +103,12 @@ def preprocess_function(examples: Dict[str, List[Any]],
             logger.info('next proof step    : "%s"', serial.next_proof_step)
             logger.info('gold proof         : "%s"', gold_proof)
 
-    _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
-
     # without this additional token, we can not accurately calculate the prompt length
     # as the token
     forward_inputs: Dict[str, Any] = {}
     if split == 'train':
+        _proof_steps_w_eos = [step + f' {tokenizer.eos_token}' for step in proof_steps]
+
         if any(_targets is None for _targets in proof_steps):
             raise ValueError()
 
@@ -119,7 +120,7 @@ def preprocess_function(examples: Dict[str, List[Any]],
 
         elif lm_type == LMType.CAUSAL:
             # just for getting length
-            _prompts = [prompt + _CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
+            _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
             if include_prompt_for_causal_lm_loss:
                 prompt_lengths = None
@@ -149,14 +150,11 @@ def preprocess_function(examples: Dict[str, List[Any]],
             raise NotImplementedError()
 
     elif split == 'eval':
-        if any(_gold_proofs is None for _gold_proofs in gold_proofs):
-            raise Exception('Why pass here? might be a bug?')
-
         if lm_type == LMType.SEQ_2_SEQ:
             forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, max_source_length))
 
         elif lm_type == LMType.CAUSAL:
-            _prompts = [prompt + _CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
+            _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
             forward_inputs.update(
                 _prepare_tokenized_inputs(
@@ -172,7 +170,8 @@ def preprocess_function(examples: Dict[str, List[Any]],
         raise ValueError()
 
     for add_feature in ['depth', 'hypothesis', 'facts']:
-        forward_inputs[add_feature] = examples[add_feature]
+        if add_feature in examples:
+            forward_inputs[add_feature] = examples[add_feature]
 
     forward_inputs['prompts_w_partial_proof'] = prompts_w_partial_proof
     forward_inputs['proof_step'] = proof_steps
