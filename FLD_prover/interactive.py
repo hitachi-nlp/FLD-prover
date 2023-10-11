@@ -17,17 +17,27 @@ from FLD_prover.data_processing import (
 )
 
 
-def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gradio_port=8010):
+def launch(seq2seq_trainer,
+           tokenizer,
+           eval_dataset_transform_fn,
+           mode: str,
+           gradio_port=8010):
 
     def _unmask_by_pad_token(tensor):
         return unmask_by_pad_token(tensor, tokenizer.pad_token_id)
 
-    def get_prediction(facts: str, hypothesis: str) -> str:
+    def get_prediction(facts: str, hypothesis: str, is_FLD_prompt=True) -> str:
         facts = re.sub(r'\s+', ' ', re.sub(r'\n', ' ', facts))
-        instance = {
-            'facts': facts,
-            'hypothesis': hypothesis,
-        }
+
+        if is_FLD_prompt:
+            instance = {
+                'facts': facts,
+                'hypothesis': hypothesis,
+            }
+        else:
+            instance = {
+                'prompt_text': facts,
+            }
 
         tmp = tempfile.mktemp()
         with open(tmp, 'w') as f_out:
@@ -39,7 +49,25 @@ def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gra
             cache_dir=None,
             use_auth_token=False,
         )['tmp']
-        user_input_dataset.set_transform(eval_dataset_transform_fn)
+
+        if is_FLD_prompt:
+            # user_input_dataset.set_transform(eval_dataset_transform_fn)
+            user_input_dataset = user_input_dataset.map(
+                eval_dataset_transform_fn,
+                batched=True,
+                num_proc=1,
+                # remove_columns=column_names,
+                # load_from_cache_file=not data_args.overwrite_cache,
+                desc="FLD processing",
+            )
+        else:
+            user_input_dataset = user_input_dataset.map(
+                lambda examples: tokenizer(examples['prompt_text']),
+                batched=True,
+                num_proc=1,
+                desc="plain prompt processing",
+            )
+
         results = seq2seq_trainer.predict(user_input_dataset,
                                           metric_key_prefix="predict")
 
@@ -77,15 +105,17 @@ def launch(seq2seq_trainer, tokenizer, eval_dataset_transform_fn, mode: str, gra
 
     elif mode == 'gradio':
         # XXX TODO: to be compatible with deepspeed.
-        def predict(facts: str, hypothesis: str):
-            proof = get_prediction(facts, hypothesis)
-            proof = prettify_proof_text(proof)
+        def predict(facts: str, hypothesis: str, is_FLD_prompt: bool):
+            proof = get_prediction(facts, hypothesis, is_FLD_prompt=is_FLD_prompt)
+            if is_FLD_prompt:
+                proof = prettify_proof_text(proof)
             return proof
 
         demo = gr.Interface(
             fn=predict,
             inputs=[gr.Textbox(lines=10, placeholder='fact1: Allen is red\nfact2: Allen is blue'),
-                    gr.Textbox(lines=1, placeholder='Allen is red')],
+                    gr.Textbox(lines=1, placeholder='Allen is red'),
+                    gr.Checkbox(value=True, label='Convert to FLD prompt')],
             outputs=['text'],
         )
         demo.launch(share=True, server_name='0.0.0.0', server_port=gradio_port)
