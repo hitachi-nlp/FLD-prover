@@ -50,7 +50,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
-    output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
+    # output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
+    output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -62,6 +63,7 @@ def main():
         './outputs.FLD/00.create_corpus/20230912.jpn',
         './outputs.FLD/00.create_corpus/20230916.jpn',
         './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
+        './outputs.FLD/00.create_corpus/20231010.large_vocab',
     ]
 
     FLD_dataset_unames = [
@@ -86,12 +88,16 @@ def main():
 
         # ---------------------------------- 20231010.D3.large_vocab ------------------------------------
         '20231010.D3.large_vocab',
-        '20231010.D3.large_vocab.smpl_stncs',
-        '20231010.D3.large_vocab.smpl_stncs.transl_vrnts',
+        # '20231010.D3.large_vocab.smpl_stncs',
+        # '20231010.D3.large_vocab.smpl_stncs.cntx_shffls-3',
+        # '20231010.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
     ]
 
     other_dataset_name = "wikitext"
     other_dataset_config_name = "wikitext-2-raw-v1"
+
+    # other_dataset_name = "cerebras/SlimPajama-627B"
+    # other_dataset_config_name = None
 
     # [cerebras/SlimPajama-627B](https://huggingface.co/datasets/cerebras/SlimPajama-627B)
     # other_dataset_name = "cerebras/SlimPajama-627B"
@@ -185,14 +191,14 @@ def main():
         # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
-        'debug.middle',
+        # 'debug.middle',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
 
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        # 'FT.step-5000',
+        'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
@@ -239,7 +245,7 @@ def main():
     # streaming = True
 
     instruction_args = [
-        # False,
+        False,
         True,
     ]
 

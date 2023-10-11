@@ -33,16 +33,20 @@ def main():
     output_top_dir = Path('./outputs/02.interactive.py')
 
     # ---------------------------------- 2023-07-27.compare_models.large_steps ------------------------------------
-    # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
-    # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
-    # checkpoint_top_dir = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
+    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
+    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
+    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
 
-    # checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
+    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
 
-    # checkpoint_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
+    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
 
-    # checkpoint_top_dir = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
-    checkpoint_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
+    # checkpoint = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
+
+    # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
+
+    # checkpoint = ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'all_at_once')
+    checkpoint = ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'all_at_once')
 
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
@@ -81,19 +85,27 @@ def main():
     generation_timeout = 60 * 10  # For LLMs
     # generation_timeout = 6
 
-    checkpoint_configs = [path for path in checkpoint_top_dir.glob('**/*/tokenizer_config.json')
-                          if str(path).find('checkpoint-') < 0]  # this finds the final checkpoint output to the top dir
-    if len(checkpoint_configs) == 0:
-        checkpoint_configs = [path for path in checkpoint_top_dir.glob('**/*/tokenizer_config.json')]
+    if isinstance(checkpoint, Path):
+        checkpoint_configs = [path for path in checkpoint.glob('**/*/tokenizer_config.json')
+                              if str(path).find('checkpoint-') < 0]  # this finds the final checkpoint output to the top dir
+        if len(checkpoint_configs) == 0:
+            checkpoint_configs = [path for path in checkpoint.glob('**/*/tokenizer_config.json')]
 
-    if len(checkpoint_configs) == 0:
-        raise ValueError(f'No checkpoint found under "{str(checkpoint_top_dir)}"')
-    elif len(checkpoint_configs) >= 2:
-        raise ValueError(f'multiple checkpoint  found under "{str(checkpoint_top_dir)}"')
-    checkpoint_dir = checkpoint_configs[0].parent
-    lab_setting = json.load(open(str(checkpoint_dir / 'lab.params.json')))
+        if len(checkpoint_configs) == 0:
+            raise ValueError(f'No checkpoint found under "{str(checkpoint)}"')
+        elif len(checkpoint_configs) >= 2:
+            raise ValueError(f'multiple checkpoint  found under "{str(checkpoint)}"')
 
-    lm_type = lab_setting['lm_type']
+        checkpoint_dir = checkpoint_configs[0].parent
+        lab_setting = json.load(open(str(checkpoint_dir / 'lab.params.json')))
+
+        hf_model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
+        lm_type = lab_setting['lm_type']
+        proof_sampling = lab_setting['proof_sampling']
+        model_name_or_path = checkpoint_dir
+    else:
+        hf_model_name, lm_type, proof_sampling = checkpoint
+        model_name_or_path = hf_model_name
 
     setting = {}
 
@@ -106,8 +118,6 @@ def main():
         )
     )
 
-    model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
-    proof_sampling = lab_setting['proof_sampling']
     setting.update(
         get_batch_setting(
             script_type,
@@ -115,9 +125,9 @@ def main():
         )
     )
 
-    setting.update(get_model_setting(model_name))
+    setting.update(get_model_setting(hf_model_name))
 
-    setting.update(get_tokenizer_setting(model_name))
+    setting.update(get_tokenizer_setting(hf_model_name))
 
     setting.update(get_other_setting(script_type, generation_timeout))
 
@@ -135,11 +145,11 @@ def main():
         'base_setting_name': base_setting_name,
 
         'lm_type': lm_type,
-        'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
+        'fp16': hf_model_name.find('t5-') < 0 and hf_model_name.find('rinna/japanese-gpt2-medium') < 0,
 
         'proof_sampling': proof_sampling,
 
-        'model_name_or_path': str(checkpoint_dir),
+        'model_name_or_path': model_name_or_path,
         'evaluation_strategy': None,  # should specify None, otherwise --do_eval is forced to be True
 
         'dataloader_num_workers': 0,
