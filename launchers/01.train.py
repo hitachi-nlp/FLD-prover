@@ -79,7 +79,6 @@ def main():
         # '20230826.jpn.D3',
         # '20230826.jpn.D8',
 
-
         # ---------------------------------- 20230916.jpn ------------------------------------
         # '20230916.jpn.D1_wo_dist',
         # '20230916.jpn.D1',
@@ -87,7 +86,8 @@ def main():
         # '20230916.jpn.D5',
 
         # ---------------------------------- 20231010.D3.large_vocab ------------------------------------
-        '20231010.D3.large_vocab',
+        # '20231010.D3.large_vocab',
+        '20231010.D3.large_vocab__eval-20230801.case_study_finalize.fix',
         # '20231010.D3.large_vocab.smpl_stncs',
         # '20231010.D3.large_vocab.smpl_stncs.cntx_shffls-3',
         # '20231010.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',

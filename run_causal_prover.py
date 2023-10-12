@@ -324,7 +324,7 @@ class DataTrainingArguments:
     )
 
     generation_max_new_tokens: int = field(
-        default=2000,
+        default=200,
     )
 
     generation_timeout: int = field(
@@ -1044,4 +1044,3 @@ def _mp_fn(index):
 
 if __name__ == "__main__":
     main()
-  

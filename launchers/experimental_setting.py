@@ -879,6 +879,13 @@ _DATASET_PATHS = {
         'validation_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
         'test_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
     },
+
+    '20231010.D3.large_vocab__eval-20230801.case_study_finalize.fix': {
+        'train_file': './outputs.FLD/00.create_corpus/20231010.large_vocab/dataset_name=20231010.D3.large_vocab/cntxt_shffls_pr_instnc=1/smpl_all_stncs_pr_lgc=False/trnsltn_adj_vrb_nn_rt=1-1-1/train/train.jsonl',
+        'validation_file': './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix/dataset_name=20230729.case_study_finalize.D3/trnsltn_adj_vrb_nn_rt=1-1-1/test/test.jsonl',
+        'test_file': './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix/dataset_name=20230729.case_study_finalize.D3/trnsltn_adj_vrb_nn_rt=1-1-1/test/test.jsonl',
+    },
+
 }
 
 
@@ -1825,6 +1832,120 @@ def make_output_dir(setting: Dict,
                     dirname_ignore_params: Optional[List[str]] = None) -> str:
     dataset_setting_names = [key for key in setting if
                              key.startswith('dataset_setting.')]
+
+    dirname_exclude_params = [
+        # 'system_name',
+        # 'EB_task',
+
+        'tokenizer_name',
+        'config_name',
+
+        'dataset_config_name',
+        'dataset_1',
+        'train_file_1',
+
+        'exclude_unknown',
+        # 'add_final_reference_to_proofs',
+        # 'split',
+
+        'prover_ckpt',
+        'verifier_ckpt',
+
+        'base_setting_name',
+        # 'base_config_path',
+
+        'resume_from_checkpoint',
+        'checkpoint_name',
+        'checkpoint_path',
+
+        'trainer_ckpt_for_resume_training',
+
+        # 'model_name',
+
+        'train_file',
+        'validation_file',
+        'test_file',
+
+        'train_file_1',
+        'validation_file_1',
+        'test_file_1',
+
+        'do_train',
+        'do_eval',
+        'do_eval_in_outerloop',
+        'do_predict',
+
+        'estimated_batches_per_epoch',
+        'val_check_interval_in_batch',
+        # 'check_val_every_n_epoch',
+        'per_device_train_batch_size',
+        'gradient_accumulation_steps',
+        'per_device_eval_batch_size',
+        'padding',
+        'limit_eval_batches',
+        'num_val_stage_throught_training',
+
+        "argument_configs",
+        "translation_configs",
+
+        'max_source_length',
+        'max_target_length',
+        'unknown_ratio',
+        'log_examples',
+        'dataloader_num_workers',
+
+        'max_grad_norm',
+        'max_eval_samples',
+        'max_proof_steps',
+        'fp16',
+        'generation_max_proof_steps',
+        'generation_num_return_sequences',
+        'generation_timeout',
+        'source_prefix',
+        'logging_strategy',
+
+        'overwrite_output_dir',
+        'log_generation',
+        'path_train_1',
+        'path_val_1',
+        'path_test_1',
+        'evaluation_strategy',
+        'save_strategy',
+        'logging_strategy',
+        'logging_steps',
+        'predict_with_generate',
+        'checkpoint_lrate',
+        'checkpoint_model_name_or_path',
+        'checkpoint_model_name',
+        'eval_steps',
+        'file_type',
+        'log_examples',
+        'max_predict_samples',
+        'max_train_samples',
+        'max_eval_samples',
+        'remove_unused_columns',
+        'save_steps',
+
+        'FLD_dataset_uname',
+        'FLD_file_type',
+        'FLD_max_eval_samples',
+        'FLD_proof_eval_dataset',
+        'FLD_proof_eval_padding',
+        'FLD_train_file',
+        'FLD_validation_file',
+        'FLD_test_file',
+
+        'gradient_checkpointing',
+        'lm_type',
+        'script_type',
+        'use_auth_token',
+        'gpu_name_for_batch_size',
+
+    ]
+
+    if len(setting.get('model_name_or_path', '')) > 50:  # likely it is a Path and
+        dirname_ignore_params.append('model_name_or_path')
+
     return build_dir(
         setting,
         top_dir=str(
@@ -1840,118 +1961,7 @@ def make_output_dir(setting: Dict,
             / f'chckpnt_nm={setting.get("checkpoint_name", None)}'
         ),
         short=True,
-
-        dirname_ignore_params=[
-            # 'system_name',
-            # 'EB_task',
-
-            'tokenizer_name',
-            'config_name',
-
-            'dataset_config_name',
-            'dataset_1',
-            'train_file_1',
-
-            'exclude_unknown',
-            # 'add_final_reference_to_proofs',
-            # 'split',
-
-            'prover_ckpt',
-            'verifier_ckpt',
-
-            'base_setting_name',
-            # 'base_config_path',
-
-            'resume_from_checkpoint',
-            'checkpoint_name',
-            'checkpoint_path',
-
-            'trainer_ckpt_for_resume_training',
-
-            # 'model_name',
-
-            'train_file',
-            'validation_file',
-            'test_file',
-
-            'train_file_1',
-            'validation_file_1',
-            'test_file_1',
-
-            'do_train',
-            'do_eval',
-            'do_eval_in_outerloop',
-            'do_predict',
-
-            'estimated_batches_per_epoch',
-            'val_check_interval_in_batch',
-            # 'check_val_every_n_epoch',
-            'per_device_train_batch_size',
-            'gradient_accumulation_steps',
-            'per_device_eval_batch_size',
-            'padding',
-            'limit_eval_batches',
-            'num_val_stage_throught_training',
-
-            "argument_configs",
-            "translation_configs",
-
-            'max_source_length',
-            'max_target_length',
-            'unknown_ratio',
-            'log_examples',
-            'dataloader_num_workers',
-
-            'max_grad_norm',
-            'max_eval_samples',
-            'max_proof_steps',
-            'fp16',
-            'generation_max_proof_steps',
-            'generation_num_return_sequences',
-            'generation_timeout',
-            'source_prefix',
-            'logging_strategy',
-
-            'overwrite_output_dir',
-            'log_generation',
-            'path_train_1',
-            'path_val_1',
-            'path_test_1',
-            'evaluation_strategy',
-            'save_strategy',
-            'logging_strategy',
-            'logging_steps',
-            'predict_with_generate',
-            'checkpoint_lrate',
-            'checkpoint_model_name_or_path',
-            'checkpoint_model_name',
-            'eval_steps',
-            'file_type',
-            'log_examples',
-            'max_predict_samples',
-            'max_train_samples',
-            'max_eval_samples',
-            'remove_unused_columns',
-            'save_steps',
-
-            'FLD_dataset_uname',
-            'FLD_file_type',
-            'FLD_max_eval_samples',
-            'FLD_proof_eval_dataset',
-            'FLD_proof_eval_padding',
-            'FLD_train_file',
-            'FLD_validation_file',
-            'FLD_test_file',
-
-            'gradient_checkpointing',
-            'lm_type',
-            'script_type',
-            'use_auth_token',
-            'gpu_name_for_batch_size',
-
-            'model_name_or_path',  # since it is a filepath for some cases.
-
-        ] + dataset_setting_names + (dirname_ignore_params or []),
+        dirname_ignore_params = dirname_exclude_params + dataset_setting_names + (dirname_ignore_params or []),
         save_params=True
     )
 

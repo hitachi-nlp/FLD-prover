@@ -53,11 +53,11 @@ def main():
 
     instruction = True
 
-    generation_do_sample = True
+    generation_do_sample = False
     generation_top_k = 10
-    generation_repetition_penalty = 1.5
+    generation_repetition_penalty = 1.0
     generation_max_length = 2000
-    generation_max_new_tokens = 2000
+    generation_max_new_tokens = 200
     generation_timeout = 60
 
     interactive_mode = 'gradio'
