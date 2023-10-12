@@ -840,9 +840,6 @@ def get_batch_setting(script_type: str,
     elif script_type == "run_causal_prover":
         def update_for_causal_prover(setting: Dict[str, Any]):
             setting["block_size"] = setting["max_target_length"]
-            setting["FLD_proof_eval_generation_top_k"] = setting.get("generation_top_k", None)
-            setting["FLD_proof_eval_generation_num_return_sequences"] = setting.get("generation_num_return_sequences", None)
-            setting["FLD_proof_eval_generation_num_beams"] = setting.get("generation_num_beams", None)
             setting["FLD_proof_eval_padding"] = setting.get("padding", None)
 
         if for_interactive:
@@ -1576,18 +1573,25 @@ def get_tokenizer_setting(model_name_or_path: str) -> Dict[str, Any]:
         return {}
 
 
-def get_other_setting(script_type: str,
-                      generation_timeout=60) -> Dict[str, Any]:
-    setting = {}
-    if script_type == 'run_prover':
-        FLD_option_prefix = ''
-    elif script_type == 'run_causal_prover':
-        FLD_option_prefix = 'FLD_proof_eval_'
-    else:
-        raise ValueError()
-    setting.update({
-        f'{FLD_option_prefix}generation_timeout': generation_timeout,
-    })
+def get_generation_setting(script_type: str,
+                           generation_num_beams: Optional[int] = None,
+                           generation_top_k: Optional[int] = None,
+                           generation_num_return_sequences: Optional[int] = None,
+                           generation_do_sample=False,
+                           generation_repetition_penalty: Optional[float] = None,
+                           generation_max_length: Optional[int] = None,
+                           generation_max_new_tokens: Optional[int] = None,
+                           generation_timeout=60) -> Dict[str, Any]:
+    setting = {
+        'generation_num_beams': generation_num_beams,
+        'generation_top_k': generation_top_k,
+        'generation_num_return_sequences': generation_num_return_sequences,
+        'generation_do_sample': generation_do_sample,
+        'generation_repetition_penalty': generation_repetition_penalty,
+        'generation_max_length': generation_max_length,
+        'generation_max_new_tokens': generation_max_new_tokens,
+        'generation_timeout': generation_timeout,
+    }
     return setting
 
 
@@ -1934,10 +1938,7 @@ def make_output_dir(setting: Dict,
             'FLD_file_type',
             'FLD_max_eval_samples',
             'FLD_proof_eval_dataset',
-            'FLD_proof_eval_generation_top_k',
             'FLD_proof_eval_padding',
-            'FLD_proof_eval_generation_timeout',
-            'FLD_proof_eval_generation_num_return_sequences',
             'FLD_train_file',
             'FLD_validation_file',
             'FLD_test_file',
@@ -1947,6 +1948,8 @@ def make_output_dir(setting: Dict,
             'script_type',
             'use_auth_token',
             'gpu_name_for_batch_size',
+
+            'model_name_or_path',  # since it is a filepath for some cases.
 
         ] + dataset_setting_names + (dirname_ignore_params or []),
         save_params=True

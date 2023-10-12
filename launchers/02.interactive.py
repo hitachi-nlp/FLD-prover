@@ -15,7 +15,7 @@ from experimental_setting import (
     get_dataset_setting,
     get_batch_setting,
     get_qsub_gpu_setting,
-    get_other_setting,
+    get_generation_setting,
     get_model_setting,
     get_tokenizer_setting,
     make_output_dir,
@@ -43,15 +43,22 @@ def main():
 
     # checkpoint = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
 
-    # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
+    checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
 
     # checkpoint = ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'all_at_once')
-    checkpoint = ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'all_at_once')
+    # checkpoint = ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'all_at_once')
 
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
     instruction = True
+
+    generation_do_sample = True
+    generation_top_k = 10
+    generation_repetition_penalty = 1.5
+    generation_max_length = 2000
+    generation_max_new_tokens = 2000
+    generation_timeout = 60
 
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
@@ -80,10 +87,6 @@ def main():
         n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     base_setting_name = 'default'
-
-    # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
-    generation_timeout = 60 * 10  # For LLMs
-    # generation_timeout = 6
 
     if isinstance(checkpoint, Path):
         checkpoint_configs = [path for path in checkpoint.glob('**/*/tokenizer_config.json')
@@ -129,7 +132,17 @@ def main():
 
     setting.update(get_tokenizer_setting(hf_model_name))
 
-    setting.update(get_other_setting(script_type, generation_timeout))
+    setting.update(
+        get_generation_setting(
+            script_type,
+            generation_do_sample=generation_do_sample,
+            generation_top_k=generation_top_k,
+            generation_repetition_penalty=generation_repetition_penalty,
+            generation_max_length=generation_max_length,
+            generation_max_new_tokens=generation_max_new_tokens,
+            generation_timeout=generation_timeout,
+        ),
+    )
 
     setting.update({
         'do_train': False,
@@ -149,7 +162,7 @@ def main():
 
         'proof_sampling': proof_sampling,
 
-        'model_name_or_path': model_name_or_path,
+        'model_name_or_path': str(model_name_or_path),
         'evaluation_strategy': None,  # should specify None, otherwise --do_eval is forced to be True
 
         'dataloader_num_workers': 0,

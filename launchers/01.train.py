@@ -16,7 +16,7 @@ from experimental_setting import (
     get_tokenizer_setting,
     get_qsub_gpu_setting,
     get_learning_setting,
-    get_other_setting,
+    get_generation_setting,
     make_output_dir,
     make_command,
     run_by_engine,
@@ -62,7 +62,7 @@ def main():
         './outputs.FLD/00.create_corpus/20230904.jpn',
         './outputs.FLD/00.create_corpus/20230912.jpn',
         './outputs.FLD/00.create_corpus/20230916.jpn',
-        './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
+        # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
         './outputs.FLD/00.create_corpus/20231010.large_vocab',
     ]
 
@@ -372,7 +372,7 @@ def main():
 
                                     setting.update(get_tokenizer_setting(model_name))
 
-                                    setting.update(get_other_setting(script_type, generation_timeout))
+                                    setting.update(get_generation_setting(script_type, generation_timeout))
 
                                     setting.update({
                                         'do_train': True,

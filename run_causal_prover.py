@@ -234,15 +234,6 @@ class DataTrainingArguments:
     FLD_max_eval_samples: Optional[int] = field(
         default=None,
     )
-    FLD_proof_eval_generation_num_beams: Optional[int] = field(
-        default=None,
-        metadata={
-            "help": (
-                "Number of beams to use for evaluation. This argument will be passed to ``model.generate``, "
-                "which is used during ``evaluate`` and ``predict``."
-            )
-        },
-    )
     streaming: bool = field(default=False, metadata={"help": "Enable streaming mode"})
     block_size: Optional[int] = field(
         default=None,
@@ -308,15 +299,35 @@ class DataTrainingArguments:
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
 
-    FLD_proof_eval_generation_top_k: int = field(
+    generation_top_k: int = field(
         default=None,
     )
 
-    FLD_proof_eval_generation_num_return_sequences: int = field(
+    generation_num_beams: int = field(
         default=1,
     )
 
-    FLD_proof_eval_generation_timeout: int = field(
+    generation_num_return_sequences: int = field(
+        default=1,
+    )
+
+    generation_do_sample: bool = field(
+        default=False,
+    )
+
+    generation_repetition_penalty: float = field(
+        default=None,
+    )
+
+    generation_max_length: int = field(
+        default=2000,
+    )
+
+    generation_max_new_tokens: int = field(
+        default=2000,
+    )
+
+    generation_timeout: int = field(
         default=60,
     )
 
@@ -877,29 +888,33 @@ def main():
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
-    # hack for the training_args to fit into Seq2SeqTrainer()
-    training_args.generation_config = None  # For Seq2SeqTrainer
-    training_args.generation_max_length = block_size
-    training_args.generation_num_beams = data_args.FLD_proof_eval_generation_num_beams
+    training_args.generation_config = None
     training_args.predict_with_generate = True
-
-    ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
-        ForceCallMetricsSeq2SeqTrainer.evaluate,
+    generation_handle_args = [
         LMType.CAUSAL,
         tokenizer,
         model,
-        timeout=data_args.FLD_proof_eval_generation_timeout,
-        top_k=data_args.FLD_proof_eval_generation_top_k,
-        num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
+    ]
+    generation_handled_kwargs = {
+        'timeout': data_args.generation_timeout,
+        'eos_token_id': tokenizer.eos_token_id,
+        'top_k': data_args.generation_top_k,
+        'num_beams': data_args.generation_num_beams,
+        'num_return_sequences': data_args.generation_num_return_sequences,
+        'do_sample': data_args.generation_do_sample,
+        'repetition_penalty': data_args.generation_repetition_penalty,
+        'max_length': data_args.generation_max_length + 1,  # + 1 to be compatible with beam_search
+        'max_new_tokens': data_args.generation_max_new_tokens,
+    }
+    ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
+        ForceCallMetricsSeq2SeqTrainer.evaluate,
+        *generation_handle_args,
+        **generation_handled_kwargs,
     )
     ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.predict,
-        LMType.CAUSAL,
-        tokenizer,
-        model,
-        timeout=data_args.FLD_proof_eval_generation_timeout,
-        top_k=data_args.FLD_proof_eval_generation_top_k,
-        num_return_sequences=data_args.FLD_proof_eval_generation_num_return_sequences,
+        *generation_handle_args,
+        **generation_handled_kwargs,
     )
 
     if "validation" in FLD_lm_datasets:
@@ -1029,3 +1044,4 @@ def _mp_fn(index):
 
 if __name__ == "__main__":
     main()
+  

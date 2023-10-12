@@ -1,7 +1,7 @@
 from typing import Optional
 import logging
 import time
-from copy import copy
+from copy import copy, deepcopy
 
 import torch
 from transformers.generation.stopping_criteria import StoppingCriteria
@@ -31,8 +31,7 @@ def generation_handled(func,
                        tokenizer,
                        model,
                        timeout: Optional[int] = None,
-                       top_k=1,
-                       num_return_sequences=1):
+                       **gen_kwargs):
     if lm_type == LMType.CAUSAL:
         """
             model.generate() with batch size >= 2 require hacks on special tokens.
@@ -69,12 +68,12 @@ def generation_handled(func,
             tokenizer special tokens, we also have to generate gen_kwargs dynamically.
         """
         stopping_criteria = MaxTimeCriteriaWithWarning(timeout)
-        return {
-            'top_k': top_k,
+        _kwargs = {
             'stopping_criteria': [stopping_criteria],
-            'num_return_sequences': num_return_sequences,
             'pad_token_id': tokenizer.pad_token_id,
         }
+        _kwargs.update(deepcopy(gen_kwargs))
+        return _kwargs
 
     def handled(self, *args, **kwargs):
         generation_init_special_tokens()

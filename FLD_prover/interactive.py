@@ -71,6 +71,7 @@ def launch(seq2seq_trainer,
         results = seq2seq_trainer.predict(user_input_dataset,
                                           metric_key_prefix="predict")
 
+
         if seq2seq_trainer.is_world_process_zero():
             predictions = results.predictions
             predictions = _unmask_by_pad_token(predictions)

@@ -329,8 +329,28 @@ class DataTrainingArguments:
         default=None,
     )
 
+    generation_num_beams: int = field(
+        default=1,
+    )
+
     generation_num_return_sequences: int = field(
         default=1,
+    )
+
+    generation_do_sample: bool = field(
+        default=False,
+    )
+
+    generation_repetition_penalty: float = field(
+        default=None,
+    )
+
+    generation_max_length: int = field(
+        default=2000,
+    )
+
+    generation_max_new_tokens: int = field(
+        default=200,
     )
 
     generation_timeout: int = field(
@@ -617,17 +637,9 @@ def main():
         logger.info('train LoRA model with the following parameters:')
         model.print_trainable_parameters()
 
-    # Override the decoding parameters of Seq2SeqTrainer
-    # + 1 to be compatible with beam search
-    training_args.generation_max_length = (
-        training_args.generation_max_length + 1
-        if training_args.generation_max_length is not None
-        else data_args.val_max_target_length + 1
-    )
-
-    training_args.generation_num_beams = (
-        data_args.num_beams if data_args.num_beams is not None else training_args.generation_num_beams
-    )
+    # training_args.generation_num_beams = (
+    #     data_args.num_beams if data_args.num_beams is not None else training_args.generation_num_beams
+    # )
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -801,23 +813,39 @@ def main():
     else:
         raise NotImplementedError()
 
-    StepWiseGenerationTrainer.evaluate = generation_handled(
-        StepWiseGenerationTrainer.evaluate,
+    # Override the decoding parameters of Seq2SeqTrainer
+    # + 1 to be compatible with beam search
+    generation_max_length = (
+        training_args.generation_max_length + 1
+        if training_args.generation_max_length is not None
+        else data_args.val_max_target_length + 1
+    )
+    training_args.generation_max_length = generation_max_length
+    generation_handle_args = [
         lm_type,
         tokenizer,
         model,
-        timeout=data_args.generation_timeout,
-        top_k=data_args.generation_top_k,
-        num_return_sequences=data_args.generation_num_return_sequences,
+    ]
+    generation_handled_kwargs = {
+        'timeout': data_args.generation_timeout,
+        'eos_token_id': tokenizer.eos_token_id,
+        'top_k': data_args.generation_top_k,
+        'num_beams': data_args.generation_num_beams,
+        'num_return_sequences': data_args.generation_num_return_sequences,
+        'do_sample': data_args.generation_do_sample,
+        'repetition_penalty': data_args.generation_repetition_penalty,
+        'max_length': generation_max_length,
+        'max_new_tokens': data_args.generation_max_new_tokens,
+    }
+    StepWiseGenerationTrainer.evaluate = generation_handled(
+        StepWiseGenerationTrainer.evaluate,
+        *generation_handle_args,
+        **generation_handled_kwargs,
     )
     StepWiseGenerationTrainer.predict = generation_handled(
         StepWiseGenerationTrainer.predict,
-        lm_type,
-        tokenizer,
-        model,
-        timeout=data_args.generation_timeout,
-        top_k=data_args.generation_top_k,
-        num_return_sequences=data_args.generation_num_return_sequences,
+        *generation_handle_args,
+        **generation_handled_kwargs,
     )
 
     trainer = StepWiseGenerationTrainer(
