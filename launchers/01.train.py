@@ -51,7 +51,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
     # output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
-    output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab')
+    output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
@@ -364,7 +364,7 @@ def main():
                                             gpu_name=gpu_name_for_batch_size,
                                             n_gpus=n_gpus,
                                             model_name=model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
-                                            train_effective_batch_size=train_effective_batch_size,
+                                            train_effective_batch_size=setting.get('train_effective_batch_size', None),
                                         )
                                     )
 
