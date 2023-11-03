@@ -329,9 +329,9 @@ class DataTrainingArguments:
         default=None,
     )
 
-    generation_num_beams: int = field(
-        default=1,
-    )
+    # generation_num_beams: int = field(
+    #     default=1,
+    # )
 
     generation_num_return_sequences: int = field(
         default=1,
@@ -345,9 +345,9 @@ class DataTrainingArguments:
         default=None,
     )
 
-    generation_max_length: int = field(
-        default=2000,
-    )
+    # generation_max_length: int = field(
+    #     default=2000,
+    # )
 
     generation_max_new_tokens: int = field(
         default=200,
@@ -830,7 +830,7 @@ def main():
         'timeout': data_args.generation_timeout,
         'eos_token_id': tokenizer.eos_token_id,
         'top_k': data_args.generation_top_k,
-        'num_beams': data_args.generation_num_beams,
+        'num_beams': training_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
         'repetition_penalty': data_args.generation_repetition_penalty,

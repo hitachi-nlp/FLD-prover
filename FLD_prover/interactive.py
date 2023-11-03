@@ -1,6 +1,7 @@
 import re
 import tempfile
 import json
+import logging
 
 from datasets import load_dataset
 import gradio as gr
@@ -15,6 +16,8 @@ from FLD_prover.data_processing import (
     unmask_by_pad_token,
     CAUSAL_LM_END_OF_PROMPT,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def launch(seq2seq_trainer,
@@ -108,6 +111,13 @@ def launch(seq2seq_trainer,
         # XXX TODO: to be compatible with deepspeed.
         def predict(facts: str, hypothesis: str, is_FLD_prompt: bool):
             proof = get_prediction(facts, hypothesis, is_FLD_prompt=is_FLD_prompt)
+
+            log_example(
+                facts=facts,
+                hypothesis=hypothesis,
+                pred_proof=proof,
+            )
+
             if is_FLD_prompt:
                 proof = prettify_proof_text(proof)
             return proof

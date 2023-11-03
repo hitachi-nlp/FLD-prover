@@ -52,8 +52,12 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
     # output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab')
-    output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
+    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
     # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
+    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
+    output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -66,6 +70,8 @@ def main():
         # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
         './outputs.FLD/00.create_corpus/20231010.large_vocab',
         './outputs.FLD/00.create_corpus/20231012.large_vocab',
+        './outputs.FLD/00.create_corpus/20231021.knowledge',
+        './outputs.FLD/00.create_corpus/20231103.knowledge',
     ]
 
     FLD_dataset_unames = [
@@ -94,7 +100,21 @@ def main():
         # '20231012.D3.large_vocab',
         # '20231012.D3.large_vocab.smpl_stncs',
         # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3',
-        '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
+        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
+
+        # ---------------------------------- 20231021.knowledge ------------------------------------
+        # '20231021.knowledge.D3',
+        # '20231021.knowledge.D3.w_knowledge',
+        # '20231021.knowledge.D3.w_knowledge.complex-0.3',
+
+        # ---------------------------------- 20231021.knowledge.D3 ------------------------------------
+        # '20231021.knowledge.D3',
+        # '20231021.knowledge.D3.complex-0.3',
+        # '20231021.knowledge.D3.complex-0.3.w_knowledge',
+
+        # ---------------------------------- 20231101.knowledge.D3 ------------------------------------
+        '20231103.knowledge.D3.knowledge_factor-5.0',
+
     ]
 
     other_dataset_name = "wikitext"
@@ -196,14 +216,15 @@ def main():
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
         # 'debug.middle',
+        # 'debug.large',
         # 'debug.find_batch_size',
         # 'debug.20000.zero_warmup',
 
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        # 'FT.step-5000',
-        'FT.step-10000',
+        'FT.step-5000',
+        # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',

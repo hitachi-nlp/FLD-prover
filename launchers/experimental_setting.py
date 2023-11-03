@@ -1346,6 +1346,20 @@ _PROVER_LEARNING_SETTINGS: Dict[str, Dict[str, Any]] = {
         'use_test_as_val': True,
     },
 
+    'debug.large': {
+        'max_train_samples': 300,
+        'max_eval_samples': 301,
+        'max_predict_samples': 100,
+
+        'train_effective_batch_size': 64,
+        'max_steps': 300,
+        'eval_steps': 300,
+        'warmup_steps': 0,
+
+        'use_test_as_train': True,
+        'use_test_as_val': True,
+    },
+
     'debug.find_batch_size': {
         'max_train_samples': 16,
         'max_eval_samples': 16,
