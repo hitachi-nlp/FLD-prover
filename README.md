@@ -1,10 +1,13 @@
-# FLD Prover
+# FLD-Prover
+(**new**) FLD training is now accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch), which may be easier to use. Give it a try!  
+
 This repository includes the code to train and evaluate language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
 ## Release notes
 * **2024-xx-xx**: We made it possible to [Fine-tune LLMs](#fine-tune-llms). 
+* 2023-11-05: Training is available in [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).
 * 2023-08-22: Official release v2.
     * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
     * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
