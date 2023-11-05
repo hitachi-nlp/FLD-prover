@@ -1,9 +1,13 @@
 # FLD-Prover
-(**new**) FLD training is now accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch), which may be easier to use. Give it a try!
-
 This repository includes the code for training language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
+
+## Important notice
+(**new**) FLD training is now accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).
+Specifically, LogiTorch enables the training of an 'all-at-once' prover that generates an entire logical proof at once.
+This prover differs from the original stepwise prover used in the paper and delivers slightly better performance.
+LogiTorch is very user-friendly - give it a try!
 
 ## About this release
 * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
