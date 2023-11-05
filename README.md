@@ -1,4 +1,6 @@
 # FLD-Prover
+(**new**) FLD training is now accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch), which may be easier to use. Give it a try!
+
 This repository includes the code for training language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
