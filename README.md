@@ -5,7 +5,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 ## Important notice
 **(new!)** **FLD training is now accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).**
-Specifically, LogiTorch enables the training of an 'all-at-once' prover that generates an entire logical proof at once.
+Specifically, LogiTorch enables the training of an "all-at-once" prover that generates an entire logical proof at once.
 This prover differs from the original stepwise prover used in the paper and delivers slightly better performance.
 **LogiTorch is very user-friendly - give it a try!**
 
