@@ -91,8 +91,8 @@ A prover trained for 20000 steps on each corpus should perform as follows:
 
 | corpus           | extr_stps.D-all.proof_accuracy | strct.D-all.proof_accuracy | D-all.answer_accuracy |
 |------------------|--------------------------------|-----------------------------|-----------------------|
-| **FLD** (FLD.3)  | 85.2                           | 74.8                        | 91.6                  |
-| **FLD★**(FLD.4)   | 60.6                           |43.4                        | 72.2                  |
+| **FLD** (FLD.3)  | 85.2                           | 75.8                        | 91.6                  |
+| **FLD★**(FLD.4)   | 60.6                           |44.4                        | 72.2                  |
 
 As seen above, we have defined the two types of metrics:
 * `strict` (shown as `strct.*`. used in the paper.)

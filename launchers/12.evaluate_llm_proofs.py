@@ -26,8 +26,32 @@ def main():
     # input_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
     # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20230905.LLM_FS/')
 
-    input_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
-    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/220230919.jpn/')
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/220230919.jpn/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231106.refaactor/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231106.refaactor/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231107.preliminary/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples.seed--1/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples.seed--1/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples.seed--2/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples.seed--2/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_seeds/')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231107.preliminary.many_seeds/')
+
+    # input_top_dir = Path('./outputs/11.reason_by_llm/20231109.icl_max_proof_by_contradiction_per_label')
+    # output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231109.icl_max_proof_by_contradiction_per_label')
+
+    input_top_dir = Path('./outputs/11.reason_by_llm/20231109.3-shot')
+    output_top_dir = Path('./outputs/12.evaluate_llm_proofs/20231109.3-shot')
 
     # ----------------- settings ---------------------
 

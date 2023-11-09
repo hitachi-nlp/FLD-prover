@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from dotenv import load_dotenv
-load_dotenv()  # must be here
+load_dotenv()  # XXX!! MUST BE AT TOP
 import os
 import logging
 from pathlib import Path
@@ -43,7 +43,7 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
         hf = HuggingFacePipeline.from_model_id(
             model_id=model_name.lstrip('hf.'),
             task='text-generation',
-            # pipeline_kwargs={"max_new_tokens": 10},
+            model_kwargs={'trust_remote_code': True, 'use_auth_token': True},
         )
 
         def get_reply(prompt: str) -> Optional[str]:
@@ -53,10 +53,7 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
     elif model_service == 'openai':
 
         if api_key is None:
-            if _model_name.startswith('openai.gpt-4'):
-                api_key = os.environ.get('OPENAI_API_KEY_GPT4', None)
-            else:
-                api_key = os.environ.get('OPENAI_API_KEY', None)
+            api_key = os.environ.get('OPENAI_API_KEY', None)
         if api_key is None:
             raise ValueError()
 
@@ -76,14 +73,13 @@ def main(input_path, model_name, output_path, api_key, max_samples, log_level):
                 for i in range(0, 3):
                     try:
                         return chat_model([HumanMessage(content=prompt)]).content
-                    # except openai.error.InvalidRequestError as e:
-                    #     logger.critical(e)
-                    #     return None
                     except openai.error.RateLimitError as e:
                         last_exception = e
                         logger.info('getting a reply failed due to the following rate limit exception. will sleep  1min and retry:\n%s', str(e))
                         time.sleep(60)
                 raise Exception('Could not get any reply. The last exception is the following:\n' + str(last_exception))
+    else:
+        raise ValueError(f'Unknown model service {model_service}')
 
     with open(output_path, 'w') as f_out:
         for i_sample, line in tqdm(enumerate(open(input_path))):

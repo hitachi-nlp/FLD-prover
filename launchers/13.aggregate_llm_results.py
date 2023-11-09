@@ -25,11 +25,37 @@ def main():
     # ]
     # output_dir = Path('./outputs/13.aggregate_llm_results.py/20230905.LLM_FS/')
 
-    input_dirs = [
-        './outputs/12.evaluate_llm_proofs/220230919.jpn/',
-    ]
-    output_dir = Path('./outputs/13.aggregate_llm_results.py/220230919.jpn/')
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/220230919.jpn/',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/220230919.jpn/')
 
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/20231107.preliminary/',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/20231107.preliminary/')
+
+    input_dirs = [
+        './outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples/',
+        './outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples.seed--1/',
+        './outputs/12.evaluate_llm_proofs/20231107.preliminary.many_samples.seed--2/',
+    ]
+    output_dir = Path('./outputs/13.aggregate_llm_results.py/20231107.preliminary.many_samples/')
+
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/20231107.preliminary.many_seeds/',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/20231107.preliminary.many_seeds/')
+
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/20231109.icl_max_proof_by_contradiction_per_label',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/20231109.icl_max_proof_by_contradiction_per_label')
+
+    # input_dirs = [
+    #     './outputs/12.evaluate_llm_proofs/20231109.3-shot',
+    # ]
+    # output_dir = Path('./outputs/13.aggregate_llm_results.py/20231109.3-shot')
 
     command = ' '.join([
         'python ./aggregate_llm_results.py',

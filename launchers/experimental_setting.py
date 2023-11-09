@@ -13,8 +13,6 @@ from script_engine.base import EngineBase
 from tempfile import mktemp
 import os
 
-# from pytorch_lightning import Trainer
-
 
 logger = logging.getLogger(__name__)
 
@@ -872,23 +870,6 @@ def get_batch_setting(script_type: str,
     
 
 
-
-_DATASET_PATHS = {
-    '20221120.negative_tree.debug': {
-        'train_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
-        'validation_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
-        'test_file': './outputs.FLNL/10.create_FLNL_corpus/20221120.negative_tree/local_dataset_name=20221120.negative_tree__arg-RT__frml-cmpl__tree-small__dist-5__transl_dist--5__transl-wide__size-1000/rsd_objct_nns_mx_fctr=1.0/smpl_hrd_ngtvs=True/try_ngtd_hypthss_frst=False/us_fxd_trnsltn=False/test/test.jsonl',
-    },
-
-    '20231010.D3.large_vocab__eval-20230801.case_study_finalize.fix': {
-        'train_file': './outputs.FLD/00.create_corpus/20231010.large_vocab/dataset_name=20231010.D3.large_vocab/cntxt_shffls_pr_instnc=1/smpl_all_stncs_pr_lgc=False/trnsltn_adj_vrb_nn_rt=1-1-1/train/train.jsonl',
-        'validation_file': './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix/dataset_name=20230729.case_study_finalize.D3/trnsltn_adj_vrb_nn_rt=1-1-1/test/test.jsonl',
-        'test_file': './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix/dataset_name=20230729.case_study_finalize.D3/trnsltn_adj_vrb_nn_rt=1-1-1/test/test.jsonl',
-    },
-
-}
-
-
 def get_dataset_setting(script_type: str,
                         dataset_uname: Optional[str] = None,
                         top_dirs: Optional[List[str]] = None,
@@ -960,93 +941,82 @@ def get_local_dataset_paths(uname: str,
                 else:
                     raise Exception(msg)
 
-    if dataset_name in _DATASET_PATHS:
-        paths = _DATASET_PATHS[dataset_name].copy()
+    def get_split_jsonl(top_dir: Path, split: str) -> Optional[Path]:
+        all_paths = glob.glob(str(top_dir) + '/**/*', recursive=True)
+        paths = [path for path in all_paths
+                 if path.endswith(f'{split}.jsonl') and str(path).find('job-') < 0]
+        if len(paths) == 0:
+            return None
+        elif len(paths) == 1:
+            return paths[0]
+        else:
+            raise ValueError(f'multiple dataset file found under {str(top_dir)} as:\n'
+                             '\n'.join([str(path) for path in paths]))
 
-        if use_test_as_train:
-            paths['train_file'] = paths['test_file']
+    def get_split_jsonl_with_warning(top_dir: Path, local_dataset_name: str, split: str) -> Optional[Path]:
+        path = get_split_jsonl(top_dir, split)
+        # if path is None:
+        #     logger.warning('dataset split="%s" name="%s" not found under "%s"',
+        #                    split,
+        #                    local_dataset_name,
+        #                    str(top_dir))
+        return path
 
-        if use_test_as_val:
-            paths['validation_file'] = paths['test_file']
+    # We must use glob to follow symbolic links
+    found_dataset_paths = None
+    found_lab_path = None
+    for top_dir in top_dirs:
 
-        validate(paths)
-        return paths
+        for lab_path in glob.glob(top_dir + '/**/*', recursive=True):
 
-    else:
+            if not lab_path.endswith('lab.params.json'):
+                continue
+            if lab_path.find('job-') >= 0:
+                continue
 
-        def get_split_jsonl(top_dir: Path, split: str) -> Optional[Path]:
-            all_paths = glob.glob(str(top_dir) + '/**/*', recursive=True)
-            paths = [path for path in all_paths
-                     if path.endswith(f'{split}.jsonl') and str(path).find('job-') < 0]
-            if len(paths) == 0:
-                return None
-            elif len(paths) == 1:
-                return paths[0]
-            else:
-                raise ValueError(f'multiple dataset file found under {str(top_dir)} as:\n'
-                                 '\n'.join([str(path) for path in paths]))
+            try:
+                setting = json.load(open(lab_path))
+            except:
+                print(lab_path)
+                raise
 
-        def get_split_jsonl_with_warning(top_dir: Path, local_dataset_name: str, split: str) -> Optional[Path]:
-            path = get_split_jsonl(top_dir, split)
-            # if path is None:
-            #     logger.warning('dataset split="%s" name="%s" not found under "%s"',
-            #                    split,
-            #                    local_dataset_name,
-            #                    str(top_dir))
-            return path
+            if setting.get('dataset_name', None) != dataset_name:
+                continue
 
-        # We must use glob to follow symbolic links
-        found_dataset_paths = None
-        found_lab_path = None
-        for top_dir in top_dirs:
+            if found_lab_path is not None:
+                raise Exception(f'Multiple files for dataset "{dataset_name}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
 
-            for lab_path in glob.glob(top_dir + '/**/*', recursive=True):
+            lab_path = Path(lab_path)
+            found_lab_path = lab_path
 
-                if not lab_path.endswith('lab.params.json'):
-                    continue
-                if lab_path.find('job-') >= 0:
-                    continue
+            train_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'train')
+            valid_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'valid')
+            test_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'test')
 
-                try:
-                    setting = json.load(open(lab_path))
-                except:
-                    print(lab_path)
-                    raise
+            if use_test_as_train:
+                train_path = test_path
+            if use_test_as_val:
+                valid_path = test_path
 
-                if setting.get('dataset_name', None) != dataset_name:
-                    continue
+            found_dataset_paths = {
+                'train_file': str(train_path) if train_path is not None else None,
+                'validation_file': str(valid_path) if valid_path is not None else None,
+                'test_file': str(test_path) if test_path is not None else None,
+            }
 
-                if found_lab_path is not None:
-                    raise Exception(f'Multiple files for dataset "{dataset_name}" are found:\n1. "{str(found_lab_path)}"\n2. "{str(lab_path)}"')
-
-                lab_path = Path(lab_path)
-                found_lab_path = lab_path
-
-                train_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'train')
-                valid_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'valid')
-                test_path = get_split_jsonl_with_warning(lab_path.parent, dataset_name, 'test')
-
-                if use_test_as_train:
-                    train_path = test_path
-                if use_test_as_val:
-                    valid_path = test_path
-
-                found_dataset_paths = {
-                    'train_file': str(train_path) if train_path is not None else None,
-                    'validation_file': str(valid_path) if valid_path is not None else None,
-                    'test_file': str(test_path) if test_path is not None else None,
-                }
-
-            if found_dataset_paths is not None:
-                validate(found_dataset_paths)
-                return found_dataset_paths
+        if found_dataset_paths is not None:
+            validate(found_dataset_paths)
+            return found_dataset_paths
 
     raise ValueError(f'Dataset {dataset_name} not found under {top_dirs}.')
 
 
 def _parse_dataset_name(name: str) -> Tuple[str, str, Optional[str]]:
     if name.startswith('hf.'):
-        return 'hf', *re.sub(r'^hf\.', '', name).split('__')
+        if name.find('__') >= 0:
+            return 'hf', *re.sub(r'^hf\.', '', name).split('__')
+        else:
+            return 'hf', re.sub(r'^hf\.', '', name), None
     else:
         return 'local', name, None
 
@@ -1987,18 +1957,19 @@ def run_by_engine(engine: EngineBase,
                   command: str,
                   output_dir: Union[Path, str],
                   hours=24,
-                  dry_run=False):
+                  dry_run=False,
+                  wait_until_finish=None):
     output_dir = Path(output_dir)
     log_path = output_dir / 'log.txt'
     if isinstance(engine, SubprocessEngine):
         stdout = None
         stderr = None
-        wait_until_finish = True
+        wait_until_finish = wait_until_finish if wait_until_finish is not None else True
     else:
         command += f' 1>{str(log_path)} 2>&1'
         stdout = output_dir / 'stdout.txt'
         stderr = output_dir / 'stderr.txt'
-        wait_until_finish = False
+        wait_until_finish = wait_until_finish if wait_until_finish is not None else False
 
     engine.run(
         command,

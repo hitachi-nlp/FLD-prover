@@ -27,18 +27,43 @@ def main():
     # input_top_dir = Path('./outputs/10.make_prompts.py/20230905.LLM_FS/')
     # output_top_dir = Path('./outputs/11.reason_by_llm/20230905.LLM_FS/')
 
-    input_top_dir = Path('./outputs/10.make_prompts.py/20230919.jpn/')
-    output_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20230919.jpn/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20230919.jpn/')
 
-    # ----------------- settings ---------------------
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231106.refaactor/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231106.refaactor/')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231106.preliminary/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231106.preliminary/')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231107.preliminary/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary/')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231107.preliminary/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples/')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231107.preliminary.seed--1/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples.seed--1')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231107.preliminary.seed--2/')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_samples.seed--2')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231107.preliminary.many_seeds')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231107.preliminary.many_seeds')
+
+    # input_top_dir = Path('./outputs/10.make_prompts.py/20231109.icl_max_proof_by_contradiction_per_label')
+    # output_top_dir = Path('./outputs/11.reason_by_llm/20231109.icl_max_proof_by_contradiction_per_label')
+
+    input_top_dir = Path('./outputs/10.make_prompts.py/20231109.3-shot')
+    output_top_dir = Path('./outputs/11.reason_by_llm/20231109.3-shot')
 
     dataset_unames = [
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         # '20230729.case_study_finalize.D3',
         # '20230729.case_study_finalize.D8',
 
-        # 'hf.hitachi-nlp/FLD.v2',
-        # 'hf.hitachi-nlp/FLD-star.v2',
+        'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__star',
 
         # ---------------------------------- 20230826.jpn ------------------------------------
         # '20230826.jpn.D3',
@@ -48,31 +73,41 @@ def main():
         # '20230916.jpn.D1_wo_dist',
         # '20230916.jpn.D1',
         # '20230916.jpn.D3',
-        '20230916.jpn.D5',
+        # '20230916.jpn.D5',
+    ]
+
+    n_shot_list = [
+        3,
+        # 10,
+        # 16,
+        # 32,
     ]
 
     engine = SubprocessEngine()   # for debug
     # engine = QsubEngine('ABCI', 'rt_G.large')
 
     model_names = [
-        # 'openai.text-davinci-003',
+        # See [here](https://platform.openai.com/docs/models) for the openai models.
 
-        # 'openai.gpt-3.5-turbo',
-        # 'openai.gpt-3.5-turbo-16k'
+        # 'openai.gpt-3.5-turbo',     # context=4k
+        'openai.gpt-3.5-turbo-16k'
+        # 'openai.gpt-3.5-turbo-1106'
 
-        # 'openai.gpt-4-0314',
-        'openai.gpt-4',
-        # 'openai.gpt-4-32k',
+        # 'openai.gpt-4',               # 	$0.03 / 1K tokens	$0.06 / 1K tokens
+        # 'openai.gpt-4-32k',           # XXX can not access
+        # 'openai.gpt-4-32k-0613',      # XXX can not access
+        # 'openai.gpt-4-1106-preview'   # XXX: somehow less than gpt-4
+
+        # 'hf.Yukang/Llama-2-70b-longlora-32k',
+        # 'hf.meta-llama/Llama-2-7b-chat-hf',
+        # 'hf.PY007/TinyLlama-1.1B-intermediate-step-480k-1T',
     ]
 
-    # max_samples = 1
-    # max_samples = 5
-    # max_samples = 10
-    # max_samples = 30
-    # max_samples = 30
-    # max_samples = 50
-    max_samples = 60
-    # max_samples = 100
+    # max_samples = 11
+    max_samples = 31
+    # max_samples = 61
+    # max_samples = 101
+    # max_samples = 201
     # max_samples = None
 
     skip_if_exists = False
@@ -104,6 +139,8 @@ def main():
 
             dataset_setting = json.load(open(prompt_path.parent / 'lab.params.json'))
             if dataset_setting['dataset_uname'] not in dataset_unames:
+                continue
+            if dataset_setting['n_shot'] not in n_shot_list:
                 continue
 
             setting.update({

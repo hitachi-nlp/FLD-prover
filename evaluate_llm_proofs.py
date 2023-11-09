@@ -44,7 +44,7 @@ def main(input_path,
         for i_example, line in enumerate(open(input_path)):
             sample = json.loads(line.strip('\n'))
 
-            golds = sample['gold_proofs']
+            gold = sample['gold_proof']
             pred = sample['reply']
             if pred is None:
                 logger.warning('The sample will be skipped because the prediction is None')
@@ -53,11 +53,15 @@ def main(input_path,
 
             sample['metrics'] = {}
             for metric_type, calc_metrics in calc_metric_funcs.items():
-                metrics = calc_metrics(
-                    golds,
-                    pred,
-                    facts=facts,
-                )
+                try:
+                    metrics = calc_metrics(
+                        [gold],
+                        pred,
+                        facts=facts,
+                    )
+                except Exception as e:
+                    logger.warning('The sample will be skipped because the following exception was raised:\n%s', str(e))
+                    continue
 
                 sample['metrics'][metric_type] = metrics
 

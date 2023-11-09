@@ -31,35 +31,43 @@ def main(input_path, output_dir, log_level):
     metrics_types = list(samples[0]['metrics'].keys())
 
     for metric_type in metrics_types:
-        errors_path = output_dir / f'errors.metric--{metric_type}.txt'
-        with open(errors_path, 'w') as f_err:
+        for metric in ['proof_accuracy.zero_one', 'answer_accuracy']:
+            errors_path = output_dir / f'metric_type--{metric_type}.metric--{metric}.errors.txt'
+            corrects_path = output_dir / f'metric_type--{metric_type}.metric--{metric}.corrects.txt'
+            with open(errors_path, 'w') as f_err, open(corrects_path, 'w') as f_corr:
 
-            for i_sample, sample in enumerate(samples):
-                proof_accuracy = sample['metrics'][metric_type]['proof_accuracy.zero_one']
-                if proof_accuracy > 0.0:
-                    continue
+                for i_sample, sample in enumerate(samples):
+                    if metric_type not in sample['metrics']:
+                        f_err.write('\n\n\n\n\n')
+                        f_err.write(f'****************************************** example-{i_sample} ******************************************')
+                        f_err.write('metrics not found in this example, might be failed to calculate the metrics due to some errors.')
+                        continue
 
-                facts = sample['example']['facts']
-                hypothesis = sample['example']['hypothesis']
-                proof_golds = sample['gold_proofs']
-                if len(proof_golds) >= 2:
-                    raise NotImplementedError()
-                proof_pred = sample['reply']
+                    accuracy = sample['metrics'][metric_type][metric]
+                    if accuracy > 0.0:
+                        f_out = f_corr
+                    else:
+                        f_out = f_err
 
-                f_err.write('\n\n\n\n\n')
-                f_err.write(f'****************************************** example-{i_sample} ******************************************')
+                    facts = sample['example']['facts']
+                    hypothesis = sample['example']['hypothesis']
+                    proof_gold = sample['gold_proof']
+                    proof_pred = sample['reply']
 
-                f_err.write('\n\n===================== facts =====================\n')
-                f_err.write(prettify_facts_text(facts))
+                    f_out.write('\n\n\n\n\n')
+                    f_out.write(f'****************************************** example-{i_sample} ******************************************')
 
-                f_err.write('\n\n===================== hypothesis =====================\n')
-                f_err.write(hypothesis)
+                    f_out.write('\n\n===================== facts =====================\n')
+                    f_out.write(prettify_facts_text(facts))
 
-                f_err.write('\n\n===================== proof_gold =====================\n')
-                f_err.write(prettify_proof_text(proof_golds[0]))
+                    f_out.write('\n\n===================== hypothesis =====================\n')
+                    f_out.write(hypothesis)
 
-                f_err.write('\n\n===================== proof_pred =====================\n')
-                f_err.write(prettify_proof_text(proof_pred))
+                    f_out.write('\n\n===================== proof_gold =====================\n')
+                    f_out.write(prettify_proof_text(proof_gold))
+
+                    f_out.write('\n\n===================== proof_pred =====================\n')
+                    f_out.write(prettify_proof_text(proof_pred))
 
 
 if __name__ == '__main__':
