@@ -10,7 +10,7 @@ import click
 from script_engine import QsubEngine, SubprocessEngine
 from logger_setup import setup as setup_logger
 
-from experimental_setting import (
+from FLD_user_shared_settings import (
     get_base_setting,
     get_dataset_setting,
     get_batch_setting,

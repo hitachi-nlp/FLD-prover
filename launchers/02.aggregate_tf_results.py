@@ -6,7 +6,7 @@ import click
 from script_engine import SubprocessEngine
 from logger_setup import setup as setup_logger
 
-from experimental_setting import run_by_engine
+from FLD_user_shared_settings import run_by_engine
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ def main():
     output_dir = Path('./outputs/02.aggregate_tf_results.py/20231008.jpn.run_causal_prover')
 
     command = ' '.join([
-        'python ./aggregate_tf_results.py',
+        'python ./scripts/aggregate_tf_results.py',
         ' '.join([f'--input_dir {str(input_dir)}' for input_dir in input_dirs]),
         f'--output_dir {str(output_dir)}',
     ])
