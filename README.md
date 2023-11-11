@@ -18,6 +18,7 @@ The code has been tested on Python 3.8.5.
 ```console
 $ pip install -r ./requirements.txt
 $ git clone https://github.com/hitachi-nlp/FLD-task.git && pip install -e ./FLD-task
+$ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
 ## How to train a prover
