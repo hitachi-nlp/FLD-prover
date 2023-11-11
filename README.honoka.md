@@ -1,12 +1,10 @@
 # FLD-Prover for dev
 
 ## Installation
-
-### To use launcher scripts
 ```console
-$ pip install -r ./requirements/requirements.launchers.txt
+$ pip install -r ./requirements/requirements.others.txt
 $ git clone https://github.com/HonoMi/FLD-user-shared-settings.git
-$ cd FLD-user-shared-settings && export PYTHONPATH=`pwd -r`:$PYTHONPATH
+$ export PYTHONPATH=./FLD-user-shared-settings:$PYTHONPATH
 ```
 
 ### To use DeepSpeed at ABCI
