@@ -10,8 +10,9 @@ This prover differs from the original stepwise prover used in the paper and deli
 **LogiTorch is very user-friendly - give it a try!**
 
 ## About this release
-* The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have re-implemented a prover that is a straightforward adaptation from the huggingface [run_summarization.py](https://github.com/huggingface/transformers/blob/main/examples/pytorch/summarization/run_summarization.py).
-* Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
+* This is the re-implemented version of the step-wise prover used in the paper, which was based in [the previous study](https://github.com/princeton-nlp/NLProofS).
+    - These provers differs in how to predict an answer label: Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
+* If you want to train a simpler causal prover that generate an entire logical proof at once, use LogiTorch above, or please make your own script that use `prompt_serial` field of our dataset as an input, and `proof_serial` as an output.
 
 ## Installation
 The code has been tested on Python 3.8.5.
