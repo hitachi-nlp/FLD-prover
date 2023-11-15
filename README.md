@@ -10,9 +10,9 @@ This prover differs from the original stepwise prover used in the paper and deli
 **LogiTorch is very user-friendly - give it a try!**
 
 ## About this release
-* This is the re-implemented version of the step-wise prover used in the paper, which was based in [the previous study](https://github.com/princeton-nlp/NLProofS).
-    - These provers differs in how to predict an answer label: Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
-* If you want to train a simpler causal prover that generate an entire logical proof at once, use LogiTorch above, or please make your own script that use `prompt_serial` field of our dataset as an input, and `proof_serial` as an output.
+* This is the re-implemented version of the step-wise prover used in the paper, which was based on [the previous study](https://github.com/princeton-nlp/NLProofS).
+    - Our re-implemented prover predicts an answer label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof, while the original one predicts the label by using another classifier on top of a generated proof.
+* If you want to train a simpler causal prover that generate an entire logical proof at once, use LogiTorch above, or please make your own script that use `prompt_serial` field of the corpora as an input, and `proof_serial` as an output (see [the schema of FLD corpora](https://github.com/hitachi-nlp/FLD-corpus#schema)).
 
 ## Installation
 The code has been tested on Python 3.8.5.
