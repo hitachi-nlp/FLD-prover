@@ -44,7 +44,8 @@ def main():
     # checkpoint = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
 
     # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
-    checkpoint = Path('./outputs/01.train.py/20231021.knowledge/dtst_nm=20231021.knowledge.D3.complex-0.3.w_knowledge')
+    # checkpoint = Path('./outputs/01.train.py/20231021.knowledge/dtst_nm=20231021.knowledge.D3.complex-0.3.w_knowledge')
+    checkpoint = Path('./outputs/01.train.py/20231103.knowledge')
 
     # checkpoint = ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'all_at_once')
     # checkpoint = ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'all_at_once')
