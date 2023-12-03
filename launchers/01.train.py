@@ -57,7 +57,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
-    output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
+    # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
+
+    output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -72,6 +74,7 @@ def main():
         './outputs.FLD/00.create_corpus/20231012.large_vocab',
         './outputs.FLD/00.create_corpus/20231021.knowledge',
         './outputs.FLD/00.create_corpus/20231103.knowledge',
+        './outputs.FLD/00.create_corpus/20231203.jpn',
     ]
 
     FLD_dataset_unames = [
@@ -113,12 +116,17 @@ def main():
         # '20231021.knowledge.D3.complex-0.3.w_knowledge',
 
         # ---------------------------------- 20231101.knowledge.D3 ------------------------------------
-        '20231103.knowledge.D3.knowledge_factor-5.0',
+        # '20231103.knowledge.D3.knowledge_factor-5.0',
 
+        # ---------------------------------- 20231203.jpn ------------------------------------
+        '20231203.jpn.D1_wo_dist',
+        '20231203.jpn.D1',
+        '20231203.jpn.D3',
+        # '20231203.jpn.D8',
     ]
 
-    other_dataset_name = "wikitext"
-    other_dataset_config_name = "wikitext-2-raw-v1"
+    # other_dataset_name = "wikitext"
+    # other_dataset_config_name = "wikitext-2-raw-v1"
 
     # other_dataset_name = "cerebras/SlimPajama-627B"
     # other_dataset_config_name = None
@@ -126,6 +134,9 @@ def main():
     # [cerebras/SlimPajama-627B](https://huggingface.co/datasets/cerebras/SlimPajama-627B)
     # other_dataset_name = "cerebras/SlimPajama-627B"
     # other_dataset_config_name = "None"
+
+    other_dataset_name = None
+    other_dataset_config_name = None
 
     model_settings = [
         # ============================ english      ============================
@@ -139,7 +150,7 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
+        # ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
         # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
@@ -179,7 +190,7 @@ def main():
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
@@ -194,7 +205,7 @@ def main():
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
@@ -223,20 +234,17 @@ def main():
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        'FT.step-5000',
+        # 'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
 
+        # ---- JFLD experiments ----
         # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
-
-        # 'FT.step-10000.mx_evl-100',
-        # 'FT.step-10000.mx_evl-100.btch_sz-8',
-        # 'FT.step-100000.mx_evl-100.btch_sz-8',
     ]
 
     seeds = [
@@ -259,19 +267,18 @@ def main():
 
         # -- learning = 'FT' ---
         # 1e-5,
-        1e-4,   # much better than 1e-05
+        # 1e-4,   # much better than 1e-05
 
         # -- learning = 'LLM_FS' ---
-        # 3e-5,   # 20230919.jpn
-
+        3e-5,   # 20230919.jpn
     ]
 
     streaming = False
     # streaming = True
 
     instruction_args = [
-        # False,   # better for chat-model?
-        True,      # better for non-chat model, somehow.
+        False,       # better for chat-model?
+        # True,      # better for non-chat model, somehow.
     ]
 
     # run_mode = 'vanilla'
@@ -295,11 +302,11 @@ def main():
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    # hours = 12
-    hours = 24
+    hours = 12
+    # hours = 24
 
-    # save_model = False
-    save_model = True
+    save_model = False
+    # save_model = True
 
     # dry_run = True
     dry_run = False
