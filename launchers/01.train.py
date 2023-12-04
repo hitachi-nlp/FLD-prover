@@ -190,7 +190,7 @@ def main():
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
@@ -242,9 +242,9 @@ def main():
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
     ]
 
     seeds = [
