@@ -87,7 +87,6 @@ def main():
     ]
     output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn')
 
-
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',
         ' '.join([f'--input_dir {str(input_dir)}' for input_dir in input_dirs]),
