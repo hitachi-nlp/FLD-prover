@@ -176,7 +176,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
@@ -190,7 +190,7 @@ def main():
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
@@ -205,7 +205,7 @@ def main():
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
@@ -281,13 +281,13 @@ def main():
         # True,      # better for non-chat model, somehow.
     ]
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=5)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
@@ -297,9 +297,9 @@ def main():
         # n_gpus = None  # specify this when running through QsubEngine
 
         # gpu_name_for_batch_size = 'A100_48_1'
-        gpu_name_for_batch_size = 'V100_16_1'
+        # gpu_name_for_batch_size = 'V100_16_1'
         # gpu_name_for_batch_size = 'V100_16_4'
-        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     hours = 12
