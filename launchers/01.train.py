@@ -190,7 +190,7 @@ def main():
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
@@ -205,7 +205,7 @@ def main():
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
@@ -270,7 +270,8 @@ def main():
         # 1e-4,   # much better than 1e-05
 
         # -- learning = 'LLM_FS' ---
-        3e-5,   # 20230919.jpn
+        # 3e-5,   # 20230919.jpn
+        1e-5,
     ]
 
     streaming = False
