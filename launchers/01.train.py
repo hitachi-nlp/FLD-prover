@@ -59,7 +59,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
     # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
 
-    output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -120,8 +121,8 @@ def main():
 
         # ---------------------------------- 20231203.jpn ------------------------------------
         '20231203.jpn.D1_wo_dist',
-        '20231203.jpn.D1',
-        '20231203.jpn.D3',
+        # '20231203.jpn.D1',
+        # '20231203.jpn.D3',
         # '20231203.jpn.D8',
     ]
 
@@ -205,13 +206,13 @@ def main():
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
 
 
         # XXX can not fit into V100 x 4. Use 2 nodes.
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
     ]
 
     # script_type = 'run_prover'
@@ -243,8 +244,8 @@ def main():
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-10',
         'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
     ]
 
     seeds = [
@@ -282,17 +283,17 @@ def main():
         # True,      # better for non-chat model, somehow.
     ]
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus = 1  # debug
-        # n_gpus = 4
+        # n_gpus = 1  # debug
+        n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
 
         # gpu_name_for_batch_size = 'A100_48_1'
@@ -301,7 +302,7 @@ def main():
         gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    hours = 12
+    hours = 16
     # hours = 24
 
     save_model = False
