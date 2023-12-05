@@ -299,6 +299,10 @@ class DataTrainingArguments:
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
 
+    no_subproof_for_unknown: bool = field(
+        default=False,
+    )
+
     generation_top_k: int = field(
         default=None,
     )
@@ -778,7 +782,7 @@ def main():
                 max_target_length=block_size,
                 proof_sampling=False,
                 sample_negative_proof=False,
-                no_subproof_for_unknown=False,
+                no_subproof_for_unknown=data_args.no_subproof_for_unknown,
                 include_prompt_for_causal_lm_loss=data_args.include_prompt_for_causal_lm_loss,
                 instruction=data_args.instruction,
                 log_examples=data_args.log_examples,
