@@ -82,10 +82,16 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231008.jpn.run_causal_prover')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20231203.jpn',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn')
+
     input_dirs = [
-        './outputs/01.train.py/20231203.jpn',
+        './outputs/01.train.py/20231203.jpn.no_subproof_for_unknown',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn.no_subproof_for_unknown20231203.jpn')
+
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',
