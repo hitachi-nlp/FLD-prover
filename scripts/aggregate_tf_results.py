@@ -221,7 +221,6 @@ def main(input_dir, output_dir, log_level, read_from_eval_json):
         output_dir.mkdir(exist_ok=True, parents=True)
 
         merged_df.to_csv(output_dir / 'results.tsv', sep='\t', index=None)
-        print(merged_df)
 
         with open(output_dir / 'pretty.txt', 'w') as f:
             print(pretty_df, file=f)

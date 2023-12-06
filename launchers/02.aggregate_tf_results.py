@@ -87,11 +87,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn')
 
-    input_dirs = [
-        './outputs/01.train.py/20231203.jpn.no_subproof_for_unknown',
-    ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn.no_subproof_for_unknown20231203.jpn')
+    # input_dirs = [
+    #     './outputs/01.train.py/20231203.jpn.no_subproof_for_unknown',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn.no_subproof_for_unknown20231203.jpn')
 
+    input_dirs = [
+        './outputs/01.train.py/20231206.new_models',
+    ]
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231206.new_models')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',

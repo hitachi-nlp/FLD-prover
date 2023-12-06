@@ -60,7 +60,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
 
     # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231203.jpn.no_subproof_for_unknown')
+    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn.no_subproof_for_unknown')
+    output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -121,9 +122,9 @@ def main():
 
         # ---------------------------------- 20231203.jpn ------------------------------------
         '20231203.jpn.D1_wo_dist',
-        '20231203.jpn.D1',
-        '20231203.jpn.D3',
-        '20231203.jpn.D8',
+        # '20231203.jpn.D1',
+        # '20231203.jpn.D3',
+        # '20231203.jpn.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -170,7 +171,43 @@ def main():
 
         # # # ============================ japanese     ============================
 
-        # # # -------------- < 1B params --------------
+        # -- V100 x 4 x 1 nodes --
+
+        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
+
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
+        # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+
+        # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
+        # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        
+
+        # -- V100 x 4 x 2 nodes --
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
+
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+
+        # -------------- < 1B params --------------
 
         # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
         # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
@@ -183,36 +220,7 @@ def main():
 
         # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
-        # XXX must use deepspeed
-        # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),
-
-        # # # # # -------------- > 1B params --------------
-
-        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
-
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
-
-        # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
-        # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
-# 
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
-
-        #('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-
-        # XXX can not fit into V100 x 4. Use 2 nodes.
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
+        # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),  # should use deepspeed
     ]
 
     # script_type = 'run_prover'
@@ -244,8 +252,8 @@ def main():
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-10',
         'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
     ]
 
     seeds = [
@@ -288,8 +296,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         # n_gpus = 1  # debug
