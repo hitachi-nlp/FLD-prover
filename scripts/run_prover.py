@@ -341,6 +341,10 @@ class DataTrainingArguments:
         default=False,
     )
 
+    generation_temperature: float = field(
+        default=1.0,
+    )
+
     generation_repetition_penalty: float = field(
         default=None,
     )
@@ -833,6 +837,7 @@ def main():
         'num_beams': training_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
+        'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
         'max_length': generation_max_length,
         'max_new_tokens': data_args.generation_max_new_tokens,

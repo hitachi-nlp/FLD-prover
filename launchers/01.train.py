@@ -61,7 +61,13 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20231203.jpn.no_subproof_for_unknown')
-    output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
+    # output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_fix')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_before')
+
+    output_top_dir = Path('./outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -121,10 +127,10 @@ def main():
         # '20231103.knowledge.D3.knowledge_factor-5.0',
 
         # ---------------------------------- 20231203.jpn ------------------------------------
-        '20231203.jpn.D1_wo_dist',
+        # '20231203.jpn.D1_wo_dist',
         # '20231203.jpn.D1',
         # '20231203.jpn.D3',
-        # '20231203.jpn.D8',
+        '20231203.jpn.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -191,7 +197,7 @@ def main():
 
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
@@ -300,14 +306,14 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
-        # n_gpus = 1  # debug
-        n_gpus = 4
+        n_gpus = 1  # debug
+        # n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
 
-        # gpu_name_for_batch_size = 'A100_48_1'
+        gpu_name_for_batch_size = 'A100_48_1'
         # gpu_name_for_batch_size = 'V100_16_1'
         # gpu_name_for_batch_size = 'V100_16_4'
-        gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     hours = 12

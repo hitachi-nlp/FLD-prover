@@ -319,6 +319,10 @@ class DataTrainingArguments:
         default=False,
     )
 
+    generation_temperature: float = field(
+        default=1.0,
+    )
+
     generation_repetition_penalty: float = field(
         default=None,
     )
@@ -328,7 +332,7 @@ class DataTrainingArguments:
     )
 
     generation_max_new_tokens: int = field(
-        default=200,
+        default=None,
     )
 
     generation_timeout: int = field(
@@ -913,6 +917,7 @@ def main():
         'num_beams': data_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
+        'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
         'max_length': data_args.generation_max_length + 1,  # + 1 to be compatible with beam_search
         'max_new_tokens': data_args.generation_max_new_tokens,

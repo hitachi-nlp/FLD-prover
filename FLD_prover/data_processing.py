@@ -350,6 +350,7 @@ def mask_labels_by_ignore_index(labels,
 
     if mask_pad_tokens:
         labels = torch.where(labels != pad_token_id, labels, mask_id)
+
     return labels
 
 

@@ -92,10 +92,25 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn.no_subproof_for_unknown20231203.jpn')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20231206.new_models',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231206.new_models')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.elyza_fix',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.elyza_fix')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-07.elyza_before',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-07.elyza_before')
+
     input_dirs = [
-        './outputs/01.train.py/20231206.new_models',
+        './outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231206.new_models')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',
