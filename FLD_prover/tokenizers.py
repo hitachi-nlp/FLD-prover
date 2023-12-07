@@ -21,6 +21,20 @@ def load(name: str,
             trust_remote_code=trust_remote_code,
         )
 
+    if tokenizer.eos_token == tokenizer.pad_token:
+        # If the eos token is the same as the pad token,
+        # the eos token in the labels will be replaced to ignore token (i.e., -100) as well as the pad tokens,
+        # and the models will not learn to predict the eos token at the end of text.
+        # see the followings:
+        #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1573966012
+        #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285
+        if name.find('ELYZA') >= 0:
+            # elyza defaults: eos='</s>', pad='</s>'
+            tokenizer.pad_token = '<PAD>'
+        else:
+            raise NotImplementedError('I have verified that the above hack works with ELYZA,'
+                                      'but not with other models. Please implement the hack for other models.')
+
     if tokenizer.pad_token is None:
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
