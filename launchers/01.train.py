@@ -213,7 +213,7 @@ def main():
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
         # -------------- < 1B params --------------
 
@@ -304,8 +304,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # XXX only for weblab, plamo
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         n_gpus = 1  # debug
