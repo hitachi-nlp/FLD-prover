@@ -68,7 +68,13 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_before')
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
-    output_top_dir = Path('./outputs/01.train.py/2023-12-06.D8')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.D8')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
+
+    output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -84,6 +90,7 @@ def main():
         './outputs.FLD/00.create_corpus/20231021.knowledge',
         './outputs.FLD/00.create_corpus/20231103.knowledge',
         './outputs.FLD/00.create_corpus/20231203.jpn',
+        './outputs.FLD/00.create_corpus/20231213.jpn',
     ]
 
     FLD_dataset_unames = [
@@ -131,8 +138,15 @@ def main():
         # '20231203.jpn.D1_wo_dist',
         # '20231203.jpn.D1',
         # '20231203.jpn.D3',
-        '20231203.jpn.D5',
+        # '20231203.jpn.D5',
         # '20231203.jpn.D8',
+
+        # ---------------------------------- 20231213.jpn ------------------------------------
+        '20231213.jpn.D1_wo_dist',
+        '20231213.jpn.D1',
+        '20231213.jpn.D3',
+        # '20231213.jpn.D5',
+        '20231213.jpn.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -160,8 +174,8 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        # ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
-        # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'cyberagent/open-calm-3b'),   # much better than chat model
+        # ('TinyLlama/TinyLlama-1.1B-Chat-v0.4', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-1b-short-ctx')
@@ -183,26 +197,26 @@ def main():
 
         # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
 
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
         # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
-        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
 
         # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
         # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
         
 
         # -- V100 x 4 x 2 nodes --
@@ -210,10 +224,10 @@ def main():
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
         # -------------- < 1B params --------------
 
@@ -258,10 +272,11 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        # 'LLM_FS.shot-10',
+        'LLM_FS.shot-10',
         'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
+        'LLM_FS.shot-30000',
     ]
 
     seeds = [
@@ -284,7 +299,7 @@ def main():
 
         # -- learning = 'FT' ---
         # 1e-5,
-        # 1e-4,   # much better than 1e-05
+        # 1e-4,   # much better on FLD than 1e-05, but could degredate on other downstream tasks?
 
         # -- learning = 'LLM_FS' ---
         # 3e-5,   # 20230919.jpn
@@ -304,8 +319,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         n_gpus = 1  # debug
@@ -318,8 +333,8 @@ def main():
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    hours = 16
-    # hours = 24
+    hours = None
+    # hours = 72
 
     save_model = False
     # save_model = True
@@ -349,13 +364,19 @@ def main():
     epoch = None
     warmup_ratio = None
     train_effective_batch_size = None
-    steps_upper = None
     warmup_steps = None
     max_eval_samples = None
     num_evals = None
+    steps_upper = None
 
     for FLD_dataset_uname in FLD_dataset_unames:
         for learning in learnings:
+            if hours is None:
+                if learning == 'LLM_FS.shot-30000':
+                    hours = 50
+                else:
+                    hours = 16
+
             for sample_negative_proof in sample_negative_proof_args:
                 for no_subproof_for_unknown in no_subproof_for_unknown_args:
                     for seed in seeds:
