@@ -183,6 +183,9 @@ class DataTrainingArguments:
     do_eval_in_outerloop: bool = field(
         default=False,
     )
+    save_model_at_end: bool = field(
+        default=False,
+    )
     test_file: Optional[str] = field(
         default=None,
         metadata={
@@ -876,7 +879,8 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        # trainer.save_model()  # Saves the tokenizer too for easy upload
+        if data_args.save_model_at_end:
+            trainer.save_model()
 
         metrics = train_result.metrics
         max_train_samples = (
