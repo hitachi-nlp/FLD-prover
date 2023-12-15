@@ -172,18 +172,22 @@ def main(input_dir, output_dir, log_level, read_from_eval_json):
                     df_dict[metric_name].append(eval_results.get(json_metric_name, None))
 
             else:
-
                 tf_df = read_as_dataframe(str(tensorboard_dir))
                 if 'step' not in tf_df.columns:
-                    logger.warning('skip the results under "%s"', str(tensorboard_dir))
+                    logger.warning('skip the results under "%s" as "step" not found in tensorboard log', str(tensorboard_dir))
+                    continue
+
+                try:
+                    evaluated_metric = [metric_name for metric_name in METRIC_NAMES
+                                        if metric_name in tf_df['tag'].values][0]
+                except IndexError as e:
+                    logger.warning('loading metric failed from "%s"', str(tensorboard_dir))
                     continue
 
                 lab_setting = json.load(open(str(tensorboard_dir.parent / 'lab.params.json')))
                 for name in LAB_ATTR_NAMES:
                     df_dict[name].append(lab_setting.get(name, None))
 
-                evaluated_metric = [metric_name for metric_name in METRIC_NAMES
-                                    if metric_name in tf_df['tag'].values][0]
                 final_evalation_step = tf_df[tf_df['tag'] == evaluated_metric]['step'].max()
                 final_evalation_df = tf_df[tf_df['step'] == final_evalation_step]
                 logger.info('loading metirc results from the final evaluation step = %d', final_evalation_step)

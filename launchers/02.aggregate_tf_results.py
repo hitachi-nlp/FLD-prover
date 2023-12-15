@@ -117,10 +117,15 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.D8')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.D8',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.D8')
+
     input_dirs = [
-        './outputs/01.train.py/2023-12-06.D8',
+        './outputs/01.train.py/20231213.jpn',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.D8')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',
