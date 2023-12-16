@@ -375,9 +375,11 @@ def main():
         for learning in learnings:
             if hours == 'LLM_FS.auto':
                 if learning == 'LLM_FS.shot-30000':
-                    hours = 30
+                    _hours = 30
                 else:
-                    hours = 10
+                    _hours = 10
+            else:
+                _hours = hours
 
             for sample_negative_proof in sample_negative_proof_args:
                 for no_subproof_for_unknown in no_subproof_for_unknown_args:
@@ -411,7 +413,7 @@ def main():
                                     setting.update(
                                         get_dataset_setting(
                                             script_type,
-                                            dataset_uname=FLD_dataset_uname,
+                                            FLD_dataset_uname=FLD_dataset_uname,
                                             top_dirs=DATASETS_DIRS,
                                             other_dataset_name=other_dataset_name,
                                             other_dataset_config_name=other_dataset_config_name,
@@ -502,7 +504,7 @@ def main():
                                         engine,
                                         command,
                                         output_dir,
-                                        hours=hours,
+                                        hours=_hours,
                                         dry_run=dry_run
                                     )
 
