@@ -351,7 +351,7 @@ def main():
     base_setting_name = 'default'
 
     # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
-    generation_timeout = 60 * 10  # For LLMs
+    generation_timeout = 60 * 20  # For LLMs
 
     sample_negative_proof_args = [
         # True,
