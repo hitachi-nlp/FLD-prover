@@ -142,10 +142,10 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        # '20231213.jpn.D1_wo_dist',
+        '20231213.jpn.D1_wo_dist',
         '20231213.jpn.D1',
-        # '20231213.jpn.D3',
-        # '20231213.jpn.D8',
+        '20231213.jpn.D3',
+        '20231213.jpn.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -153,10 +153,6 @@ def main():
 
     # other_dataset_name = "cerebras/SlimPajama-627B"
     # other_dataset_config_name = None
-
-    # [cerebras/SlimPajama-627B](https://huggingface.co/datasets/cerebras/SlimPajama-627B)
-    # other_dataset_name = "cerebras/SlimPajama-627B"
-    # other_dataset_config_name = "None"
 
     other_dataset_name = None
     other_dataset_config_name = None
@@ -198,7 +194,7 @@ def main():
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
-        ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
@@ -212,14 +208,14 @@ def main():
 
         # -- V100 x 4 x 2 nodes --
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
 
         # -------------- < 1B params --------------
@@ -265,16 +261,16 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
+        'LLM_FS.shot-10',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
         'LLM_FS.shot-10000',
-        # 'LLM_FS.shot-30000',
+        'LLM_FS.shot-30000',
     ]
 
     seeds = [
-        # 0,
-        1,
+        0,
+        # 1,
     ]
 
     lrates = [
@@ -312,8 +308,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         n_gpus = 1  # debug

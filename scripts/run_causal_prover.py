@@ -213,7 +213,7 @@ class DataTrainingArguments:
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
     )
     FLD_dataset_prob: Optional[float] = field(
-        default=0.1,
+        default=1.0,
     )
 
     max_train_samples: Optional[int] = field(
