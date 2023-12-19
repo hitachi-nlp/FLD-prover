@@ -74,7 +74,10 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+
+    # output_top_dir = Path('./outputs/01.train.py/test_hang')
+    output_top_dir = Path('./outputs/01.train.py/test_hang.rerun')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -143,9 +146,9 @@ def main():
 
         # ---------------------------------- 20231213.jpn ------------------------------------
         '20231213.jpn.D1_wo_dist',
-        '20231213.jpn.D1',
-        '20231213.jpn.D3',
-        '20231213.jpn.D8',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
+        # '20231213.jpn.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -209,13 +212,13 @@ def main():
         # -- V100 x 4 x 2 nodes --
 
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
 
         # -------------- < 1B params --------------
@@ -262,10 +265,10 @@ def main():
 
         # ---- JFLD experiments ----
         'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-30000',
     ]
 
     seeds = [
@@ -312,7 +315,7 @@ def main():
     engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus = 1  # debug
+        n_total_gpus = 1  # debug
         # n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
 
@@ -336,7 +339,7 @@ def main():
 
     # --------------------------- fixed settings ---------------------------------
     if isinstance(engine, QsubEngine):
-        n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     base_setting_name = 'default'
 
@@ -426,7 +429,7 @@ def main():
                                         get_batch_setting(
                                             script_type,
                                             gpu_name=gpu_name_for_batch_size,
-                                            n_gpus=n_gpus,
+                                            n_gpus=n_total_gpus,
                                             model_name=model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                                             train_effective_batch_size=setting.get('train_effective_batch_size', None),
                                         )
@@ -488,7 +491,7 @@ def main():
                                                            output_dir,
                                                            setting,
                                                            run_mode,
-                                                           n_gpus=n_gpus)
+                                                           n_gpus_per_node=n_gpus_per_node)
 
                                     run_by_engine(
                                         engine,
