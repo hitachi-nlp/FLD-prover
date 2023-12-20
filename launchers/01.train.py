@@ -208,15 +208,17 @@ def main():
 
         # -- V100 x 4 x 2 nodes --
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
+        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # -------------- < 1B params --------------
 
