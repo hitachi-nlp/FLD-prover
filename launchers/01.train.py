@@ -359,8 +359,8 @@ def main():
     warmup_ratio = None
     train_effective_batch_size = None
     warmup_steps = None
-    max_eval_samples = None
-    num_evals = None
+    max_eval_samples = 301
+    num_evals = 1
     steps_upper = None
 
     for FLD_dataset_uname in FLD_dataset_unames:
