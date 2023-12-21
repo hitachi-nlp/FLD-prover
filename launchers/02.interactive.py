@@ -49,8 +49,13 @@ def main():
 
     # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
 
-    # checkpoint = ('TinyLlama/TinyLlama-1.1B-Chat-v0.4', 'causal', 'all_at_once')
-    checkpoint = ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'all_at_once')
+    # best model on the basis of lm-eval
+    checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
+
+    # checkpoint = ('TinyLlama/TinyLlama-1.1B-Chat-v0.6', 'causal', 'all_at_once')
+    # checkpoint = ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'all_at_once')
+
+    # checkpoint = ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'all_at_once')
 
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
@@ -59,6 +64,7 @@ def main():
 
     # https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-955k-token-2T
     generation_do_sample = False
+    generation_temperature = 1.0
     generation_top_k = 10
     generation_repetition_penalty = 1.5  # XXX must tune for each model
     generation_max_length = 2000
@@ -145,6 +151,7 @@ def main():
             script_type,
             generation_do_sample=generation_do_sample,
             generation_top_k=generation_top_k,
+            generation_temperature=generation_temperature,
             generation_repetition_penalty=generation_repetition_penalty,
             generation_max_length=generation_max_length,
             generation_max_new_tokens=generation_max_new_tokens,
@@ -185,7 +192,7 @@ def main():
                            output_dir,
                            setting,
                            run_mode,
-                           n_gpus=n_gpus)
+                           n_gpus_per_node=n_gpus)
 
     run_by_engine(
         engine,
