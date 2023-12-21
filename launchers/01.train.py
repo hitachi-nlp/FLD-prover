@@ -74,7 +74,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -190,20 +191,20 @@ def main():
 
         # -- V100 x 4 x 1 nodes --
 
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
-        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
 
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
         
 
         # -- V100 x 4 x 2 nodes --
@@ -217,8 +218,8 @@ def main():
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
 
-        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
-        ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # -------------- < 1B params --------------
 
@@ -266,13 +267,13 @@ def main():
         'LLM_FS.shot-10',
         'LLM_FS.shot-100',
         'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
+        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-30000',
     ]
 
     seeds = [
-        0,
-        # 1,
+        # 0,
+        1,
     ]
 
     lrates = [
@@ -310,8 +311,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         n_total_gpus = 1  # debug
