@@ -194,8 +194,7 @@ def main():
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),   # NEW
-        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # NEW
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
@@ -204,7 +203,7 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
         
 
         # -- V100 x 4 x 2 nodes --
@@ -212,11 +211,11 @@ def main():
         ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
-        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),   # NEW
+        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
 
         ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
         ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
@@ -235,6 +234,9 @@ def main():
         # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
         # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),  # should use deepspeed
+
+        # --------------- rejected models ---------------------
+        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # the training fails somehow
     ]
 
     # script_type = 'run_prover'
@@ -344,7 +346,8 @@ def main():
     base_setting_name = 'default'
 
     # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
-    generation_timeout = 60 * 20  # For LLMs
+    # generation_timeout = 60 * 30  # For LLMs
+    generation_timeout = None
 
     sample_negative_proof_args = [
         # True,

@@ -32,6 +32,9 @@ def generation_handled(func,
                        model,
                        timeout: Optional[int] = None,
                        **gen_kwargs):
+    if timeout is not None:
+        raise NotImplementedError()
+
     if lm_type == LMType.CAUSAL:
         """
             model.generate() with batch size >= 2 require hacks on special tokens.
@@ -67,9 +70,9 @@ def generation_handled(func,
             As generation_init_special_tokens()/generation_exit_special_tokens() dynamically change
             tokenizer special tokens, we also have to generate gen_kwargs dynamically.
         """
-        stopping_criteria = MaxTimeCriteriaWithWarning(timeout)
+        # stopping_criteria = MaxTimeCriteriaWithWarning(timeout)  # XXX this sets the start time at the start of evaluation, which is not our intention
         _kwargs = {
-            'stopping_criteria': [stopping_criteria],
+            # 'stopping_criteria': [stopping_criteria],
             'pad_token_id': tokenizer.pad_token_id,
         }
         _kwargs.update(deepcopy(gen_kwargs))

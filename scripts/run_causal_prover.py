@@ -339,7 +339,8 @@ class DataTrainingArguments:
     )
 
     generation_timeout: int = field(
-        default=60,
+        # default=60,
+        default=None,
     )
 
     interactive_mode: str = field(
