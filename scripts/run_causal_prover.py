@@ -55,6 +55,7 @@ from transformers import (
     set_seed,
     Seq2SeqTrainer,
 )
+from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_callback import TrainerCallback, TrainerState, TrainerControl
 from transformers.testing_utils import CaptureLogger
 from transformers.trainer_utils import get_last_checkpoint
@@ -339,6 +340,11 @@ class DataTrainingArguments:
     )
 
     generation_timeout: int = field(
+        # default=60,
+        default=None,
+    )
+
+    evaluation_timeout: int = field(
         # default=60,
         default=None,
     )
@@ -907,6 +913,8 @@ def main():
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
+    new_generation_config = GenerationConfig.from_model_config(config)
+    new_generation_config.max_time = data_args.generation_timeout
     training_args.generation_config = None
     training_args.predict_with_generate = True
     generation_handle_args = [
@@ -915,7 +923,6 @@ def main():
         model,
     ]
     generation_handled_kwargs = {
-        'timeout': data_args.generation_timeout,
         'eos_token_id': tokenizer.eos_token_id,
         'top_k': data_args.generation_top_k,
         'num_beams': data_args.generation_num_beams,
@@ -929,11 +936,15 @@ def main():
     ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.evaluate,
         *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because evaluation took too long',
         **generation_handled_kwargs,
     )
     ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.predict,
         *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because evaluation took too long',
         **generation_handled_kwargs,
     )
 

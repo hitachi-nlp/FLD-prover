@@ -75,7 +75,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.generation_timeout-10')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
+
+    output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -202,8 +209,8 @@ def main():
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
         
 
         # -- V100 x 4 x 2 nodes --
@@ -211,10 +218,10 @@ def main():
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
@@ -269,8 +276,10 @@ def main():
         'LLM_FS.shot-10',
         'LLM_FS.shot-100',
         'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
-        # 'LLM_FS.shot-30000',
+        'LLM_FS.shot-10000',
+        'LLM_FS.shot-30000',
+
+        # 'LLM_FS.shot-1',
     ]
 
     seeds = [
@@ -313,8 +322,8 @@ def main():
     run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
 
     if isinstance(engine, SubprocessEngine):
         n_total_gpus = 1  # debug
@@ -345,9 +354,14 @@ def main():
 
     base_setting_name = 'default'
 
-    # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
-    # generation_timeout = 60 * 30  # For LLMs
-    generation_timeout = None
+    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
+    generation_timeout = 60 * 3
+
+    # too long evaluation. we cut it off due to the same reason as above.
+    evaluation_timeout = 3600 * 2
+
+    max_steps = None
+    eval_steps = None
 
     sample_negative_proof_args = [
         # True,
@@ -422,8 +436,8 @@ def main():
 
                                     setting.update(
                                         get_save_eval_step_setting(
-                                            max_steps=setting['max_steps'],
-                                            eval_steps=setting['eval_steps'],
+                                            max_steps = max_steps or setting['max_steps'],
+                                            eval_steps = eval_steps or setting['eval_steps'],
                                             do_save_model=save_model,
                                         )
                                     )
@@ -442,7 +456,13 @@ def main():
 
                                     setting.update(get_tokenizer_setting(model_name))
 
-                                    setting.update(get_generation_setting(script_type, generation_timeout=generation_timeout))
+                                    setting.update(
+                                        get_generation_setting(
+                                            script_type,
+                                            generation_timeout=generation_timeout,
+                                            evaluation_timeout=evaluation_timeout,
+                                       ),
+                                    )
 
                                     setting.update({
                                         'do_train': True,
