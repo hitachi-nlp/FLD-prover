@@ -127,10 +127,10 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn')
 
-    # input_dirs = [
-    #     './outputs/01.train.py/20231213.jpn.seed--1',
-    # ]
-    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn.seed--1')
+    input_dirs = [
+        './outputs/01.train.py/20231213.jpn.seed--1',
+    ]
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn.seed--1')
 
     # input_dirs = [
     #     './outputs/01.train.py/20231213.jpn',
@@ -138,10 +138,10 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn.seed--0-1')
 
-    input_dirs = [
-        './outputs/01.train.py/20231223.seed--1.timeout_fix',
-    ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231223.seed--1.timeout_fix')
+    # input_dirs = [
+    #     './outputs/01.train.py/20231223.seed--1.timeout_fix',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231223.seed--1.timeout_fix')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',

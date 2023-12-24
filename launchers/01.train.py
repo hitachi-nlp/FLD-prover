@@ -75,14 +75,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.generation_timeout-10')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
 
-    output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
+    # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -215,17 +215,17 @@ def main():
 
         # -- V100 x 4 x 2 nodes --
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
         ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
         ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # -------------- < 1B params --------------
 
