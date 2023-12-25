@@ -273,13 +273,12 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        'LLM_FS.shot-10',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
-
-        # 'LLM_FS.shot-1',
+        'LLM_FS.shot-5',
+        # 'LLM_FS.shot-10',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-30000',
     ]
 
     seeds = [
