@@ -342,6 +342,11 @@ def main():
     # max_eval_samples = 10
     max_eval_samples = 301
 
+    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
+    generation_timeout = None
+    # generation_timeout = 60 * 3
+    # generation_timeout = 1
+
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
@@ -374,10 +379,6 @@ def main():
         n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     base_setting_name = 'default'
-
-    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    # generation_timeout = 60 * 3
-    generation_timeout = 1
 
     # too long evaluation. we cut it off due to the same reason as above.
     evaluation_timeout = 3600 * 2
