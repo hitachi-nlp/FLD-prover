@@ -74,15 +74,21 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
-
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.generation_timeout-10')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
 
     # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b')
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-10')
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
+
+    output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -150,9 +156,9 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        '20231213.jpn.D1_wo_dist',
-        '20231213.jpn.D1',
-        '20231213.jpn.D3',
+        # '20231213.jpn.D1_wo_dist',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
         '20231213.jpn.D8',
     ]
 
@@ -227,6 +233,10 @@ def main():
         ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
         ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
+        # -- V100 x 4 x 4 nodes --
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+
         # -------------- < 1B params --------------
 
         # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
@@ -274,11 +284,12 @@ def main():
 
         # ---- JFLD experiments ----
         'LLM_FS.shot-5',
-        # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
+        'LLM_FS.shot-100',
         # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
+
+        # 'LLM_FS.shot-10',
     ]
 
     seeds = [
@@ -320,9 +331,17 @@ def main():
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
+    # epoch = 5
+    epoch = 10
+    # epoch = None
+
+    # max_eval_samples = 10
+    max_eval_samples = 301
+
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab, plamo
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
         n_total_gpus = 1  # debug
@@ -372,28 +391,29 @@ def main():
         # False,
     ]
 
-    epoch = None
     warmup_ratio = None
     train_effective_batch_size = None
     warmup_steps = None
-    max_eval_samples = 301
     num_evals = 1
     steps_upper = None
 
     for FLD_dataset_uname in FLD_dataset_unames:
         for learning in learnings:
-            if hours == 'LLM_FS.auto':
-                if learning == 'LLM_FS.shot-30000':
-                    _hours = 30
-                else:
-                    _hours = 10
-            else:
-                _hours = hours
 
             for sample_negative_proof in sample_negative_proof_args:
                 for no_subproof_for_unknown in no_subproof_for_unknown_args:
                     for seed in seeds:
                         for model_name, lm_type, model_name_for_batch_size in model_settings:
+                            if hours == 'LLM_FS.auto':
+                                if learning == 'LLM_FS.shot-30000':
+                                    _hours = 30
+                                else:
+                                    _hours = 10
+                                if model_name.find('70b') >= 0:
+                                    _hours *= 2
+                            else:
+                                _hours = hours
+
                             if lm_type == 'causal':
                                 proof_sampling = 'all_at_once'
                             else:
@@ -416,6 +436,7 @@ def main():
                                             train_effective_batch_size=train_effective_batch_size,
                                             num_evals=num_evals,
                                             max_eval_samples=max_eval_samples,
+                                            n_gpus=n_total_gpus,
                                         )
                                     )
 
