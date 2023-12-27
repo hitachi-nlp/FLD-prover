@@ -982,13 +982,13 @@ def main():
             self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
-            self._FLD_seq2seq_trainer.model = deepspeed.init_inference(
-                model,
-                mp_size=2,
-                dtype=torch.half,
-                checkpoint=None,
-                replace_with_kernel_inject=True,
-            ).module
+            # self._FLD_seq2seq_trainer.model = deepspeed.init_inference(
+            #     model,
+            #     mp_size=2,
+            #     dtype=torch.half,
+            #     checkpoint=None,
+            #     replace_with_kernel_inject=True,
+            # ).module
             self._FLD_seq2seq_trainer.state = state
             self._FLD_seq2seq_trainer.evaluate(
                 metric_key_prefix="FLD_proof_eval"
