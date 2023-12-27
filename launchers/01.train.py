@@ -80,15 +80,16 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
 
     # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
-
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b')
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-10')
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
 
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
+
+    # output_top_dir = Path('./outputs/01.train.py/timeout')
+    output_top_dir = Path('./outputs/01.train.py/20231227.large_batch_size')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -156,9 +157,9 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        '20231213.jpn.D1_wo_dist',
-        '20231213.jpn.D1',
-        '20231213.jpn.D3',
+        # '20231213.jpn.D1_wo_dist',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
         '20231213.jpn.D8',
     ]
 
@@ -224,13 +225,13 @@ def main():
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
@@ -287,10 +288,10 @@ def main():
 
         # ---- JFLD experiments ----
         'LLM_FS.shot-5',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-30000',
 
         # 'LLM_FS.shot-10',
     ]
@@ -347,13 +348,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
-        n_total_gpus = 1  # debug
-        # n_gpus = 4
-        # n_gpus = None  # specify this when running through QsubEngine
+        n_gpus_per_node = 4
+        n_total_gpus = 4
 
-        gpu_name_for_batch_size = 'A100_48_1'
+        # gpu_name_for_batch_size = 'A100_48_1'
         # gpu_name_for_batch_size = 'V100_16_1'
-        # gpu_name_for_batch_size = 'V100_16_4'
+        gpu_name_for_batch_size = 'V100_16_4'
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
@@ -376,7 +376,8 @@ def main():
     base_setting_name = 'default'
 
     # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    generation_timeout = 60 * 3
+    # generation_timeout = 60 * 3
+    generation_timeout = 1
 
     # too long evaluation. we cut it off due to the same reason as above.
     evaluation_timeout = 3600 * 2
