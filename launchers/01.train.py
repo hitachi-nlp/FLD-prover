@@ -85,11 +85,18 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
 
     # output_top_dir = Path('./outputs/01.train.py/timeout')
-    output_top_dir = Path('./outputs/01.train.py/20231227.large_batch_size')
+    # output_top_dir = Path('./outputs/01.train.py/20231227.large_batch_size')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231227.init_inference')
+    # output_top_dir = Path('./outputs/01.train.py/20231227.init_inference.mp_size=None')
+    # output_top_dir = Path('./outputs/01.train.py/20231227.quantization')
+    # output_top_dir = Path('./outputs/01.train.py/20231227.single_trainer')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231227.find_batch_size_with_single_trainer')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -222,19 +229,19 @@ def main():
 
         # -- V100 x 4 x 2 nodes --
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
 
         ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # -- V100 x 4 x 4 nodes --
@@ -288,7 +295,7 @@ def main():
 
         # ---- JFLD experiments ----
         'LLM_FS.shot-5',
-        # 'LLM_FS.shot-100',
+        'LLM_FS.shot-100',
         # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
@@ -335,21 +342,28 @@ def main():
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
+    # epoch = 1
     # epoch = 5
-    # epoch = 10
     epoch = None
 
+    # hf_bug_zero_lr_offset = 0
+    hf_bug_zero_lr_offset = 20
+
     # max_eval_samples = 10
-    max_eval_samples = 301
+    # max_eval_samples = 301
+    max_eval_samples = 151
 
     # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    generation_timeout = None
-    # generation_timeout = 60 * 3
-    # generation_timeout = 1
+    # generation_timeout = None
+    generation_timeout = 3600 * 1
+
+    # too long evaluation. we cut it off due to the same reason as above.
+    evaluation_timeout = 3600 * 5
 
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=3)  # 10b model for sppedup
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
@@ -380,9 +394,6 @@ def main():
 
     base_setting_name = 'default'
 
-    # too long evaluation. we cut it off due to the same reason as above.
-    evaluation_timeout = 3600 * 2
-
     max_steps = None
     eval_steps = None
 
@@ -411,11 +422,11 @@ def main():
                         for model_name, lm_type, model_name_for_batch_size in model_settings:
                             if hours == 'LLM_FS.auto':
                                 if learning == 'LLM_FS.shot-30000':
-                                    _hours = 30
+                                    _hours = 50
                                 else:
-                                    _hours = 10
+                                    _hours = 20
                                 if model_name.find('70b') >= 0:
-                                    _hours *= 2
+                                    _hours = min(_hours * 2, 72)
                             else:
                                 _hours = hours
 
@@ -441,6 +452,7 @@ def main():
                                             train_effective_batch_size=train_effective_batch_size,
                                             num_evals=num_evals,
                                             max_eval_samples=max_eval_samples,
+                                            hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
                                             n_gpus=n_total_gpus,
                                         )
                                     )

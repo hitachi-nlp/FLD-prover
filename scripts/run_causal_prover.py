@@ -57,6 +57,7 @@ from transformers import (
 )
 from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_callback import TrainerCallback, TrainerState, TrainerControl
+from transformers.trainer_callback import CallbackHandler
 from transformers.testing_utils import CaptureLogger
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
@@ -67,7 +68,11 @@ from FLD_prover.data_processing import (
     preprocess_function as FLD_preprocess_function,
     compute_metrics as FLD_compute_metrics,
 )
-from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
+from FLD_prover.trainer import (
+    ForceCallMetricsSeq2SeqTrainer,
+    custom_evaluation_loop_init,
+    custom_evaluation_loop_exit,
+)
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
@@ -625,6 +630,12 @@ def main():
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
+    # if True:
+    #     # [Model quantization - Models - Hugging Face Forums](https://discuss.huggingface.co/t/model-quantization/10172/6)
+    #     import torch.quantization
+    #     model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
+
+
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
         peft_config = LoraConfig(task_type=PeftTaskType.CAUSAL_LM,
@@ -937,14 +948,14 @@ def main():
         ForceCallMetricsSeq2SeqTrainer.evaluate,
         *generation_handle_args,
         timeout_from_call=data_args.evaluation_timeout,
-        timeout_msg_title='generation aborted because evaluation took too long',
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
         **generation_handled_kwargs,
     )
     ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.predict,
         *generation_handle_args,
         timeout_from_call=data_args.evaluation_timeout,
-        timeout_msg_title='generation aborted because evaluation took too long',
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
         **generation_handled_kwargs,
     )
 
@@ -965,9 +976,11 @@ def main():
             LMType.CAUSAL,
         )
 
-    def _build_FLD_seq2seq_trainer(do_compute_metrics=True):
+    def _build_FLD_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
+                                   do_compute_metrics=True):
         return ForceCallMetricsSeq2SeqTrainer(
             model,
+            other=other_trainer,
             args=training_args,
             data_collator=collator,
             train_dataset=None,
@@ -978,21 +991,39 @@ def main():
 
     class FLDEvaluationCallback(TrainerCallback):
 
-        def __init__(self):
-            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
+        def __init__(self, other_trainer: Trainer):
+            # hack to evaluate generations at evaluiation, not the perplexities.
+            # self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
+            # self._trainer = trainer
+
+            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer(other_trainer=other_trainer)
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+            # HONOKA: mp_size error
             # self._FLD_seq2seq_trainer.model = deepspeed.init_inference(
             #     model,
-            #     mp_size=2,
+            #     # mp_size=8,
             #     dtype=torch.half,
             #     checkpoint=None,
             #     replace_with_kernel_inject=True,
             # ).module
+
             self._FLD_seq2seq_trainer.state = state
             self._FLD_seq2seq_trainer.evaluate(
                 metric_key_prefix="FLD_proof_eval"
             )
+
+            # custom_evaluation_loop_init(
+            #     self._trainer,
+            #     Seq2SeqTrainer.evaluation_loop,
+            #     compute_metrics_func=_FLD_compute_metrics,
+            #     do_compute_metrics_even_if_labels_is_None=True,
+            # )
+            # self._trainer.evaluate(
+            #     eval_dataset=FLD_proof_eval_dataset,
+            #     metric_key_prefix="FLD_proof_eval"
+            # )
+            # custom_evaluation_loop_exit(self._trainer)
 
     # Initialize our Trainer
     trainer = Trainer(
@@ -1009,8 +1040,13 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
 
-        callbacks=[FLDEvaluationCallback()],
+        # callbacks=[FLDEvaluationCallback(trainer)],  # set by ourselves below to handle circular dependency between FLDEvaluationCallback and the trainer
     )
+    callbacks = trainer.callback_handler.callbacks + [FLDEvaluationCallback(trainer)]
+    trainer.callback_handler = CallbackHandler(
+        callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
+    )
+
 
     # Training
     if training_args.do_train:
@@ -1052,7 +1088,7 @@ def main():
 
     if data_args.interactive_mode is not None:
         launch(
-            _build_FLD_seq2seq_trainer(do_compute_metrics=False),
+            _build_FLD_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
             lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
             data_args.interactive_mode,
