@@ -363,7 +363,7 @@ def main():
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=3)  # 10b model for sppedup
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
