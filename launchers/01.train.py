@@ -213,16 +213,17 @@ def main():
 
         # ---- V100 x 4 x 1 nodes ----
 
-        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         
         # ---- V100 x 4 x 2 nodes ----
 
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
         # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -253,7 +254,6 @@ def main():
 
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
@@ -355,9 +355,9 @@ def main():
     evaluation_timeout = 3600 * 10
 
     # engine = SubprocessEngine()
-    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
