@@ -220,12 +220,12 @@ def main():
         
         # ---- V100 x 4 x 2 nodes ----
 
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---- V100 x 4 x 4 nodes ----
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
@@ -288,9 +288,9 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        'LLM_FS.shot-5',
-        'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-5',
+        # 'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
 
