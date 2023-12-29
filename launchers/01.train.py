@@ -85,7 +85,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
 
     # output_top_dir = Path('./outputs/01.train.py/timeout')
@@ -97,6 +97,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231227.single_trainer')
 
     # output_top_dir = Path('./outputs/01.train.py/20231227.find_batch_size_with_single_trainer')
+
+    output_top_dir = Path('./outputs/01.train.py/20231229.test_overfit')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -170,6 +172,9 @@ def main():
         '20231213.jpn.D8',
     ]
 
+    use_test_as_val = True
+    use_test_as_train = True
+
     # other_dataset_name = "wikitext"
     # other_dataset_config_name = "wikitext-2-raw-v1"
 
@@ -210,41 +215,34 @@ def main():
 
         # # # ============================ japanese     ============================
 
-        # -- V100 x 4 x 1 nodes --
+        # ---- V100 x 4 x 1 nodes ----
 
         # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-
         # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
-
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
-
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
         # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
         
+        # ---- V100 x 4 x 2 nodes ----
 
-        # -- V100 x 4 x 2 nodes --
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-
-        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
         # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-
-        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-
-        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-
-        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # -- V100 x 4 x 4 nodes --
+        # ---- V100 x 4 x 4 nodes ----
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
 
@@ -255,7 +253,7 @@ def main():
         # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
         # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
 
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
+        ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
         # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
         # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
 
@@ -295,7 +293,7 @@ def main():
 
         # ---- JFLD experiments ----
         'LLM_FS.shot-5',
-        'LLM_FS.shot-100',
+        # 'LLM_FS.shot-100',
         # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
@@ -338,9 +336,9 @@ def main():
         # True,      # better for non-chat model, somehow.
     ]
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
     # epoch = 1
     # epoch = 5
@@ -349,30 +347,33 @@ def main():
     # hf_bug_zero_lr_offset = 0
     hf_bug_zero_lr_offset = 20
 
-    # max_eval_samples = 10
+    max_eval_samples = 5
     # max_eval_samples = 301
-    max_eval_samples = 151
+    # max_eval_samples = 151
 
     # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
     # generation_timeout = None
-    generation_timeout = 3600 * 1
+    generation_timeout = 3600 * 2
 
     # too long evaluation. we cut it off due to the same reason as above.
-    evaluation_timeout = 3600 * 5
+    evaluation_timeout = 3600 * 10
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus_per_node = 4
-        n_total_gpus = 4
+        n_gpus_per_node = 1
+        n_total_gpus = 1
+
+        # n_gpus_per_node = 4
+        # n_total_gpus = 4
 
         # gpu_name_for_batch_size = 'A100_48_1'
-        # gpu_name_for_batch_size = 'V100_16_1'
-        gpu_name_for_batch_size = 'V100_16_4'
+        gpu_name_for_batch_size = 'V100_16_1'
+        # gpu_name_for_batch_size = 'V100_16_4'
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
@@ -424,7 +425,7 @@ def main():
                                 if learning == 'LLM_FS.shot-30000':
                                     _hours = 50
                                 else:
-                                    _hours = 20
+                                    _hours = 25
                                 if model_name.find('70b') >= 0:
                                     _hours = min(_hours * 2, 72)
                             else:
@@ -464,8 +465,8 @@ def main():
                                             top_dirs=DATASETS_DIRS,
                                             other_dataset_name=other_dataset_name,
                                             other_dataset_config_name=other_dataset_config_name,
-                                            use_test_as_val=setting.get('use_test_as_val', False),
-                                            use_test_as_train=setting.get('use_test_as_train', False),
+                                            use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
+                                            use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                                             streaming=streaming,
                                             instruction=instruction,
                                         )

@@ -38,64 +38,6 @@ if is_torch_tpu_available(check_device=False):
 logger = logging.getLogger(__name__)
 
 
-def custom_evaluation_loop_init(trainer: Trainer,
-                                evaluation_loop_func: Callable,
-                                compute_metrics_func: Optional[Callable] = None,
-                                do_compute_metrics_even_if_labels_is_None=False) -> None:
-    """
-    What we want to do: run custom evaluation loop, such as the one of Seq2SeqTrainer, using the same model owned by the original trainer.
-    This is more computational efficient than using two different trainers, as they would have the same models in two places in the memory.
-    """
-    trainer._evaluation_loop_org_cache = trainer.evaluation_loop
-
-    def do_custom_evaluation_loop(
-        dataloader: DataLoader,
-        description: str,
-        prediction_loss_only: Optional[bool] = None,
-        ignore_keys: Optional[List[str]] = None,
-        metric_key_prefix: str = "eval",
-    ) -> EvalLoopOutput:
-        eval_loop_output = evaluation_loop_func(
-            trainer,
-            dataloader,
-            description,
-            prediction_loss_only=prediction_loss_only,
-            ignore_keys=ignore_keys,
-            metric_key_prefix=metric_key_prefix,
-        )
-
-        args = trainer.args
-        all_preds = eval_loop_output.predictions
-        all_labels = eval_loop_output.label_ids
-
-        # if all_labels is None, compute_metrics is not called in the super class
-        # we want to avoid this
-        # if self.compute_metrics is not None and all_preds is not None and all_labels is None:
-        if compute_metrics_func is not None and all_preds is not None:
-            if args.include_inputs_for_metrics:
-                raise ValueError()
-            else:
-                if do_compute_metrics_even_if_labels_is_None:
-                    metrics = compute_metrics_func(EvalPrediction(predictions=all_preds, label_ids=all_labels))
-                else:
-                    metrics = {}
-        else:
-            metrics = {}
-        metrics = denumpify_detensorize(metrics)
-
-        for key in list(metrics.keys()):
-            if not key.startswith(f"{metric_key_prefix}_"):
-                eval_loop_output.metrics[f"{metric_key_prefix}_{key}"] = metrics.pop(key)
-
-        return eval_loop_output
-
-    trainer.evaluation_loop = do_custom_evaluation_loop
-
-
-def custom_evaluation_loop_exit(trainer: Trainer) -> None:
-    trainer.evaluation_loop = trainer._evaluation_loop_org_cache
-
-
 class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
     """ call self.compute_metrics() even if labels are None """
 
@@ -184,7 +126,8 @@ class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
         self.model = other.model
 
         self.compute_metrics = compute_metrics or other.compute_metrics
-        self.preprocess_logits_for_metrics = other.preprocess_logits_for_metrics
+        # self.preprocess_logits_for_metrics = other.preprocess_logits_for_metrics
+        self.preprocess_logits_for_metrics = None  # should be None because preprocessing for seq2seq should be different from other trainer.
 
         self.optimizer, self.lr_scheduler = other.optimizer, other.lr_scheduler
         self.callback_handler = other.callback_handler

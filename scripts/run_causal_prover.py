@@ -70,8 +70,6 @@ from FLD_prover.data_processing import (
 )
 from FLD_prover.trainer import (
     ForceCallMetricsSeq2SeqTrainer,
-    custom_evaluation_loop_init,
-    custom_evaluation_loop_exit,
 )
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
@@ -630,12 +628,6 @@ def main():
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
-    # if True:
-    #     # [Model quantization - Models - Hugging Face Forums](https://discuss.huggingface.co/t/model-quantization/10172/6)
-    #     import torch.quantization
-    #     model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-
-
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
         peft_config = LoraConfig(task_type=PeftTaskType.CAUSAL_LM,
@@ -992,38 +984,14 @@ def main():
     class FLDEvaluationCallback(TrainerCallback):
 
         def __init__(self, other_trainer: Trainer):
-            # hack to evaluate generations at evaluiation, not the perplexities.
-            # self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
-            # self._trainer = trainer
-
-            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer(other_trainer=other_trainer)
+            self._other_trainer = other_trainer
+            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer(other_trainer=self._other_trainer)
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
-            # HONOKA: mp_size error
-            # self._FLD_seq2seq_trainer.model = deepspeed.init_inference(
-            #     model,
-            #     # mp_size=8,
-            #     dtype=torch.half,
-            #     checkpoint=None,
-            #     replace_with_kernel_inject=True,
-            # ).module
-
             self._FLD_seq2seq_trainer.state = state
             self._FLD_seq2seq_trainer.evaluate(
                 metric_key_prefix="FLD_proof_eval"
             )
-
-            # custom_evaluation_loop_init(
-            #     self._trainer,
-            #     Seq2SeqTrainer.evaluation_loop,
-            #     compute_metrics_func=_FLD_compute_metrics,
-            #     do_compute_metrics_even_if_labels_is_None=True,
-            # )
-            # self._trainer.evaluate(
-            #     eval_dataset=FLD_proof_eval_dataset,
-            #     metric_key_prefix="FLD_proof_eval"
-            # )
-            # custom_evaluation_loop_exit(self._trainer)
 
     # Initialize our Trainer
     trainer = Trainer(
