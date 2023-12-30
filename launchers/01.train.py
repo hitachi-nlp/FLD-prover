@@ -347,7 +347,8 @@ def main():
 
     # max_eval_samples = 5
     # max_eval_samples = 301
-    max_eval_samples = 151
+    # max_eval_samples = 151
+    max_eval_samples = 152
 
     # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
     # generation_timeout = None
