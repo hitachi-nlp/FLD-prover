@@ -85,7 +85,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
 
     # output_top_dir = Path('./outputs/01.train.py/timeout')
@@ -99,6 +99,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231227.find_batch_size_with_single_trainer')
 
     # output_top_dir = Path('./outputs/01.train.py/20231229.test_overfit')
+
+    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -166,8 +168,8 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        # '20231213.jpn.D1_wo_dist',
-        # '20231213.jpn.D1',
+        '20231213.jpn.D1_wo_dist',
+        '20231213.jpn.D1',
         '20231213.jpn.D3',
         '20231213.jpn.D8',
     ]
@@ -288,18 +290,18 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        # 'LLM_FS.shot-5',
-        # 'LLM_FS.shot-100',
+        'LLM_FS.shot-5',
+        'LLM_FS.shot-100',
         'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
-        # 'LLM_FS.shot-30000',
+        'LLM_FS.shot-10000',
+        'LLM_FS.shot-30000',
 
         # 'LLM_FS.shot-10',
     ]
 
     seeds = [
-        # 0,
-        1,
+        0,
+        # 1,
     ]
 
     lrates = [
@@ -385,7 +387,7 @@ def main():
     # dry_run = True
     dry_run = False
 
-    # --------------------------- fixed settings ---------------------------------
+    # =========================== fixed settings =================================
     if isinstance(engine, QsubEngine):
         n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
