@@ -153,11 +153,18 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231230.jpn.seed--0')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--0',
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231231.jpn.seed--0-1')
+
     input_dirs = [
         './outputs/01.train.py/20231230.jpn.seed--0',
         './outputs/01.train.py/20231213.jpn.seed--1',
+        './outputs/01.train.py/20231230.jpn.swallow-70b.seed--0',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231231.jpn.seed--0-1')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231231.jpn.seed--0-1.with_swallow-70b')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',

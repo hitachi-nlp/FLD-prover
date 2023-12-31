@@ -87,23 +87,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
-
-    # output_top_dir = Path('./outputs/01.train.py/timeout')
-    # output_top_dir = Path('./outputs/01.train.py/20231227.large_batch_size')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231227.init_inference')
-    # output_top_dir = Path('./outputs/01.train.py/20231227.init_inference.mp_size=None')
-    # output_top_dir = Path('./outputs/01.train.py/20231227.quantization')
-    # output_top_dir = Path('./outputs/01.train.py/20231227.single_trainer')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231227.find_batch_size_with_single_trainer')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231229.test_overfit')
-
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
-    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
+    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
 
-    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -225,15 +212,15 @@ def main():
         
         # ---- V100 x 4 x 2 nodes ----
 
-        ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---- V100 x 16 nodes ----
-        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
 
         # -------------- < 1B params --------------
@@ -303,9 +290,9 @@ def main():
     ]
 
     seeds = [
-        # 0,
+        0,
         # 1,
-        2,
+        # 2,
     ]
 
     lrates = [
@@ -356,8 +343,8 @@ def main():
 
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
         n_gpus_per_node = 1
