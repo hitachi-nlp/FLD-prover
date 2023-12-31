@@ -85,7 +85,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
 
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
 
     # output_top_dir = Path('./outputs/01.train.py/timeout')
@@ -100,7 +100,7 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20231229.test_overfit')
 
-    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
+    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -168,9 +168,9 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        '20231213.jpn.D1_wo_dist',
-        '20231213.jpn.D1',
-        '20231213.jpn.D3',
+        # '20231213.jpn.D1_wo_dist',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
         '20231213.jpn.D8',
     ]
 
@@ -223,8 +223,8 @@ def main():
         # ---- V100 x 4 x 2 nodes ----
 
         # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
@@ -290,18 +290,18 @@ def main():
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        'LLM_FS.shot-5',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-5',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
         'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
+        # 'LLM_FS.shot-30000',
 
         # 'LLM_FS.shot-10',
     ]
 
     seeds = [
-        # 0,
-        1,
+        0,
+        # 1,
     ]
 
     lrates = [
