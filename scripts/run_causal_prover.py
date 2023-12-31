@@ -30,6 +30,7 @@ from itertools import chain
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 import readline
 
+import numpy as np
 import deepspeed
 import datasets
 from datasets import interleave_datasets, DatasetDict
@@ -229,6 +230,16 @@ class DataTrainingArguments:
             )
         },
     )
+    random_sample_max_train_samples: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "For debugging purposes or quicker training, truncate the number of training examples to this "
+                "value if set."
+            )
+        },
+    )
+
     max_eval_samples: Optional[int] = field(
         default=None,
         metadata={
@@ -238,9 +249,23 @@ class DataTrainingArguments:
             )
         },
     )
+    random_sample_max_eval_samples: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "For debugging purposes or quicker training, truncate the number of evaluation examples to this "
+                "value if set."
+            )
+        },
+    )
+
     FLD_max_eval_samples: Optional[int] = field(
         default=None,
     )
+    random_sample_FLD_max_eval_samples: bool = field(
+        default=False,
+    )
+
     streaming: bool = field(default=False, metadata={"help": "Enable streaming mode"})
     block_size: Optional[int] = field(
         default=None,
@@ -872,7 +897,11 @@ def main():
                                                  FLD_lm_datasets.get("train", None))
         if data_args.max_train_samples is not None:
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
-            train_dataset = train_dataset.select(range(max_train_samples))
+            if data_args.random_sample_max_train_samples:
+                indexes = np.random.choice(len(train_dataset), max_train_samples, replace=False)
+            else:
+                indexes = np.arange(max_train_samples)
+            train_dataset = train_dataset.select(indexes)
     else:
         train_dataset = None
 
@@ -883,7 +912,11 @@ def main():
                                                 FLD_lm_datasets.get("validation", None))
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
-            eval_dataset = eval_dataset.select(range(max_eval_samples))
+            if data_args.random_sample_max_eval_samples:
+                indexes = np.random.choice(len(eval_dataset), max_eval_samples, replace=False)
+            else:
+                indexes = np.arange(max_eval_samples)
+            eval_dataset = eval_dataset.select(indexes)
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
@@ -956,7 +989,12 @@ def main():
         FLD_proof_eval_dataset.set_transform(
             lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
         if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
-            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(range(data_args.FLD_max_eval_samples))
+            # select as train and eval dataset
+            if data_args.random_sample_FLD_max_eval_samples:
+                indexes = np.random.choice(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples, replace=False)
+            else:
+                indexes = np.arange(data_args.FLD_max_eval_samples)
+            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(indexes)
     else:
         FLD_proof_eval_dataset = None
 

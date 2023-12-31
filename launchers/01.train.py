@@ -101,7 +101,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231229.test_overfit')
 
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
-    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
+
+    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -216,10 +218,10 @@ def main():
 
         # ---- V100 x 4 x 1 nodes ----
 
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         
         # ---- V100 x 4 x 2 nodes ----
 
@@ -231,7 +233,7 @@ def main():
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---- V100 x 16 nodes ----
-        ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
 
         # -------------- < 1B params --------------
@@ -293,16 +295,17 @@ def main():
         # ---- JFLD experiments ----
         'LLM_FS.shot-5',
         'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
-        # 'LLM_FS.shot-30000',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
+        'LLM_FS.shot-30000',
 
         # 'LLM_FS.shot-10',
     ]
 
     seeds = [
-        0,
+        # 0,
         # 1,
+        2,
     ]
 
     lrates = [
@@ -339,30 +342,23 @@ def main():
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-    # epoch = 1
-    # epoch = 5
-    epoch = None
+    hours = 'LLM_FS.auto'
+    # hours = 72
 
-    # hf_bug_zero_lr_offset = 0
-    hf_bug_zero_lr_offset = 20
+    save_model = False
+    # save_model = True
 
-    # max_eval_samples = 5
-    # max_eval_samples = 301
-    # max_eval_samples = 151
-    max_eval_samples = 152
+    # skip_if_exists = False
+    skip_if_exists = True
 
-    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    # generation_timeout = None
-    generation_timeout = 3600 * 2
-
-    # too long evaluation. we cut it off due to the same reason as above.
-    evaluation_timeout = 3600 * 10
+    # dry_run = True
+    dry_run = False
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)  # 10b model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
         n_gpus_per_node = 1
@@ -376,18 +372,6 @@ def main():
         # gpu_name_for_batch_size = 'V100_16_4'
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
-
-    hours = 'LLM_FS.auto'
-    # hours = 72
-
-    save_model = False
-    # save_model = True
-
-    # skip_if_exists = False
-    skip_if_exists = True
-
-    # dry_run = True
-    dry_run = False
 
     # =========================== fixed settings =================================
     if isinstance(engine, QsubEngine):
@@ -410,6 +394,23 @@ def main():
         True,   # better
         # False,
     ]
+
+    # max_eval_samples = 5
+    # max_eval_samples = 301
+    # max_eval_samples = 151
+    max_eval_samples = 152
+
+    epoch = None
+
+    # hf_bug_zero_lr_offset = 0
+    hf_bug_zero_lr_offset = 20
+
+    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
+    # generation_timeout = None
+    generation_timeout = 3600 * 2
+
+    # too long evaluation. we cut it off due to the same reason as above.
+    evaluation_timeout = 3600 * 10
 
     warmup_ratio = None
     train_effective_batch_size = None
@@ -546,6 +547,13 @@ def main():
                                         'use_auth_token': True,
                                         'log_examples': True,
                                     })
+
+                                    if seed >= 2:  # for compatibility with older experiments of jpn
+                                        setting.update({
+                                            'random_sample_max_train_samples': True,
+                                            'random_sample_max_eval_samples': True,
+                                            'random_sample_FLD_max_eval_samples': True,
+                                        })
 
                                     output_dir = make_output_dir(setting, output_top_dir)
                                     if skip_if_exists and (output_dir / 'log.txt').exists():
