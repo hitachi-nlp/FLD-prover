@@ -88,9 +88,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
     # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
-    output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
 
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
+
+    output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -107,6 +109,7 @@ def main():
         './outputs.FLD/00.create_corpus/20231103.knowledge',
         './outputs.FLD/00.create_corpus/20231203.jpn',
         './outputs.FLD/00.create_corpus/20231213.jpn',
+        './outputs.FLD/00.create_corpus/20230120.jpn.large',
     ]
 
     FLD_dataset_unames = [
@@ -158,10 +161,17 @@ def main():
         # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
-        '20231213.jpn.D1_wo_dist',
-        '20231213.jpn.D1',
-        '20231213.jpn.D3',
-        '20231213.jpn.D8',
+        # '20231213.jpn.D1_wo_dist',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
+        # '20231213.jpn.D8',
+
+        # ---------------------------------- 20230118.jpn ------------------------------------
+        '20230118.jpn.wordnet.D3',
+        '20230118.jpn.wordnet.D3.argument_pred_arg_only',
+        '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
+        '20230118.jpn.BCCWJ.D3',
+        '20230118.jpn.punipuni.D3',
     ]
 
     # other_dataset_name = "wikitext"
@@ -207,7 +217,7 @@ def main():
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         
         # ---- V100 x 4 x 2 nodes ----
@@ -220,7 +230,7 @@ def main():
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---- V100 x 16 nodes ----
-        ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
 
         # -------------- < 1B params --------------
@@ -342,9 +352,9 @@ def main():
     dry_run = False
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
         n_gpus_per_node = 1
