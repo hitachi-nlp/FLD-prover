@@ -46,8 +46,6 @@ from transformers import (
     MODEL_FOR_CAUSAL_LM_MAPPING,
     AutoConfig,
     AutoModelForCausalLM,
-    AutoTokenizer,
-    LlamaTokenizer,
     HfArgumentParser,
     Trainer,
     TrainingArguments,
@@ -518,12 +516,6 @@ def main():
         if validation_file is not None:
             data_files["validation"] = validation_file
 
-        # extension = (
-        #     train_file.split(".")[-1]
-        #     if train_file is not None
-        #     else validation_file.split(".")[-1]
-        # )
-
         extension = file_type
         if extension == "txt":
             extension = "text"
@@ -600,7 +592,6 @@ def main():
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
     # Load pretrained model and tokenizer
-    #
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
@@ -1036,8 +1027,8 @@ def main():
         model=model,
         args=training_args,
 
-        train_dataset=train_dataset if training_args.do_train else None,
-        eval_dataset=eval_dataset if training_args.do_eval else None,
+        train_dataset = train_dataset if training_args.do_train else None,
+        eval_dataset = eval_dataset if training_args.do_eval else None,
 
         tokenizer=tokenizer,
         # Data collator will default to DataCollatorWithPadding, so we change it.
@@ -1052,7 +1043,6 @@ def main():
     trainer.callback_handler = CallbackHandler(
         callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
     )
-
 
     # Training
     if training_args.do_train:
