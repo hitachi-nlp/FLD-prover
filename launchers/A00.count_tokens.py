@@ -30,12 +30,13 @@ def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
     # output_top_dir = Path('./outputs/A00.count_tokens.py/20231213.jpn')
-    output_top_dir = Path('./outputs/A00.count_tokens.py/20230120.jpn.large')
+
+    output_top_dir = Path('./outputs/A00.count_tokens.py/20230118.jpn.ICL')
 
     DATASETS_DIRS = [
         './outputs.FLD/00.create_corpus/20231203.jpn',
         './outputs.FLD/00.create_corpus/20231213.jpn',
-        './outputs.FLD/00.create_corpus/20230120.jpn.large',
+        './outputs.FLD/00.create_corpus/20230118.jpn.ICL',
     ]
 
     FLD_dataset_unames = [
@@ -46,11 +47,21 @@ def main():
         # '20231213.jpn.D8',
 
         # ---------------------------------- 20230118.jpn ------------------------------------
-        '20230118.jpn.wordnet.D3',
-        '20230118.jpn.wordnet.D3.argument_pred_arg_only',
-        '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
-        '20230118.jpn.BCCWJ.D3',
-        '20230118.jpn.punipuni.D3',
+
+        # '20230118.jpn.wordnet.D3',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
+        # '20230118.jpn.BCCWJ.D3',
+        # '20230118.jpn.punipuni.D3',
+
+        # ---------------------------------- 20230118.jpn.ICL ------------------------------------
+        '20230118.jpn.wordnet.D3.extension-3.distractor-10',
+        '20230118.jpn.wordnet.D3.extension-3.distractor-5',
+        '20230118.jpn.wordnet.D3.extension-3.distractor-3',
+        '20230118.jpn.wordnet.D3.extension-2.distractor-5',
+        '20230118.jpn.wordnet.D3.extension-2.distractor-3',
+        '20230118.jpn.wordnet.D3.extension-1.distractor-5',
+        '20230118.jpn.wordnet.D3.extension-1.distractor-3',
     ]
 
     model_names = [
@@ -71,10 +82,10 @@ def main():
     # dry_run = True
     dry_run = False
 
-    # --------------- run comaand ---------------
+    # engine = SubprocessEngine()
+    engine = QsubEngine('ABCI', 'rt_C.small', n_resource=1)
 
-    engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_C.small', n_resource=1)
+    # --------------- run comaand ---------------
 
     for FLD_dataset_uname in FLD_dataset_unames:
         for model_name in model_names:
@@ -88,7 +99,7 @@ def main():
                     'run_causal_prover',
                     dataset_uname=FLD_dataset_uname,
                     top_dirs=DATASETS_DIRS,
-                    use_test_as_val=True,
+                    allow_not_found_splits=True,
                 )
             )
 
@@ -111,6 +122,7 @@ def main():
                 maybe_option_value('--fld_dataset_config_name', setting.get('FLD_dataset_config_name', None)),
                 maybe_option_value('--fld_train_file', setting.get('FLD_train_file', None)),
                 maybe_option_value('--fld_validation_file', setting.get('FLD_validation_file', None)),
+                maybe_option_value('--fld_test_file', setting.get('FLD_test_file', None)),
                 maybe_option_value('--tokenizer_name', setting.get('model_name', None)),
             ])
 

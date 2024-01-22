@@ -91,8 +91,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
 
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
+    # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
 
-    output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
+    output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -110,6 +111,8 @@ def main():
         './outputs.FLD/00.create_corpus/20231203.jpn',
         './outputs.FLD/00.create_corpus/20231213.jpn',
         './outputs.FLD/00.create_corpus/20230120.jpn.large',
+
+        './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
     ]
 
     FLD_dataset_unames = [
@@ -167,11 +170,24 @@ def main():
         # '20231213.jpn.D8',
 
         # ---------------------------------- 20230118.jpn ------------------------------------
-        '20230118.jpn.wordnet.D3',
-        '20230118.jpn.wordnet.D3.argument_pred_arg_only',
-        '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
-        '20230118.jpn.BCCWJ.D3',
-        '20230118.jpn.punipuni.D3',
+        # '20230118.jpn.wordnet.D3',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
+        # '20230118.jpn.BCCWJ.D3',
+        # '20230118.jpn.punipuni.D3',
+
+        # ---------------------------------- 20230120.jpn.punipuni ------------------------------------
+        '20230120.jpn.wordnet.D3',
+
+        '20230120.jpn.BCCWJ.D1_wo_dist',
+        '20230120.jpn.BCCWJ.D1',
+        '20230120.jpn.BCCWJ.D3',
+        '20230120.jpn.BCCWJ.D8',
+
+        '20230120.jpn.punipuni.D1_wo_dist',
+        '20230120.jpn.punipuni.D1',
+        '20230120.jpn.punipuni.D3',
+        '20230120.jpn.punipuni.D8',
     ]
 
     # other_dataset_name = "wikitext"

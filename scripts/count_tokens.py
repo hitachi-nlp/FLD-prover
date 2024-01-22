@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 @click.option('--fld_dataset_config_name', type=str, default=None)
 @click.option('--fld_train_file', type=str, default=None)
 @click.option('--fld_validation_file', type=str, default=None)
+@click.option('--fld_test_file', type=str, default=None)
 @click.option('--tokenizer_name', type=str, default=None)
 @click.option('--log_level', type=str, default='INFO')
 def main(
@@ -40,6 +41,7 @@ def main(
     fld_dataset_config_name,
     fld_train_file,
     fld_validation_file,
+    fld_test_file,
     tokenizer_name,
     log_level,
 ):
@@ -64,6 +66,7 @@ def main(
 
     def load_raw_dataset_by_files(train_file: Optional[str],
                                   validation_file: Optional[str],
+                                  test_file: Optional[str],
                                   file_type: str,
                                   keep_linebreaks: bool):
         data_files = {}
@@ -72,6 +75,8 @@ def main(
             data_files["train"] = train_file
         if validation_file is not None:
             data_files["validation"] = validation_file
+        if test_file is not None:
+            data_files["validation"] = test_file
 
         extension = file_type
         if extension == "txt":
@@ -96,6 +101,7 @@ def main(
     else:
         fld_raw_datasets = load_raw_dataset_by_files(fld_train_file,
                                                      fld_validation_file,
+                                                     fld_test_file,
                                                      'json',
                                                      False)
 
@@ -124,9 +130,19 @@ def main(
         use_fast_tokenizer=True,
         trust_remote_code=True,
     )
-    train_dataset = fld_raw_datasets['train'].map(count_tokens)
+    dataset = fld_raw_datasets.get(
+        'train',
+        fld_raw_datasets.get(
+            'validation',
+            fld_raw_datasets.get(
+                'test',
+                None,
+            )
+        )
+    )
+    dataset = dataset.map(count_tokens)
 
-    token_counts = train_dataset['num_tokens']
+    token_counts = dataset['num_tokens']
 
     count_stats = {
         'max_tokens': max(token_counts),
