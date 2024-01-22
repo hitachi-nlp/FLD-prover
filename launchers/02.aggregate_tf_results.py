@@ -184,6 +184,11 @@ def main():
     ]
     output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.large')
 
+    input_dirs = [
+        './outputs/01.train.py/20230120.jpn.punipuni',
+    ]
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.punipuni')
+
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',
         ' '.join([f'--input_dir {str(input_dir)}' for input_dir in input_dirs]),
