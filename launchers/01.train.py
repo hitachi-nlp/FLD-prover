@@ -57,7 +57,43 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
     # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
-    output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
+    # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn.no_subproof_for_unknown')
+    # output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_fix')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_before')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.D8')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
+
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.generation_timeout-10')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10')
+    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b')
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-10')
+    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
+    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
+    # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
+
+    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
+    # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
+
+    output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -72,6 +108,11 @@ def main():
         './outputs.FLD/00.create_corpus/20231012.large_vocab',
         './outputs.FLD/00.create_corpus/20231021.knowledge',
         './outputs.FLD/00.create_corpus/20231103.knowledge',
+        './outputs.FLD/00.create_corpus/20231203.jpn',
+        './outputs.FLD/00.create_corpus/20231213.jpn',
+        './outputs.FLD/00.create_corpus/20230120.jpn.large',
+
+        './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
     ]
 
     FLD_dataset_unames = [
@@ -113,19 +154,50 @@ def main():
         # '20231021.knowledge.D3.complex-0.3.w_knowledge',
 
         # ---------------------------------- 20231101.knowledge.D3 ------------------------------------
-        '20231103.knowledge.D3.knowledge_factor-5.0',
+        # '20231103.knowledge.D3.knowledge_factor-5.0',
 
+        # ---------------------------------- 20231203.jpn ------------------------------------
+        # '20231203.jpn.D1_wo_dist',
+        # '20231203.jpn.D1',
+        # '20231203.jpn.D3',
+        # '20231203.jpn.D5',
+        # '20231203.jpn.D8',
+
+        # ---------------------------------- 20231213.jpn ------------------------------------
+        # '20231213.jpn.D1_wo_dist',
+        # '20231213.jpn.D1',
+        # '20231213.jpn.D3',
+        # '20231213.jpn.D8',
+
+        # ---------------------------------- 20230118.jpn ------------------------------------
+        # '20230118.jpn.wordnet.D3',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only',
+        # '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
+        # '20230118.jpn.BCCWJ.D3',
+        # '20230118.jpn.punipuni.D3',
+
+        # ---------------------------------- 20230120.jpn.punipuni ------------------------------------
+        '20230120.jpn.wordnet.D3',
+
+        '20230120.jpn.BCCWJ.D1_wo_dist',
+        '20230120.jpn.BCCWJ.D1',
+        '20230120.jpn.BCCWJ.D3',
+        '20230120.jpn.BCCWJ.D8',
+
+        '20230120.jpn.punipuni.D1_wo_dist',
+        '20230120.jpn.punipuni.D1',
+        '20230120.jpn.punipuni.D3',
+        '20230120.jpn.punipuni.D8',
     ]
 
-    other_dataset_name = "wikitext"
-    other_dataset_config_name = "wikitext-2-raw-v1"
+    # other_dataset_name = "wikitext"
+    # other_dataset_config_name = "wikitext-2-raw-v1"
 
     # other_dataset_name = "cerebras/SlimPajama-627B"
     # other_dataset_config_name = None
 
-    # [cerebras/SlimPajama-627B](https://huggingface.co/datasets/cerebras/SlimPajama-627B)
-    # other_dataset_name = "cerebras/SlimPajama-627B"
-    # other_dataset_config_name = "None"
+    other_dataset_name = None
+    other_dataset_config_name = None
 
     model_settings = [
         # ============================ english      ============================
@@ -139,8 +211,8 @@ def main():
 
         # # # # # -------------- > 1B params --------------
 
-        ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'cyberagent/open-calm-3b'),   # much better than "PY007/TinyLlama-1.1B-Chat-v0.3"
-        # ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'cyberagent/open-calm-3b'),   # much better than chat model
+        # ('TinyLlama/TinyLlama-1.1B-Chat-v0.4', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-1b-short-ctx')
@@ -155,10 +227,29 @@ def main():
         # TODO: other models such as mBART
 
 
+        # ============================ japanese     ============================
 
-        # # # ============================ japanese     ============================
+        # ---- V100 x 4 x 1 nodes ----
 
-        # # # -------------- < 1B params --------------
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+        
+        # ---- V100 x 4 x 2 nodes ----
+
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ---- V100 x 16 nodes ----
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+
+        # -------------- < 1B params --------------
 
         # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
         # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
@@ -171,36 +262,21 @@ def main():
 
         # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
 
-        # XXX must use deepspeed
-        # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),
+        # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),  # should use deepspeed
 
-        # # # # # -------------- > 1B params --------------
+        # --------------- rejected models ---------------------
 
-        # ('retrieva-jp/t5-xl', 'seq2seq', 'retrieva-jp/t5-xl'),
-
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-7b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # # ('cyberagent/open-calm-1b', 'causal', 'cyberagent/open-calm-1b'),
-        # # ('cyberagent/open-calm-3b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/open-calm-7b', 'causal', 'cyberagent/open-calm-7b'),
-
-        # # ('line-corporation/japanese-large-lm-1.7b', 'causal', 'cyberagent/open-calm-1b'),
-        # # ('line-corporation/japanese-large-lm-1.7b-instruction-sft', 'causal', 'cyberagent/open-calm-1b'),
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # # ('rinna/japanese-gpt-neox-3.6b-instruction-sft-v2', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
+        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
 
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-
-        # XXX can not fit into V100 x 4. Use 2 nodes.
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b')
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
+
+
+        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # the training fails somehow
     ]
 
     # script_type = 'run_prover'
@@ -223,25 +299,26 @@ def main():
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
-        'FT.step-5000',
+        # 'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
 
-        # 'LLM_FS.shot-10',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
+        # ---- JFLD experiments ----
+        'LLM_FS.shot-5',
+        'LLM_FS.shot-100',
+        'LLM_FS.shot-1000',
+        'LLM_FS.shot-10000',
+        'LLM_FS.shot-30000',
 
-        # 'FT.step-10000.mx_evl-100',
-        # 'FT.step-10000.mx_evl-100.btch_sz-8',
-        # 'FT.step-100000.mx_evl-100.btch_sz-8',
+        # 'LLM_FS.shot-10',
     ]
 
     seeds = [
         0,
         # 1,
+        # 2,
     ]
 
     lrates = [
@@ -259,35 +336,48 @@ def main():
 
         # -- learning = 'FT' ---
         # 1e-5,
-        1e-4,   # much better than 1e-05
+        # 1e-4,   # much better on FLD than 1e-05, but could degredate on other downstream tasks?
 
         # -- learning = 'LLM_FS' ---
         # 3e-5,   # 20230919.jpn
-
+        1e-5,   # NLP_2024
     ]
 
     streaming = False
     # streaming = True
 
     instruction_args = [
-        # False,   # better for chat-model?
-        True,      # better for non-chat model, somehow.
+        False,       # better for chat-model?
+        # True,      # better for non-chat model, somehow.
     ]
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
+    hours = 'LLM_FS.auto'
+    # hours = 72
+
+    save_model = False
+    # save_model = True
+
+    # skip_if_exists = False
+    skip_if_exists = True
+
+    # dry_run = True
+    dry_run = False
+
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=5)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch sie 32
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus = 1  # debug
-        # n_gpus = 4
-        # n_gpus = None  # specify this when running through QsubEngine
+        n_gpus_per_node = 1
+        n_total_gpus = 1
+
+        # n_gpus_per_node = 4
+        # n_total_gpus = 4
 
         # gpu_name_for_batch_size = 'A100_48_1'
         gpu_name_for_batch_size = 'V100_16_1'
@@ -295,23 +385,17 @@ def main():
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    # hours = 12
-    hours = 24
-
-    # save_model = False
-    save_model = True
-
-    # dry_run = True
-    dry_run = False
-
-    # --------------------------- fixed settings ---------------------------------
+    # =========================== fixed settings =================================
     if isinstance(engine, QsubEngine):
-        n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     base_setting_name = 'default'
 
-    # slow generatoin is most likely the repetitions coming from underfitting, so we discard such generations.
-    generation_timeout = 60 * 10  # For LLMs
+    use_test_as_val = False
+    use_test_as_train = False
+
+    max_steps = None
+    eval_steps = None
 
     sample_negative_proof_args = [
         # True,
@@ -323,20 +407,46 @@ def main():
         # False,
     ]
 
+    # max_eval_samples = 5
+    # max_eval_samples = 301
+    # max_eval_samples = 151
+    max_eval_samples = 152
+
     epoch = None
+
+    # hf_bug_zero_lr_offset = 0
+    hf_bug_zero_lr_offset = 20
+
+    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
+    # generation_timeout = None
+    generation_timeout = 3600 * 2
+
+    # too long evaluation. we cut it off due to the same reason as above.
+    evaluation_timeout = 3600 * 10
+
     warmup_ratio = None
     train_effective_batch_size = None
-    steps_upper = None
     warmup_steps = None
-    max_eval_samples = None
-    num_evals = None
+    num_evals = 1
+    steps_upper = None
 
     for FLD_dataset_uname in FLD_dataset_unames:
         for learning in learnings:
+
             for sample_negative_proof in sample_negative_proof_args:
                 for no_subproof_for_unknown in no_subproof_for_unknown_args:
                     for seed in seeds:
                         for model_name, lm_type, model_name_for_batch_size in model_settings:
+                            if hours == 'LLM_FS.auto':
+                                if learning == 'LLM_FS.shot-30000':
+                                    _hours = 50
+                                else:
+                                    _hours = 25
+                                if model_name.find('70b') >= 0:
+                                    _hours = min(_hours * 2, 72)
+                            else:
+                                _hours = hours
+
                             if lm_type == 'causal':
                                 proof_sampling = 'all_at_once'
                             else:
@@ -359,6 +469,8 @@ def main():
                                             train_effective_batch_size=train_effective_batch_size,
                                             num_evals=num_evals,
                                             max_eval_samples=max_eval_samples,
+                                            hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
+                                            n_gpus=n_total_gpus,
                                         )
                                     )
 
@@ -369,8 +481,8 @@ def main():
                                             top_dirs=DATASETS_DIRS,
                                             other_dataset_name=other_dataset_name,
                                             other_dataset_config_name=other_dataset_config_name,
-                                            use_test_as_val=setting.get('use_test_as_val', False),
-                                            use_test_as_train=setting.get('use_test_as_train', False),
+                                            use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
+                                            use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                                             streaming=streaming,
                                             instruction=instruction,
                                         )
@@ -378,8 +490,8 @@ def main():
 
                                     setting.update(
                                         get_save_eval_step_setting(
-                                            max_steps=setting['max_steps'],
-                                            eval_steps=setting['eval_steps'],
+                                            max_steps = max_steps or setting['max_steps'],
+                                            eval_steps = eval_steps or setting['eval_steps'],
                                             do_save_model=save_model,
                                         )
                                     )
@@ -388,7 +500,7 @@ def main():
                                         get_batch_setting(
                                             script_type,
                                             gpu_name=gpu_name_for_batch_size,
-                                            n_gpus=n_gpus,
+                                            n_gpus=n_total_gpus,
                                             model_name=model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                                             train_effective_batch_size=setting.get('train_effective_batch_size', None),
                                         )
@@ -398,7 +510,13 @@ def main():
 
                                     setting.update(get_tokenizer_setting(model_name))
 
-                                    setting.update(get_generation_setting(script_type, generation_timeout=generation_timeout))
+                                    setting.update(
+                                        get_generation_setting(
+                                            script_type,
+                                            generation_timeout=generation_timeout,
+                                            evaluation_timeout=evaluation_timeout,
+                                       ),
+                                    )
 
                                     setting.update({
                                         'do_train': True,
@@ -442,18 +560,28 @@ def main():
                                         'log_examples': True,
                                     })
 
+                                    if seed >= 2:  # for compatibility with older experiments of jpn
+                                        setting.update({
+                                            'random_sample_max_train_samples': True,
+                                            'random_sample_max_eval_samples': True,
+                                            'random_sample_FLD_max_eval_samples': True,
+                                        })
+
                                     output_dir = make_output_dir(setting, output_top_dir)
+                                    if skip_if_exists and (output_dir / 'log.txt').exists():
+                                        logger.info(f'Skipping "{output_dir}"')
+                                        continue
                                     command = make_command(script_type,
                                                            output_dir,
                                                            setting,
                                                            run_mode,
-                                                           n_gpus=n_gpus)
+                                                           n_gpus_per_node=n_gpus_per_node)
 
                                     run_by_engine(
                                         engine,
                                         command,
                                         output_dir,
-                                        hours=hours,
+                                        hours=_hours,
                                         dry_run=dry_run
                                     )
 

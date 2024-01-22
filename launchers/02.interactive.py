@@ -45,19 +45,28 @@ def main():
 
     # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
     # checkpoint = Path('./outputs/01.train.py/20231021.knowledge/dtst_nm=20231021.knowledge.D3.complex-0.3.w_knowledge')
-    checkpoint = Path('./outputs/01.train.py/20231103.knowledge')
+    # checkpoint = Path('./outputs/01.train.py/20231103.knowledge')
 
-    # checkpoint = ('PY007/TinyLlama-1.1B-Chat-v0.3', 'causal', 'all_at_once')
-    # checkpoint = ('PY007/TinyLlama-1.1B-intermediate-step-480k-1T', 'causal', 'all_at_once')
+    # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
+
+    # best model on the basis of lm-eval
+    checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
+
+    # checkpoint = ('TinyLlama/TinyLlama-1.1B-Chat-v0.6', 'causal', 'all_at_once')
+    # checkpoint = ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'all_at_once')
+
+    # checkpoint = ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'all_at_once')
 
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
     instruction = True
 
+    # https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-955k-token-2T
     generation_do_sample = False
+    generation_temperature = 1.0
     generation_top_k = 10
-    generation_repetition_penalty = 1.0
+    generation_repetition_penalty = 1.5  # XXX must tune for each model
     generation_max_length = 2000
     generation_max_new_tokens = 200
     generation_timeout = 60
@@ -76,8 +85,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
     if not isinstance(engine, QsubEngine):
-        # n_gpus = 1  # debug
-        n_gpus = 4
+        n_gpus = 1  # debug
+        # n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
 
     hours = 12
@@ -91,10 +100,10 @@ def main():
     base_setting_name = 'default'
 
     if isinstance(checkpoint, Path):
-        checkpoint_configs = [path for path in checkpoint.glob('**/*/tokenizer_config.json')
+        checkpoint_configs = [path for path in checkpoint.glob('**/*tokenizer_config.json')
                               if str(path).find('checkpoint-') < 0]  # this finds the final checkpoint output to the top dir
         if len(checkpoint_configs) == 0:
-            checkpoint_configs = [path for path in checkpoint.glob('**/*/tokenizer_config.json')]
+            checkpoint_configs = [path for path in checkpoint.glob('**/*tokenizer_config.json')]
 
         if len(checkpoint_configs) == 0:
             raise ValueError(f'No checkpoint found under "{str(checkpoint)}"')
@@ -142,6 +151,7 @@ def main():
             script_type,
             generation_do_sample=generation_do_sample,
             generation_top_k=generation_top_k,
+            generation_temperature=generation_temperature,
             generation_repetition_penalty=generation_repetition_penalty,
             generation_max_length=generation_max_length,
             generation_max_new_tokens=generation_max_new_tokens,
@@ -182,7 +192,7 @@ def main():
                            output_dir,
                            setting,
                            run_mode,
-                           n_gpus=n_gpus)
+                           n_gpus_per_node=n_gpus)
 
     run_by_engine(
         engine,

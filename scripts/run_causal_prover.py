@@ -30,6 +30,7 @@ from itertools import chain
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 import readline
 
+import numpy as np
 import deepspeed
 import datasets
 from datasets import interleave_datasets, DatasetDict
@@ -45,8 +46,6 @@ from transformers import (
     MODEL_FOR_CAUSAL_LM_MAPPING,
     AutoConfig,
     AutoModelForCausalLM,
-    AutoTokenizer,
-    LlamaTokenizer,
     HfArgumentParser,
     Trainer,
     TrainingArguments,
@@ -55,7 +54,9 @@ from transformers import (
     set_seed,
     Seq2SeqTrainer,
 )
+from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_callback import TrainerCallback, TrainerState, TrainerControl
+from transformers.trainer_callback import CallbackHandler
 from transformers.testing_utils import CaptureLogger
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
@@ -66,7 +67,9 @@ from FLD_prover.data_processing import (
     preprocess_function as FLD_preprocess_function,
     compute_metrics as FLD_compute_metrics,
 )
-from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
+from FLD_prover.trainer import (
+    ForceCallMetricsSeq2SeqTrainer,
+)
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
@@ -191,6 +194,9 @@ class DataTrainingArguments:
     do_eval_in_outerloop: bool = field(
         default=False,
     )
+    save_model_at_end: bool = field(
+        default=False,
+    )
     file_type: Optional[str] = field(
         default=None, metadata={"help": "The input file type such as 'json' or 'csv'"}
     )
@@ -210,7 +216,7 @@ class DataTrainingArguments:
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
     )
     FLD_dataset_prob: Optional[float] = field(
-        default=0.1,
+        default=1.0,
     )
 
     max_train_samples: Optional[int] = field(
@@ -222,6 +228,16 @@ class DataTrainingArguments:
             )
         },
     )
+    random_sample_max_train_samples: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "For debugging purposes or quicker training, truncate the number of training examples to this "
+                "value if set."
+            )
+        },
+    )
+
     max_eval_samples: Optional[int] = field(
         default=None,
         metadata={
@@ -231,9 +247,23 @@ class DataTrainingArguments:
             )
         },
     )
+    random_sample_max_eval_samples: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "For debugging purposes or quicker training, truncate the number of evaluation examples to this "
+                "value if set."
+            )
+        },
+    )
+
     FLD_max_eval_samples: Optional[int] = field(
         default=None,
     )
+    random_sample_FLD_max_eval_samples: bool = field(
+        default=False,
+    )
+
     streaming: bool = field(default=False, metadata={"help": "Enable streaming mode"})
     block_size: Optional[int] = field(
         default=None,
@@ -299,6 +329,10 @@ class DataTrainingArguments:
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
 
+    no_subproof_for_unknown: bool = field(
+        default=False,
+    )
+
     generation_top_k: int = field(
         default=None,
     )
@@ -315,6 +349,10 @@ class DataTrainingArguments:
         default=False,
     )
 
+    generation_temperature: float = field(
+        default=1.0,
+    )
+
     generation_repetition_penalty: float = field(
         default=None,
     )
@@ -324,11 +362,17 @@ class DataTrainingArguments:
     )
 
     generation_max_new_tokens: int = field(
-        default=200,
+        default=None,
     )
 
     generation_timeout: int = field(
-        default=60,
+        # default=60,
+        default=None,
+    )
+
+    evaluation_timeout: int = field(
+        # default=60,
+        default=None,
     )
 
     interactive_mode: str = field(
@@ -472,12 +516,6 @@ def main():
         if validation_file is not None:
             data_files["validation"] = validation_file
 
-        # extension = (
-        #     train_file.split(".")[-1]
-        #     if train_file is not None
-        #     else validation_file.split(".")[-1]
-        # )
-
         extension = file_type
         if extension == "txt":
             extension = "text"
@@ -554,7 +592,6 @@ def main():
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
     # Load pretrained model and tokenizer
-    #
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
@@ -635,17 +672,6 @@ def main():
     if len(tokenizer) > embedding_size:
         model.resize_token_embeddings(len(tokenizer))
 
-    # Preprocessing the datasets.
-    # First we tokenize all the texts.
-    if training_args.do_train:
-        column_names = list(raw_datasets["train"].features)
-    elif training_args.do_eval or data_args.do_eval_in_outerloop:
-        column_names = list(raw_datasets["validation"].features)
-    else:
-        column_names = None
-    text_column_name = data_args.text_column_name\
-        or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
-
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
         logger.info("block_size is set as %d, which is the model's max length")
@@ -658,35 +684,91 @@ def main():
             )
             raise ValueError(msg)
 
-    # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
-    tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
+    if len(raw_datasets) == 0:
+        # if prob != 1.0 raise error
+        if data_args.FLD_dataset_prob != 1.0:
+            raise ValueError("FLD_dataset_prob must be 1.0 when the main dataset is empty.")
+        lm_datasets = {}
+    else:
+        # Preprocessing the datasets.
+        # First we tokenize all the texts.
+        if training_args.do_train:
+            column_names = list(raw_datasets["train"].features)
+        elif training_args.do_eval or data_args.do_eval_in_outerloop:
+            column_names = list(raw_datasets["validation"].features)
+        else:
+            column_names = None
+        text_column_name = data_args.text_column_name\
+            or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
 
-    def tokenize_function(examples):
-        with CaptureLogger(tok_logger) as cl:
-            output = tokenizer(examples[text_column_name])
-        # clm input could be much much longer than block_size
-        if "Token indices sequence length is longer than the" in cl.out:
-            tok_logger.warning(
-                "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
-                " before being passed to the model."
-            )
-        return output
+        # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
+        tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
 
-    # Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.
-    def group_texts(examples):
-        # Concatenate all texts.
-        concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-        total_length = len(concatenated_examples[list(examples.keys())[0]])
-        # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
-        # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
-        total_length = (total_length // block_size) * block_size
-        # Split by chunks of max_len.
-        result = {
-            k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
-            for k, t in concatenated_examples.items()
-        }
-        result["labels"] = result["input_ids"].copy()
-        return result
+        def tokenize_function(examples):
+            with CaptureLogger(tok_logger) as cl:
+                output = tokenizer(examples[text_column_name])
+            # clm input could be much much longer than block_size
+            if "Token indices sequence length is longer than the" in cl.out:
+                tok_logger.warning(
+                    "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
+                    " before being passed to the model."
+                )
+            return output
+
+        # Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.
+        def group_texts(examples):
+            # Concatenate all texts.
+            concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
+            total_length = len(concatenated_examples[list(examples.keys())[0]])
+            # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
+            # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
+            total_length = (total_length // block_size) * block_size
+            # Split by chunks of max_len.
+            result = {
+                k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
+                for k, t in concatenated_examples.items()
+            }
+            result["labels"] = result["input_ids"].copy()
+            return result
+
+        with training_args.main_process_first(desc="dataset map tokenization"):
+            if not data_args.streaming:
+                tokenized_datasets = raw_datasets.map(
+                    tokenize_function,
+                    batched=True,
+                    num_proc=data_args.preprocessing_num_workers,
+                    remove_columns=column_names,
+                    load_from_cache_file=not data_args.overwrite_cache,
+                    desc="Running tokenizer on dataset",
+                )
+            else:
+                tokenized_datasets = raw_datasets.map(
+                    tokenize_function,
+                    batched=True,
+                    remove_columns=column_names,
+                )
+
+        # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
+        # for each of those groups of 1,000 texts. You can adjust that batch_size here but a higher value might be slower
+        # to preprocess.
+        #
+        # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
+        # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
+
+        with training_args.main_process_first(desc="grouping texts together"):
+            if not data_args.streaming:
+                lm_datasets = tokenized_datasets.map(
+                    group_texts,
+                    batched=True,
+                    num_proc=data_args.preprocessing_num_workers,
+                    load_from_cache_file=not data_args.overwrite_cache,
+                    desc=f"Grouping texts in chunks of {block_size}",
+                )
+            else:
+                lm_datasets = tokenized_datasets.map(
+                    group_texts,
+                    batched=True,
+                )
 
     def _maybe_FLD_preprocess(examples: Dict[str, List[Any]], mode: str):
         if "hypothesis" not in examples:
@@ -733,7 +815,7 @@ def main():
                 max_target_length=block_size,
                 proof_sampling=False,
                 sample_negative_proof=False,
-                no_subproof_for_unknown=False,
+                no_subproof_for_unknown=data_args.no_subproof_for_unknown,
                 include_prompt_for_causal_lm_loss=data_args.include_prompt_for_causal_lm_loss,
                 instruction=data_args.instruction,
                 log_examples=data_args.log_examples,
@@ -755,44 +837,6 @@ def main():
                 processed = {key: vals for key, vals in non_FLD_examples.items() if key in feature_names}
             return processed
 
-    with training_args.main_process_first(desc="dataset map tokenization"):
-        if not data_args.streaming:
-            tokenized_datasets = raw_datasets.map(
-                tokenize_function,
-                batched=True,
-                num_proc=data_args.preprocessing_num_workers,
-                remove_columns=column_names,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc="Running tokenizer on dataset",
-            )
-        else:
-            tokenized_datasets = raw_datasets.map(
-                tokenize_function,
-                batched=True,
-                remove_columns=column_names,
-            )
-
-    # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
-    # for each of those groups of 1,000 texts. You can adjust that batch_size here but a higher value might be slower
-    # to preprocess.
-    #
-    # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
-    # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
-
-    with training_args.main_process_first(desc="grouping texts together"):
-        if not data_args.streaming:
-            lm_datasets = tokenized_datasets.map(
-                group_texts,
-                batched=True,
-                num_proc=data_args.preprocessing_num_workers,
-                load_from_cache_file=not data_args.overwrite_cache,
-                desc=f"Grouping texts in chunks of {block_size}",
-            )
-        else:
-            lm_datasets = tokenized_datasets.map(
-                group_texts,
-                batched=True,
-            )
     FLD_lm_datasets = FLD_raw_datasets
 
     # the below "map" does not work, because the trainer drops all the features before set_transform() is called,
@@ -844,7 +888,11 @@ def main():
                                                  FLD_lm_datasets.get("train", None))
         if data_args.max_train_samples is not None:
             max_train_samples = min(len(train_dataset), data_args.max_train_samples)
-            train_dataset = train_dataset.select(range(max_train_samples))
+            if data_args.random_sample_max_train_samples:
+                indexes = np.random.choice(len(train_dataset), max_train_samples, replace=False)
+            else:
+                indexes = np.arange(max_train_samples)
+            train_dataset = train_dataset.select(indexes)
     else:
         train_dataset = None
 
@@ -855,7 +903,11 @@ def main():
                                                 FLD_lm_datasets.get("validation", None))
         if data_args.max_eval_samples is not None:
             max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
-            eval_dataset = eval_dataset.select(range(max_eval_samples))
+            if data_args.random_sample_max_eval_samples:
+                indexes = np.random.choice(len(eval_dataset), max_eval_samples, replace=False)
+            else:
+                indexes = np.arange(max_eval_samples)
+            eval_dataset = eval_dataset.select(indexes)
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
@@ -888,7 +940,9 @@ def main():
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
-    training_args.generation_config = None
+    new_generation_config = GenerationConfig.from_model_config(config)
+    new_generation_config.max_time = data_args.generation_timeout
+    training_args.generation_config = new_generation_config
     training_args.predict_with_generate = True
     generation_handle_args = [
         LMType.CAUSAL,
@@ -896,12 +950,12 @@ def main():
         model,
     ]
     generation_handled_kwargs = {
-        'timeout': data_args.generation_timeout,
         'eos_token_id': tokenizer.eos_token_id,
         'top_k': data_args.generation_top_k,
         'num_beams': data_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
+        'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
         'max_length': data_args.generation_max_length + 1,  # + 1 to be compatible with beam_search
         'max_new_tokens': data_args.generation_max_new_tokens,
@@ -909,11 +963,15 @@ def main():
     ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.evaluate,
         *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
         **generation_handled_kwargs,
     )
     ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
         ForceCallMetricsSeq2SeqTrainer.predict,
         *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
         **generation_handled_kwargs,
     )
 
@@ -922,7 +980,12 @@ def main():
         FLD_proof_eval_dataset.set_transform(
             lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
         if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
-            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(range(data_args.FLD_max_eval_samples))
+            # select as train and eval dataset
+            if data_args.random_sample_FLD_max_eval_samples:
+                indexes = np.random.choice(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples, replace=False)
+            else:
+                indexes = np.arange(data_args.FLD_max_eval_samples)
+            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(indexes)
     else:
         FLD_proof_eval_dataset = None
 
@@ -934,9 +997,11 @@ def main():
             LMType.CAUSAL,
         )
 
-    def _build_FLD_seq2seq_trainer(do_compute_metrics=True):
+    def _build_FLD_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
+                                   do_compute_metrics=True):
         return ForceCallMetricsSeq2SeqTrainer(
             model,
+            other=other_trainer,
             args=training_args,
             data_collator=collator,
             train_dataset=None,
@@ -947,8 +1012,9 @@ def main():
 
     class FLDEvaluationCallback(TrainerCallback):
 
-        def __init__(self):
-            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer()
+        def __init__(self, other_trainer: Trainer):
+            self._other_trainer = other_trainer
+            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer(other_trainer=self._other_trainer)
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
             self._FLD_seq2seq_trainer.state = state
@@ -961,8 +1027,8 @@ def main():
         model=model,
         args=training_args,
 
-        train_dataset=train_dataset if training_args.do_train else None,
-        eval_dataset=eval_dataset if training_args.do_eval else None,
+        train_dataset = train_dataset if training_args.do_train else None,
+        eval_dataset = eval_dataset if training_args.do_eval else None,
 
         tokenizer=tokenizer,
         # Data collator will default to DataCollatorWithPadding, so we change it.
@@ -971,7 +1037,11 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
 
-        callbacks=[FLDEvaluationCallback()],
+        # callbacks=[FLDEvaluationCallback(trainer)],  # set by ourselves below to handle circular dependency between FLDEvaluationCallback and the trainer
+    )
+    callbacks = trainer.callback_handler.callbacks + [FLDEvaluationCallback(trainer)]
+    trainer.callback_handler = CallbackHandler(
+        callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
     )
 
     # Training
@@ -982,8 +1052,8 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        trainer.save_model()  # Saves the tokenizer too for easy upload
-
+        if data_args.save_model_at_end:
+            trainer.save_model()  # Saves the tokenizer too for easy upload
         metrics = train_result.metrics
 
         max_train_samples = (
@@ -1014,7 +1084,7 @@ def main():
 
     if data_args.interactive_mode is not None:
         launch(
-            _build_FLD_seq2seq_trainer(do_compute_metrics=False),
+            _build_FLD_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
             lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
             data_args.interactive_mode,

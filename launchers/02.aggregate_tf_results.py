@@ -77,10 +77,117 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231005.jpn.seed--0')
 
+    # input_dirs = [
+    #     './outputs/01.train.py/20231008.jpn.run_causal_prover',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231008.jpn.run_causal_prover')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231203.jpn',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231203.jpn.no_subproof_for_unknown',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231203.jpn.no_subproof_for_unknown20231203.jpn')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231206.new_models',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231206.new_models')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.elyza_fix',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.elyza_fix')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-07.elyza_before',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-07.elyza_before')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.D8',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.D8')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/2023-12-06.D8',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/2023-12-06.D8')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231213.jpn',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn.seed--1')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231213.jpn',
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231213.jpn.seed--0-1')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231223.seed--1.timeout_fix',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231223.seed--1.timeout_fix')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231226.jpn.epoch--10',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231226.jpn.epoch--10')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--0',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231230.jpn.seed--0')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--0',
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231231.jpn.seed--0-1')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--0',
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    #     './outputs/01.train.py/20231230.jpn.swallow-70b.seed--0',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231231.jpn.seed--0-1.with_swallow-70b')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--2',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20231230.jpn.seed--2')
+
+    # input_dirs = [
+    #     './outputs/01.train.py/20231230.jpn.seed--0',
+    #     './outputs/01.train.py/20231213.jpn.seed--1',
+    #     './outputs/01.train.py/20231230.jpn.seed--2',
+    #     './outputs/01.train.py/20231230.jpn.swallow-70b.seed--0',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230101.jpn.seed--0-1-2.with_swallow-70b')
+
     input_dirs = [
-        './outputs/01.train.py/20231008.jpn.run_causal_prover',
+        './outputs/01.train.py/20230120.jpn.large',
     ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20231008.jpn.run_causal_prover')
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.large')
+
+    input_dirs = [
+        './outputs/01.train.py/20230120.jpn.punipuni',
+    ]
+    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.punipuni')
 
     command = ' '.join([
         'python ./scripts/aggregate_tf_results.py',

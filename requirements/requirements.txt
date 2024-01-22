@@ -1,9 +1,10 @@
 sentencepiece != 0.1.92  # XXX SHOULD BE INSTALLED BEFORE TRANSFORMERS
 
 # transformers==4.29.2
-transformers==4.31.0
+# transformers==4.31.0
 # transformers==4.29.1
 # transformers==4.28.1
+transformers==4.34.0
 
 tokenizers==v0.13.4.rc3
 

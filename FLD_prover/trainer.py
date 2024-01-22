@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, Callable
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, Callable, Optional
 import logging
 import time
+import os
 
 import numpy as np
 import torch
@@ -27,6 +28,7 @@ from transformers.trainer_pt_utils import (
     nested_numpify,
     nested_truncate,
 )
+from transformers.utils import is_torch_compile_available
 if is_torch_tpu_available(check_device=False):
     import torch_xla.core.xla_model as xm
     import torch_xla.debug.metrics as met
@@ -37,7 +39,141 @@ logger = logging.getLogger(__name__)
 
 
 class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
-    """ calll self.compute_metrics() even if labels are None """
+    """ call self.compute_metrics() even if labels are None """
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     # custom_evaluation_loop_init(self)
+
+
+    def __init__(self,
+                 model,
+                 other: Optional[Trainer] = None,
+                 args=None,
+                 data_collator=None,
+                 train_dataset=None,
+                 eval_dataset=None,
+                 tokenizer=None,
+                 compute_metrics=None):
+
+        if other is None:
+            super().__init__(
+                model,
+                args=args,
+                data_collator=data_collator,
+                train_dataset=train_dataset,
+                eval_dataset=eval_dataset,
+                tokenizer=tokenizer,
+                compute_metrics=compute_metrics,
+            )
+        else:
+            self._init_from_other(
+                other,
+                args=args,
+                data_collator=data_collator,
+                train_dataset=train_dataset,
+                eval_dataset=eval_dataset,
+                tokenizer=tokenizer,
+                compute_metrics=compute_metrics,
+            )
+
+    def _init_from_other(self,
+                         other: Trainer,
+                         args=None,
+                         data_collator=None,
+                         train_dataset=None,
+                         eval_dataset=None,
+                         tokenizer=None,
+                         compute_metrics=None):
+        """ initialize from other trainer
+
+        We want to share the models of other trainer for computational efficiency.
+        """
+
+        self.args = args or other.args
+        self.hp_name = None
+        self.deepspeed = None
+        self.is_in_train = False
+
+        # create accelerator object
+        self.accelerator = other.accelerator
+        self.is_deepspeed_enabled = other.is_deepspeed_enabled
+        self.is_fsdp_enabled = other.is_fsdp_enabled
+        self._memory_tracker = other._memory_tracker
+        # self._memory_tracker.start()
+
+        self.model_init = other.model_init
+        self.is_model_parallel = other.is_model_parallel
+
+        self.sharded_ddp = other.sharded_ddp
+        self.fsdp = other.fsdp
+        if hasattr(other, 'backward_prefetch'):
+            self.backward_prefetch = other.backward_prefetch
+        if hasattr(other, 'limit_all_gathers'):
+            self.limit_all_gathers = other.limit_all_gathers
+
+        self.place_model_on_device = other.place_model_on_device
+        self.place_model_on_device = args.place_model_on_device
+
+        self.data_collator = data_collator or other.data_collator
+        self.train_dataset = train_dataset or other.train_dataset
+        self.eval_dataset = eval_dataset or other.eval_dataset
+        self.tokenizer = tokenizer or other.tokenizer
+
+        self._move_model_to_device = other._move_model_to_device
+
+        self.model_wrapped = other.model_wrapped
+        self.model = other.model
+
+        self.compute_metrics = compute_metrics or other.compute_metrics
+        # self.preprocess_logits_for_metrics = other.preprocess_logits_for_metrics
+        self.preprocess_logits_for_metrics = None  # should be None because preprocessing for seq2seq should be different from other trainer.
+
+        self.optimizer, self.lr_scheduler = other.optimizer, other.lr_scheduler
+        self.callback_handler = other.callback_handler
+
+        self._loggers_initialized = other._loggers_initialized
+
+        # Create distant repo and output directory if needed
+        self.hub_model_id = other.hub_model_id
+        if self.args.push_to_hub:
+            self.init_hf_repo()
+        if self.args.should_save:
+            os.makedirs(self.args.output_dir, exist_ok=True)
+
+        self._signature_columns = other._signature_columns
+
+        self.use_apex = other.use_apex
+        self.use_cuda_amp = other.use_cuda_amp
+        self.use_cpu_amp = other.use_cpu_amp
+
+        self.do_grad_scaling = other.do_grad_scaling
+        if hasattr(other, 'amp_dtype'):
+            self.amp_dtype = other.amp_dtype
+        if hasattr(other, 'scalar'):
+            self.scalar = other.scalar
+
+        self.label_smoother = other.label_smoother
+
+        self.state = other.state
+
+        self.control = other.control
+        self.current_flos = other.current_flos
+        self.hp_search_backend = other.hp_search_backend
+        self.use_tune_checkpoints = other.use_tune_checkpoints
+        self.label_names = other.label_names
+        self.can_return_loss = other.can_return_loss
+        self.control = other.control
+
+        self._train_batch_size = other._train_batch_size
+        self._created_lr_scheduler = other._created_lr_scheduler
+
+        if args.torch_compile and not is_torch_compile_available():
+            raise RuntimeError("Using torch.compile requires PyTorch 2.0 or higher.")
+        if self.args.generation_config is not None:
+            gen_config = self.load_generation_config(self.args.generation_config)
+            self.model.generation_config = gen_config
+
 
     def evaluation_loop(
         self,
@@ -193,7 +329,8 @@ class StepWiseGenerationTrainer(ForceCallMetricsSeq2SeqTrainer):
                 break
 
         if not all(are_finished.values()):
-            logger.warning('The step-wise generation is not finished within max_steps=%d. will return the incomplete results', self._max_steps)
+            logger.warning(
+                'The step-wise generation is not finished within max_steps=%d. will return the incomplete results', self._max_steps)
 
         # return loss=None computing the loss is not implemented.
         # it is compliated to compare the gold text with step-wisely generated texts.

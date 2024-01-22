@@ -183,6 +183,9 @@ class DataTrainingArguments:
     do_eval_in_outerloop: bool = field(
         default=False,
     )
+    save_model_at_end: bool = field(
+        default=False,
+    )
     test_file: Optional[str] = field(
         default=None,
         metadata={
@@ -339,6 +342,10 @@ class DataTrainingArguments:
 
     generation_do_sample: bool = field(
         default=False,
+    )
+
+    generation_temperature: float = field(
+        default=1.0,
     )
 
     generation_repetition_penalty: float = field(
@@ -833,6 +840,7 @@ def main():
         'num_beams': training_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
+        'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
         'max_length': generation_max_length,
         'max_new_tokens': data_args.generation_max_new_tokens,
@@ -871,7 +879,8 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        # trainer.save_model()  # Saves the tokenizer too for easy upload
+        if data_args.save_model_at_end:
+            trainer.save_model()
 
         metrics = train_result.metrics
         max_train_samples = (

@@ -12,15 +12,19 @@ logger = logging.getLogger(__name__)
 
 
 class MaxTimeCriteriaWithWarning(StoppingCriteria):
-    def __init__(self, max_time: float, initial_timestamp: Optional[float] = None):
+    def __init__(self,
+                 max_time: float,
+                 initial_timestamp: Optional[float] = None,
+                 msg_title: str = 'generation timeout',):
         self.max_time = max_time
         self.initial_timestamp = time.time() if initial_timestamp is None else initial_timestamp
+        self.msg_title = msg_title
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
         elapsed = time.time() - self.initial_timestamp
         do_timeout = elapsed > self.max_time
         if do_timeout:
-            logger.warning('generation timeout with %d sec', self.max_time)
+            logger.warning(f'{self.msg_title} (timeout=%d sec)' % self.max_time)
             return True
         else:
             return False
@@ -30,8 +34,10 @@ def generation_handled(func,
                        lm_type: LMType,
                        tokenizer,
                        model,
-                       timeout: Optional[int] = None,
+                       timeout_from_call: Optional[int] = None,
+                       timeout_msg_title: str = 'generation timeout',
                        **gen_kwargs):
+
     if lm_type == LMType.CAUSAL:
         """
             model.generate() with batch size >= 2 require hacks on special tokens.
@@ -67,7 +73,7 @@ def generation_handled(func,
             As generation_init_special_tokens()/generation_exit_special_tokens() dynamically change
             tokenizer special tokens, we also have to generate gen_kwargs dynamically.
         """
-        stopping_criteria = MaxTimeCriteriaWithWarning(timeout)
+        stopping_criteria = MaxTimeCriteriaWithWarning(timeout_from_call, msg_title=timeout_msg_title)
         _kwargs = {
             'stopping_criteria': [stopping_criteria],
             'pad_token_id': tokenizer.pad_token_id,
