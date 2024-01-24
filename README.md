@@ -9,7 +9,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 ## Releases
 * (2024-01-24) `NLP_2024_KOBE_BEEF` branch
     - Release at LREC-COLING 2024 and NLP(言語処理学会) 2024．
-    - We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.
+    - **We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.**
     - Minor update on proof generation strategy: for the example with `UNKNOWN` label, we now generate only the label. Previously, we also generated the subproof in addition to the label, which was a bit unreasonable, as that subproof can not be distinguished from the noise proofs yielded from the distractors. The change of the strategy might affect the performance a litte.
     - **This branch might not be compatible with the older branches of relevant repositories.**
 * (2023-08-22) `main` branch.
@@ -32,15 +32,15 @@ This prover differs from the original stepwise prover used in the paper and deli
 ## Installation
 The code has been tested on Python 3.11.5
 ```console
-$ pip install -r ./requirements/requirements.txt
+pip install -r ./requirements/requirements.txt
 
-$ git clone https://github.com/hitachi-nlp/FLD-task.git
-$ cd FLD-task
-$ git checkout NLP_2024_KOBE_BEEF
-$ pip install -e .
-$ cd ..
+git clone https://github.com/hitachi-nlp/FLD-task.git
+cd FLD-task
+git checkout NLP_2024_KOBE_BEEF
+pip install -e .
+cd ..
 
-$ export PYTHONPATH=`pwd -P`:$PYTHONPATH
+export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
 
@@ -49,7 +49,7 @@ $ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ## Fine-tune T5
 To train and evaluate the T5-based prover, which was used in the ICML paper:
 ```console
-$ python ./run_prover.py \
+python ./run_prover.py \
     --dataset_name hitachi-nlp/FLD.v2 \
     --dataset_config_name default \
     --model_name_or_path t5-base \
@@ -103,7 +103,7 @@ If you have the datasets on your local filesystem, swap the `--dataset_name` opt
 
 After that, you can check the results by tensorboard as:
 ```console
-$ tensorboard --port 6006 --logdir ./outputs/tensorboard/
+tensorboard --port 6006 --logdir ./outputs/tensorboard/
 ```
 
 
@@ -167,7 +167,7 @@ If you have the datasets on your local filesystem, swap the `--FLD_dataset_name`
 
 After that, you can check the results by tensorboard as:
 ```console
-$ tensorboard --port 6006 --logdir ./outputs/tensorboard/
+tensorboard --port 6006 --logdir ./outputs/tensorboard/
 ```
 
 
