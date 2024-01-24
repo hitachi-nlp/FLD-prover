@@ -6,7 +6,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 
 
-## Release notes
+## Releases
 * (2024-01-24) `NLP_2024_KOBE_BEEF` branch
     - Release at LREC-COLING 2024 and NLP(言語処理学会) 2024．
     - We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.
@@ -14,7 +14,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
     - **This branch might not be compatible with the older branches of relevant repositories.**
 * (2023-08-22) `main` branch.
     - Initial release at ICML 2023.
-    - Note the followings:
+    - Note that the prover implemented in this repository is slightly different from the one used in the original ICML paper, as follows:
         * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have implemented a simpler prover.
         * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
 
@@ -47,7 +47,7 @@ $ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 
 
 ## Fine-tune T5
-To train and evaluate the T5-based prover, which was used in the ICML paper, on **FLD** corpus hosted by [🤗 huggingface hub](https://huggingface.co/datasets/hitachi-nlp/FLD.v2):
+To train and evaluate the T5-based prover, which was used in the ICML paper:
 ```console
 $ python ./run_prover.py \
     --dataset_name hitachi-nlp/FLD.v2 \
@@ -90,7 +90,8 @@ $ python ./run_prover.py \
     --eval_steps 5000 \
     --tokenizer_padding longest
 ```
-or, if you want to use **FLD★**(FLD.4 in the paper), specify `--dataset_config_name star`.
+Note that we use **FLD** corpus hosted by [🤗 huggingface hub](https://huggingface.co/datasets/hitachi-nlp/FLD.v2).
+If you want to use **FLD★**, specify `--dataset_config_name star`.
 
 
 If you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
