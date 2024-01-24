@@ -177,17 +177,22 @@ def main():
         # '20230118.jpn.punipuni.D3',
 
         # ---------------------------------- 20230120.jpn.punipuni ------------------------------------
-        '20230120.jpn.wordnet.D3',
+        # '20230120.jpn.wordnet.D3',
 
-        '20230120.jpn.BCCWJ.D1_wo_dist',
-        '20230120.jpn.BCCWJ.D1',
-        '20230120.jpn.BCCWJ.D3',
-        '20230120.jpn.BCCWJ.D8',
+        # '20230120.jpn.BCCWJ.D1_wo_dist',
+        # '20230120.jpn.BCCWJ.D1',
+        # '20230120.jpn.BCCWJ.D3',
+        # '20230120.jpn.BCCWJ.D8',
 
-        '20230120.jpn.punipuni.D1_wo_dist',
-        '20230120.jpn.punipuni.D1',
-        '20230120.jpn.punipuni.D3',
-        '20230120.jpn.punipuni.D8',
+        # '20230120.jpn.punipuni.D1_wo_dist',
+        # '20230120.jpn.punipuni.D1',
+        # '20230120.jpn.punipuni.D3',
+        # '20230120.jpn.punipuni.D8',
+
+        '20230120.jpn.wordnet_repro_wo_proposition.D1_wo_dist',
+        '20230120.jpn.wordnet_repro_wo_proposition.D1',
+        '20230120.jpn.wordnet_repro_wo_proposition.D3',
+        '20230120.jpn.wordnet_repro_wo_proposition.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -233,7 +238,7 @@ def main():
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         
         # ---- V100 x 4 x 2 nodes ----
@@ -243,7 +248,7 @@ def main():
         # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
         # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ---- V100 x 16 nodes ----
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
