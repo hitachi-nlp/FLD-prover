@@ -411,7 +411,7 @@ def main():
     # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
-    # must be placed at top, so we extract string from sys.argv directry
+    # must be placed at top, so we extract string from sys.argv directly
     if any(arg.find('deepspeed') >= 0 for arg in sys.argv):
         deepspeed.init_distributed()
 
