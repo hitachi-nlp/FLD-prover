@@ -8,7 +8,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 ## Releases (READ CAREFULLY to determine which branch suits you)
 * **`NLP_2024_KOBE_BEEF`** branch (2024-01-24) 
-    - Released at LREC-COLING 2024 and NLP (言語処理学会) 2024.
+    - Release NLP (言語処理学会) 2024.
     - **We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.**
     - Minor update on the proof generation strategy: For examples with the UNKNOWN label, we now generate only the label. Previously, in addition to the label, we also generated a subproof, which was somewhat unreasonable since this subproof could not be distinguished from the noise proofs yielded by the distractors. This change in strategy might slightly affect performance.
     - **This branch might not be compatible with the older branches of relevant repositories.**
