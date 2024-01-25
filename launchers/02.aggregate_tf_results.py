@@ -179,10 +179,10 @@ def main():
     # ]
     # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230101.jpn.seed--0-1-2.with_swallow-70b')
 
-    input_dirs = [
-        './outputs/01.train.py/20230120.jpn.large',
-    ]
-    output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.large')
+    # input_dirs = [
+    #     './outputs/01.train.py/20230120.jpn.large',
+    # ]
+    # output_dir = Path('./outputs/02.aggregate_tf_results.py/20230120.jpn.large')
 
     input_dirs = [
         './outputs/01.train.py/20230120.jpn.punipuni',

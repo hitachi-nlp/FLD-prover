@@ -6,13 +6,13 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 
 
-## Releases
-* (2024-01-24) `NLP_2024_KOBE_BEEF` branch
-    - Release at LREC-COLING 2024 and NLP(言語処理学会) 2024．
+## Releases (READ CAREFULLY to determine which branch suits you)
+* **`NLP_2024_KOBE_BEEF`** branch (2024-01-24) 
+    - Released at LREC-COLING 2024 and NLP (言語処理学会) 2024.
     - **We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.**
-    - Minor update on proof generation strategy: for the example with `UNKNOWN` label, we now generate only the label. Previously, we also generated the subproof in addition to the label, which was a bit unreasonable, as that subproof can not be distinguished from the noise proofs yielded from the distractors. The change of the strategy might affect the performance a litte.
+    - Minor update on the proof generation strategy: For examples with the UNKNOWN label, we now generate only the label. Previously, in addition to the label, we also generated a subproof, which was somewhat unreasonable since this subproof could not be distinguished from the noise proofs yielded by the distractors. This change in strategy might slightly affect performance.
     - **This branch might not be compatible with the older branches of relevant repositories.**
-* (2023-08-22) `main` branch.
+* **`main`** branch (2023-08-22)
     - Initial release at ICML 2023.
     - Note that the prover implemented in this repository is slightly different from the one used in the original ICML paper, as follows:
         * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have implemented a simpler prover.
