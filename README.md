@@ -32,15 +32,15 @@ This prover differs from the original stepwise prover used in the paper and deli
 ## Installation
 The code has been tested on Python 3.11.5
 ```console
-$ pip install -r ./requirements/requirements.txt
+pip install -r ./requirements/requirements.txt
 
-$ git clone https://github.com/hitachi-nlp/FLD-task.git
-$ cd FLD-task
-$ git checkout NLP_2024_KOBE_BEEF
-$ pip install -e .
-$ cd ..
+git clone https://github.com/hitachi-nlp/FLD-task.git
+cd FLD-task
+git checkout NLP_2024_KOBE_BEEF
+pip install -e .
+cd ..
 
-$ export PYTHONPATH=`pwd -P`:$PYTHONPATH
+export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
 
@@ -49,7 +49,7 @@ $ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ## Fine-tune T5
 To train and evaluate the T5-based prover, which was used in the ICML paper:
 ```console
-$ python ./run_prover.py \
+python ./scripts/run_prover.py \
     --dataset_name hitachi-nlp/FLD.v2 \
     --dataset_config_name default \
     --model_name_or_path t5-base \
@@ -88,7 +88,7 @@ $ python ./run_prover.py \
     --save_strategy steps  \
     --max_predict_samples 1000 \
     --eval_steps 5000 \
-    --tokenizer_padding longest
+    --padding longest
 ```
 Note that we use **FLD** corpus hosted by [🤗 huggingface hub](https://huggingface.co/datasets/hitachi-nlp/FLD.v2).
 If you want to use **FLD★**, specify `--dataset_config_name star`.
@@ -101,18 +101,20 @@ If you have the datasets on your local filesystem, swap the `--dataset_name` opt
     --test_file ./data/FLD.v2/FLD.v2/test.jsonl \
 ```
 
-After that, you can check the results by tensorboard as:
+After launching the script, you can check the results by tensorboard as:
 ```console
-$ tensorboard --port 6006 --logdir ./outputs/tensorboard/
+tensorboard --port 6006 --logdir ./outputs/tensorboard/
 ```
 
 
 ## Fine-tune LLMs
-LLMs are mostly encoder-only models, which can be trained by the other script as follows:
+LLMs are mostly encoder-only models, which can be trained by the other script as follows.
+
+Training English model on FLD:
 ```console
 python ./scripts/run_causal_prover.py  \
-    --dataset_name hitachi-nlp/FLD.v2 \
-    --dataset_config_name default \
+    --FLD_dataset_name hitachi-nlp/FLD.v2 \
+    --FLD_dataset_config_name default \
     --model_name_or_path TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
     --output_dir outputs/ \
     --logging_dir outputs/tensorboard/ \
@@ -120,7 +122,7 @@ python ./scripts/run_causal_prover.py  \
     --max_grad_norm 0.5   \
     --max_steps 70  \
     --gradient_accumulation_steps 4  \
-    --max_eval_samples 152  \
+    --max_eval_samples 150  \
     --learning_rate 1e-05  \
     --warmup_steps 21  \
     --max_target_length 2000  \
@@ -128,8 +130,8 @@ python ./scripts/run_causal_prover.py  \
     --logging_steps 1  \
     --overwrite_output_dir True  \
     --no_subproof_for_unknown True  \
-    --per_device_train_batch_size 2  \
-    --per_device_eval_batch_size 4  \
+    --per_device_train_batch_size 1  \
+    --per_device_eval_batch_size 1  \
     --dataloader_num_workers 0  \
     --log_examples True  \
     --max_train_samples 5  \
@@ -159,15 +161,67 @@ python ./scripts/run_causal_prover.py  \
     --use_auth_token
 ```
 
+Training Japanese model on JFLD:
+```console
+python ./scripts/run_causal_prover.py  \
+    --FLD_dataset_name hitachi-nlp/JFLD_BCCWJ \
+    --FLD_dataset_config_name D3 \
+    --model_name_or_path rinna/japanese-gpt-neox-3.6b \
+    --output_dir outputs/ \
+    --logging_dir outputs/tensorboard/ \
+    --seed 0  \
+    --max_grad_norm 0.5   \
+    --max_steps 70  \
+    --gradient_accumulation_steps 4  \
+    --max_eval_samples 150  \
+    --learning_rate 1e-05  \
+    --warmup_steps 21  \
+    --max_target_length 2000  \
+    --logging_strategy steps  \
+    --logging_steps 1  \
+    --overwrite_output_dir True  \
+    --no_subproof_for_unknown True  \
+    --per_device_train_batch_size 1  \
+    --per_device_eval_batch_size 1  \
+    --dataloader_num_workers 0  \
+    --log_examples True  \
+    --max_train_samples 5  \
+    --FLD_dataset_prob 1.0  \
+    --FLD_max_eval_samples 150  \
+    --eval_steps 70  \
+    --remove_unused_columns False  \
+    --instruction False  \
+    --streaming False    \
+    --evaluation_strategy steps  \
+    --save_strategy no  \
+    --save_model_at_end False  \
+    --gradient_checkpointing True  \
+    --block_size 2000  \
+    --FLD_proof_eval_padding longest   \
+    --generation_do_sample False  \
+    --generation_temperature 1.0     \
+    --generation_timeout 7200  \
+    --evaluation_timeout 36000  \
+    --do_train True  \
+    --do_eval_in_outerloop False  \
+    --do_predict False  \
+    --fp16 True  \
+    --lr_scheduler_type linear  \
+    --weight_decay 0.0  \
+    --lora False  \
+    --use_auth_token
+```
+
+
 If you have the datasets on your local filesystem, swap the `--FLD_dataset_name` option to the following:
 ```console
     --FLD_train_file ./data/FLD.v2/FLD.v2/train.jsonl \
     --FLD_validation_file ./data/FLD.v2/FLD.v2/valid.jsonl \
 ```
 
-After that, you can check the results by tensorboard as:
+After launching the script, you can check the results by tensorboard as:
 ```console
-$ tensorboard --port 6006 --logdir ./outputs/tensorboard/
+tensorboard --port 6006 --logdir ./outputs/tensorboard/
 ```
 
 

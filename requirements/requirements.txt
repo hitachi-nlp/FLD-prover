@@ -6,7 +6,8 @@ sentencepiece != 0.1.92  # XXX SHOULD BE INSTALLED BEFORE TRANSFORMERS
 # transformers==4.28.1
 transformers==4.34.0
 
-tokenizers==v0.13.4.rc3
+# tokenizers==v0.13.4.rc3
+tokenizers==0.14.1
 
 accelerate >= 0.21.0
 # accelerate==0.18.0
@@ -38,6 +39,7 @@ colorlog
 tensorboard
 gradio
 tbparse
+scikit-learn
 
 git+https://github.com/google-research/bleurt.git
 

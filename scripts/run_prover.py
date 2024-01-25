@@ -451,7 +451,7 @@ def main():
         # XXX: too hacky
         sys.argv = sys.argv[:arg_idx] + sys.argv[arg_idx + 2:]
     else:
-        lm_type = 'seq2seq'
+        lm_type = LMType('seq2seq')
 
     # must be placed at top, so we extract string from sys.argv directry
     if any(arg.find('deepspeed') >= 0 for arg in sys.argv):
@@ -811,10 +811,11 @@ def main():
         raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augumentation.')
 
     if lm_type == LMType.SEQ_2_SEQ:
-        preprocess_logits_for_metrics = None
+        # preprocess_logits_for_metrics = None
+        pass
 
     elif lm_type == LMType.CAUSAL:
-        preprocess_logits_for_metrics = None
+        # preprocess_logits_for_metrics = None
         if data_args.proof_sampling == 'stepwise':
             raise ValueError('proof_sampling = "stepwise" is not suitable for LMType.CAUSAL')
     else:
@@ -867,7 +868,7 @@ def main():
         compute_metrics=compute_metrics if training_args.predict_with_generate and not is_torch_tpu_available() else None,
         texts_to_inputs_func=lambda texts: prepare_tokenized_inputs(texts, tokenizer, padding, data_args.max_source_length),
         is_finished_func=lambda text: len(get_stance_markers(text)) > 0,
-        preprocess_logits_for_metrics=preprocess_logits_for_metrics,
+        # preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         log_generation=data_args.log_generation,
     )
 
