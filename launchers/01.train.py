@@ -177,22 +177,26 @@ def main():
         # '20230118.jpn.punipuni.D3',
 
         # ---------------------------------- 20230120.jpn.punipuni ------------------------------------
-        # '20230120.jpn.wordnet.D3',
 
-        # '20230120.jpn.BCCWJ.D1_wo_dist',
-        # '20230120.jpn.BCCWJ.D1',
-        # '20230120.jpn.BCCWJ.D3',
-        # '20230120.jpn.BCCWJ.D8',
-
-        # '20230120.jpn.punipuni.D1_wo_dist',
-        # '20230120.jpn.punipuni.D1',
-        # '20230120.jpn.punipuni.D3',
-        # '20230120.jpn.punipuni.D8',
+        '20230120.jpn.wordnet_repro_w_proposition.D1_wo_dist',
+        '20230120.jpn.wordnet_repro_w_proposition.D1',
+        '20230120.jpn.wordnet_repro_w_proposition.D3',
+        '20230120.jpn.wordnet_repro_w_proposition.D8',
 
         '20230120.jpn.wordnet_repro_wo_proposition.D1_wo_dist',
         '20230120.jpn.wordnet_repro_wo_proposition.D1',
         '20230120.jpn.wordnet_repro_wo_proposition.D3',
         '20230120.jpn.wordnet_repro_wo_proposition.D8',
+
+        '20230120.jpn.BCCWJ.D1_wo_dist',
+        '20230120.jpn.BCCWJ.D1',
+        '20230120.jpn.BCCWJ.D3',
+        '20230120.jpn.BCCWJ.D8',
+
+        '20230120.jpn.punipuni.D1_wo_dist',
+        '20230120.jpn.punipuni.D1',
+        '20230120.jpn.punipuni.D3',
+        '20230120.jpn.punipuni.D8',
     ]
 
     # other_dataset_name = "wikitext"
@@ -373,8 +377,8 @@ def main():
     dry_run = False
 
     # engine = SubprocessEngine()
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch size 32
+    engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch size 32
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
