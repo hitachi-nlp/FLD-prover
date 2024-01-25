@@ -1,18 +1,30 @@
 # FLD-Prover
-This repository includes the code for training language models on FLD corpora.  
+This repository includes the code to train and evaluate language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
-## Important notice
-**(new!)** **FLD training is now available on a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).**
-Specifically, LogiTorch enables the training of an "all-at-once" prover that generates an entire logical proof at once.
-This prover differs from the original stepwise prover used in the paper and delivers slightly better performance.
-**LogiTorch is very user-friendly - give it a try!**
 
-## About this release
-* This is the re-implemented version of the step-wise prover used in the paper, which was based on [the previous study](https://github.com/princeton-nlp/NLProofS).
-    - Our re-implemented prover predicts an answer label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof, while the original one predicts the label by using another classifier on top of a generated proof.
-* If you want to train a simpler causal prover that generate an entire logical proof at once, use LogiTorch above, or please make your own script that use `prompt_serial` field of the corpora as an input, and `proof_serial` as an output (see [the schema of FLD corpora](https://github.com/hitachi-nlp/FLD-corpus#schema)).
+
+
+## Releases (READ CAREFULLY to determine which branch suits you)
+* **`NLP_2024_KOBE_BEEF`** branch (2024-01-24) 
+    - Released at LREC-COLING 2024 and NLP (言語処理学会) 2024.
+    - **We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.**
+    - Minor update on the proof generation strategy: For examples with the UNKNOWN label, we now generate only the label. Previously, in addition to the label, we also generated a subproof, which was somewhat unreasonable since this subproof could not be distinguished from the noise proofs yielded by the distractors. This change in strategy might slightly affect performance.
+    - **This branch might not be compatible with the older branches of relevant repositories.**
+* **`main`** branch (2023-08-22)
+    - Initial release at ICML 2023.
+    - Note that the prover implemented in this repository is slightly different from the one used in the original ICML paper, as follows:
+        * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have implemented a simpler prover.
+        * Besides the difference in implementation details, there is a difference in how to predict an answer label. Our re-implemented model predicts a label simply by generating a marker (`__PROVED__`/`__DISPROVED__`/`__UNKNOWN__`) at the end of a proof sequence, while the original model predicts an answer label by using another classifier on top of a generated proof sequence.
+
+
+
+
+## Other Framework
+FLD training is also accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).
+Specifically, LogiTorch enables the training of an "all-at-once prover that generates an entire logical proof at once.
+This prover differs from the original stepwise prover used in the paper and delivers slightly better performance.
 
 ## Installation
 The code has been tested on Python 3.8.5.
