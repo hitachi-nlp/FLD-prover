@@ -68,6 +68,17 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
 
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.node--4')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp32')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp16.batch_size_32')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp16.batch_size_32.padding=max_len')
+
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.batch_size_32')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32.half_batch_size')
+
     output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
 
     DATASETS_DIRS = [
@@ -258,8 +269,8 @@ def main():
         # 'FS.shot-10',
         # 'FS.shot-100',
 
-        # 'FT.step-5000',
-        'FT.step-10000',
+        'FT.step-5000',
+        # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
@@ -365,10 +376,10 @@ def main():
     evaluation_timeout = 3600 * 10
 
     warmup_ratio = None
-    train_effective_batch_size = None
     warmup_steps = None
     num_evals = 1
     steps_upper = None
+    train_effective_batch_size = None
 
     # other_dataset_name = "wikitext"
     # other_dataset_config_name = "wikitext-2-raw-v1"
@@ -404,6 +415,16 @@ def main():
                             else:
                                 _hours = hours
 
+                            # V100 is only compatible with fp16, but not bf16,
+                            # but fp16 and deepspeed sometimes causes "Loss scale already at minimum" error.
+                            # Therefore, we use fp32 for V100.
+                            # https://github.com/microsoft/DeepSpeed/issues/4017#issuecomment-1754820339
+                            is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
+                            fp32 = (
+                                model_name.find('t5-') >= 0\
+                                or is_V100 and (model_name.find('rinna/japanese-gpt2-medium') >= 0 or model_name.find('llama') >= 0)
+                            )
+
                             if lm_type == 'causal':
                                 proof_sampling = 'all_at_once'
                             else:
@@ -411,6 +432,7 @@ def main():
 
                             for lrate in lrates:
                                 for instruction in instruction_args:
+
                                     setting = {}
 
                                     setting.update(get_base_setting(base_setting_name))
@@ -460,6 +482,7 @@ def main():
                                             n_gpus=n_total_gpus,
                                             model_name=model_name_for_batch_size + '.all_at_once' if proof_sampling == 'all_at_once' else model_name_for_batch_size,
                                             train_effective_batch_size=setting.get('train_effective_batch_size', None),
+                                            batch_size_per_gpu_factor = 1/2 if fp32 else 1.0,
                                         )
                                     )
 
@@ -493,7 +516,7 @@ def main():
                                         'base_setting_name': base_setting_name,
 
                                         'lm_type': lm_type,
-                                        'fp16': model_name.find('t5-') < 0 and model_name.find('rinna/japanese-gpt2-medium') < 0,
+                                        'fp16': not fp32,
 
                                         # 'save_total_limit': save_total_limit,
 
