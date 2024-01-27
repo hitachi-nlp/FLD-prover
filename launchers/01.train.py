@@ -35,28 +35,6 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
 
-    # output_top_dir = Path('./outputs/01.train.py/20230807.all_at_once')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20230919.jpn.seed--1')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231005.jpn.seed--0')
-    # output_top_dir = Path('./outputs/01.train.py/20231008.run_causal_prover')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231008.jpn.run_causal_prover')
-    # output_top_dir = Path('./outputs/01.train.py/20231009.jpn.run_causal_prover')
-    # output_top_dir = Path('./outputs/01.train.py/20231009.run_causal_prover.large_models')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models')
-    # output_top_dir = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models')
-    # output_top_dir = Path('./outputs/01.train.py/20231010.large_vocab.small')
-    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab')
-    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
-    # output_top_dir = Path('./outputs/01.train.py/20231012.large_vocab.other_corpus')
     # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
 
     # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
@@ -74,11 +52,6 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test')
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.generation_timeout-10')
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10')
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-23.timeout_test.evaluation_timeout-10.run-2')
-
     # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b')
     # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-10')
@@ -93,7 +66,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
     # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
 
-    output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
+    # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
+
+    output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -134,15 +109,6 @@ def main():
         # '20230916.jpn.D3',
         # '20230916.jpn.D5',
 
-        # ---------------------------------- 20231010.D3.large_vocab ------------------------------------
-        # '20231010.D3.large_vocab',
-
-        # ---------------------------------- 20231012.D3.large_vocab ------------------------------------
-        # '20231012.D3.large_vocab',
-        # '20231012.D3.large_vocab.smpl_stncs',
-        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3',
-        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
-
         # ---------------------------------- 20231021.knowledge ------------------------------------
         # '20231021.knowledge.D3',
         # '20231021.knowledge.D3.w_knowledge',
@@ -155,13 +121,6 @@ def main():
 
         # ---------------------------------- 20231101.knowledge.D3 ------------------------------------
         # '20231103.knowledge.D3.knowledge_factor-5.0',
-
-        # ---------------------------------- 20231203.jpn ------------------------------------
-        # '20231203.jpn.D1_wo_dist',
-        # '20231203.jpn.D1',
-        # '20231203.jpn.D3',
-        # '20231203.jpn.D5',
-        # '20231203.jpn.D8',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
         # '20231213.jpn.D1_wo_dist',
@@ -191,22 +150,23 @@ def main():
         # '20230120.jpn.BCCWJ.D1_wo_dist',
         # '20230120.jpn.BCCWJ.D1',
         # '20230120.jpn.BCCWJ.D3',
-        '20230120.jpn.BCCWJ.D8',
+        # '20230120.jpn.BCCWJ.D8',
 
         # '20230120.jpn.punipuni.D1_wo_dist',
         # '20230120.jpn.punipuni.D1',
         # '20230120.jpn.punipuni.D3',
         # '20230120.jpn.punipuni.D8',
+
+
+        # -------------------------------- 20240127.logical_cirtuit.llama2 --------------------------------
+
+        # '20231012.D3.large_vocab',
+        # '20231012.D3.large_vocab.smpl_stncs',
+        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3',
+        '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
+
+        # '20231103.knowledge.D3.knowledge_factor-5.0',
     ]
-
-    # other_dataset_name = "wikitext"
-    # other_dataset_config_name = "wikitext-2-raw-v1"
-
-    # other_dataset_name = "cerebras/SlimPajama-627B"
-    # other_dataset_config_name = None
-
-    other_dataset_name = None
-    other_dataset_config_name = None
 
     model_settings = [
         # ============================ english      ============================
@@ -223,10 +183,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'cyberagent/open-calm-3b'),   # much better than chat model
         # ('TinyLlama/TinyLlama-1.1B-Chat-v0.4', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b', 'causal', 'cyberagent/open-calm-1b-short-ctx')
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-1b-short-ctx')
-        # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-1b-short-ctx')
-
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
 
         # ============================ multilingual ============================
@@ -242,7 +201,7 @@ def main():
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
         # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
         
         # ---- V100 x 4 x 2 nodes ----
@@ -288,40 +247,41 @@ def main():
         # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # the training fails somehow
     ]
 
-    # script_type = 'run_prover'
-    script_type = 'run_causal_prover'
-
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
-
     learnings = [
         # 'debug.ZS',
         # 'debug.step-10',
         # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
-        # 'debug.middle',
-        # 'debug.large',
-        # 'debug.find_batch_size',
-        # 'debug.20000.zero_warmup',
 
         # 'FS.shot-0',
         # 'FS.shot-10',
         # 'FS.shot-100',
+
         # 'FT.step-5000',
-        # 'FT.step-10000',
+        'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
         # 'FT.step-100000',
 
         # ---- JFLD experiments ----
-        'LLM_FS.shot-5',
-        'LLM_FS.shot-100',
-        'LLM_FS.shot-1000',
-        'LLM_FS.shot-10000',
-        'LLM_FS.shot-30000',
+        # 'LLM_FS.shot-5',
+        # 'LLM_FS.shot-100',
+        # 'LLM_FS.shot-1000',
+        # 'LLM_FS.shot-10000',
+        # 'LLM_FS.shot-30000',
+    ]
 
-        # 'LLM_FS.shot-10',
+    lrates = [
+        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
+        # 1e-4,
+
+        1e-5,   # NLP_2024
+    ]
+
+    instruction_args = [
+        # False,       # better for chat-model?
+        True,      # better for non-chat model, somehow.
     ]
 
     seeds = [
@@ -330,45 +290,10 @@ def main():
         # 2,
     ]
 
-    lrates = [
-        # ==== script_type = 'run_prover' =====
+    hours = 72
 
-        # -- learning = 'FT' ---
-        # 1e-4,
-
-        # -- learning = 'LLM_FS' ---
-        # 1e-5,
-        # 3e-5,   # might be better but not checked
-
-
-        # ==== script_type = 'run_causal_prover' =====
-
-        # -- learning = 'FT' ---
-        # 1e-5,
-        # 1e-4,   # much better on FLD than 1e-05, but could degredate on other downstream tasks?
-
-        # -- learning = 'LLM_FS' ---
-        # 3e-5,   # 20230919.jpn
-        1e-5,   # NLP_2024
-    ]
-
-    streaming = False
-    # streaming = True
-
-    instruction_args = [
-        False,       # better for chat-model?
-        # True,      # better for non-chat model, somehow.
-    ]
-
-    # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
-
-    hours = 'LLM_FS.auto'
-    # hours = 72
-
-    save_model = False
-    # save_model = True
+    # save_model = False
+    save_model = True
 
     # skip_if_exists = False
     skip_if_exists = True
@@ -376,10 +301,15 @@ def main():
     # dry_run = True
     dry_run = False
 
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
+
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch size 32
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch size 32
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
@@ -440,6 +370,23 @@ def main():
     num_evals = 1
     steps_upper = None
 
+    # other_dataset_name = "wikitext"
+    # other_dataset_config_name = "wikitext-2-raw-v1"
+
+    # other_dataset_name = "cerebras/SlimPajama-627B"
+    # other_dataset_config_name = None
+
+    other_dataset_name = None
+    other_dataset_config_name = None
+
+    streaming = False
+
+    # script_type = 'run_prover'
+    script_type = 'run_causal_prover'
+
+    # seq2seq_proof_sampling = 'stepwise'
+    seq2seq_proof_sampling = 'all_at_once'
+
     for FLD_dataset_uname in FLD_dataset_unames:
         for learning in learnings:
 
@@ -447,7 +394,7 @@ def main():
                 for no_subproof_for_unknown in no_subproof_for_unknown_args:
                     for seed in seeds:
                         for model_name, lm_type, model_name_for_batch_size in model_settings:
-                            if hours == 'LLM_FS.auto':
+                            if learning.find('LLM_FS') >= 0:
                                 if learning == 'LLM_FS.shot-30000':
                                     _hours = 50
                                 else:

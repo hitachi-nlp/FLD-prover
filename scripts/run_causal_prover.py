@@ -644,6 +644,8 @@ def main():
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
+    model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
         peft_config = LoraConfig(task_type=PeftTaskType.CAUSAL_LM,
