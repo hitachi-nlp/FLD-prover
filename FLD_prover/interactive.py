@@ -108,7 +108,6 @@ def launch(seq2seq_trainer,
                 )
 
     elif mode == 'gradio':
-        # XXX TODO: to be compatible with deepspeed.
         def predict(facts: str, hypothesis: str, is_FLD_prompt: bool):
             proof = get_prediction(facts, hypothesis, is_FLD_prompt=is_FLD_prompt)
 

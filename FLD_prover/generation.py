@@ -16,7 +16,7 @@ class MaxTimeCriteriaWithWarning(StoppingCriteria):
                  max_time: float,
                  initial_timestamp: Optional[float] = None,
                  msg_title: str = 'generation timeout',):
-        self.max_time = max_time
+        self.max_time = max_time or float('inf')
         self.initial_timestamp = time.time() if initial_timestamp is None else initial_timestamp
         self.msg_title = msg_title
 

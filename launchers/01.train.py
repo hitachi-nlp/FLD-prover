@@ -79,7 +79,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32')
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32.half_batch_size')
 
-    output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
+    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
+    output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -99,6 +100,7 @@ def main():
         './outputs.FLD/00.create_corpus/20230120.jpn.large',
 
         './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
+        './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
     ]
 
     FLD_dataset_unames = [
@@ -174,9 +176,14 @@ def main():
         # '20231012.D3.large_vocab',
         # '20231012.D3.large_vocab.smpl_stncs',
         # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3',
-        '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
+        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
 
         # '20231103.knowledge.D3.knowledge_factor-5.0',
+
+        # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
+        '2024-01-29.enhance_arguments.past_reproduce',
+        '2024-01-29.enhance_arguments.theorems',
+        '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
     ]
 
     model_settings = [
@@ -282,6 +289,7 @@ def main():
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
     ]
+    num_evals = 1
 
     lrates = [
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
@@ -377,7 +385,6 @@ def main():
 
     warmup_ratio = None
     warmup_steps = None
-    num_evals = 1
     steps_upper = None
     train_effective_batch_size = None
 
