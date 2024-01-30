@@ -90,6 +90,8 @@ logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
+MAP = False
+
 
 @dataclass
 class ModelArguments:
@@ -554,16 +556,12 @@ def main():
 
         return raw_datasets
 
-    dataset_names = [name or None for name in data_args.dataset_names.split(
-        '::')] if data_args.dataset_names is not None else []
-    dataset_config_names = [name or None for name in data_args.dataset_config_names.split(
-        '::')] if data_args.dataset_config_names is not None else []
+    dataset_names = [name or None for name in data_args.dataset_names.split('::')] if data_args.dataset_names is not None else []
+    dataset_config_names = [name or None for name in data_args.dataset_config_names.split('::')] if data_args.dataset_config_names is not None else []
     train_files = [name or None for name in data_args.train_files.split('::')] if data_args.train_files is not None else []
-    validation_files = [name or None for name in data_args.validation_files.split(
-        '::')] if data_args.validation_files is not None else []
+    validation_files = [name or None for name in data_args.validation_files.split('::')] if data_args.validation_files is not None else []
     file_types = [name or None for name in data_args.file_types.split('::')] if data_args.file_types is not None else []
-    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')
-                     ] if data_args.dataset_probs is not None else []
+    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')] if data_args.dataset_probs is not None else []
     raw_datasets_list = []
     if len(dataset_names) > 0:
         for i in range(len(dataset_names)):
@@ -871,13 +869,18 @@ def main():
     #     )
 
     def make_interleave_datasets(datasets: List[Dataset], FLD_dataset: Optional[Dataset]):
-        dataset_prob_tot = 1 - data_args.FLD_dataset_prob
-        FLD_dataset_prob = data_args.FLD_dataset_prob
+        if len(datasets) == 0 and FLD_dataset is None:
+            raise ValueError()
 
-        if dataset_prob_tot > 0.0 and len(datasets) == 0:
-            raise ValueError()
-        if FLD_dataset_prob > 0.0 and FLD_dataset is None:
-            raise ValueError()
+        if len(datasets) == 0:
+            dataset_prob_tot = 0.0
+            FLD_dataset_prob = 1.0
+        elif FLD_dataset is None:
+            dataset_prob_tot = 1.0
+            FLD_dataset_prob = 0.0
+
+            FLD_dataset_prob = data_args.FLD_dataset_prob
+            dataset_prob_tot = 1 - data_args.FLD_dataset_prob
 
         probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
         if FLD_dataset is not None:
@@ -972,23 +975,27 @@ def main():
     # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
     # as interleave_datasets() does not respect that processing in the current implementation
     if train_dataset:
-        # train_dataset.set_transform(
-        #     lambda examples: _maybe_FLD_preprocess(examples, 'train'))
 
-        train_dataset = train_dataset.map(
-            lambda examples: _maybe_FLD_preprocess(examples, 'train'),
-            batched=True,
-            remove_columns=remove_columns,
-        )
+        if MAP:
+
+            train_dataset = train_dataset.map(
+                lambda examples: _maybe_FLD_preprocess(examples, 'train'),
+                batched=True,
+                remove_columns=remove_columns,
+            )
+        else:
+            train_dataset.set_transform(
+                lambda examples: _maybe_FLD_preprocess(examples, 'train'))
     if eval_dataset:
-        # eval_dataset.set_transform(
-        #     lambda examples: _maybe_FLD_preprocess(examples, 'eval'))
-
-        eval_dataset = eval_dataset.map(
-            lambda examples: _maybe_FLD_preprocess(examples, 'eval'),
-            batched=True,
-            remove_columns=remove_columns,
-        )
+        if MAP:
+            eval_dataset = eval_dataset.map(
+                lambda examples: _maybe_FLD_preprocess(examples, 'eval'),
+                batched=True,
+                remove_columns=remove_columns,
+            )
+        else:
+            eval_dataset.set_transform(
+                lambda examples: _maybe_FLD_preprocess(examples, 'eval'))
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
@@ -1030,13 +1037,15 @@ def main():
     if "validation" in FLD_lm_datasets:
         FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
 
-        # FLD_proof_eval_dataset.set_transform(
-        #     lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
-        FLD_proof_eval_dataset = FLD_proof_eval_dataset.map(
-            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
-            batched=True,
-            remove_columns=remove_columns,
-        )
+        if MAP:
+            FLD_proof_eval_dataset = FLD_proof_eval_dataset.map(
+                lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
+                batched=True,
+                remove_columns=remove_columns,
+            )
+        else:
+            FLD_proof_eval_dataset.set_transform(
+                lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
 
         if data_args.FLD_max_eval_samples is not None:
             if isinstance(FLD_proof_eval_dataset, IterableDataset):

@@ -184,17 +184,17 @@ def main():
         # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
     ]
 
-    # FLD_dataset_prob = 1.0
-    # other_datasets = []
-    # streaming = False
+    FLD_dataset_prob = 1.0
+    other_datasets = []
+    streaming = False
 
-    FLD_dataset_prob = 0.5
-    other_datasets = [
-        # (0.5, 'cerbras/SlimPajama-627B', None),
-        (0.5, 'wikitext', 'wikitext-2-raw-v1'),
-        (0.5, 'wikitext', 'wikitext-2-raw-v1'),
-    ]
-    streaming = True
+    # FLD_dataset_prob = 0.5
+    # other_datasets = [
+    #     # (0.5, 'cerbras/SlimPajama-627B', None),
+    #     # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+    #     # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+    # ]
+    # streaming = True
 
     model_settings = [
         # ============================ english      ============================
