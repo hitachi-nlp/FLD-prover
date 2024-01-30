@@ -357,6 +357,8 @@ def mask_labels_by_ignore_index(labels,
 def unmask_by_pad_token(tensor: Union[np.ndarray, torch.Tensor],
                         pad_token_id,
                         mask_id=-100) -> np.ndarray:
+    if isinstance(tensor, list):
+        tensor = torch.tensor(tensor)
     if not isinstance(tensor, (np.ndarray, torch.Tensor)):
         raise ValueError()
     if isinstance(tensor, torch.Tensor):

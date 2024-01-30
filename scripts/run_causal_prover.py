@@ -90,7 +90,7 @@ logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
-MAP = False
+MAP = True  # temporary to keep old code
 
 
 @dataclass
@@ -694,9 +694,6 @@ def main():
                 f"The block_size passed ({data_args.block_size}) is larger than the maximum length for the model"
                 f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
             )
-
-            # logger.warning(msg)
-            # block_size = tokenizer.model_max_length - 100
             raise ValueError(msg)
 
 
@@ -979,9 +976,7 @@ def main():
     # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
     # as interleave_datasets() does not respect that processing in the current implementation
     if train_dataset:
-
         if MAP:
-
             train_dataset = train_dataset.map(
                 lambda examples: _maybe_FLD_preprocess(examples, 'train'),
                 batched=True,
