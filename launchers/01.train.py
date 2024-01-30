@@ -80,7 +80,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32.half_batch_size')
 
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
-    output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
+    # output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -173,18 +175,26 @@ def main():
 
         # -------------------------------- 20240127.logical_cirtuit.llama2 --------------------------------
 
-        # '20231012.D3.large_vocab',
-        # '20231012.D3.large_vocab.smpl_stncs',
-        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3',
-        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
-
+        '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
         # '20231103.knowledge.D3.knowledge_factor-5.0',
 
         # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
-        '2024-01-29.enhance_arguments.past_reproduce',
-        '2024-01-29.enhance_arguments.theorems',
-        '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
+        # '2024-01-29.enhance_arguments.past_reproduce',
+        # '2024-01-29.enhance_arguments.theorems',
+        # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
     ]
+
+    # FLD_dataset_prob = 1.0
+    # other_datasets = []
+    # streaming = False
+
+    FLD_dataset_prob = 0.5
+    other_datasets = [
+        # (0.5, 'cerbras/SlimPajama-627B', None),
+        (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+        (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+    ]
+    streaming = True
 
     model_settings = [
         # ============================ english      ============================
@@ -192,7 +202,7 @@ def main():
         # # # -------------- < 1B params --------------
         # ('t5-base', 'seq2seq', 't5-base'),
 
-        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
+        ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),  # XXX: context is short, only  for debug
         # ('gpt2-medium', 'causal', 'cyberagent/open-calm-medium'),
 
 
@@ -201,7 +211,7 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'cyberagent/open-calm-3b'),   # much better than chat model
         # ('TinyLlama/TinyLlama-1.1B-Chat-v0.4', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
@@ -267,7 +277,7 @@ def main():
 
     learnings = [
         # 'debug.ZS',
-        # 'debug.step-10',
+        'debug.step-10',
         # 'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
@@ -276,7 +286,7 @@ def main():
         # 'FS.shot-10',
         # 'FS.shot-100',
 
-        'FT.step-5000',
+        # 'FT.step-5000',
         # 'FT.step-10000',
         # 'FT.step-20000',
         # 'FT.step-50000',
@@ -320,33 +330,38 @@ def main():
     # dry_run = True
     dry_run = False
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)  # 10b model for sppedup. Note that n_resouce=3 does not yield batch size 32
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
+
+    # 10b models for speedup
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
+
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70b model
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus_per_node = 1
-        n_total_gpus = 1
+        n_gpus_per_node = 4
+        n_total_gpus = 4
+        is_V100 = True
 
         # n_gpus_per_node = 4
         # n_total_gpus = 4
 
         # gpu_name_for_batch_size = 'A100_48_1'
-        gpu_name_for_batch_size = 'V100_16_1'
-        # gpu_name_for_batch_size = 'V100_16_4'
+        #gpu_name_for_batch_size = 'V100_16_1'
+        gpu_name_for_batch_size = 'V100_16_4'
         # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
-    # =========================== fixed settings =================================
-    if isinstance(engine, QsubEngine):
+    elif isinstance(engine, QsubEngine):
+        # DO NOT MODIFY
         n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
 
     base_setting_name = 'default'
 
@@ -388,17 +403,6 @@ def main():
     steps_upper = None
     train_effective_batch_size = None
 
-    # other_dataset_name = "wikitext"
-    # other_dataset_config_name = "wikitext-2-raw-v1"
-
-    # other_dataset_name = "cerebras/SlimPajama-627B"
-    # other_dataset_config_name = None
-
-    other_dataset_name = None
-    other_dataset_config_name = None
-
-    streaming = False
-
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
@@ -426,7 +430,6 @@ def main():
                             # but fp16 and deepspeed sometimes causes "Loss scale already at minimum" error.
                             # Therefore, we use fp32 for V100.
                             # https://github.com/microsoft/DeepSpeed/issues/4017#issuecomment-1754820339
-                            is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
                             fp32 = (
                                 model_name.find('t5-') >= 0\
                                 or is_V100 and (model_name.find('rinna/japanese-gpt2-medium') >= 0 or model_name.find('llama') >= 0)
@@ -455,18 +458,24 @@ def main():
                                             train_effective_batch_size=train_effective_batch_size,
                                             num_evals=num_evals,
                                             max_eval_samples=max_eval_samples,
+                                            FLD_dataset_prob=FLD_dataset_prob,
                                             hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
                                             n_gpus=n_total_gpus,
                                         )
                                     )
 
+
+                                    other_dataset_probs = [other_dataset[0] for other_dataset in other_datasets]
+                                    other_dataset_names = [other_dataset[1] for other_dataset in other_datasets]
+                                    other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
                                     setting.update(
                                         get_dataset_setting(
                                             script_type,
                                             dataset_uname=FLD_dataset_uname,
                                             top_dirs=DATASETS_DIRS,
-                                            other_dataset_name=other_dataset_name,
-                                            other_dataset_config_name=other_dataset_config_name,
+                                            other_dataset_names=other_dataset_names,
+                                            other_dataset_config_names=other_dataset_config_names,
+                                            other_dataset_probs=other_dataset_probs,
                                             use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
                                             use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                                             streaming=streaming,
@@ -517,8 +526,8 @@ def main():
                                         'seed': seed,
 
                                         'FLD_dataset_uname': FLD_dataset_uname,
-                                        'other_dataset_name': other_dataset_name,
-                                        'other_dataset_config_name': other_dataset_config_name,
+                                        'other_dataset_name': other_dataset_names,
+                                        'other_dataset_config_name': other_dataset_config_names,
 
                                         'base_setting_name': base_setting_name,
 
@@ -543,7 +552,7 @@ def main():
                                         'lora': False,
 
                                         'gpu_name_for_batch_size': gpu_name_for_batch_size,
-                                        'use_auth_token': True,
+                                        # 'use_auth_token': True,
                                         'log_examples': True,
                                     })
 

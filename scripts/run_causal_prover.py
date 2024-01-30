@@ -38,6 +38,7 @@ import evaluate
 import torch
 from datasets import load_dataset
 from torch.utils.data import Dataset
+from datasets import IterableDataset
 
 
 import transformers
@@ -180,25 +181,28 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
-    dataset_name: Optional[str] = field(
-        default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
+    dataset_names: Optional[str] = field(
+        default=None, metadata={"help": "Dataset names separated by ::"}
     )
-    dataset_config_name: Optional[str] = field(
-        default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
+    dataset_config_names: Optional[str] = field(
+        default=None, metadata={"help": "Dataset config names separated by ::"}
     )
-    train_file: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
-    validation_file: Optional[str] = field(
+    dataset_probs: Optional[str] = field(
+        default=None, metadata={"help": "Dataset probabilities separated by ::"}
+    )
+    train_files: Optional[str] = field(default=None, metadata={"help": "Training files separated by ::"})
+    validation_files: Optional[str] = field(
         default=None,
-        metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
+        metadata={"help": "Validation files separated by ::"},
+    )
+    file_types: Optional[str] = field(
+        default=None, metadata={"help": "File types separated by ::"}
     )
     do_eval_in_outerloop: bool = field(
         default=False,
     )
     save_model_at_end: bool = field(
         default=False,
-    )
-    file_type: Optional[str] = field(
-        default=None, metadata={"help": "The input file type such as 'json' or 'csv'"}
     )
     text_column_name: Optional[str] = field(
         default=None, metadata={"help": "The column of text field to be use from dataset"}
@@ -389,13 +393,6 @@ class DataTrainingArguments:
         if self.streaming:
             require_version("datasets>=2.0.0", "The streaming feature requires `datasets>=2.0.0`")
 
-        # if self.train_file is not None:
-        #     extension = self.train_file.split(".")[-1]
-        #     assert extension in ["csv", "json", "txt"], "`train_file` should be a csv, a json or a txt file."
-        # if self.validation_file is not None:
-        #     extension = self.validation_file.split(".")[-1]
-        #     assert extension in ["csv", "json", "txt"], "`validation_file` should be a csv, a json or a txt file."
-        pass
         if self.val_max_target_length is None:
             self.val_max_target_length = self.max_target_length
 
@@ -433,7 +430,8 @@ def main():
 
     # Initialize our Trainer
     if training_args.remove_unused_columns:
-        raise ValueError('remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
+        raise ValueError(
+            'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
 
     log_level = training_args.get_process_log_level()
     logger.setLevel(log_level)
@@ -444,8 +442,8 @@ def main():
 
     # Log on each process the small summary:
     logger.warning(
-        f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
+        f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}" +
+        f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
     )
     logger.info(f"Training/evaluation parameters {training_args}")
 
@@ -556,16 +554,29 @@ def main():
 
         return raw_datasets
 
-    if data_args.dataset_name is not None:
-        raw_datasets = load_raw_dataset_by_name(data_args.dataset_name,
-                                                data_args.dataset_config_name,
-                                                data_args.streaming)
+    dataset_names = [name or None for name in data_args.dataset_names.split(
+        '::')] if data_args.dataset_names is not None else []
+    dataset_config_names = [name or None for name in data_args.dataset_config_names.split(
+        '::')] if data_args.dataset_config_names is not None else []
+    train_files = [name or None for name in data_args.train_files.split('::')] if data_args.train_files is not None else []
+    validation_files = [name or None for name in data_args.validation_files.split(
+        '::')] if data_args.validation_files is not None else []
+    file_types = [name or None for name in data_args.file_types.split('::')] if data_args.file_types is not None else []
+    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')
+                     ] if data_args.dataset_probs is not None else []
+    raw_datasets_list = []
+    if len(dataset_names) > 0:
+        for i in range(len(dataset_names)):
+            raw_datasets_list.append(load_raw_dataset_by_name(dataset_names[i],
+                                                              dataset_config_names[i],
+                                                              data_args.streaming))
     else:
-        raw_datasets = load_raw_dataset_by_files(data_args.train_file,
-                                                 data_args.validation_file,
-                                                 data_args.file_type,
-                                                 data_args.keep_linebreaks,
-                                                 data_args.streaming)
+        for i in range(len(train_files)):
+            raw_datasets_list.append(load_raw_dataset_by_files(train_files[i],
+                                                               validation_files[i],
+                                                               file_types[i],
+                                                               data_args.keep_linebreaks,
+                                                               data_args.streaming))
 
     FLD_dataset_streaming = data_args.streaming
     if data_args.FLD_dataset_name is not None:
@@ -578,6 +589,7 @@ def main():
                                                      'json',
                                                      False,
                                                      FLD_dataset_streaming)
+
     # load and dump once to normalize the schema from different versions of datasets.
     # to always reflect the modification of the preprocessing
     # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
@@ -686,91 +698,91 @@ def main():
             )
             raise ValueError(msg)
 
-    if len(raw_datasets) == 0:
-        # if prob != 1.0 raise error
-        if data_args.FLD_dataset_prob != 1.0:
-            raise ValueError("FLD_dataset_prob must be 1.0 when the main dataset is empty.")
-        lm_datasets = {}
+    if len(raw_datasets_list) == 0:
+        lm_datasets_list = []
     else:
-        # Preprocessing the datasets.
-        # First we tokenize all the texts.
-        if training_args.do_train:
-            column_names = list(raw_datasets["train"].features)
-        elif training_args.do_eval or data_args.do_eval_in_outerloop:
-            column_names = list(raw_datasets["validation"].features)
-        else:
-            column_names = None
-        text_column_name = data_args.text_column_name\
-            or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
+        lm_datasets_list = []
 
-        # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
-        tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
-
-        def tokenize_function(examples):
-            with CaptureLogger(tok_logger) as cl:
-                output = tokenizer(examples[text_column_name])
-            # clm input could be much much longer than block_size
-            if "Token indices sequence length is longer than the" in cl.out:
-                tok_logger.warning(
-                    "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
-                    " before being passed to the model."
-                )
-            return output
-
-        # Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.
-        def group_texts(examples):
-            # Concatenate all texts.
-            concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-            total_length = len(concatenated_examples[list(examples.keys())[0]])
-            # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
-            # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
-            total_length = (total_length // block_size) * block_size
-            # Split by chunks of max_len.
-            result = {
-                k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
-                for k, t in concatenated_examples.items()
-            }
-            result["labels"] = result["input_ids"].copy()
-            return result
-
-        with training_args.main_process_first(desc="dataset map tokenization"):
-            if not data_args.streaming:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    num_proc=data_args.preprocessing_num_workers,
-                    remove_columns=column_names,
-                    load_from_cache_file=not data_args.overwrite_cache,
-                    desc="Running tokenizer on dataset",
-                )
+        for raw_datasets in raw_datasets_list:
+            if training_args.do_train:
+                column_names = list(raw_datasets["train"].features)
+            elif training_args.do_eval or data_args.do_eval_in_outerloop:
+                column_names = list(raw_datasets["validation"].features)
             else:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    remove_columns=column_names,
-                )
+                column_names = None
+            text_column_name = data_args.text_column_name\
+                or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
 
-        # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
-        # for each of those groups of 1,000 texts. You can adjust that batch_size here but a higher value might be slower
-        # to preprocess.
-        #
-        # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
-        # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
+            # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
+            tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
 
-        with training_args.main_process_first(desc="grouping texts together"):
-            if not data_args.streaming:
-                lm_datasets = tokenized_datasets.map(
-                    group_texts,
-                    batched=True,
-                    num_proc=data_args.preprocessing_num_workers,
-                    load_from_cache_file=not data_args.overwrite_cache,
-                    desc=f"Grouping texts in chunks of {block_size}",
-                )
-            else:
-                lm_datasets = tokenized_datasets.map(
-                    group_texts,
-                    batched=True,
-                )
+            def tokenize_function(examples):
+                with CaptureLogger(tok_logger) as cl:
+                    output = tokenizer(examples[text_column_name])
+                # clm input could be much much longer than block_size
+                if "Token indices sequence length is longer than the" in cl.out:
+                    tok_logger.warning(
+                        "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
+                        " before being passed to the model."
+                    )
+                return output
+
+            # Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.
+            def group_texts(examples):
+                # Concatenate all texts.
+                concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
+                total_length = len(concatenated_examples[list(examples.keys())[0]])
+                # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
+                # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
+                total_length = (total_length // block_size) * block_size
+                # Split by chunks of max_len.
+                result = {
+                    k: [t[i: i + block_size] for i in range(0, total_length, block_size)]
+                    for k, t in concatenated_examples.items()
+                }
+                result["labels"] = result["input_ids"].copy()
+                return result
+
+            with training_args.main_process_first(desc="dataset map tokenization"):
+                if not data_args.streaming:
+                    tokenized_datasets = raw_datasets.map(
+                        tokenize_function,
+                        batched=True,
+                        num_proc=data_args.preprocessing_num_workers,
+                        remove_columns=column_names,
+                        load_from_cache_file=not data_args.overwrite_cache,
+                        desc="Running tokenizer on dataset",
+                    )
+                else:
+                    tokenized_datasets = raw_datasets.map(
+                        tokenize_function,
+                        batched=True,
+                        remove_columns=column_names,
+                    )
+
+            # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
+            # for each of those groups of 1,000 texts. You can adjust that batch_size here but a higher value might be slower
+            # to preprocess.
+            #
+            # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
+            # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
+
+            with training_args.main_process_first(desc="grouping texts together"):
+                if not data_args.streaming:
+                    lm_datasets = tokenized_datasets.map(
+                        group_texts,
+                        batched=True,
+                        num_proc=data_args.preprocessing_num_workers,
+                        load_from_cache_file=not data_args.overwrite_cache,
+                        desc=f"Grouping texts in chunks of {block_size}",
+                    )
+                else:
+                    lm_datasets = tokenized_datasets.map(
+                        group_texts,
+                        batched=True,
+                    )
+
+            lm_datasets_list.append(lm_datasets)
 
     def _maybe_FLD_preprocess(examples: Dict[str, List[Any]], mode: str):
         if "hypothesis" not in examples:
@@ -830,7 +842,8 @@ def main():
         else:
             if num_FLD_examples > 0 and num_non_FLD_examples > 0:
                 processed = {
-                    key: torch.concat((FLD_processed[key], torch.tensor(non_FLD_examples[key], dtype=FLD_processed[key].dtype)))
+                    key: torch.concat((FLD_processed[key], torch.tensor(
+                        non_FLD_examples[key], dtype=FLD_processed[key].dtype)))
                     for key in feature_names
                 }
             elif num_FLD_examples > 0:
@@ -857,59 +870,59 @@ def main():
     #         batched=True,
     #     )
 
-    def make_interleave_datasets(dataset: Optional[Dataset], FLD_dataset: Optional[Dataset]):
-        if data_args.FLD_dataset_prob == 0.0:
-            if dataset is None:
-                raise ValueError()
-            return dataset
-        elif data_args.FLD_dataset_prob == 1.0:
-            if FLD_dataset is None:
-                raise ValueError()
-            return FLD_dataset
+    def make_interleave_datasets(datasets: List[Dataset], FLD_dataset: Optional[Dataset]):
+        dataset_prob_tot = 1 - data_args.FLD_dataset_prob
+        FLD_dataset_prob = data_args.FLD_dataset_prob
 
-        datasets = []
-        probs = []
-        if dataset is not None:
-            datasets.append(dataset)
-            probs.append(1.0)
+        if dataset_prob_tot > 0.0 and len(datasets) == 0:
+            raise ValueError()
+        if FLD_dataset_prob > 0.0 and FLD_dataset is None:
+            raise ValueError()
+
+        probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
         if FLD_dataset is not None:
             datasets.append(FLD_dataset)
-            probs.append(data_args.FLD_dataset_prob)
-            probs[0] -= data_args.FLD_dataset_prob
-        return interleave_datasets(
-            datasets,
-            probabilities=probs,
-            seed=0,
-            stopping_strategy="all_exhausted",
-        )
+            probs.append(FLD_dataset_prob)
+
+        if len(datasets) == 1:
+            return datasets[0]
+        else:
+            return interleave_datasets(
+                datasets,
+                probabilities=probs,
+                seed=0,
+                stopping_strategy="all_exhausted",
+            )
 
     if training_args.do_train:
-        if "train" not in lm_datasets and "train" not in FLD_lm_datasets:
-            raise ValueError("--do_train requires a train dataset")
-        train_dataset = make_interleave_datasets(lm_datasets.get("train", None),
+        train_dataset = make_interleave_datasets([lm_datasets["train"] for lm_datasets in lm_datasets_list],
                                                  FLD_lm_datasets.get("train", None))
         if data_args.max_train_samples is not None:
-            max_train_samples = min(len(train_dataset), data_args.max_train_samples)
-            if data_args.random_sample_max_train_samples:
-                indexes = np.random.choice(len(train_dataset), max_train_samples, replace=False)
+            if isinstance(train_dataset, IterableDataset):
+                train_dataset = train_dataset.take(data_args.max_train_samples)
             else:
-                indexes = np.arange(max_train_samples)
-            train_dataset = train_dataset.select(indexes)
+                max_train_samples = min(len(train_dataset), data_args.max_train_samples)
+                if data_args.random_sample_max_train_samples:
+                    indexes = np.random.choice(len(train_dataset), max_train_samples, replace=False)
+                else:
+                    indexes = np.arange(max_train_samples)
+                train_dataset = train_dataset.select(indexes)
     else:
         train_dataset = None
 
     if training_args.do_eval or data_args.do_eval_in_outerloop:
-        if "validation" not in lm_datasets and "validation" not in FLD_lm_datasets:
-            raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = make_interleave_datasets(lm_datasets.get("validation", None),
+        eval_dataset = make_interleave_datasets([lm_datasets["validation"] for lm_datasets in lm_datasets_list],
                                                 FLD_lm_datasets.get("validation", None))
         if data_args.max_eval_samples is not None:
-            max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
-            if data_args.random_sample_max_eval_samples:
-                indexes = np.random.choice(len(eval_dataset), max_eval_samples, replace=False)
+            if isinstance(eval_dataset, IterableDataset):
+                eval_dataset = eval_dataset.take(data_args.max_eval_samples)
             else:
-                indexes = np.arange(max_eval_samples)
-            eval_dataset = eval_dataset.select(indexes)
+                max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
+                if data_args.random_sample_max_eval_samples:
+                    indexes = np.random.choice(len(eval_dataset), max_eval_samples, replace=False)
+                else:
+                    indexes = np.arange(max_eval_samples)
+                eval_dataset = eval_dataset.select(indexes)
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
@@ -930,15 +943,52 @@ def main():
     else:
         eval_dataset = None
 
+    remove_columns = [
+        # 'input_ids',
+        # 'attention_mask',
+        # 'labels',
+        'version',
+        'hypothesis_formula',
+        'facts_formula',
+        'proofs',
+        'proofs_formula',
+        'negative_hypothesis',
+        'negative_hypothesis_formula',
+        'negative_proofs',
+        'negative_original_tree_depth',
+        'original_tree_depth',
+        'num_formula_distractors',
+        'num_translation_distractors',
+        'num_all_distractors',
+        'proof_label',
+        'negative_proof_label',
+        'world_assump_label',
+        'negative_world_assump_label',
+        'prompt_serial',
+        'proof_serial',
+    ]
+
     # We set FLD preprocesssing function to the interleaved datasets.
     # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
     # as interleave_datasets() does not respect that processing in the current implementation
     if train_dataset:
-        train_dataset.set_transform(
-            lambda examples: _maybe_FLD_preprocess(examples, 'train'))
+        # train_dataset.set_transform(
+        #     lambda examples: _maybe_FLD_preprocess(examples, 'train'))
+
+        train_dataset = train_dataset.map(
+            lambda examples: _maybe_FLD_preprocess(examples, 'train'),
+            batched=True,
+            remove_columns=remove_columns,
+        )
     if eval_dataset:
-        eval_dataset.set_transform(
-            lambda examples: _maybe_FLD_preprocess(examples, 'eval'))
+        # eval_dataset.set_transform(
+        #     lambda examples: _maybe_FLD_preprocess(examples, 'eval'))
+
+        eval_dataset = eval_dataset.map(
+            lambda examples: _maybe_FLD_preprocess(examples, 'eval'),
+            batched=True,
+            remove_columns=remove_columns,
+        )
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
@@ -979,15 +1029,27 @@ def main():
 
     if "validation" in FLD_lm_datasets:
         FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
-        FLD_proof_eval_dataset.set_transform(
-            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
-        if data_args.FLD_max_eval_samples is not None and data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
-            # select as train and eval dataset
-            if data_args.random_sample_FLD_max_eval_samples:
-                indexes = np.random.choice(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples, replace=False)
+
+        # FLD_proof_eval_dataset.set_transform(
+        #     lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
+        FLD_proof_eval_dataset = FLD_proof_eval_dataset.map(
+            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
+            batched=True,
+            remove_columns=remove_columns,
+        )
+
+        if data_args.FLD_max_eval_samples is not None:
+            if isinstance(FLD_proof_eval_dataset, IterableDataset):
+                if data_args.random_sample_FLD_max_eval_samples:
+                    logger.warning('random_sample_FLD_max_eval_samples is ignored because of the streaming mode')
+                FLD_proof_eval_dataset = FLD_proof_eval_dataset.take(data_args.FLD_max_eval_samples)
             else:
-                indexes = np.arange(data_args.FLD_max_eval_samples)
-            FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(indexes)
+                if data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
+                    if data_args.random_sample_FLD_max_eval_samples:
+                        indexes = np.random.choice(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples, replace=False)
+                    else:
+                        indexes = np.arange(data_args.FLD_max_eval_samples)
+                    FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(indexes)
     else:
         FLD_proof_eval_dataset = None
 
@@ -1029,8 +1091,8 @@ def main():
         model=model,
         args=training_args,
 
-        train_dataset = train_dataset if training_args.do_train else None,
-        eval_dataset = eval_dataset if training_args.do_eval else None,
+        train_dataset=train_dataset if training_args.do_train else None,
+        eval_dataset=eval_dataset if training_args.do_eval else None,
 
         tokenizer=tokenizer,
         # Data collator will default to DataCollatorWithPadding, so we change it.
@@ -1093,20 +1155,6 @@ def main():
             gradio_port=data_args.gradio_port,
         )
         return
-
-    # kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-generation"}
-    # if data_args.dataset_name is not None:
-    #     kwargs["dataset_tags"] = data_args.dataset_name
-    #     if data_args.dataset_config_name is not None:
-    #         kwargs["dataset_args"] = data_args.dataset_config_name
-    #         kwargs["dataset"] = f"{data_args.dataset_name} {data_args.dataset_config_name}"
-    #     else:
-    #         kwargs["dataset"] = data_args.dataset_name
-
-    # if training_args.push_to_hub:
-    #     trainer.push_to_hub(**kwargs)
-    # else:
-    #     trainer.create_model_card(**kwargs)
 
 
 def _mp_fn(index):
