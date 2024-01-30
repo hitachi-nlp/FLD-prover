@@ -694,7 +694,11 @@ def main():
                 f"The block_size passed ({data_args.block_size}) is larger than the maximum length for the model"
                 f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
             )
+
+            # logger.warning(msg)
+            # block_size = tokenizer.model_max_length - 100
             raise ValueError(msg)
+
 
     if len(raw_datasets_list) == 0:
         lm_datasets_list = []
@@ -1008,6 +1012,7 @@ def main():
         tokenizer,
         model,
     ]
+    generation_max_length = min(data_args.generation_max_length + 1, model.config.max_position_embeddings)
     generation_handled_kwargs = {
         'eos_token_id': tokenizer.eos_token_id,
         'top_k': data_args.generation_top_k,
@@ -1016,7 +1021,7 @@ def main():
         'do_sample': data_args.generation_do_sample,
         'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
-        'max_length': data_args.generation_max_length + 1,  # + 1 to be compatible with beam_search
+        'max_length': generation_max_length,
         'max_new_tokens': data_args.generation_max_new_tokens,
     }
     ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
