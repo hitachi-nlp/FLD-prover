@@ -9,6 +9,30 @@ _REMOVE_NAMES = [
     'prompts_w_partial_proof',
     'proof_step',
     'gold_proof',
+
+
+    # 'input_ids',
+    # 'attention_mask',
+    # 'labels',
+    'version',
+    'hypothesis_formula',
+    'facts_formula',
+    'proofs',
+    'proofs_formula',
+    'negative_hypothesis',
+    'negative_hypothesis_formula',
+    'negative_proofs',
+    'negative_original_tree_depth',
+    'original_tree_depth',
+    'num_formula_distractors',
+    'num_translation_distractors',
+    'num_all_distractors',
+    'proof_label',
+    'negative_proof_label',
+    'world_assump_label',
+    'negative_world_assump_label',
+    'prompt_serial',
+    'proof_serial',
 ]
 
 
@@ -24,7 +48,8 @@ class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
 
 class RemoveUnusedColumnsCollator:
 
-    def __init__(self, return_tensors: Optional[str] = None):
+    def __init__(self,
+                 return_tensors: Optional[str] = None):
         if return_tensors is None:
             raise ValueError()
         self.return_tensors = return_tensors

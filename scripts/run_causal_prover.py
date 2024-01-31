@@ -490,6 +490,7 @@ def main():
                 dataset_name,
                 dataset_config_name,
                 split=f"train[:{data_args.validation_split_percentage}%]",
+                # split=f"train",
                 cache_dir=model_args.cache_dir,
                 use_auth_token=True if model_args.use_auth_token else None,
                 streaming=streaming,
@@ -498,6 +499,7 @@ def main():
                 dataset_name,
                 dataset_config_name,
                 split=f"train[{data_args.validation_split_percentage}%:]",
+                # split=f"train",
                 cache_dir=model_args.cache_dir,
                 use_auth_token=True if model_args.use_auth_token else None,
                 streaming=streaming,
@@ -566,13 +568,13 @@ def main():
     if len(dataset_names) > 0:
         for i in range(len(dataset_names)):
             raw_datasets_list.append(load_raw_dataset_by_name(dataset_names[i],
-                                                              dataset_config_names[i],
+                                                              dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
                                                               data_args.streaming))
     else:
         for i in range(len(train_files)):
             raw_datasets_list.append(load_raw_dataset_by_files(train_files[i],
-                                                               validation_files[i],
-                                                               file_types[i],
+                                                               validation_files[i] if validation_files[i] != 'None' else None,
+                                                               file_types[i] if file_types[i] != 'None' else 'json',
                                                                data_args.keep_linebreaks,
                                                                data_args.streaming))
 
@@ -588,13 +590,27 @@ def main():
                                                      False,
                                                      FLD_dataset_streaming)
 
+    def FLD_unify_schema(examples: Dict[str, List[Any]]):
+        keys = list(examples.keys())
+        batch_size = len(examples[keys[0]])
+        examples_list = [
+            {key: values[i] for key, values in examples.items()}
+            for i in range(batch_size)
+        ]
+        examples_list = [
+            load_deduction(example).dict()
+            for example in examples_list
+        ]
+        return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+
     # load and dump once to normalize the schema from different versions of datasets.
     # to always reflect the modification of the preprocessing
     # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
     FLD_dataset_map_config = {} if FLD_dataset_streaming else {'load_from_cache_file': False}
     FLD_raw_datasets = FLD_raw_datasets.map(
-        lambda example: load_deduction(example).dict(),
-        batched=False,
+        # lambda example: load_deduction(example).dict(),
+        FLD_unify_schema,
+        batched=True,
         **FLD_dataset_map_config,
     )
 
@@ -802,6 +818,11 @@ def main():
             key: [values[i] for i in non_FLD_indexes]
             for key, values in examples.items()
         }
+        if data_args.log_examples:
+            for i_example in range(num_non_FLD_examples):
+                logger.info('------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
+                for key, values in non_FLD_examples.items():
+                    logger.info('%s: "%s"', key, values[i_example])
 
         if mode in ["train", "eval"]:
             FLD_preproc_split = "train"
@@ -879,7 +900,7 @@ def main():
         elif FLD_dataset is None:
             dataset_prob_tot = 1.0
             FLD_dataset_prob = 0.0
-
+        else:
             FLD_dataset_prob = data_args.FLD_dataset_prob
             dataset_prob_tot = 1 - data_args.FLD_dataset_prob
 
@@ -891,6 +912,13 @@ def main():
         if len(datasets) == 1:
             return datasets[0]
         else:
+            if any(max_sample_arg is not None for max_sample_arg in [data_args.max_train_samples,
+                                                                     data_args.random_sample_max_train_samples,
+                                                                     data_args.max_eval_samples,
+                                                                     data_args.random_sample_max_eval_samples,
+                                                                     data_args.FLD_max_eval_samples,
+                                                                     data_args.random_sample_FLD_max_eval_samples]):
+                logger.warning('[kind warning] max sample seems to be set, with which only few datasets might be sampled.')
             return interleave_datasets(
                 datasets,
                 probabilities=probs,
@@ -947,31 +975,6 @@ def main():
     else:
         eval_dataset = None
 
-    remove_columns = [
-        # 'input_ids',
-        # 'attention_mask',
-        # 'labels',
-        'version',
-        'hypothesis_formula',
-        'facts_formula',
-        'proofs',
-        'proofs_formula',
-        'negative_hypothesis',
-        'negative_hypothesis_formula',
-        'negative_proofs',
-        'negative_original_tree_depth',
-        'original_tree_depth',
-        'num_formula_distractors',
-        'num_translation_distractors',
-        'num_all_distractors',
-        'proof_label',
-        'negative_proof_label',
-        'world_assump_label',
-        'negative_world_assump_label',
-        'prompt_serial',
-        'proof_serial',
-    ]
-
     # We set FLD preprocesssing function to the interleaved datasets.
     # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
     # as interleave_datasets() does not respect that processing in the current implementation
@@ -980,7 +983,6 @@ def main():
             train_dataset = train_dataset.map(
                 lambda examples: _maybe_FLD_preprocess(examples, 'train'),
                 batched=True,
-                remove_columns=remove_columns,
             )
         else:
             train_dataset.set_transform(
@@ -990,7 +992,6 @@ def main():
             eval_dataset = eval_dataset.map(
                 lambda examples: _maybe_FLD_preprocess(examples, 'eval'),
                 batched=True,
-                remove_columns=remove_columns,
             )
         else:
             eval_dataset.set_transform(
@@ -1041,7 +1042,6 @@ def main():
             FLD_proof_eval_dataset = FLD_proof_eval_dataset.map(
                 lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
                 batched=True,
-                remove_columns=remove_columns,
             )
         else:
             FLD_proof_eval_dataset.set_transform(

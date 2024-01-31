@@ -184,17 +184,21 @@ def main():
         # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
     ]
 
-    FLD_dataset_prob = 1.0
-    other_datasets = []
-    streaming = False
+    # FLD_dataset_prob = 1.0
+    # other_datasets = []
+    # streaming = False
 
-    # FLD_dataset_prob = 0.5
-    # other_datasets = [
-    #     # (0.5, 'cerbras/SlimPajama-627B', None),
-    #     # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
-    #     # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
-    # ]
-    # streaming = True
+    FLD_dataset_prob = 0.5
+    other_datasets = [
+        # -- SlimPajamas --
+        (0.5, 'DKYoon/SlimPajama-6B', None)
+        # (0.5, 'venketh/SlimPajama-62B', None)
+        # (0.5, 'cerebras/SlimPajama-627B', None),
+
+        # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+        # (0.5, 'wikitext', 'wikitext-2-raw-v1'),
+    ]
+    streaming = True
 
     model_settings = [
         # ============================ english      ============================
@@ -277,8 +281,8 @@ def main():
 
     learnings = [
         # 'debug.ZS',
-        'debug.step-10',
-        # 'debug.micro',
+        # 'debug.step-10',
+        'debug.micro',
         # 'debug.micro.deepspeed',
         # 'debug.tiny',
 
@@ -552,7 +556,7 @@ def main():
                                         'lora': False,
 
                                         'gpu_name_for_batch_size': gpu_name_for_batch_size,
-                                        # 'use_auth_token': True,
+                                        'use_auth_token': True,
                                         'log_examples': True,
                                     })
 
