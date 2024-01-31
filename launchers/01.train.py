@@ -124,9 +124,13 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
     # output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--2')
+    output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
 
 
 
@@ -226,16 +230,14 @@ def main():
 
 
 
-
+    """
+    (
+        FLD_dataset_prob,
+        other_datasets,
+        streaming,
+    ),
+    """
     multitask_setting_list = [
-        """
-        (
-            FLD_dataset_prob,
-            other_datasets,
-            streaming,
-        ),
-        """
-
         # (
         #     1.0,
         #     [],
@@ -329,11 +331,11 @@ def main():
     # dry_run = True
     dry_run = False
 
-    run_mode = 'vanilla'
+    # run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
-    engine = SubprocessEngine()
+    # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
@@ -341,7 +343,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
@@ -378,8 +381,8 @@ def main():
 
         # gpu_name_for_batch_size = 'A100_48_1'
         #gpu_name_for_batch_size = 'V100_16_1'
-        gpu_name_for_batch_size = 'V100_16_4'
-        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        # gpu_name_for_batch_size = 'V100_16_4'
+        gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     elif isinstance(engine, QsubEngine):
@@ -438,10 +441,11 @@ def main():
     hf_bug_zero_lr_offset = 20
 
     # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    # generation_timeout = None
+    # generation_timeout = 1
     generation_timeout = 3600 * 2
 
     # too long evaluation. we cut it off due to the same reason as above.
+    # evaluation_timeout = 1
     evaluation_timeout = 3600 * 10
 
     warmup_ratio = None
@@ -548,6 +552,12 @@ def main():
                                                 batch_size_per_gpu_factor = 1/2 if fp32 else 1.0,
                                             )
                                         )
+
+                                        if run_mode == 'deepspeed':
+                                            # for max_eval_arg_name in ['max_eval_samples', 'max_predict_samples', 'FLD_max_eval_samples']:
+                                            for max_eval_arg_name in ['FLD_max_eval_samples']:
+                                                if setting.get(max_eval_arg_name, None) is not None and setting['eval_effective_batch_size'] > setting[max_eval_arg_name]:
+                                                    raise ValueError(f'{max_eval_arg_name} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
                                         setting.update(get_model_setting(model_name))
 
