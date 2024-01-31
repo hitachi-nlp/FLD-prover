@@ -245,13 +245,13 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            True,
-        ),
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     True,
+        # ),
 
         # (
         #     0.25,
@@ -261,13 +261,13 @@ def main():
         #     True,
         # ),
 
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     True,
-        # ),
+        (
+            0.0,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            True,
+        ),
     ]
 
 
@@ -280,8 +280,8 @@ def main():
         # 'FT.step-5000',
         # 'FT.step-10000',
 
-        # 'FT.step-2500__bs-128',
-        'FT.step-5000__bs-128',
+        'FT.step-2500__bs-128',
+        # 'FT.step-5000__bs-128',
         # 'FT.step-10000__bs-128',
 
         # ---- JFLD experiments ----
