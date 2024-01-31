@@ -238,7 +238,7 @@ def compute_metrics(eval_preds,
 
         if lm_type == LMType.CAUSAL:
             # the results from model generation include also the prompt
-            prompt = tokenizer.decode(_unmask_by_pad_token(examples[i_example]["input_ids"]),
+            prompt = tokenizer.decode(_unmask_by_pad_token(example["input_ids"]),
                                       skip_special_tokens=True)
             if prompt in pred_proof:
                 pred_proof = pred_proof[len(prompt):]
