@@ -130,8 +130,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1')
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--2')
-    output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
+    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
 
+    output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
 
 
 
@@ -274,12 +275,14 @@ def main():
 
     learnings = [
         # 'debug.ZS',
-        'debug.micro',
-        # 'debug.tiny',
+        # 'debug.micro',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
-        # 'FT.step-20000',
+
+        # 'FT.step-2500__bs-128',
+        'FT.step-5000__bs-128',
+        # 'FT.step-10000__bs-128',
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
@@ -343,8 +346,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
