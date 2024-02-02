@@ -132,7 +132,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--2')
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
+    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
+    output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
 
 
 
@@ -220,13 +221,14 @@ def main():
 
         # -------------------------------- 20240127.logical_cirtuit.llama2 --------------------------------
 
-        '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
+        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
         # '20231103.knowledge.D3.knowledge_factor-5.0',
 
         # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
-        # '2024-01-29.enhance_arguments.past_reproduce',
+        '2024-01-29.enhance_arguments.past_reproduce',
         # '2024-01-29.enhance_arguments.theorems',
         # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
+        '2024-01-29.enhance_arguments.past_reproduce.D8',
     ]
 
 
@@ -245,13 +247,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     True,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            True,
+        ),
 
         # (
         #     0.25,
@@ -261,13 +263,13 @@ def main():
         #     True,
         # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            True,
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     True,
+        # ),
     ]
 
 
@@ -292,6 +294,7 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
+    hours = 30
 
 
 
@@ -326,7 +329,6 @@ def main():
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
     ]
 
-    hours = 72
 
     # save_model = False
     save_model = True
