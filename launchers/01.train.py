@@ -227,9 +227,9 @@ def main():
 
         # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
         '2024-01-29.enhance_arguments.past_reproduce',
-        '2024-01-29.enhance_arguments.theorems',
-        '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
-        '2024-01-29.enhance_arguments.past_reproduce.D8',
+        # '2024-01-29.enhance_arguments.theorems',
+        # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
+        # '2024-01-29.enhance_arguments.past_reproduce.D8',
     ]
 
 
@@ -247,21 +247,21 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            True,
-        ),
-
         # (
-        #     0.0,
+        #     0.5,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
         #     True,
         # ),
+
+        (
+            0.0,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            True,
+        ),
     ]
 
 
