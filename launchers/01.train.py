@@ -135,8 +135,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
-
+    output_top_dir = Path('./outputs/01.train.py/2024-02-04.stable_lm')
 
 
     DATASETS_DIRS = [
@@ -228,11 +227,10 @@ def main():
 
         # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
         '2024-01-29.enhance_arguments.past_reproduce',
-        # '2024-01-29.enhance_arguments.theorems',
-        # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
-        # '2024-01-29.enhance_arguments.past_reproduce.D8',
+        '2024-01-29.enhance_arguments.theorems',
+        '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
+        '2024-01-29.enhance_arguments.past_reproduce.D8',
     ]
-
 
 
     """
@@ -243,19 +241,19 @@ def main():
     ),
     """
     multitask_setting_list = [
-        (
-            1.0,
-            [],
-            False,
-        ),
-
         # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     True,
+        #     1.0,
+        #     [],
+        #     False,
         # ),
+
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            True,
+        ),
 
         # (
         #     0.0,
@@ -271,7 +269,7 @@ def main():
 
     learnings = [
         # 'debug.ZS',
-        'debug.micro',
+        # 'debug.micro',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -279,6 +277,11 @@ def main():
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
         # 'FT.step-10000__bs-128',
+
+        # 'FT.step-1250__bs-256',
+        'FT.step-2500__bs-256',
+        # 'FT.step-5000__bs-256',
+        # 'FT.step-10000__bs-256',
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
@@ -288,7 +291,7 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
-    hours = 30
+    hours = 20
 
 
 
@@ -341,11 +344,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
