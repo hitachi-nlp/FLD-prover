@@ -105,15 +105,15 @@ class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
         self.model_init = other.model_init
         self.is_model_parallel = other.is_model_parallel
 
-        self.sharded_ddp = other.sharded_ddp
-        self.fsdp = other.fsdp
+        # self.sharded_ddp = other.sharded_ddp
+        # self.fsdp = other.fsdp
         if hasattr(other, 'backward_prefetch'):
             self.backward_prefetch = other.backward_prefetch
         if hasattr(other, 'limit_all_gathers'):
             self.limit_all_gathers = other.limit_all_gathers
 
         self.place_model_on_device = other.place_model_on_device
-        self.place_model_on_device = args.place_model_on_device
+        # self.place_model_on_device = args.place_model_on_device
 
         self.data_collator = data_collator or other.data_collator
         self.train_dataset = train_dataset or other.train_dataset
@@ -144,10 +144,10 @@ class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
         self._signature_columns = other._signature_columns
 
         self.use_apex = other.use_apex
-        self.use_cuda_amp = other.use_cuda_amp
+        # self.use_cuda_amp = other.use_cuda_amp
         self.use_cpu_amp = other.use_cpu_amp
 
-        self.do_grad_scaling = other.do_grad_scaling
+        # self.do_grad_scaling = other.do_grad_scaling
         if hasattr(other, 'amp_dtype'):
             self.amp_dtype = other.amp_dtype
         if hasattr(other, 'scalar'):
@@ -160,7 +160,7 @@ class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
         self.control = other.control
         self.current_flos = other.current_flos
         self.hp_search_backend = other.hp_search_backend
-        self.use_tune_checkpoints = other.use_tune_checkpoints
+        # self.use_tune_checkpoints = other.use_tune_checkpoints
         self.label_names = other.label_names
         self.can_return_loss = other.can_return_loss
         self.control = other.control

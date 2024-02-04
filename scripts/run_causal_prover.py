@@ -53,7 +53,6 @@ from transformers import (
     default_data_collator,
     is_torch_tpu_available,
     set_seed,
-    Seq2SeqTrainer,
 )
 from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_callback import TrainerCallback, TrainerState, TrainerControl

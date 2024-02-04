@@ -133,7 +133,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
-    output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
+
+    output_top_dir = Path('./outputs/01.train.py/debug')
 
 
 
@@ -228,7 +230,7 @@ def main():
         '2024-01-29.enhance_arguments.past_reproduce',
         # '2024-01-29.enhance_arguments.theorems',
         # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
-        '2024-01-29.enhance_arguments.past_reproduce.D8',
+        # '2024-01-29.enhance_arguments.past_reproduce.D8',
     ]
 
 
@@ -241,22 +243,14 @@ def main():
     ),
     """
     multitask_setting_list = [
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            True,
+            1.0,
+            [],
+            False,
         ),
 
         # (
-        #     0.25,
+        #     0.5,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
@@ -277,12 +271,12 @@ def main():
 
     learnings = [
         # 'debug.ZS',
-        # 'debug.micro',
+        'debug.micro',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
 
-        'FT.step-2500__bs-128',
+        # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
         # 'FT.step-10000__bs-128',
 
@@ -304,10 +298,13 @@ def main():
         # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
+        # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
 
@@ -344,12 +341,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
