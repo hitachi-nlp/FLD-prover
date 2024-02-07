@@ -9,4 +9,6 @@ fi
 find ${INPUT_DIR}/ -type f\
   | grep "log.*txt\|qsub\.err\|qsub\.out\|zlog\|\.log$"\
   | sort\
-  | ack -l --files-from=- 'Traceback|Kill|Exception|No such file or directory'
+  | ack -l --files-from=- 'Traceback'
+
+  # | ack -l --files-from=- 'Traceback|Kill|Exception|No such file or directory'

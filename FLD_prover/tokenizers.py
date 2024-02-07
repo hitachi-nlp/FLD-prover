@@ -10,7 +10,7 @@ def load(name: str,
          use_fast_tokenizer=True,
          revision="main",
          trust_remote_code=True):
-    if name.startswith('stabilityai'):
+    if name == 'stabilityai/japanese-stablelm-base-alpha':
         tokenizer = LlamaTokenizer.from_pretrained("novelai/nerdstash-tokenizer-v1",
                                                    additional_special_tokens=['▁▁'],
                                                    use_auth_token=True if use_auth_token else None)
@@ -45,10 +45,14 @@ def load(name: str,
     #     # We force reset the pad token.
     #     tokenizer.pad_token = '<pad>'
 
-    # PAD_TOKEN = '<HONOKA_PAD>'
     PAD_TOKEN = '<hono_pad>'
+    if name == 'stabilityai/stablelm-2-1_6b':
+        # this model allow only pre-registerd tokens
+        PAD_TOKEN = '<|extra0|>'
+
     if tokenizer.pad_token is None:
         tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
+
     elif tokenizer.pad_token == tokenizer.eos_token:
         # If the eos token is the same as the pad token,
         # the eos token in the labels will be replaced to ignore token (i.e., -100) as well as the pad tokens,
@@ -57,6 +61,9 @@ def load(name: str,
         #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1573966012
         #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285
 
-        tokenizer.pad_token = PAD_TOKEN
+        # XXX: this will not replace tokenizer.pad_token_id
+        # tokenizer.pad_token = PAD_TOKEN
+
+        tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
 
     return tokenizer

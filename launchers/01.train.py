@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging
 from pathlib import Path
+import time
 
 import click
 from script_engine import QsubEngine, SubprocessEngine
@@ -135,7 +136,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-02-04.stable_lm')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.stable_lm')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
 
 
     DATASETS_DIRS = [
@@ -247,21 +250,21 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     True,
-        # ),
-
         (
-            0.0,
+            0.5,
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
             True,
         ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     True,
+        # ),
     ]
 
 
@@ -291,7 +294,7 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
-    hours = 20
+    hours = 30
 
 
 
@@ -305,7 +308,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
+
+        ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
@@ -349,7 +354,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=44)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
@@ -643,6 +649,10 @@ def main():
                                             hours=_hours,
                                             dry_run=dry_run
                                         )
+
+                                        if streaming:
+                                            logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
+                                            time.sleep(60 * 10)
 
     logger.info('------------- ./01.train.py finished !! -----------')
 

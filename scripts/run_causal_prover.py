@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 import readline
+import warnings
 
 import numpy as np
 import deepspeed
@@ -408,6 +409,7 @@ def main():
     logging.getLogger('absl').setLevel(logging.WARNING)
     # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
+    warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
     # must be placed at top, so we extract string from sys.argv directly
     if any(arg.find('deepspeed') >= 0 for arg in sys.argv):
@@ -1125,6 +1127,7 @@ def main():
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         if data_args.save_model_at_end:
+            logger.info("*** Save Model ***")
             trainer.save_model()  # Saves the tokenizer too for easy upload
         metrics = train_result.metrics
 
