@@ -34,6 +34,7 @@ import warnings
 import numpy as np
 import deepspeed
 import datasets
+from datasets.download.download_config import DownloadConfig
 from datasets import interleave_datasets, DatasetDict
 import evaluate
 import torch
@@ -485,6 +486,7 @@ def main():
             cache_dir=model_args.cache_dir,
             use_auth_token=True if model_args.use_auth_token else None,
             streaming=streaming,
+            # download_config=DownloadConfig(resume_download=True),
         )
         if "validation" not in raw_datasets.keys():
             raw_datasets["validation"] = load_dataset(
@@ -495,6 +497,7 @@ def main():
                 cache_dir=model_args.cache_dir,
                 use_auth_token=True if model_args.use_auth_token else None,
                 streaming=streaming,
+                # download_config=DownloadConfig(resume_download=True),
             )
             raw_datasets["train"] = load_dataset(
                 dataset_name,
@@ -504,6 +507,7 @@ def main():
                 cache_dir=model_args.cache_dir,
                 use_auth_token=True if model_args.use_auth_token else None,
                 streaming=streaming,
+                # download_config=DownloadConfig(resume_download=True),
             )
         return raw_datasets
 
@@ -532,6 +536,7 @@ def main():
                 use_auth_token=True if model_args.use_auth_token else None,
                 streaming=streaming,
                 **dataset_args,
+                # download_config=DownloadConfig(resume_download=True),
             )
 
             # If no validation data is there, validation_split_percentage will be used to divide the dataset.
@@ -544,6 +549,7 @@ def main():
                     use_auth_token=True if model_args.use_auth_token else None,
                     streaming=streaming,
                     **dataset_args,
+                    # download_config=DownloadConfig(resume_download=True),
                 )
                 raw_datasets["train"] = load_dataset(
                     extension,
@@ -553,6 +559,7 @@ def main():
                     use_auth_token=True if model_args.use_auth_token else None,
                     streaming=streaming,
                     **dataset_args,
+                    # download_config=DownloadConfig(resume_download=True),
                 )
         else:
             raw_datasets = DatasetDict()

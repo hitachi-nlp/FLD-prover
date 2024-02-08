@@ -138,7 +138,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.stable_lm')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
+    output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
 
 
     DATASETS_DIRS = [
@@ -279,12 +280,12 @@ def main():
 
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
-        # 'FT.step-10000__bs-128',
 
         # 'FT.step-1250__bs-256',
-        'FT.step-2500__bs-256',
-        # 'FT.step-5000__bs-256',
-        # 'FT.step-10000__bs-256',
+        # 'FT.step-2500__bs-256',
+
+        'FT.step-1250__bs-512',
+        # 'FT.step-2500__bs-512',
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
@@ -568,8 +569,9 @@ def main():
                                         if run_mode == 'deepspeed':
                                             # for max_eval_arg_name in ['max_eval_samples', 'max_predict_samples', 'FLD_max_eval_samples']:
                                             for max_eval_arg_name in ['FLD_max_eval_samples']:
-                                                if setting.get(max_eval_arg_name, None) is not None and setting['eval_effective_batch_size'] > setting[max_eval_arg_name]:
-                                                    raise ValueError(f'{max_eval_arg_name} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
+                                                max_eval_arg_sample = setting.get(max_eval_arg_name, None)
+                                                if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
+                                                    raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
                                         setting.update(get_model_setting(model_name))
 
