@@ -244,6 +244,14 @@ class DataTrainingArguments:
             )
         },
     )
+    num_train_examples_skip: Optional[int] = field(
+        default=0,
+        metadata={
+            "help": (
+                "Skip the first n training examples."
+            )
+        },
+    )
 
     max_eval_samples: Optional[int] = field(
         default=None,
@@ -937,6 +945,11 @@ def main():
     if training_args.do_train:
         train_dataset = make_interleave_datasets([lm_datasets["train"] for lm_datasets in lm_datasets_list],
                                                  FLD_lm_datasets.get("train", None))
+
+        if data_args.num_train_examples_skip > 0:
+            logger.info('skip %d examples from the training dataset', data_args.num_train_examples_skip)
+            train_dataset = train_dataset.skip(data_args.num_train_examples_skip)
+
         if data_args.max_train_samples is not None:
             if isinstance(train_dataset, IterableDataset):
                 train_dataset = train_dataset.take(data_args.max_train_samples)

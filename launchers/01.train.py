@@ -2,6 +2,8 @@
 import logging
 from pathlib import Path
 import time
+import os
+import json
 
 import click
 from script_engine import QsubEngine, SubprocessEngine
@@ -141,9 +143,16 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
-    # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
 
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint.num_train_examples_skip')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
+
+    # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -246,9 +255,13 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        # '2024-02-14.translation_speedup.translation-v3',
-        '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
+        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
     ]
+
+    # num_train_examples_skip = None
+    # num_train_examples_skip = 1000
+    num_train_examples_skip = 256 * 1250
 
 
     """
@@ -292,6 +305,8 @@ def main():
         # 'FT.step-5000',
         # 'FT.step-10000',
 
+        # 'FT.step-100_bs-64',
+
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
@@ -327,8 +342,11 @@ def main():
 
         # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
+
+        # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
+        ('./outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0/', 'causal', 'cyberagent/open-calm-7b'),
 
 
         # ============================ japanese     ============================
@@ -349,6 +367,8 @@ def main():
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
     ]
 
+    resume_from_checkpoint = None
+    # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
     # save_model = False
     save_model = True
@@ -510,7 +530,11 @@ def main():
                                 # https://github.com/microsoft/DeepSpeed/issues/4017#issuecomment-1754820339
                                 fp32 = (
                                     model_name.find('t5-') >= 0\
-                                    or is_V100 and (model_name.find('rinna/japanese-gpt2-medium') >= 0 or model_name.find('llama') >= 0)
+                                    or (is_V100\
+                                        and (model_name.find('rinna/japanese-gpt2-medium') >= 0\
+                                             or model_name.find('llama') >= 0\
+                                             or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
+                                        )
                                 )
 
                                 if lm_type == 'causal':
@@ -613,6 +637,9 @@ def main():
                                             'FLD_dataset_uname': FLD_dataset_uname,
                                             'other_dataset_name': other_dataset_names,
                                             'other_dataset_config_name': other_dataset_config_names,
+
+                                            'resume_from_checkpoint': resume_from_checkpoint,
+                                            'num_train_examples_skip': num_train_examples_skip,
 
                                             'base_setting_name': base_setting_name,
 
