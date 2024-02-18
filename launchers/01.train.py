@@ -139,7 +139,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.stable_lm')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
-    output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
+    # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
 
     DATASETS_DIRS = [
@@ -161,6 +164,7 @@ def main():
 
         './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
         './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
+        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
     ]
 
 
@@ -230,10 +234,20 @@ def main():
         # '20231103.knowledge.D3.knowledge_factor-5.0',
 
         # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
-        '2024-01-29.enhance_arguments.past_reproduce',
+        # '2024-01-29.enhance_arguments.past_reproduce',
         # '2024-01-29.enhance_arguments.theorems',
         # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
         # '2024-01-29.enhance_arguments.past_reproduce.D8',
+
+        # ---------------------------------- 2024-02-14.translation_speedup ------------------------------------
+        # '2024-02-14.translation_speedup.past_reproduce',
+        # '2024-02-14.translation_speedup.D8',
+        # '2024-02-14.translation_speedup.propositional-0.2',
+        # '2024-02-14.translation_speedup.theorems',
+        # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
+        # '2024-02-14.translation_speedup.translation-v2',
+        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
     ]
 
 
@@ -281,10 +295,10 @@ def main():
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
-        # 'FT.step-1250__bs-256',
+        'FT.step-1250__bs-256',
         # 'FT.step-2500__bs-256',
 
-        'FT.step-1250__bs-512',
+        # 'FT.step-1250__bs-512',
         # 'FT.step-2500__bs-512',
 
         # ---- JFLD experiments ----
@@ -311,9 +325,9 @@ def main():
 
         # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
+        # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
 
@@ -356,8 +370,8 @@ def main():
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=44)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=44)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
