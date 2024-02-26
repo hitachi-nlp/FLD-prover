@@ -255,13 +255,14 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
+        '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
     ]
 
-    # num_train_examples_skip = None
+    num_train_examples_skip = None
     # num_train_examples_skip = 1000
-    num_train_examples_skip = 256 * 1250
+    # num_train_examples_skip = 256 * 1250
 
 
     """
@@ -342,11 +343,11 @@ def main():
 
         # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
-        ('./outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0/', 'causal', 'cyberagent/open-calm-7b'),
+        # ('./outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0/', 'causal', 'cyberagent/open-calm-7b'),
 
 
         # ============================ japanese     ============================
