@@ -12,7 +12,7 @@ from FLD_task import (
     prettify_proof_text,
     log_example,
 )
-from FLD_prover.data_processing import (
+from FLD_prover.tokenization import (
     unmask_by_pad_token,
     CAUSAL_LM_END_OF_PROMPT,
 )

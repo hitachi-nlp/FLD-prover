@@ -65,13 +65,15 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 from logger_setup import setup as setup_logger
-from FLD_prover.data_processing import (
-    preprocess_function as FLD_preprocess_function,
-    compute_metrics as FLD_compute_metrics,
+from FLD_prover.preprocessing import (
+    FLDPreprocessor,
+    RuleTakerPreprocessor,
 )
-from FLD_prover.trainer import (
-    ForceCallMetricsSeq2SeqTrainer,
+from FLD_prover.metrics import (
+    FLDMetrics,
+    RuleTakerMetrics,
 )
+from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
@@ -211,18 +213,19 @@ class DataTrainingArguments:
         default=None, metadata={"help": "The column of text field to be use from dataset"}
     )
 
-    FLD_dataset_name: Optional[str] = field(
+    logic_dataset_type: str = 'FLD'
+    logic_dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
     )
-    FLD_dataset_config_name: Optional[str] = field(
+    logic_dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    FLD_train_file: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
-    FLD_validation_file: Optional[str] = field(
+    logic_train_fileg: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
+    logic_validation_file: Optional[str] = field(
         default=None,
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
     )
-    FLD_dataset_prob: Optional[float] = field(
+    logic_dataset_prob: Optional[float] = field(
         default=1.0,
     )
 
@@ -272,10 +275,10 @@ class DataTrainingArguments:
         },
     )
 
-    FLD_max_eval_samples: Optional[int] = field(
+    logic_max_eval_samples: Optional[int] = field(
         default=None,
     )
-    random_sample_FLD_max_eval_samples: bool = field(
+    random_sample_logic_max_eval_samples: bool = field(
         default=False,
     )
 
@@ -290,7 +293,7 @@ class DataTrainingArguments:
             )
         },
     )
-    FLD_proof_eval_padding: Optional[str] = field(
+    logic_proof_eval_padding: Optional[str] = field(
         default="longest",
     )
 
@@ -574,12 +577,16 @@ def main():
 
         return raw_datasets
 
-    dataset_names = [name or None for name in data_args.dataset_names.split('::')] if data_args.dataset_names is not None else []
-    dataset_config_names = [name or None for name in data_args.dataset_config_names.split('::')] if data_args.dataset_config_names is not None else []
+    dataset_names = [name or None for name in data_args.dataset_names.split(
+        '::')] if data_args.dataset_names is not None else []
+    dataset_config_names = [name or None for name in data_args.dataset_config_names.split(
+        '::')] if data_args.dataset_config_names is not None else []
     train_files = [name or None for name in data_args.train_files.split('::')] if data_args.train_files is not None else []
-    validation_files = [name or None for name in data_args.validation_files.split('::')] if data_args.validation_files is not None else []
+    validation_files = [name or None for name in data_args.validation_files.split(
+        '::')] if data_args.validation_files is not None else []
     file_types = [name or None for name in data_args.file_types.split('::')] if data_args.file_types is not None else []
-    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')] if data_args.dataset_probs is not None else []
+    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')
+                     ] if data_args.dataset_probs is not None else []
     raw_datasets_list = []
     if len(dataset_names) > 0:
         for i in range(len(dataset_names)):
@@ -594,41 +601,42 @@ def main():
                                                                data_args.keep_linebreaks,
                                                                data_args.streaming))
 
-    FLD_dataset_streaming = data_args.streaming
-    if data_args.FLD_dataset_name is not None:
-        FLD_raw_datasets = load_raw_dataset_by_name(data_args.FLD_dataset_name,
-                                                    data_args.FLD_dataset_config_name,
-                                                    FLD_dataset_streaming)
+    logic_dataset_streaming = data_args.streaming
+    if data_args.logic_dataset_name is not None:
+        logic_raw_datasets = load_raw_dataset_by_name(data_args.logic_dataset_name,
+                                                      data_args.logic_dataset_config_name,
+                                                      logic_dataset_streaming)
     else:
-        FLD_raw_datasets = load_raw_dataset_by_files(data_args.FLD_train_file,
-                                                     data_args.FLD_validation_file,
-                                                     'json',
-                                                     False,
-                                                     FLD_dataset_streaming)
+        logic_raw_datasets = load_raw_dataset_by_files(data_args.logic_train_fileg,
+                                                       data_args.logic_validation_file,
+                                                       'json',
+                                                       False,
+                                                       logic_dataset_streaming)
 
-    def FLD_unify_schema(examples: Dict[str, List[Any]]):
-        keys = list(examples.keys())
-        batch_size = len(examples[keys[0]])
-        examples_list = [
-            {key: values[i] for key, values in examples.items()}
-            for i in range(batch_size)
-        ]
-        examples_list = [
-            load_deduction(example).dict()
-            for example in examples_list
-        ]
-        return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+    if data_args.logic_dataset_type == 'FLD':
 
-    # load and dump once to normalize the schema from different versions of datasets.
-    # to always reflect the modification of the preprocessing
-    # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
-    FLD_dataset_map_config = {} if FLD_dataset_streaming else {'load_from_cache_file': False}
-    FLD_raw_datasets = FLD_raw_datasets.map(
-        # lambda example: load_deduction(example).dict(),
-        FLD_unify_schema,
-        batched=True,
-        **FLD_dataset_map_config,
-    )
+        # load and dump once to normalize the schema from different versions of datasets.
+        # to always reflect the modification of the preprocessing
+        # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
+
+        def FLD_unify_schema(examples: Dict[str, List[Any]]):
+            keys = list(examples.keys())
+            batch_size = len(examples[keys[0]])
+            examples_list = [
+                {key: values[i] for key, values in examples.items()}
+                for i in range(batch_size)
+            ]
+            examples_list = [
+                load_deduction(example).dict()
+                for example in examples_list
+            ]
+            return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+        logic_raw_datasets = logic_raw_datasets.map(
+            # lambda example: load_deduction(example).dict(),
+            FLD_unify_schema,
+            batched=True,
+            **({} if logic_dataset_streaming else {'load_from_cache_file': False}),
+        )
 
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
@@ -728,7 +736,6 @@ def main():
             )
             raise ValueError(msg)
 
-
     if len(raw_datasets_list) == 0:
         lm_datasets_list = []
     else:
@@ -815,115 +822,121 @@ def main():
 
             lm_datasets_list.append(lm_datasets)
 
-    def _maybe_FLD_preprocess(examples: Dict[str, List[Any]], mode: str):
-        if "hypothesis" not in examples:
+    def _maybe_logic_preprocess(examples: Dict[str, List[Any]], mode: str):
+        if data_args.logic_dataset_type == 'FLD':
+            logic_key = 'hypothesis'
+        elif data_args.logic_dataset_type == 'ruletaker':
+            logic_key = 'context'
+        else:
+            raise ValueError()
+
+        if logic_key not in examples:
             return examples
 
-        FLD_indexes = [i for i in range(len(examples["hypothesis"]))
-                       if examples["hypothesis"][i] is not None]
-        non_FLD_indexes = [i for i in range(len(examples["hypothesis"]))
-                           if i not in FLD_indexes]
-        num_FLD_examples = len(FLD_indexes)
-        num_non_FLD_examples = len(non_FLD_indexes)
+        logic_indexes = [i for i in range(len(examples[logic_key]))
+                         if examples[logic_key][i] is not None]
+        non_logic_indexes = [i for i in range(len(examples[logic_key]))
+                             if i not in logic_indexes]
+        num_logic_examples = len(logic_indexes)
+        num_non_logic_examples = len(non_logic_indexes)
 
-        FLD_examples = {
-            key: [values[i] for i in FLD_indexes]
+        logic_examples = {
+            key: [values[i] for i in logic_indexes]
             for key, values in examples.items()
         }
-        non_FLD_examples = {
-            key: [values[i] for i in non_FLD_indexes]
+        non_logic_examples = {
+            key: [values[i] for i in non_logic_indexes]
             for key, values in examples.items()
         }
         if data_args.log_examples:
-            for i_example in range(num_non_FLD_examples):
-                logger.info('------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
-                for key, values in non_FLD_examples.items():
+            for i_example in range(num_non_logic_examples):
+                logger.info(
+                    '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
+                for key, values in non_logic_examples.items():
                     logger.info('%s: "%s"', key, values[i_example])
 
         if mode in ["train", "eval"]:
-            FLD_preproc_split = "train"
-            FLD_padding = "max_length" if data_args.FLD_dataset_prob != 1.0 else data_args.FLD_proof_eval_padding
+            logic_preproc_split = "train"
+            logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_proof_eval_padding
             feature_names = ['input_ids', 'attention_mask', 'labels']
 
-        elif mode == "FLD_proof_eval":
-            FLD_preproc_split = "eval"
-            FLD_padding = data_args.FLD_proof_eval_padding
-            feature_names = list(FLD_examples.keys())
+        elif mode == "proof_eval":
+            logic_preproc_split = "eval"
+            logic_padding = data_args.logic_proof_eval_padding
+            feature_names = list(logic_examples.keys())
 
         else:
             raise ValueError()
 
-        if num_FLD_examples > 0:
-            FLD_processed = FLD_preprocess_function(
-                FLD_examples,
-                FLD_preproc_split,
+        if num_logic_examples > 0:
+            preprocessor_args = [
                 LMType.CAUSAL,
                 tokenizer,
-                prompt_prefix=data_args.source_prefix,
-                padding=FLD_padding,
-                max_source_length=block_size,
-                max_target_length=block_size,
-                proof_sampling=False,
-                sample_negative_proof=False,
-                no_subproof_for_unknown=data_args.no_subproof_for_unknown,
-                include_prompt_for_causal_lm_loss=data_args.include_prompt_for_causal_lm_loss,
-                instruction=data_args.instruction,
-                log_examples=data_args.log_examples,
-            )
-        else:
-            FLD_processed = {}
+            ]
+            preprocessor_kwargs = {
+                'prompt_prefix': data_args.source_prefix,
+                'padding': logic_padding,
+                'max_source_length': block_size,
+                'max_target_length': block_size,
+                'proof_sampling': False,
+                'sample_negative_proof': False,
+                'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
+                'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
+                'instruction': data_args.instruction,
+                'log_examples': data_args.log_examples,
+            }
+            if data_args.logic_dataset_type == 'FLD':
+                logic_preprocessor = FLDPreprocessor(*preprocessor_args, **preprocessor_kwargs)
+            elif data_args.logic_dataset_type == 'ruletaker':
+                logic_preprocessor = RuleTakerPreprocessor(*preprocessor_args, **preprocessor_kwargs)
+            else:
+                raise ValueError()
 
-        if mode == "FLD_proof_eval":
-            return FLD_processed
+            logic_processed = logic_preprocessor.preprocess_examples(
+                logic_examples,
+                logic_preproc_split,
+            )
+
         else:
-            if num_FLD_examples > 0 and num_non_FLD_examples > 0:
+            logic_processed = {}
+
+        if mode == "proof_eval":
+            return logic_processed
+
+        else:
+            if num_logic_examples > 0 and num_non_logic_examples > 0:
                 processed = {
-                    key: torch.concat((FLD_processed[key], torch.tensor(
-                        non_FLD_examples[key], dtype=FLD_processed[key].dtype)))
+                    key: torch.concat((logic_processed[key], torch.tensor(
+                        non_logic_examples[key], dtype=logic_processed[key].dtype)))
                     for key in feature_names
                 }
-            elif num_FLD_examples > 0:
-                processed = {key: vals for key, vals in FLD_processed.items() if key in feature_names}
+            elif num_logic_examples > 0:
+                processed = {key: vals for key, vals in logic_processed.items() if key in feature_names}
             else:
-                processed = {key: vals for key, vals in non_FLD_examples.items() if key in feature_names}
+                processed = {key: vals for key, vals in non_logic_examples.items() if key in feature_names}
+
             return processed
 
-    FLD_lm_datasets = FLD_raw_datasets
+    logic_lm_datasets = logic_raw_datasets
 
-    # the below "map" does not work, because the trainer drops all the features before set_transform() is called,
-    # as the features do not match forward() signatures.
-    # if not data_args.streaming:
-    #     FLD_lm_datasets = FLD_raw_datasets.map(
-    #         lambda examples: _maybe_FLD_preprocess(examples, 'train'),
-    #         batched=True,
-    #         num_proc=data_args.preprocessing_num_workers,
-    #         load_from_cache_file=not data_args.overwrite_cache,
-    #         desc="preprocessing FLD datasets",
-    #     )
-    # else:
-    #     FLD_lm_datasets = FLD_raw_datasets.map(
-    #         lambda examples: _maybe_FLD_preprocess(examples, 'train'),
-    #         batched=True,
-    #     )
-
-    def make_interleave_datasets(datasets: List[Dataset], FLD_dataset: Optional[Dataset]):
-        if len(datasets) == 0 and FLD_dataset is None:
+    def make_interleave_datasets(datasets: List[Dataset], logic_dataset: Optional[Dataset]):
+        if len(datasets) == 0 and logic_dataset is None:
             raise ValueError()
 
         if len(datasets) == 0:
             dataset_prob_tot = 0.0
-            FLD_dataset_prob = 1.0
-        elif FLD_dataset is None:
+            logic_dataset_prob = 1.0
+        elif logic_dataset is None:
             dataset_prob_tot = 1.0
-            FLD_dataset_prob = 0.0
+            logic_dataset_prob = 0.0
         else:
-            FLD_dataset_prob = data_args.FLD_dataset_prob
-            dataset_prob_tot = 1 - data_args.FLD_dataset_prob
+            logic_dataset_prob = data_args.logic_dataset_prob
+            dataset_prob_tot = 1 - data_args.logic_dataset_prob
 
         probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
-        if FLD_dataset is not None:
-            datasets.append(FLD_dataset)
-            probs.append(FLD_dataset_prob)
+        if logic_dataset is not None:
+            datasets.append(logic_dataset)
+            probs.append(logic_dataset_prob)
 
         if len(datasets) == 1:
             return datasets[0]
@@ -932,8 +945,8 @@ def main():
                                                                      data_args.random_sample_max_train_samples,
                                                                      data_args.max_eval_samples,
                                                                      data_args.random_sample_max_eval_samples,
-                                                                     data_args.FLD_max_eval_samples,
-                                                                     data_args.random_sample_FLD_max_eval_samples]):
+                                                                     data_args.logic_max_eval_samples,
+                                                                     data_args.random_sample_logic_max_eval_samples]):
                 logger.warning('[kind warning] max sample seems to be set, with which only few datasets might be sampled.')
             return interleave_datasets(
                 datasets,
@@ -944,7 +957,7 @@ def main():
 
     if training_args.do_train:
         train_dataset = make_interleave_datasets([lm_datasets["train"] for lm_datasets in lm_datasets_list],
-                                                 FLD_lm_datasets.get("train", None))
+                                                 logic_lm_datasets.get("train", None))
 
         if data_args.num_train_examples_skip > 0:
             logger.info('skip %d examples from the training dataset', data_args.num_train_examples_skip)
@@ -965,7 +978,7 @@ def main():
 
     if training_args.do_eval or data_args.do_eval_in_outerloop:
         eval_dataset = make_interleave_datasets([lm_datasets["validation"] for lm_datasets in lm_datasets_list],
-                                                FLD_lm_datasets.get("validation", None))
+                                                logic_lm_datasets.get("validation", None))
         if data_args.max_eval_samples is not None:
             if isinstance(eval_dataset, IterableDataset):
                 eval_dataset = eval_dataset.take(data_args.max_eval_samples)
@@ -1002,21 +1015,21 @@ def main():
     if train_dataset:
         if MAP:
             train_dataset = train_dataset.map(
-                lambda examples: _maybe_FLD_preprocess(examples, 'train'),
+                lambda examples: _maybe_logic_preprocess(examples, 'train'),
                 batched=True,
             )
         else:
             train_dataset.set_transform(
-                lambda examples: _maybe_FLD_preprocess(examples, 'train'))
+                lambda examples: _maybe_logic_preprocess(examples, 'train'))
     if eval_dataset:
         if MAP:
             eval_dataset = eval_dataset.map(
-                lambda examples: _maybe_FLD_preprocess(examples, 'eval'),
+                lambda examples: _maybe_logic_preprocess(examples, 'eval'),
                 batched=True,
             )
         else:
             eval_dataset.set_transform(
-                lambda examples: _maybe_FLD_preprocess(examples, 'eval'))
+                lambda examples: _maybe_logic_preprocess(examples, 'eval'))
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
@@ -1056,40 +1069,45 @@ def main():
         **generation_handled_kwargs,
     )
 
-    if "validation" in FLD_lm_datasets:
-        FLD_proof_eval_dataset = FLD_lm_datasets["validation"]
+    if "validation" in logic_lm_datasets:
+        logic_eval_dataset = logic_lm_datasets["validation"]
 
         if MAP:
-            FLD_proof_eval_dataset = FLD_proof_eval_dataset.map(
-                lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
+            logic_eval_dataset = logic_eval_dataset.map(
+                lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
                 batched=True,
             )
         else:
-            FLD_proof_eval_dataset.set_transform(
-                lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'))
+            logic_eval_dataset.set_transform(
+                lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'))
 
-        if data_args.FLD_max_eval_samples is not None:
-            if isinstance(FLD_proof_eval_dataset, IterableDataset):
-                if data_args.random_sample_FLD_max_eval_samples:
-                    logger.warning('random_sample_FLD_max_eval_samples is ignored because of the streaming mode')
-                FLD_proof_eval_dataset = FLD_proof_eval_dataset.take(data_args.FLD_max_eval_samples)
+        if data_args.logic_max_eval_samples is not None:
+            if isinstance(logic_eval_dataset, IterableDataset):
+                if data_args.random_sample_logic_max_eval_samples:
+                    logger.warning('random_sample_logic_max_eval_samples is ignored because of the streaming mode')
+                logic_eval_dataset = logic_eval_dataset.take(data_args.logic_max_eval_samples)
             else:
-                if data_args.FLD_max_eval_samples < len(FLD_proof_eval_dataset):
-                    if data_args.random_sample_FLD_max_eval_samples:
-                        indexes = np.random.choice(len(FLD_proof_eval_dataset), data_args.FLD_max_eval_samples, replace=False)
+                if data_args.logic_max_eval_samples < len(logic_eval_dataset):
+                    if data_args.random_sample_logic_max_eval_samples:
+                        indexes = np.random.choice(len(logic_eval_dataset),
+                                                   data_args.logic_max_eval_samples, replace=False)
                     else:
-                        indexes = np.arange(data_args.FLD_max_eval_samples)
-                    FLD_proof_eval_dataset = FLD_proof_eval_dataset.select(indexes)
+                        indexes = np.arange(data_args.logic_max_eval_samples)
+                    logic_eval_dataset = logic_eval_dataset.select(indexes)
     else:
-        FLD_proof_eval_dataset = None
+        logic_eval_dataset = None
 
-    def _FLD_compute_metrics(eval_preds) -> Dict[str, Any]:
-        return FLD_compute_metrics(
-            eval_preds,
-            tokenizer,
-            FLD_proof_eval_dataset,
-            LMType.CAUSAL,
-        )
+    metric_kwargs = {
+        'tokenizer': tokenizer,
+        'eval_dataset': logic_eval_dataset,
+        'lm_type': LMType.CAUSAL,
+    }
+    if data_args.logic_dataset_type == 'FLD':
+        compute_metrics = FLDMetrics(**metric_kwargs)
+    elif data_args.logic_dataset_type == 'ruletaker':
+        compute_metrics = RuleTakerMetrics(**metric_kwargs)
+    else:
+        raise ValueError()
 
     def _build_FLD_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                    do_compute_metrics=True):
@@ -1099,9 +1117,9 @@ def main():
             args=training_args,
             data_collator=collator,
             train_dataset=None,
-            eval_dataset=FLD_proof_eval_dataset,
+            eval_dataset=logic_eval_dataset,
             tokenizer=tokenizer,
-            compute_metrics=_FLD_compute_metrics if do_compute_metrics else None,
+            compute_metrics=compute_metrics if do_compute_metrics else None,
         )
 
     class FLDEvaluationCallback(TrainerCallback):
@@ -1113,7 +1131,7 @@ def main():
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
             self._FLD_seq2seq_trainer.state = state
             self._FLD_seq2seq_trainer.evaluate(
-                metric_key_prefix="FLD_proof_eval"
+                metric_key_prefix="proof_eval"
             )
 
     # Initialize our Trainer
@@ -1130,10 +1148,10 @@ def main():
         compute_metrics=compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
-
-        # callbacks=[FLDEvaluationCallback(trainer)],  # set by ourselves below to handle circular dependency between FLDEvaluationCallback and the trainer
     )
-    callbacks = trainer.callback_handler.callbacks + [FLDEvaluationCallback(trainer)]
+    callbacks = trainer.callback_handler.callbacks
+    if data_args.logic_dataset_type == 'FLD':
+        callbacks + [FLDEvaluationCallback(trainer)]
     trainer.callback_handler = CallbackHandler(
         callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
     )
@@ -1171,10 +1189,12 @@ def main():
         trainer.save_metrics("eval", metrics)
 
     if data_args.interactive_mode is not None:
+        if data_args.logic_dataset_type != 'FLD':
+            raise ValueError(f'interactive_mode is not supported for {data_args.logic_dataset_type}')
         launch(
             _build_FLD_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
-            lambda examples: _maybe_FLD_preprocess(examples, 'FLD_proof_eval'),
+            lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
             data_args.interactive_mode,
             gradio_port=data_args.gradio_port,
         )
