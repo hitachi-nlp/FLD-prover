@@ -68,12 +68,6 @@ class Metrics(ABC):
             logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
             facts, hypothesis, gold_proof = self._get_logic(example)
-            log_example(
-                facts=facts,
-                hypothesis=hypothesis,
-                gold_proofs=[gold_proof],
-                logger=logger,
-            )
 
             if self._lm_type == LMType.CAUSAL:
                 # the results from model generation include also the prompt
@@ -81,6 +75,14 @@ class Metrics(ABC):
                                                 skip_special_tokens=True)
                 if prompt in pred_proof:
                     pred_proof = pred_proof[len(prompt):]
+
+            log_example(
+                facts=facts,
+                hypothesis=hypothesis,
+                gold_proofs=[gold_proof],
+                pred_proof=pred_proof,
+                logger=logger,
+            )
 
             if example is not None:
                 _metrics = self._compute_metrics_from_example(example, pred_proof)

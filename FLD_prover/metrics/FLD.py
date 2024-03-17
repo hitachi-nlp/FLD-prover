@@ -18,7 +18,7 @@ class FLDMetrics(Metrics):
         def _unmask_by_pad_token(tensor):
             return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
 
-        metrics: Dict[str, List[Any]] = defaultdict(list)
+        metrics = {}
 
         metric_funcs = {
             'strct': build_metrics('strict'),
@@ -42,7 +42,7 @@ class FLDMetrics(Metrics):
                       else ['all', 'None'])
             for depth in depths:
                 for metric_name, metric_val in _metrics.items():
-                    metrics[f"{metric_type}.D-{depth}.{metric_name}"].append(metric_val)
+                    metrics[f"{metric_type}.D-{depth}.{metric_name}"] = metric_val
 
         return metrics
 
