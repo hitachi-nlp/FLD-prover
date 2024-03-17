@@ -1,4 +1,4 @@
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Tuple
 import logging
 import re
 from pprint import pformat
@@ -13,6 +13,7 @@ from FLD_task import (
     serialize,
     build_metrics,
     log_example,
+    log_metrics,
 )
 from FLD_task.proof import get_stance_markers
 from FLD_prover.lm_types import LMType
@@ -66,6 +67,14 @@ class Metrics(ABC):
             logger.info('')
             logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
 
+            facts, hypothesis, gold_proof = self._get_logic(example)
+            log_example(
+                facts=facts,
+                hypothesis=hypothesis,
+                gold_proofs=[gold_proof],
+                logger=logger,
+            )
+
             if self._lm_type == LMType.CAUSAL:
                 # the results from model generation include also the prompt
                 prompt = self._tokenizer.decode(_unmask_by_pad_token(example["input_ids"]),
@@ -74,9 +83,9 @@ class Metrics(ABC):
                     pred_proof = pred_proof[len(prompt):]
 
             if example is not None:
-                metrics.update(
-                    self._compute_metrics_from_example(example, pred_proof)
-                )
+                _metrics = self._compute_metrics_from_example(example, pred_proof)
+                log_metrics(_metrics, logger=logger)
+                metrics.update(_metrics)
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
@@ -85,6 +94,10 @@ class Metrics(ABC):
         logger.info('\n' + pformat(results))
 
         return results
+
+    @abstractmethod
+    def _get_logic(self, example) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+        pass
 
     @abstractmethod
     def _compute_metrics_from_example(self, example, pred_proof: str):

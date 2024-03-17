@@ -10,7 +10,7 @@ from .base import Preprocessor
 logger = logging.getLogger()
 
 
-class RuleTakerPreprocessor(Preprocessor):
+class PararulePlusPreprocessor(Preprocessor):
 
     def _get_logic(
         self,
@@ -26,9 +26,9 @@ class RuleTakerPreprocessor(Preprocessor):
         prompt_with_partial_proof = self._prompt_prefix + prompt
 
         label = example['label']
-        if label == 'entailment':
+        if label == 1:
             marker = StanceMarker.PROVED
-        elif label == 'not entailment':
+        elif label == 0:
             marker = StanceMarker.UNKNOWN
         else:
             raise ValueError()
@@ -40,6 +40,6 @@ class RuleTakerPreprocessor(Preprocessor):
 
     def _get_features(self, examples) -> Dict[str, Any]:
         return {
-            'depth': [int(depth_str.lstrip('depth-'))
-                      for depth_str in examples['config']]
+            'depth': int(example['meta']['QDep'])
+            for example in examples
         }

@@ -10,7 +10,7 @@ from .base import Preprocessor
 logger = logging.getLogger()
 
 
-class RuleTakerPreprocessor(Preprocessor):
+class RobustLRPreprocessor(Preprocessor):
 
     def _get_logic(
         self,
@@ -20,7 +20,7 @@ class RuleTakerPreprocessor(Preprocessor):
 
         prompt = ' ; '.join([
             '$facts$ = ' + example['context'],
-            '$hypothesis$ = ' + example['question'],
+            '$hypothesis$ = ' + example['statement'],
             '$proof$ = '
         ])
         prompt_with_partial_proof = self._prompt_prefix + prompt
@@ -28,8 +28,10 @@ class RuleTakerPreprocessor(Preprocessor):
         label = example['label']
         if label == 'entailment':
             marker = StanceMarker.PROVED
-        elif label == 'not entailment':
+        elif label == 'neutral':
             marker = StanceMarker.UNKNOWN
+        elif label == 'contradiction':
+            marker = StanceMarker.DISPROVED
         else:
             raise ValueError()
 
@@ -39,7 +41,4 @@ class RuleTakerPreprocessor(Preprocessor):
         return prompt_with_partial_proof, next_proof_step, gold_proof
 
     def _get_features(self, examples) -> Dict[str, Any]:
-        return {
-            'depth': [int(depth_str.lstrip('depth-'))
-                      for depth_str in examples['config']]
-        }
+        return {}

@@ -11,7 +11,7 @@ from .base import Metrics
 logger = logging.getLogger()
 
 
-class RuleTakerMetrics(Metrics):
+class PararulePlusMetrics(Metrics):
 
     def _compute_metrics_from_example(self, example, pred_proof: str) -> Dict[str, List[Any]]:
 

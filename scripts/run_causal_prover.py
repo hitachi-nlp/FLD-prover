@@ -489,7 +489,9 @@ def main():
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
-    def load_raw_dataset_by_name(dataset_name: str, dataset_config_name: str, streaming: bool):
+    def load_raw_dataset_by_name(dataset_name: str,
+                                 dataset_config_name: str,
+                                 streaming: bool):
         # Downloading and loading a dataset from the hub.
         raw_datasets = load_dataset(
             dataset_name,
@@ -1103,13 +1105,13 @@ def main():
         'lm_type': LMType.CAUSAL,
     }
     if data_args.logic_dataset_type == 'FLD':
-        compute_metrics = FLDMetrics(**metric_kwargs)
+        logic_compute_metrics = FLDMetrics(**metric_kwargs)
     elif data_args.logic_dataset_type == 'ruletaker':
-        compute_metrics = RuleTakerMetrics(**metric_kwargs)
+        logiccompute_metrics = RuleTakerMetrics(**metric_kwargs)
     else:
         raise ValueError()
 
-    def _build_FLD_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
+    def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                    do_compute_metrics=True):
         return ForceCallMetricsSeq2SeqTrainer(
             model,
@@ -1119,18 +1121,18 @@ def main():
             train_dataset=None,
             eval_dataset=logic_eval_dataset,
             tokenizer=tokenizer,
-            compute_metrics=compute_metrics if do_compute_metrics else None,
+            compute_metrics = logic_compute_metrics if do_compute_metrics else None,
         )
 
-    class FLDEvaluationCallback(TrainerCallback):
+    class LogicEvaluationCallback(TrainerCallback):
 
         def __init__(self, other_trainer: Trainer):
             self._other_trainer = other_trainer
-            self._FLD_seq2seq_trainer = _build_FLD_seq2seq_trainer(other_trainer=self._other_trainer)
+            self._logic_seq2seq_trainer = _build_logic_seq2seq_trainer(other_trainer=self._other_trainer)
 
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
-            self._FLD_seq2seq_trainer.state = state
-            self._FLD_seq2seq_trainer.evaluate(
+            self._logic_seq2seq_trainer.state = state
+            self._logic_seq2seq_trainer.evaluate(
                 metric_key_prefix="proof_eval"
             )
 
@@ -1145,13 +1147,11 @@ def main():
         tokenizer=tokenizer,
         # Data collator will default to DataCollatorWithPadding, so we change it.
         data_collator=collator,
-        compute_metrics=compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
+        compute_metrics = compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
     )
-    callbacks = trainer.callback_handler.callbacks
-    if data_args.logic_dataset_type == 'FLD':
-        callbacks + [FLDEvaluationCallback(trainer)]
+    callbacks = trainer.callback_handler.callbacks + [LogicEvaluationCallback(trainer)]
     trainer.callback_handler = CallbackHandler(
         callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
     )
@@ -1192,7 +1192,7 @@ def main():
         if data_args.logic_dataset_type != 'FLD':
             raise ValueError(f'interactive_mode is not supported for {data_args.logic_dataset_type}')
         launch(
-            _build_FLD_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
+            _build_logic_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
             lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
             data_args.interactive_mode,

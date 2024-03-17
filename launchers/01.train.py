@@ -152,7 +152,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
 
-    output_top_dir = Path('./outputs/01.train.py/debug')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-16')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -257,19 +259,18 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-02-14.translation_speedup.translation-v3',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
 
 
         # ---------------------------------- other datasets ------------------------------------
-        'hf.tasksource/ruletaker',
+        # 'hf.tasksource/ruletaker',
     ]
 
     num_train_examples_skip = None
     # num_train_examples_skip = 1000
     # num_train_examples_skip = 256 * 1250
-
 
     """
     (
@@ -309,6 +310,7 @@ def main():
         # 'debug.ZS',
         # 'debug.micro',
         'debug.tiny',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -425,19 +427,18 @@ def main():
 
 
     # ------------------------------------ fixed settings -------------------------------------------
-
     if isinstance(engine, SubprocessEngine):
-        n_gpus_per_node = 4
-        n_total_gpus = 4
+        n_gpus_per_node = 1
+        n_total_gpus = 1
         is_V100 = True
 
         # n_gpus_per_node = 4
         # n_total_gpus = 4
 
         # gpu_name_for_batch_size = 'A100_48_1'
-        #gpu_name_for_batch_size = 'V100_16_1'
+        gpu_name_for_batch_size = 'V100_16_1'
         # gpu_name_for_batch_size = 'V100_16_4'
-        gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     elif isinstance(engine, QsubEngine):
