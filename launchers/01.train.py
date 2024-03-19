@@ -150,7 +150,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint.num_train_examples_skip')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
+    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
+
+    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-16')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -179,7 +183,7 @@ def main():
 
 
 
-    FLD_dataset_unames = [
+    logic_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
         # '20230729.case_study_finalize.D3',
@@ -255,15 +259,18 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-02-14.translation_speedup.translation-v3',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
-        '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
+        # '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
+
+
+        # ---------------------------------- other datasets ------------------------------------
+        # 'hf.tasksource/ruletaker',
     ]
 
     num_train_examples_skip = None
     # num_train_examples_skip = 1000
     # num_train_examples_skip = 256 * 1250
-
 
     """
     (
@@ -273,19 +280,19 @@ def main():
     ),
     """
     multitask_setting_list = [
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            True,
+            1.0,
+            [],
+            False,
         ),
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     True,
+        # ),
 
         # (
         #     0.0,
@@ -302,6 +309,8 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.micro',
+        'debug.tiny',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -311,7 +320,7 @@ def main():
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
-        'FT.step-1250__bs-256',
+        # 'FT.step-1250__bs-256',
         # 'FT.step-2500__bs-256',
 
         # 'FT.step-1250__bs-512',
@@ -336,14 +345,14 @@ def main():
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
@@ -377,11 +386,11 @@ def main():
     # dry_run = True
     dry_run = False
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
@@ -392,7 +401,7 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=44)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
@@ -418,19 +427,18 @@ def main():
 
 
     # ------------------------------------ fixed settings -------------------------------------------
-
     if isinstance(engine, SubprocessEngine):
-        n_gpus_per_node = 4
-        n_total_gpus = 4
+        n_gpus_per_node = 1
+        n_total_gpus = 1
         is_V100 = True
 
         # n_gpus_per_node = 4
         # n_total_gpus = 4
 
         # gpu_name_for_batch_size = 'A100_48_1'
-        #gpu_name_for_batch_size = 'V100_16_1'
+        gpu_name_for_batch_size = 'V100_16_1'
         # gpu_name_for_batch_size = 'V100_16_4'
-        gpu_name_for_batch_size = 'V100_16_4.deepspeed'
+        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
         # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
 
     elif isinstance(engine, QsubEngine):
@@ -507,8 +515,8 @@ def main():
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
 
-    for FLD_dataset_uname in FLD_dataset_unames:
-        for FLD_dataset_prob, other_datasets, streaming in multitask_setting_list:
+    for logic_dataset_uname in logic_dataset_unames:
+        for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
             for learning in learnings:
 
                 for sample_negative_proof in sample_negative_proof_args:
@@ -561,7 +569,7 @@ def main():
                                                 train_effective_batch_size=train_effective_batch_size,
                                                 num_evals=num_evals,
                                                 max_eval_samples=max_eval_samples,
-                                                FLD_dataset_prob=FLD_dataset_prob,
+                                                logic_dataset_prob=logic_dataset_prob,
                                                 hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
                                                 n_gpus=n_total_gpus,
                                             )
@@ -574,7 +582,7 @@ def main():
                                         setting.update(
                                             get_dataset_setting(
                                                 script_type,
-                                                dataset_uname=FLD_dataset_uname,
+                                                dataset_uname=logic_dataset_uname,
                                                 top_dirs=DATASETS_DIRS,
                                                 other_dataset_names=other_dataset_names,
                                                 other_dataset_config_names=other_dataset_config_names,
@@ -606,8 +614,8 @@ def main():
                                         )
 
                                         if run_mode == 'deepspeed':
-                                            # for max_eval_arg_name in ['max_eval_samples', 'max_predict_samples', 'FLD_max_eval_samples']:
-                                            for max_eval_arg_name in ['FLD_max_eval_samples']:
+                                            # for max_eval_arg_name in ['max_eval_samples', 'max_predict_samples', 'logic_max_eval_samples']:
+                                            for max_eval_arg_name in ['logic_max_eval_samples']:
                                                 max_eval_arg_sample = setting.get(max_eval_arg_name, None)
                                                 if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
                                                     raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
@@ -635,7 +643,7 @@ def main():
                                             'script_type': script_type,
                                             'seed': seed,
 
-                                            'FLD_dataset_uname': FLD_dataset_uname,
+                                            'logic_dataset_uname': logic_dataset_uname,
                                             'other_dataset_name': other_dataset_names,
                                             'other_dataset_config_name': other_dataset_config_names,
 
@@ -673,7 +681,7 @@ def main():
                                             setting.update({
                                                 'random_sample_max_train_samples': True,
                                                 'random_sample_max_eval_samples': True,
-                                                'random_sample_FLD_max_eval_samples': True,
+                                                'random_sample_logicmax_eval_samples': True,
                                             })
 
                                         output_dir = make_output_dir(setting, output_top_dir)

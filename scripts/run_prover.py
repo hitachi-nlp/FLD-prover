@@ -25,10 +25,10 @@ import time
 from FLD_prover.trainer import StepWiseGenerationTrainer
 from FLD_prover.lm_types import LMType
 from FLD_prover.data_processing import (
-    preprocess_function as FLD_preprocess_function,
+    FLD_preprocess,
+    FLD_compute_metrics,
     prepare_tokenized_inputs,
     unmask_by_pad_token,
-    compute_metrics as FLD_compute_metrics,
 )
 import readline
 from FLD_prover.tokenizers import load as load_tokenizer

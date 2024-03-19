@@ -3,6 +3,13 @@ from transformers import DataCollatorForSeq2Seq, default_data_collator
 
 # taken from data_processing.preprocess_function
 _REMOVE_NAMES = [
+    # ---- ruletaker ----
+    'context',
+    'label',
+    'question',
+    'config',
+
+    # ---- FLD ----
     'depth',
     'facts',
     'hypothesis',

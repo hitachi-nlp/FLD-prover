@@ -36,6 +36,7 @@ def generation_handled(func,
                        model,
                        timeout_from_call: Optional[int] = None,
                        timeout_msg_title: str = 'generation timeout',
+                       is_generate_func: bool = True,
                        **gen_kwargs):
 
     if lm_type == LMType.CAUSAL:
@@ -73,13 +74,16 @@ def generation_handled(func,
             As generation_init_special_tokens()/generation_exit_special_tokens() dynamically change
             tokenizer special tokens, we also have to generate gen_kwargs dynamically.
         """
-        stopping_criteria = MaxTimeCriteriaWithWarning(timeout_from_call, msg_title=timeout_msg_title)
-        _kwargs = {
-            'stopping_criteria': [stopping_criteria],
-            'pad_token_id': tokenizer.pad_token_id,
-        }
-        _kwargs.update(deepcopy(gen_kwargs))
-        return _kwargs
+        if is_generate_func:
+            stopping_criteria = MaxTimeCriteriaWithWarning(timeout_from_call, msg_title=timeout_msg_title)
+            _kwargs = {
+                'stopping_criteria': [stopping_criteria],
+                'pad_token_id': tokenizer.pad_token_id,
+            }
+            _kwargs.update(deepcopy(gen_kwargs))
+            return _kwargs
+        else:
+            return {}
 
     def handled(self, *args, **kwargs):
         generation_init_special_tokens()
