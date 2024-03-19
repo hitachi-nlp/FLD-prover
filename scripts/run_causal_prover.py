@@ -1075,7 +1075,18 @@ def main():
         logic_eval_dataset = logic_lm_datasets["validation"]
 
         if MAP:
-            logic_eval_dataset = logic_eval_dataset.map(
+            # logic_eval_dataset = logic_eval_dataset.map(
+            #     lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
+            #     batched=True,
+            # )
+
+            generation_handled_map = generation_handled(
+                logic_eval_dataset.map,
+                *generation_handle_args,
+                **generation_handled_kwargs,
+                is_generate_func=False,
+            )
+            logic_eval_dataset = generation_handled_map(
                 lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
                 batched=True,
             )
@@ -1107,7 +1118,7 @@ def main():
     if data_args.logic_dataset_type == 'FLD':
         logic_compute_metrics = FLDMetrics(**metric_kwargs)
     elif data_args.logic_dataset_type == 'ruletaker':
-        logiccompute_metrics = RuleTakerMetrics(**metric_kwargs)
+        logic_compute_metrics = RuleTakerMetrics(**metric_kwargs)
     else:
         raise ValueError()
 

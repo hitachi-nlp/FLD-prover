@@ -45,6 +45,7 @@ def load(name: str,
     #     # We force reset the pad token.
     #     tokenizer.pad_token = '<pad>'
 
+    # PAD_TOKEN = '[PAD]'
     PAD_TOKEN = '<hono_pad>'
     if name == 'stabilityai/stablelm-2-1_6b':
         # this model allow only pre-registerd tokens

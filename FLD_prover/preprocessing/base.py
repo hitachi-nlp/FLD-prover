@@ -167,7 +167,8 @@ class Preprocessor(ABC):
                         _prompts,
                         self._max_source_length,
                         # add_special_tokens=False
-                    ))
+                    )
+                )
 
             else:
                 raise NotImplementedError()

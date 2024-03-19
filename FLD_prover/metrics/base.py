@@ -17,13 +17,7 @@ from FLD_task import (
 )
 from FLD_task.proof import get_stance_markers
 from FLD_prover.lm_types import LMType
-from FLD_prover.tokenization import (
-    CAUSAL_LM_END_OF_PROMPT,
-    prepare_tokenized_inputs,
-    prepare_tokenized_targets,
-    mask_labels_by_ignore_index,
-    unmask_by_pad_token,
-)
+from FLD_prover.tokenization import unmask_by_pad_token
 
 logger = logging.getLogger()
 
@@ -87,7 +81,8 @@ class Metrics(ABC):
             if example is not None:
                 _metrics = self._compute_metrics_from_example(example, pred_proof)
                 log_metrics(_metrics, logger=logger)
-                metrics.update(_metrics)
+                for metric_name, metric_val in _metrics.items():
+                    metrics[metric_name].append(metric_val)
 
         for metric_name, metric_vals in metrics.items():
             results[f"{metric_name}"] = np.mean(metric_vals)
