@@ -154,7 +154,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-03-16')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-16')
+    output_top_dir = Path('./outputs/01.train.py/2024-03-20')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -259,13 +260,17 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
 
 
         # ---------------------------------- other datasets ------------------------------------
         # 'hf.tasksource/ruletaker',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-0',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.qbao775/PARARULE-Plus',
+        'hf.tasksource/robustLR',
     ]
 
     num_train_examples_skip = None
@@ -283,7 +288,7 @@ def main():
         (
             1.0,
             [],
-            False,
+            True,   # True to always redo preprocessing
         ),
 
         # (
@@ -342,10 +347,10 @@ def main():
         # ============================ english      ============================
 
         # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
-        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
+        ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
@@ -456,9 +461,9 @@ def main():
 
     lrates = [
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        # 1e-4,
+        1e-4,
 
-        1e-5,   # NLP_2024
+        # 1e-5,   # NLP_2024
     ]
 
     seeds = [

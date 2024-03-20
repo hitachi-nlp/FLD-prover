@@ -76,6 +76,7 @@ class Metrics(ABC):
                 gold_proofs=[gold_proof],
                 pred_proof=pred_proof,
                 logger=logger,
+                warn_on_prettify_failure=self._warn_on_example_prettify_failure,
             )
 
             if example is not None:

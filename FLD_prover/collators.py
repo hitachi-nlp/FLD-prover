@@ -3,12 +3,6 @@ from transformers import DataCollatorForSeq2Seq, default_data_collator
 
 # taken from data_processing.preprocess_function
 _REMOVE_NAMES = [
-    # ---- ruletaker ----
-    'context',
-    'label',
-    'question',
-    'config',
-
     # ---- FLD ----
     'depth',
     'facts',
@@ -40,6 +34,30 @@ _REMOVE_NAMES = [
     'negative_world_assump_label',
     'prompt_serial',
     'proof_serial',
+
+    # ---- ruletaker ----
+    'context',
+    'label',
+    'question',
+    'config',
+
+    # ------------- proof writer -------------
+    'id',
+    'maxD',
+    'NFact',
+    'NRule',
+    'theory',
+    'triples',
+    'rules',
+    'questions',
+    'allProofs',
+    'proofDetails',
+
+    # ------------- pararule plus -------------
+    'meta',
+
+    # ------------- robust lr -------------
+    'statement',
 ]
 
 

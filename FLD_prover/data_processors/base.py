@@ -1,21 +1,18 @@
-
-from typing import Optional, Union, Any, Tuple
+from typing import Optional, Any, Tuple, List, Dict
 import logging
-import re
 from pprint import pformat
 from abc import ABC, abstractmethod
 
 from collections import defaultdict
 import numpy as np
-import torch
-from typing import List, Dict
+
 from FLD_task import (
     load_deduction,
     serialize,
     build_metrics,
     log_example,
+    log_metrics,
 )
-from FLD_task.proof import get_stance_markers
 from FLD_prover.lm_types import LMType
 from FLD_prover.tokenization import (
     CAUSAL_LM_END_OF_PROMPT,
@@ -28,13 +25,14 @@ from FLD_prover.tokenization import (
 logger = logging.getLogger()
 
 
-class Preprocessor(ABC):
+class Processor(ABC):
+
+    _warn_on_example_prettify_failure = False
 
     def __init__(self,
                  lm_type: LMType,
                  tokenizer,
                  prompt_prefix='',
-                 padding=False,
                  max_source_length=1024,
                  max_target_length=1024,
                  ignore_index=-100,
@@ -45,11 +43,10 @@ class Preprocessor(ABC):
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
                  eval_dataset=None,
-                 log_examples=False):
+                 log_examples=False,):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
         self._prompt_prefix = prompt_prefix
-        self._padding = padding
         self._max_source_length = max_source_length
         self._max_target_length = max_target_length
         self._ignore_index = ignore_index
@@ -60,19 +57,20 @@ class Preprocessor(ABC):
         self._ignore_pad_token_for_loss = ignore_pad_token_for_loss
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
-        self._eval_dataset = eval_dataset
+        self.eval_dataset = eval_dataset
         self._log_examples = log_examples
 
-    def preprocess_examples(
+    def preprocess(
         self,
         examples,
         split: str,
+        padding='longest',
     )  -> Dict[str, List[Any]]:
 
         def _prepare_tokenized_targets(targets, max_length, **kwargs):
-            return prepare_tokenized_targets(targets, self._tokenizer, self._padding, max_length, **kwargs)
+            return prepare_tokenized_targets(targets, self._tokenizer, padding, max_length, **kwargs)
 
-        def _prepare_tokenized_inputs(inputs, max_length, padding=self._padding, **kwargs):
+        def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
             return prepare_tokenized_inputs(inputs, self._tokenizer, padding, max_length, **kwargs)
 
         def _mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
@@ -98,7 +96,7 @@ class Preprocessor(ABC):
                 prompt_w_partial_proof,
                 next_proof_step,
                 gold_proof,
-            ) = self._get_in_out(example, split)
+            ) = self._make_in_out(example, split, padding)
 
             prompts_w_partial_proof.append(prompt_w_partial_proof)
             proof_steps.append(next_proof_step)
@@ -204,8 +202,67 @@ class Preprocessor(ABC):
 
         return forward_inputs
 
+    def compute_metrics(self, eval_preds) -> Dict[str, Any]:
+
+        def _unmask_by_pad_token(tensor):
+            return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
+
+        preds, labels = eval_preds
+        if isinstance(preds, tuple):
+            preds = preds[0]
+
+        examples = self.eval_dataset
+
+        # Replace ignore_indexs used for padding as we can't decode them
+        preds = _unmask_by_pad_token(preds)
+        decoded_preds = self._tokenizer.batch_decode(preds, skip_special_tokens=True)
+
+        results = {}
+
+        prediction_lens = [np.count_nonzero(pred != self._tokenizer.pad_token_id) for pred in preds]
+        results["gen_len"] = np.mean(prediction_lens)
+
+        metrics: Dict[str, List[Any]] = defaultdict(list)
+        for i_example, (pred_proof, example) in enumerate(zip(decoded_preds, examples)):
+
+            logger.info('')
+            logger.info('')
+            logger.info('================ compute_metrics() example=[%d] ================\n', i_example)
+
+            facts, hypothesis, gold_proof = self._get_logic(example, 'eval')
+
+            if self._lm_type == LMType.CAUSAL:
+                # the results from model generation include also the prompt
+                prompt = self._tokenizer.decode(_unmask_by_pad_token(example["input_ids"]),
+                                                skip_special_tokens=True)
+                if prompt in pred_proof:
+                    pred_proof = pred_proof[len(prompt):]
+
+            log_example(
+                facts=facts,
+                hypothesis=hypothesis,
+                gold_proofs=[gold_proof],
+                pred_proof=pred_proof,
+                logger=logger,
+                warn_on_prettify_failure=self._warn_on_example_prettify_failure,
+            )
+
+            if example is not None:
+                _metrics = self._compute_metrics(example, pred_proof)
+                log_metrics(_metrics, logger=logger)
+                for metric_name, metric_val in _metrics.items():
+                    metrics[metric_name].append(metric_val)
+
+        for metric_name, metric_vals in metrics.items():
+            results[f"{metric_name}"] = np.mean(metric_vals)
+
+        logger.info('-------- compute_metrics() done! ------------------')
+        logger.info('\n' + pformat(results))
+
+        return results
+
     @abstractmethod
-    def _get_in_out(
+    def _make_in_out(
         self,
         example,
         split: str,
@@ -213,5 +270,13 @@ class Preprocessor(ABC):
         pass
 
     @abstractmethod
+    def _compute_metrics(self, example, pred_proof: str):
+        pass
+
+    @abstractmethod
     def _get_features(self, examples) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def _get_logic(self, example, split: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         pass

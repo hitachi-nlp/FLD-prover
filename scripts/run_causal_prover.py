@@ -73,6 +73,13 @@ from FLD_prover.metrics import (
     FLDMetrics,
     RuleTakerMetrics,
 )
+from FLD_prover.data_processors import (
+    FLDProcessor,
+    RuleTakerProcessor,
+    PararulePlusProcessor,
+    RobustLRProcessor,
+    ProofWriterProcessor,
+)
 from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
@@ -502,26 +509,29 @@ def main():
             # download_config=DownloadConfig(resume_download=True),
         )
         if "validation" not in raw_datasets.keys():
-            raw_datasets["validation"] = load_dataset(
-                dataset_name,
-                dataset_config_name,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                # split=f"train",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=streaming,
-                # download_config=DownloadConfig(resume_download=True),
-            )
-            raw_datasets["train"] = load_dataset(
-                dataset_name,
-                dataset_config_name,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                # split=f"train",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=streaming,
-                # download_config=DownloadConfig(resume_download=True),
-            )
+            if "dev" in raw_datasets.keys():
+                raw_datasets["validation"] = raw_datasets["dev"]
+            else:
+                raw_datasets["validation"] = load_dataset(
+                    dataset_name,
+                    dataset_config_name,
+                    split=f"train[:{data_args.validation_split_percentage}%]",
+                    # split=f"train",
+                    cache_dir=model_args.cache_dir,
+                    use_auth_token=True if model_args.use_auth_token else None,
+                    streaming=streaming,
+                    # download_config=DownloadConfig(resume_download=True),
+                )
+                raw_datasets["train"] = load_dataset(
+                    dataset_name,
+                    dataset_config_name,
+                    split=f"train[{data_args.validation_split_percentage}%:]",
+                    # split=f"train",
+                    cache_dir=model_args.cache_dir,
+                    use_auth_token=True if model_args.use_auth_token else None,
+                    streaming=streaming,
+                    # download_config=DownloadConfig(resume_download=True),
+                )
         return raw_datasets
 
     def load_raw_dataset_by_files(train_file: Optional[str],
@@ -824,10 +834,47 @@ def main():
 
             lm_datasets_list.append(lm_datasets)
 
+    preprocessor_args = [
+        LMType.CAUSAL,
+        tokenizer,
+    ]
+    preprocessor_kwargs = {
+        'prompt_prefix': data_args.source_prefix,
+        # 'padding': logic_padding,
+        'max_source_length': block_size,
+        'max_target_length': block_size,
+        'proof_sampling': False,
+        'sample_negative_proof': False,
+        'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
+        'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
+        'instruction': data_args.instruction,
+        'log_examples': data_args.log_examples,
+    }
+
+    if data_args.logic_dataset_type == 'FLD':
+        processor_cls = FLDProcessor
+    elif data_args.logic_dataset_type == 'rule_taker':
+        processor_cls = RuleTakerProcessor
+    elif data_args.logic_dataset_type == 'proof_writer':
+        processor_cls = ProofWriterProcessor
+    elif data_args.logic_dataset_type == 'pararule_plus':
+        processor_cls = PararulePlusProcessor
+    elif data_args.logic_dataset_type == 'robust_lr':
+        processor_cls = RobustLRProcessor
+    else:
+        raise ValueError()
+    logic_data_processor = processor_cls(*preprocessor_args, **preprocessor_kwargs)
+
     def _maybe_logic_preprocess(examples: Dict[str, List[Any]], mode: str):
         if data_args.logic_dataset_type == 'FLD':
             logic_key = 'hypothesis'
-        elif data_args.logic_dataset_type == 'ruletaker':
+        elif data_args.logic_dataset_type == 'rule_taker':
+            logic_key = 'context'
+        elif data_args.logic_dataset_type == 'proof_writer':
+            logic_key = 'theory'
+        elif data_args.logic_dataset_type == 'pararule_plus':
+            logic_key = 'context'
+        elif data_args.logic_dataset_type == 'robust_lr':
             logic_key = 'context'
         else:
             raise ValueError()
@@ -871,32 +918,10 @@ def main():
             raise ValueError()
 
         if num_logic_examples > 0:
-            preprocessor_args = [
-                LMType.CAUSAL,
-                tokenizer,
-            ]
-            preprocessor_kwargs = {
-                'prompt_prefix': data_args.source_prefix,
-                'padding': logic_padding,
-                'max_source_length': block_size,
-                'max_target_length': block_size,
-                'proof_sampling': False,
-                'sample_negative_proof': False,
-                'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
-                'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
-                'instruction': data_args.instruction,
-                'log_examples': data_args.log_examples,
-            }
-            if data_args.logic_dataset_type == 'FLD':
-                logic_preprocessor = FLDPreprocessor(*preprocessor_args, **preprocessor_kwargs)
-            elif data_args.logic_dataset_type == 'ruletaker':
-                logic_preprocessor = RuleTakerPreprocessor(*preprocessor_args, **preprocessor_kwargs)
-            else:
-                raise ValueError()
-
-            logic_processed = logic_preprocessor.preprocess_examples(
+            logic_processed = logic_data_processor.preprocess(
                 logic_examples,
                 logic_preproc_split,
+                padding=logic_padding,
             )
 
         else:
@@ -1110,17 +1135,19 @@ def main():
     else:
         logic_eval_dataset = None
 
-    metric_kwargs = {
-        'tokenizer': tokenizer,
-        'eval_dataset': logic_eval_dataset,
-        'lm_type': LMType.CAUSAL,
-    }
-    if data_args.logic_dataset_type == 'FLD':
-        logic_compute_metrics = FLDMetrics(**metric_kwargs)
-    elif data_args.logic_dataset_type == 'ruletaker':
-        logic_compute_metrics = RuleTakerMetrics(**metric_kwargs)
-    else:
-        raise ValueError()
+    # metric_kwargs = {
+    #     'tokenizer': tokenizer,
+    #     'eval_dataset': logic_eval_dataset,
+    #     'lm_type': LMType.CAUSAL,
+    # }
+    # if data_args.logic_dataset_type == 'FLD':
+    #     logic_compute_metrics = FLDMetrics(**metric_kwargs)
+    # elif data_args.logic_dataset_type == 'ruletaker':
+    #     logic_compute_metrics = RuleTakerMetrics(**metric_kwargs)
+    # else:
+    #     raise ValueError()
+    logic_data_processor.eval_dataset = logic_eval_dataset
+    logic_compute_metrics = logic_data_processor.compute_metrics
 
     def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                    do_compute_metrics=True):
