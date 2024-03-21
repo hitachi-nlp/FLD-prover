@@ -155,7 +155,17 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-03-16')
-    output_top_dir = Path('./outputs/01.train.py/2024-03-20')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-20')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-20.trial_learning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.no_cache')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt.no_deepspeed')
+    output_top_dir = Path('./outputs/01.train.py/2024-03-21.debug')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -267,10 +277,9 @@ def main():
 
         # ---------------------------------- other datasets ------------------------------------
         # 'hf.tasksource/ruletaker',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-0',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # 'hf.qbao775/PARARULE-Plus',
-        'hf.tasksource/robustLR',
+        # 'hf.tasksource/robustLR',
     ]
 
     num_train_examples_skip = None
@@ -288,8 +297,14 @@ def main():
         (
             1.0,
             [],
-            True,   # True to always redo preprocessing
+            False,
         ),
+
+        # (
+        #     1.0,
+        #     [],
+        #     True,   # True to always redo preprocessing
+        # ),
 
         # (
         #     0.5,
@@ -314,7 +329,7 @@ def main():
     learnings = [
         # 'debug.ZS',
         # 'debug.micro',
-        'debug.tiny',
+        # 'debug.tiny',
         # 'debug.middle',
 
         # 'FT.step-5000',
@@ -322,6 +337,7 @@ def main():
 
         # 'FT.step-100_bs-64',
 
+        'FT.step-1000__bs-128',
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
@@ -396,6 +412,7 @@ def main():
     # run_mode = 'deepspeed'
 
     engine = SubprocessEngine()
+    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model

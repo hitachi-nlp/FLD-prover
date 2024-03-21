@@ -65,14 +65,6 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 from logger_setup import setup as setup_logger
-from FLD_prover.preprocessing import (
-    FLDPreprocessor,
-    RuleTakerPreprocessor,
-)
-from FLD_prover.metrics import (
-    FLDMetrics,
-    RuleTakerMetrics,
-)
 from FLD_prover.data_processors import (
     FLDProcessor,
     RuleTakerProcessor,
@@ -431,7 +423,7 @@ def main():
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
     # must be placed at top, so we extract string from sys.argv directly
-    if any(arg.find('deepspeed') >= 0 for arg in sys.argv):
+    if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
         deepspeed.init_distributed()
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
@@ -906,7 +898,8 @@ def main():
 
         if mode in ["train", "eval"]:
             logic_preproc_split = "train"
-            logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_proof_eval_padding
+            # logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_proof_eval_padding
+            logic_padding = "max_length"   # 'longest' leads to error as the shape of tensors will be diferrent in a batch
             feature_names = ['input_ids', 'attention_mask', 'labels']
 
         elif mode == "proof_eval":
@@ -1100,11 +1093,6 @@ def main():
         logic_eval_dataset = logic_lm_datasets["validation"]
 
         if MAP:
-            # logic_eval_dataset = logic_eval_dataset.map(
-            #     lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
-            #     batched=True,
-            # )
-
             generation_handled_map = generation_handled(
                 logic_eval_dataset.map,
                 *generation_handle_args,
@@ -1135,17 +1123,6 @@ def main():
     else:
         logic_eval_dataset = None
 
-    # metric_kwargs = {
-    #     'tokenizer': tokenizer,
-    #     'eval_dataset': logic_eval_dataset,
-    #     'lm_type': LMType.CAUSAL,
-    # }
-    # if data_args.logic_dataset_type == 'FLD':
-    #     logic_compute_metrics = FLDMetrics(**metric_kwargs)
-    # elif data_args.logic_dataset_type == 'ruletaker':
-    #     logic_compute_metrics = RuleTakerMetrics(**metric_kwargs)
-    # else:
-    #     raise ValueError()
     logic_data_processor.eval_dataset = logic_eval_dataset
     logic_compute_metrics = logic_data_processor.compute_metrics
 

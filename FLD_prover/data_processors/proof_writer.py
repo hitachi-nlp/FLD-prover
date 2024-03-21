@@ -34,7 +34,6 @@ class ProofWriterProcessor(Processor):
         ])
         prompt_with_partial_proof = self._prompt_prefix + prompt
         next_proof_step = gold_proof
-
         return prompt_with_partial_proof, next_proof_step, gold_proof
 
     def _compute_metrics(self, example, pred_proof: str):

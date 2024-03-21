@@ -1,5 +1,6 @@
 from typing import Optional, Any, Tuple, Dict
 import logging
+import re
 
 from FLD_task.proof import StanceMarker, add_stance_markers
 from FLD_prover.tokenization import unmask_by_pad_token
@@ -53,9 +54,10 @@ class RuleTakerProcessor(Processor):
 
     def _get_features(self, examples) -> Dict[str, Any]:
         return {
-            'depth': [int(depth_str.lstrip('depth-'))
-                      for depth_str in examples['config']]
+            'depth': re.sub('.*depth-([0-9]*).*', '\g<1>', depth_str)
+            for depth_str in examples['config']
         }
+
 
     def _get_logic(self, example, split: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         facts = example['context']
