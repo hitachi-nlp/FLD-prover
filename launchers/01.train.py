@@ -165,7 +165,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.no_cache')
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt')
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt.no_deepspeed')
-    output_top_dir = Path('./outputs/01.train.py/2024-03-21.debug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.debug')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -276,10 +278,10 @@ def main():
 
 
         # ---------------------------------- other datasets ------------------------------------
-        # 'hf.tasksource/ruletaker',
+        'hf.tasksource/ruletaker',
         'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # 'hf.qbao775/PARARULE-Plus',
-        # 'hf.tasksource/robustLR',
+        'hf.qbao775/PARARULE-Plus',
+        'hf.tasksource/robustLR',
     ]
 
     num_train_examples_skip = None
@@ -294,17 +296,17 @@ def main():
     ),
     """
     multitask_setting_list = [
-        (
-            1.0,
-            [],
-            False,
-        ),
-
         # (
         #     1.0,
         #     [],
-        #     True,   # True to always redo preprocessing
+        #     False,
         # ),
+
+        (
+            1.0,
+            [],
+            True,   # True to always redo preprocessing
+        ),
 
         # (
         #     0.5,
@@ -322,6 +324,9 @@ def main():
         #     True,
         # ),
     ]
+
+    take_interval_between_jobs = False
+    # take_interval_between_jobs = True
 
 
 
@@ -363,10 +368,10 @@ def main():
         # ============================ english      ============================
 
         # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
-        ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
+        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
@@ -407,16 +412,16 @@ def main():
     # dry_run = True
     dry_run = False
 
-    run_mode = 'vanilla'
+    # run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
-    engine = SubprocessEngine()
+    # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
@@ -426,7 +431,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
+    lrates = [
+        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
+        1e-4,
 
+        # 1e-5,   # NLP_2024
+    ]
 
 
 
@@ -474,13 +484,6 @@ def main():
     instruction_args = [
         # False,       # better for chat-model?
         True,      # better for non-chat model, somehow.
-    ]
-
-    lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        1e-4,
-
-        # 1e-5,   # NLP_2024
     ]
 
     seeds = [
@@ -724,7 +727,7 @@ def main():
                                             dry_run=dry_run
                                         )
 
-                                        if streaming:
+                                        if streaming and take_interval_between_jobs:
                                             logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
                                             time.sleep(60 * 10)
 
