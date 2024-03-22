@@ -167,7 +167,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt.no_deepspeed')
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.debug')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-22.trial_learning')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 

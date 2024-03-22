@@ -4,6 +4,7 @@ import random
 import re
 
 from FLD_task.proof import StanceMarker, add_stance_markers, get_stance_markers
+from FLD_task.evaluation import compute_answer_accuracy
 from FLD_prover.tokenization import unmask_by_pad_token
 
 from .base import Processor
@@ -38,24 +39,27 @@ class ProofWriterProcessor(Processor):
 
     def _compute_metrics(self, example, pred_proof: str):
 
-        def _unmask_by_pad_token(tensor):
-            return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
+        metrics = {}
 
         facts, hypothesis, gold_proof = self._get_logic(example, 'eval')
 
-        pred_markers = get_stance_markers(pred_proof)
         gold_markers = get_stance_markers(gold_proof)
 
-        answer_accuracy = 1.0 if set(pred_markers) == set(gold_markers) else 0.0
+        answer_accuracy = compute_answer_accuracy(gold_proof, pred_proof)
         if gold_markers == [StanceMarker.UNKNOWN] and answer_accuracy == 1.0:
             proof_accuracy = 1.0
         else:
             proof_accuracy = 1.0 if pred_proof.strip(' ') == gold_proof.strip(' ') else 0.0
 
-        metrics = {
+        _metrics = {
             'answer_accuracy': answer_accuracy,
             'proof_accuracy': proof_accuracy,
         }
+        depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
+                  else ['all', 'None'])
+        for depth in depths:
+            for metric_name, metric_val in _metrics.items():
+                metrics[f"D-{depth}.{metric_name}"] = metric_val
 
         return metrics
 

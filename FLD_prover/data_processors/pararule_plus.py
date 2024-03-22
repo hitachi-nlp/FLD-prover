@@ -2,6 +2,7 @@ from typing import Optional, Any, Tuple, Dict
 import logging
 
 from FLD_task.proof import StanceMarker, add_stance_markers
+from FLD_task.evaluation import compute_answer_accuracy
 from FLD_prover.tokenization import unmask_by_pad_token
 
 from .base import Processor
@@ -32,15 +33,12 @@ class PararulePlusProcessor(Processor):
 
     def _compute_metrics(self, example, pred_proof: str):
 
-        def _unmask_by_pad_token(tensor):
-            return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
-
         metrics = {}
 
         facts, hypothesis, gold_proof = self._get_logic(example, 'eval')
 
         _metrics = {
-            'accuracy': 1.0 if gold_proof == pred_proof else 0.0,
+            'answer_accuracy': compute_answer_accuracy(gold_proof, pred_proof),
         }
         depths = (['all', str(example['depth'])] if example.get('depth', None) is not None
                   else ['all', 'None'])
