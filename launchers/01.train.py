@@ -144,32 +144,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.resume_debug.from_checkpoint.num_train_examples_skip')
-
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
-
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-16')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-20')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-20.trial_learning')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.no_cache')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning.debug.streaming=False.gpt.no_deepspeed')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.debug')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-03-22.trial_learning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-22.trial_learning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-22.other_logical_datasets')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-23.other_logical_datasets')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -193,6 +175,9 @@ def main():
         './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
         './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
         './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+
+        './outputs.FLD/00.create_corpus/20230122.past_FLD',
     ]
 
 
@@ -281,9 +266,14 @@ def main():
 
         # ---------------------------------- other datasets ------------------------------------
         'hf.tasksource/ruletaker',
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         'hf.qbao775/PARARULE-Plus',
-        'hf.tasksource/robustLR',
+
+        # # 'hf.tasksource/robustLR',  # XXX not available yet
+
+        # ---------------------------------- 20230122.past_FLD ------------------------------------
+        '20240322.past_FLD.20230729.case_study_finalize.D3',
+        # '20240322.past_FLD.20230729.case_study_finalize.D8',
     ]
 
     num_train_examples_skip = None
@@ -304,19 +294,19 @@ def main():
         #     False,
         # ),
 
-        (
-            1.0,
-            [],
-            True,   # True to always redo preprocessing
-        ),
-
         # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     True,
+        #     1.0,
+        #     [],
+        #     True,   # True to always redo preprocessing
         # ),
+
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            True,
+        ),
 
         # (
         #     0.0,
@@ -327,9 +317,8 @@ def main():
         # ),
     ]
 
-    take_interval_between_jobs = False
-    # take_interval_between_jobs = True
-
+    # take_interval_between_jobs = False
+    take_interval_between_jobs = True
 
 
 
@@ -342,6 +331,7 @@ def main():
         # 'FT.step-5000',
         # 'FT.step-10000',
 
+        # 'FT.step-30_bs-64',
         # 'FT.step-100_bs-64',
 
         'FT.step-1000__bs-128',
@@ -362,8 +352,7 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
-    hours = 30
-
+    hours = 15
 
 
     model_settings = [
@@ -373,14 +362,14 @@ def main():
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'cyberagent/open-calm-7b'),
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
@@ -423,24 +412,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=22)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=44)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
-
-
-    lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        1e-4,
-
-        # 1e-5,   # NLP_2024
-    ]
-
-
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
 
@@ -492,6 +469,13 @@ def main():
         0,
         # 1,
         # 2,
+    ]
+
+    lrates = [
+        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
+        # 1e-4,
+
+        1e-5,   # NLP_2024
     ]
 
     base_setting_name = 'default'
