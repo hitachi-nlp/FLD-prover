@@ -56,9 +56,13 @@ def main():
     # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
 
 
-    checkpoint = ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'all_at_once')
     # checkpoint = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-5000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=5000/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-5000/')
 
+    # checkpoint = ('meta-llama/Llama-2-7b-hf', 'causal', 'all_at_once')
+    # gradio_port = 9200
+
+    checkpoint = Path('outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0')
+    gradio_port = 9201
 
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
@@ -69,36 +73,43 @@ def main():
     generation_do_sample = False
     generation_temperature = 1.0
     generation_top_k = 10
-    generation_repetition_penalty = 1.5  # XXX must tune for each model
+    # generation_repetition_penalty = 1.5  # XXX must tune for each model
+    generation_repetition_penalty = 1.2  # XXX must tune for each model
     generation_max_length = 2000
-    generation_max_new_tokens = 500
+    generation_max_new_tokens = 300
     generation_timeout = 60 * 5
 
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
-    gradio_port = 9200
+
+
+    # -------------- MEMORY REQUIREMENTS ---------------
+    # OK: V100 x 4 + deepspeed 
+    # NG: A100 x 1 + deepspeed
+    # NG: A100 x 1 + vanilla
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
-
+    
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
-    if not isinstance(engine, QsubEngine):
+    if isinstance(engine, SubprocessEngine):
         n_gpus = 1  # debug
         # n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
+    elif isinstance(engine, QsubEngine):
+        n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     hours = 12
 
     dry_run = False
 
     # ------------------------ fixed ------------------------
-    if isinstance(engine, QsubEngine):
-        n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
 
     base_setting_name = 'default'
 
@@ -116,12 +127,14 @@ def main():
         checkpoint_dir = checkpoint_configs[0].parent
         if (checkpoint_dir / 'lab.params.json').exists():
             lab_setting = json.load(open(str(checkpoint_dir / 'lab.params.json')))
-        else:
+        elif (checkpoint_dir.parent / 'lab.params.json').exists():
             lab_setting = json.load(open(str(checkpoint_dir.parent / 'lab.params.json')))
+        else:
+            lab_setting = {}
 
         hf_model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
-        lm_type = lab_setting['lm_type']
-        proof_sampling = lab_setting['proof_sampling']
+        lm_type = lab_setting.get('lm_type', 'causal')
+        proof_sampling = lab_setting.get('proof_sampling', 'all_at_once')
         model_name_or_path = checkpoint_dir
     else:
         hf_model_name, lm_type, proof_sampling = checkpoint
@@ -142,6 +155,7 @@ def main():
         get_batch_setting(
             script_type,
             for_interactive=True,
+            n_gpus=n_gpus,
         )
     )
 

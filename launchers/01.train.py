@@ -127,21 +127,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
     # output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--2')
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask.per_device_eval_batch_size-1.node--8')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.stable_lm')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-05.h2o.transformer-4.35.2')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
@@ -267,7 +256,7 @@ def main():
         # ---------------------------------- other datasets ------------------------------------
         'hf.tasksource/ruletaker',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        'hf.qbao775/PARARULE-Plus',
+        # 'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
 
@@ -352,7 +341,7 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
-    hours = 15
+    hours = 6
 
 
     model_settings = [
@@ -692,7 +681,7 @@ def main():
                                             setting.update({
                                                 'random_sample_max_train_samples': True,
                                                 'random_sample_max_eval_samples': True,
-                                                'random_sample_logicmax_eval_samples': True,
+                                                'random_sample_logic_max_eval_samples': True,
                                             })
 
                                         output_dir = make_output_dir(setting, output_top_dir)
