@@ -151,7 +151,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO')
     # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200')
-    output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200.pytorch_tieout=7200')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200.pytorch_tieout=7200')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-03-28.deepspeed_multinode')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -292,19 +294,19 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
+            1.0,
+            [],
             False,
         ),
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -349,8 +351,6 @@ def main():
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
     ]
-
-    hours = 6
 
 
     model_settings = [
@@ -403,8 +403,8 @@ def main():
     dry_run = False
 
     # run_mode = 'vanilla'
-    run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -415,10 +415,13 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('hai', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('hai', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
 
     context = '2000'
+    hours = 24
+
 
 
 
@@ -439,7 +442,7 @@ def main():
 
     # ------------------------------------ fixed settings -------------------------------------------
     if isinstance(engine, SubprocessEngine):
-        region = 'hai'
+        region = 'haic'
         n_gpus_per_node = 1
         n_cpus_per_node = 1
         n_total_gpus = 1
@@ -528,7 +531,7 @@ def main():
 
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
-        for logic_dataset_prob, other_datasets in multitask_setting_list:
+        for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
             for learning in learnings:
 
                 for sample_negative_proof in sample_negative_proof_args:

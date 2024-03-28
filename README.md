@@ -31,7 +31,11 @@ This prover differs from the original stepwise prover used in the paper and deli
 
 ## Installation
 The code has been tested on Python 3.11.5
+
+
 ```console
+# XXX: First, you might have to login to the computation nodes with cuda, on which the program runs,
+# especially when you are using HPC environments where the host and the computation nodes have different environments.
 pip install -r ./requirements/requirements.txt
 
 git clone https://github.com/hitachi-nlp/FLD-task.git
