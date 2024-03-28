@@ -1036,20 +1036,26 @@ def main():
         if MAP:
             train_dataset = train_dataset.map(
                 lambda examples: _maybe_logic_preprocess(examples, 'train'),
+                num_proc=data_args.preprocessing_num_workers,
                 batched=True,
             )
         else:
             train_dataset.set_transform(
-                lambda examples: _maybe_logic_preprocess(examples, 'train'))
+                lambda examples: _maybe_logic_preprocess(examples, 'train'),
+                num_proc=data_args.preprocessing_num_workers,
+            )
     if eval_dataset:
         if MAP:
             eval_dataset = eval_dataset.map(
                 lambda examples: _maybe_logic_preprocess(examples, 'eval'),
+                num_proc=data_args.preprocessing_num_workers,
                 batched=True,
             )
         else:
             eval_dataset.set_transform(
-                lambda examples: _maybe_logic_preprocess(examples, 'eval'))
+                lambda examples: _maybe_logic_preprocess(examples, 'eval'),
+                num_proc=data_args.preprocessing_num_workers,
+            )
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 

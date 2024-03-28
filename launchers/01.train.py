@@ -17,7 +17,7 @@ from FLD_user_shared_settings import (
     get_save_eval_step_setting,
     get_model_setting,
     get_tokenizer_setting,
-    get_qsub_gpu_setting,
+    get_qsub_cpu_gpu_setting,
     get_learning_setting,
     get_generation_setting,
     make_output_dir,
@@ -140,7 +140,18 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-03-22.trial_learning')
     # output_top_dir = Path('./outputs/01.train.py/2024-03-22.other_logical_datasets')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-03-23.other_logical_datasets')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-23.other_logical_datasets')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test.streaming=False')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test.streaming=False.multinode')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO')
+    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200')
+    output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200.pytorch_tieout=7200')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -163,7 +174,6 @@ def main():
 
         './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
         './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
-        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
         './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
 
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
@@ -261,7 +271,7 @@ def main():
         # # 'hf.tasksource/robustLR',  # XXX not available yet
 
         # ---------------------------------- 20230122.past_FLD ------------------------------------
-        '20240322.past_FLD.20230729.case_study_finalize.D3',
+        # '20240322.past_FLD.20230729.case_study_finalize.D3',
         # '20240322.past_FLD.20230729.case_study_finalize.D8',
     ]
 
@@ -277,16 +287,15 @@ def main():
     ),
     """
     multitask_setting_list = [
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
+
+        # streaming=True does not work in HAI cluster under the current proxy,
+        # as the connection to huggingface.co via pyarrow library fails,
+        # possibly due to the redirection forced by the proxy.
 
         # (
         #     1.0,
         #     [],
-        #     True,   # True to always redo preprocessing
+        #     False,
         # ),
 
         (
@@ -294,7 +303,7 @@ def main():
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
-            True,
+            False,
         ),
 
         # (
@@ -302,7 +311,7 @@ def main():
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
-        #     True,
+        #     False,
         # ),
     ]
 
@@ -315,7 +324,7 @@ def main():
         # 'debug.ZS',
         # 'debug.micro',
         # 'debug.tiny',
-        # 'debug.middle',
+        'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -323,7 +332,7 @@ def main():
         # 'FT.step-30_bs-64',
         # 'FT.step-100_bs-64',
 
-        'FT.step-1000__bs-128',
+        # 'FT.step-1000__bs-128',
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
@@ -362,6 +371,7 @@ def main():
         # ('meta-llama/Llama-2-7b-chat-hf', 'causal', 'cyberagent/open-calm-7b'),
 
         # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
+        # ('./outputs/01.train.py/2024-01-31.multitask/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.0/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-2500__bs-128/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=2500/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=128/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=500/wght_dcy=0.0/checkpoint-2500/', 'causal', 'cyberagent/open-calm-7b'),
         # ('./outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0/', 'causal', 'cyberagent/open-calm-7b'),
 
 
@@ -393,8 +403,8 @@ def main():
     dry_run = False
 
     # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    run_mode = 'torchrun'
+    # run_mode = 'deepspeed'
 
     # engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -402,12 +412,13 @@ def main():
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=4)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
-
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
+    engine = QsubEngine('hai', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('hai', 'xhn_s.large', n_resource=2)
+
+    context = '2000'
 
 
 
@@ -428,26 +439,26 @@ def main():
 
     # ------------------------------------ fixed settings -------------------------------------------
     if isinstance(engine, SubprocessEngine):
+        region = 'hai'
         n_gpus_per_node = 1
+        n_cpus_per_node = 1
         n_total_gpus = 1
-        is_V100 = True
+        is_V100 = False
 
         # n_gpus_per_node = 4
         # n_total_gpus = 4
 
-        # gpu_name_for_batch_size = 'A100_48_1'
-        gpu_name_for_batch_size = 'V100_16_1'
-        # gpu_name_for_batch_size = 'V100_16_4'
-        # gpu_name_for_batch_size = 'V100_16_4.deepspeed'
-        # gpu_name_for_batch_size = None   # specify this when running through QsubEngine
+        # gpu_name_for_batch_size = 'V100.mem=16.run=vanilla.cntx=2000'
+        # gpu_name_for_batch_size = 'V100.mem=16.run=deepspeed.cntx=2000'
+        gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=2000'
 
     elif isinstance(engine, QsubEngine):
-        # DO NOT MODIFY
-        n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        region = engine.region
+        n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context, run_mode)
         is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
 
-    # skip_if_exists = False
-    skip_if_exists = True
+    skip_if_exists = False
+    # skip_if_exists = True
 
     instruction_args = [
         # False,       # better for chat-model?
@@ -515,8 +526,9 @@ def main():
     # seq2seq_proof_sampling = 'stepwise'
     seq2seq_proof_sampling = 'all_at_once'
 
+    i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
-        for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
+        for logic_dataset_prob, other_datasets in multitask_setting_list:
             for learning in learnings:
 
                 for sample_negative_proof in sample_negative_proof_args:
@@ -545,6 +557,8 @@ def main():
                                              or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
                                         )
                                 )
+                                # fp16 = not fp32
+                                bf16 = not fp32
 
                                 if lm_type == 'causal':
                                     proof_sampling = 'all_at_once'
@@ -644,8 +658,8 @@ def main():
                                             'seed': seed,
 
                                             'logic_dataset_uname': logic_dataset_uname,
-                                            'other_dataset_name': other_dataset_names,
-                                            'other_dataset_config_name': other_dataset_config_names,
+                                            # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
+                                            # 'other_dataset_config_name': other_dataset_config_names,
 
                                             'resume_from_checkpoint': resume_from_checkpoint,
                                             'num_train_examples_skip': num_train_examples_skip,
@@ -653,7 +667,8 @@ def main():
                                             'base_setting_name': base_setting_name,
 
                                             'lm_type': lm_type,
-                                            'fp16': not fp32,
+                                            # 'fp16': fp16,
+                                            'bf16': bf16,
 
                                             # 'save_total_limit': save_total_limit,
 
@@ -668,9 +683,18 @@ def main():
                                             'weight_decay': 0.0,
 
                                             # 'n_gpu': 1,
-                                            'dataloader_num_workers': 0,
+
+                                            # values larger than n_gpus_per_node leads to error,
+                                            # possibly because the tokenizer is executed on GPUs?
+                                            # 'dataloader_num_workers': min(n_gpus_per_node, n_cpus_per_node),
+                                            # 'preprocessing_num_workers': min(n_gpus_per_node, n_cpus_per_node),
+                                            'dataloader_num_workers': n_cpus_per_node,
+                                            'preprocessing_num_workers': n_cpus_per_node,
+
 
                                             'lora': False,
+
+                                            'ddp_timeout': 3600 * 10,  # large for preprocessing large datasets
 
                                             'gpu_name_for_batch_size': gpu_name_for_batch_size,
                                             'use_auth_token': True,
@@ -692,15 +716,18 @@ def main():
                                                                output_dir,
                                                                setting,
                                                                run_mode,
+                                                               region,
                                                                n_gpus_per_node=n_gpus_per_node)
 
                                         run_by_engine(
                                             engine,
                                             command,
                                             output_dir,
+                                            delay = i_job * 0.5,
                                             hours=_hours,
                                             dry_run=dry_run
                                         )
+                                        i_job += 1
 
                                         if streaming and take_interval_between_jobs:
                                             logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
