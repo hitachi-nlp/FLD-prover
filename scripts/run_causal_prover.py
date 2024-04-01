@@ -30,6 +30,7 @@ from itertools import chain
 from typing import Optional, Dict, List, Any, Union, Tuple, Any
 import readline
 import warnings
+import datetime
 
 import numpy as np
 import deepspeed
@@ -292,6 +293,10 @@ class DataTrainingArguments:
             )
         },
     )
+    preprocess_batch_size: Optional[int] = field(
+        default=10,
+    )
+
     logic_proof_eval_padding: Optional[str] = field(
         default="longest",
     )
@@ -402,6 +407,10 @@ class DataTrainingArguments:
         default=False,
     )
 
+    nccl_timeout: int = field(
+        default=1800,
+    )
+
     def __post_init__(self):
         if self.streaming:
             require_version("datasets>=2.0.0", "The streaming feature requires `datasets>=2.0.0`")
@@ -422,9 +431,6 @@ def main():
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
-    # must be placed at top, so we extract string from sys.argv directly
-    if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
-        deepspeed.init_distributed()
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
@@ -433,6 +439,12 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    # must be placed at top, so we extract string from sys.argv directly
+    if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
+        deepspeed.init_distributed(timeout=datetime.timedelta(seconds=training_args.ddp_timeout))
+    # https://github.com/huggingface/accelerate/issues/223
+    # torch.distributed.init_process_group(backend="nccl", timeout=datetime.timedelta(seconds=data_args.nccl_timeout))
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -617,6 +629,8 @@ def main():
                                                        False,
                                                        logic_dataset_streaming)
 
+    if dataloader_num_worker > 1\
+            and data_args.preprocess_batch_size > 10:
     if data_args.logic_dataset_type == 'FLD':
 
         # load and dump once to normalize the schema from different versions of datasets.
@@ -639,6 +653,7 @@ def main():
             # lambda example: load_deduction(example).dict(),
             FLD_unify_schema,
             batched=True,
+            batch_size=data_args.preprocess_batch_size,
             **({} if logic_dataset_streaming else {'load_from_cache_file': False}),
         )
 
@@ -740,6 +755,11 @@ def main():
             )
             raise ValueError(msg)
 
+    if data_args.preprocessing_num_workers >= 2 and data_args.preprocess_batch_size > 10:
+        logger.critical('kind warning: dataset preprocessing with multiple workers and large batch size may hang without any error message.'
+                        '\nSee: https://discuss.huggingface.co/t/datasets-mapper-hanging-issue/32995'
+                        '\nNote that the fix introduced in the link did not work for me')
+
     if len(raw_datasets_list) == 0:
         lm_datasets_list = []
     else:
@@ -790,6 +810,7 @@ def main():
                     tokenized_datasets = raw_datasets.map(
                         tokenize_function,
                         batched=True,
+                        batch_size=data_args.preprocess_batch_size,
                         num_proc=data_args.preprocessing_num_workers,
                         remove_columns=column_names,
                         load_from_cache_file=not data_args.overwrite_cache,
@@ -799,6 +820,8 @@ def main():
                     tokenized_datasets = raw_datasets.map(
                         tokenize_function,
                         batched=True,
+                        batch_size=data_args.preprocess_batch_size,
+                        num_proc=data_args.preprocessing_num_workers,
                         remove_columns=column_names,
                     )
 
@@ -814,6 +837,7 @@ def main():
                     lm_datasets = tokenized_datasets.map(
                         group_texts,
                         batched=True,
+                        batch_size=data_args.preprocess_batch_size,
                         num_proc=data_args.preprocessing_num_workers,
                         load_from_cache_file=not data_args.overwrite_cache,
                         desc=f"Grouping texts in chunks of {block_size}",
@@ -822,6 +846,8 @@ def main():
                     lm_datasets = tokenized_datasets.map(
                         group_texts,
                         batched=True,
+                        batch_size=data_args.preprocess_batch_size,
+                        num_proc=data_args.preprocessing_num_workers,
                     )
 
             lm_datasets_list.append(lm_datasets)
@@ -1036,8 +1062,9 @@ def main():
         if MAP:
             train_dataset = train_dataset.map(
                 lambda examples: _maybe_logic_preprocess(examples, 'train'),
-                num_proc=data_args.preprocessing_num_workers,
                 batched=True,
+                batch_size=data_args.preprocess_batch_size,
+                num_proc=data_args.preprocessing_num_workers,
             )
         else:
             train_dataset.set_transform(
@@ -1048,8 +1075,9 @@ def main():
         if MAP:
             eval_dataset = eval_dataset.map(
                 lambda examples: _maybe_logic_preprocess(examples, 'eval'),
-                num_proc=data_args.preprocessing_num_workers,
                 batched=True,
+                batch_size=data_args.preprocess_batch_size,
+                num_proc=data_args.preprocessing_num_workers,
             )
         else:
             eval_dataset.set_transform(
@@ -1108,6 +1136,8 @@ def main():
             logic_eval_dataset = generation_handled_map(
                 lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
                 batched=True,
+                batch_size=data_args.preprocess_batch_size,
+                num_proc=data_args.preprocessing_num_workers,
             )
         else:
             logic_eval_dataset.set_transform(

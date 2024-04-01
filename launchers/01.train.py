@@ -141,19 +141,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-03-22.other_logical_datasets')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-03-23.other_logical_datasets')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test.streaming=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-25.H100_test.streaming=False.multinode')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-27.H100_test.streaming=False.workers=8.torchrun.NCCL_DEBUG=INFO.ddp_timeout=7200.pytorch_tieout=7200')
-
-    output_top_dir = Path('./outputs/01.train.py/2024-03-28.deepspeed_multinode')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-01.latest.num_proc=per_gpu.bs-10.nccl_timeout')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -300,13 +288,13 @@ def main():
             False,
         ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.0,
@@ -326,7 +314,9 @@ def main():
         # 'debug.ZS',
         # 'debug.micro',
         # 'debug.tiny',
-        'debug.middle',
+        # 'debug.tiny.bs-32',
+        # 'debug.tiny.bs-32.max_train_samples-10000',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -415,9 +405,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
 
     context = '2000'
     hours = 24
@@ -685,19 +674,13 @@ def main():
                                             'learning_rate': lrate,
                                             'weight_decay': 0.0,
 
-                                            # 'n_gpu': 1,
-
-                                            # values larger than n_gpus_per_node leads to error,
-                                            # possibly because the tokenizer is executed on GPUs?
-                                            # 'dataloader_num_workers': min(n_gpus_per_node, n_cpus_per_node),
-                                            # 'preprocessing_num_workers': min(n_gpus_per_node, n_cpus_per_node),
-                                            'dataloader_num_workers': n_cpus_per_node,
-                                            'preprocessing_num_workers': n_cpus_per_node,
-
+                                            'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                            'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
                                             'lora': False,
 
-                                            'ddp_timeout': 3600 * 10,  # large for preprocessing large datasets
+                                            'ddp_timeout': 3600 * 10,
+                                            # 'nccl_timeout': 3600 * 10,
 
                                             'gpu_name_for_batch_size': gpu_name_for_batch_size,
                                             'use_auth_token': True,
