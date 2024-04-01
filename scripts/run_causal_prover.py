@@ -629,8 +629,11 @@ def main():
                                                        False,
                                                        logic_dataset_streaming)
 
-    if dataloader_num_worker > 1\
-            and data_args.preprocess_batch_size > 10:
+    if data_args.preprocessing_num_workers >= 2 and data_args.preprocess_batch_size > 10:
+        logger.critical('kind warning: dataset preprocessing with multiple workers and large batch size may hang without any error message.'
+                        '\nSee: https://discuss.huggingface.co/t/datasets-mapper-hanging-issue/32995'
+                        '\nNote that the fix introduced in the link did not work for me')
+
     if data_args.logic_dataset_type == 'FLD':
 
         # load and dump once to normalize the schema from different versions of datasets.
@@ -654,6 +657,7 @@ def main():
             FLD_unify_schema,
             batched=True,
             batch_size=data_args.preprocess_batch_size,
+            num_proc=data_args.preprocessing_num_workers,
             **({} if logic_dataset_streaming else {'load_from_cache_file': False}),
         )
 
@@ -754,11 +758,6 @@ def main():
                 f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
             )
             raise ValueError(msg)
-
-    if data_args.preprocessing_num_workers >= 2 and data_args.preprocess_batch_size > 10:
-        logger.critical('kind warning: dataset preprocessing with multiple workers and large batch size may hang without any error message.'
-                        '\nSee: https://discuss.huggingface.co/t/datasets-mapper-hanging-issue/32995'
-                        '\nNote that the fix introduced in the link did not work for me')
 
     if len(raw_datasets_list) == 0:
         lm_datasets_list = []
