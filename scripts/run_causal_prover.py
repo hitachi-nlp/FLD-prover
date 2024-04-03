@@ -294,7 +294,7 @@ class DataTrainingArguments:
         },
     )
     preprocess_batch_size: Optional[int] = field(
-        default=10,
+        default=5,
     )
 
     logic_proof_eval_padding: Optional[str] = field(
@@ -407,10 +407,6 @@ class DataTrainingArguments:
         default=False,
     )
 
-    nccl_timeout: int = field(
-        default=1800,
-    )
-
     def __post_init__(self):
         if self.streaming:
             require_version("datasets>=2.0.0", "The streaming feature requires `datasets>=2.0.0`")
@@ -431,6 +427,11 @@ def main():
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
+    # MUST be placed at top (here) !!
+    if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
+        # https://github.com/huggingface/accelerate/issues/223
+        timeout = datetime.timedelta(seconds=3600 * 10)  # large for preprocessing on large dataset
+        deepspeed.init_distributed(timeout=timeout)
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
@@ -440,11 +441,6 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    # must be placed at top, so we extract string from sys.argv directly
-    if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
-        deepspeed.init_distributed(timeout=datetime.timedelta(seconds=training_args.ddp_timeout))
-    # https://github.com/huggingface/accelerate/issues/223
-    # torch.distributed.init_process_group(backend="nccl", timeout=datetime.timedelta(seconds=data_args.nccl_timeout))
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
