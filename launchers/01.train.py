@@ -170,7 +170,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -283,21 +285,17 @@ def main():
 
 
         # ---------------------------------- other datasets ------------------------------------
-        # 'hf.tasksource/ruletaker',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # 'hf.qbao775/PARARULE-Plus',
+        'hf.tasksource/ruletaker',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
 
-        # ---------------------------------- 20230122.past_FLD ------------------------------------
-        # '20240322.past_FLD.20230729.case_study_finalize.D3',
-        # '20240322.past_FLD.20230729.case_study_finalize.D8',
-
         # ---------------------------------- 2024-03-29.H100 ------------------------------------
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        '2024-03-29.JSAI_best.D8',
+        '2024-03-29.JSAI_best.theorems',
+        '2024-03-29.FLD_v2',
     ]
 
     num_train_examples_skip = None
@@ -317,19 +315,19 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        (
-            1.0,
-            [],
-            False,
-        ),
-
         # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
+        #     1.0,
+        #     [],
         #     False,
         # ),
+
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.0,
@@ -355,7 +353,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        'debug.middle',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -397,9 +395,9 @@ def main():
 
         # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
         # ('./outputs/01.train.py/2024-01-31.multitask/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.0/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-2500__bs-128/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=2500/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=128/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=500/wght_dcy=0.0/checkpoint-2500/', 'causal', 'cyberagent/open-calm-7b'),
@@ -426,12 +424,12 @@ def main():
 
     context_lengths = [
         2048,
-        4096,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
-        # True,
-        False,
+        True,
+        # False,
     ]
 
     resume_from_checkpoint = None
