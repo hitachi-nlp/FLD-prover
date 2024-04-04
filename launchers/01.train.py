@@ -174,7 +174,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-04.context=4096')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.context=4096')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-04.instruction_tuning')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -202,7 +203,6 @@ def main():
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
         './outputs.FLD/00.create_corpus/2024-03-29',
     ]
-
 
 
     logic_dataset_unames = [
@@ -300,9 +300,45 @@ def main():
         # '2024-03-29.FLD_v2',
     ]
 
-    num_train_examples_skip = None
-    # num_train_examples_skip = 1000
-    # num_train_examples_skip = 256 * 1250
+
+    model_settings = [
+        # ============================ english      ============================
+
+        # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
+        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
+
+        # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        # ============================ japanese     ============================
+
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+    ]
 
     """
     (
@@ -323,13 +359,13 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -340,13 +376,13 @@ def main():
         # ),
 
 
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'tatsu-lab/alpaca', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.0,
+            [
+                (1.0, 'tatsu-lab/alpaca', None)
+            ],
+            False,
+        ),
     ]
 
     learnings = [
@@ -367,7 +403,9 @@ def main():
         # 'FT.step-2500__bs-128',
         # 'FT.step-5000__bs-128',
 
-        'FT.step-800__bs-256',      # NeurIPS 100k
+        # 'FT.step-76__bs-256',
+        'FT.step-152__bs-256',      # NeurIPS Alpaca 3 epochs with context 2048
+        # 'FT.step-800__bs-256',      # NeurIPS 100k
         # 'FT.step-1250__bs-256',   # JSAI
         # 'FT.step-2500__bs-256',
 
@@ -383,47 +421,9 @@ def main():
     ]
 
 
-    model_settings = [
-        # ============================ english      ============================
-
-        # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
-        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
-
-        # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
-        # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
-
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'cyberagent/open-calm-7b'),
-
-        # ============================ japanese     ============================
-
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-    ]
-
     context_lengths = [
-        # 2048,
-        4096,
+        2048,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
@@ -523,6 +523,10 @@ def main():
     max_steps = None
     eval_steps = None
     num_evals = None
+
+    num_train_examples_skip = None
+    # num_train_examples_skip = 1000
+    # num_train_examples_skip = 256 * 1250
 
     sample_negative_proof_args = [
         # True,
