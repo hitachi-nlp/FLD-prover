@@ -399,10 +399,7 @@ def main():
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('./outputs/01.train.py/checkpoint.2024-02-18', 'causal', 'cyberagent/open-calm-7b'),
-        # ('./outputs/01.train.py/2024-01-31.multitask/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.0/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-2500__bs-128/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=2500/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=128/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=500/wght_dcy=0.0/checkpoint-2500/', 'causal', 'cyberagent/open-calm-7b'),
-        # ('./outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0/', 'causal', 'cyberagent/open-calm-7b'),
-
+        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'cyberagent/open-calm-7b'),
 
         # ============================ japanese     ============================
 
@@ -583,13 +580,6 @@ def main():
                                     for model_name, lm_type, model_name_for_batch_size in model_settings:
 
                                         n_resouce_org = engine.n_resource
-                                        # if model_name.find('70b') >= 0 and engine.n_resource < 3:
-                                        #     logger.warning(f'70B model requires at least 3 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
-                                        #     engine.n_resource = 3
-                                        # elif model_name.find('13b') >= 0 and engine.n_resource < 2:
-                                        #     logger.warning(f'13B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 2 nodes.')
-                                        #     engine.n_resource = 2
-
                                         if model_name.find('70b') >= 0 and engine.n_resource < 2:
                                             logger.warning(f'70B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
                                             engine.n_resource = 2
