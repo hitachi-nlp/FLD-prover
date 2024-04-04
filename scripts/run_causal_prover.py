@@ -295,6 +295,14 @@ class DataTrainingArguments:
     )
     preprocess_batch_size: Optional[int] = field(
         default=5,
+            metadata={
+            "help": (
+                "Batch size for preprocessing."
+                "XXX: dataset preprocessing with multiple workers and large batch size may hang without any error message."
+                "See: https://discuss.huggingface.co/t/datasets-mapper-hanging-issue/32995"
+                "Note that the fix introduced in the link did not work for me"
+            )
+        }
     )
 
     logic_proof_eval_padding: Optional[str] = field(
@@ -349,6 +357,10 @@ class DataTrainingArguments:
 
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
+    )
+
+    proof_intermediate_steps: bool = field(
+        default=True,
     )
 
     no_subproof_for_unknown: bool = field(
@@ -440,7 +452,9 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-
+    if training_args.dataloader_num_workers > 1:
+        logger.critical(training_args.dataloader_num_workers)
+        raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (but I don\'t know why)')
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -648,6 +662,8 @@ def main():
                 for example in examples_list
             ]
             return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+
+        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
         logic_raw_datasets = logic_raw_datasets.map(
             # lambda example: load_deduction(example).dict(),
             FLD_unify_schema,
@@ -801,6 +817,9 @@ def main():
                 return result
 
             with training_args.main_process_first(desc="dataset map tokenization"):
+                # avoid long text, which make tokenizer too slow
+                raw_datasets = raw_datasets.filter(lambda x: len(x[text_column_name]) < 100_000)
+
                 if not data_args.streaming:
                     tokenized_datasets = raw_datasets.map(
                         tokenize_function,
@@ -856,6 +875,7 @@ def main():
         # 'padding': logic_padding,
         'max_source_length': block_size,
         'max_target_length': block_size,
+        'proof_intermediate_steps': data_args.proof_intermediate_steps,
         'proof_sampling': False,
         'sample_negative_proof': False,
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
@@ -1053,6 +1073,8 @@ def main():
     # We set FLD preprocesssing function to the interleaved datasets.
     # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
     # as interleave_datasets() does not respect that processing in the current implementation
+
+    # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
     if train_dataset:
         if MAP:
             train_dataset = train_dataset.map(
@@ -1128,6 +1150,7 @@ def main():
                 **generation_handled_kwargs,
                 is_generate_func=False,
             )
+            # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
             logic_eval_dataset = generation_handled_map(
                 lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
                 batched=True,

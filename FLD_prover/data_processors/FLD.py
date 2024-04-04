@@ -107,6 +107,7 @@ class FLDProcessor(Processor):
     def _get_serial(self, example, split: str) -> SerializedDeduction:
         return serialize(
             load_deduction(example),
+            intermediate_steps=self._proof_intermediate_steps,
             stepwise=(self._proof_sampling == 'stepwise'),
             sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
             include_max_subproof_for_unknown=not self._no_subproof_for_unknown,

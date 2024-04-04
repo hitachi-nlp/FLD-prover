@@ -34,10 +34,19 @@ The code has been tested on Python 3.11.5
 
 
 ```console
-# XXX: First, you might have to login to the computation nodes with cuda, on which the program runs,
-# especially when you are using HPC environments where the host and the computation nodes have different environments.
+# [!] First, prepare CUDA libraries and set correct environmental variables,
+# as some of the modules , such as torch, can only be built under the environment.
+
+pip install --upgrade pip
+
+# Install pytorch. This is just an example with CUDA 11.8.,
+# and users have to install torch respecting THEIR OWN CUDA versions.
+pip install torch==2.0.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+
+# Install other packages
 pip install -r ./requirements/requirements.txt
 
+# Additional package for data preprocessing.
 git clone https://github.com/hitachi-nlp/FLD-task.git
 cd FLD-task
 git checkout NLP_2024_KOBE_BEEF

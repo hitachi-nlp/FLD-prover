@@ -26,8 +26,8 @@ $ export PYTHONPATH=./FLD-user-shared-settings:$PYTHONPATH
         ```
 
 ### To use DeepSpeed on HAIC
-1. Open MPI is already installed. So just do `module load openmpi-xx`
-1. Install mpi4py as the above.
+1. `source ./set-envs.sh` to load modules, such as CUDA and OpenMPI.
+1. Install mpi4py as `pip install mpi4py`.
 1. Modify source code of deepspeed as the above. The difference here is that you should use `eno3` as:
     ```python
          '--mca',
@@ -38,6 +38,5 @@ $ export PYTHONPATH=./FLD-user-shared-settings:$PYTHONPATH
     ```
 
 * references
-    * [Merge branch 'impl-haic' into main](https://gitlab.rdck.intra.hitachi.co.jp/industrial-fm/deepspeed-huggingface/-/commit/8dc7ac4e646582a0edfb959b10afbb2b546c87a2)
     * [README.haic.md](https://gitlab.rdck.intra.hitachi.co.jp/industrial-fm/deepspeed-huggingface/-/blob/main/README.haic.md)
 

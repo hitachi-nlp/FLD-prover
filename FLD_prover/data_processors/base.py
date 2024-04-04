@@ -36,6 +36,7 @@ class Processor(ABC):
                  max_source_length=1024,
                  max_target_length=1024,
                  ignore_index=-100,
+                 proof_intermediate_steps=False,
                  proof_sampling='stepwise',
                  sample_negative_proof=False,
                  no_subproof_for_unknown=False,
@@ -51,6 +52,7 @@ class Processor(ABC):
         self._max_target_length = max_target_length
         self._ignore_index = ignore_index
             
+        self._proof_intermediate_steps = proof_intermediate_steps
         self._proof_sampling = proof_sampling
         self._sample_negative_proof = sample_negative_proof
         self._no_subproof_for_unknown = no_subproof_for_unknown
