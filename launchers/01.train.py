@@ -172,7 +172,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -285,17 +286,17 @@ def main():
 
 
         # ---------------------------------- other datasets ------------------------------------
-        'hf.tasksource/ruletaker',
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        'hf.qbao775/PARARULE-Plus',
+        # 'hf.tasksource/ruletaker',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
 
         # ---------------------------------- 2024-03-29.H100 ------------------------------------
-        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        '2024-03-29.JSAI_best.D8',
-        '2024-03-29.JSAI_best.theorems',
-        '2024-03-29.FLD_v2',
+        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-03-29.JSAI_best.D8',
+        # '2024-03-29.JSAI_best.theorems',
+        # '2024-03-29.FLD_v2',
     ]
 
     num_train_examples_skip = None
@@ -425,8 +426,8 @@ def main():
     ]
 
     proof_intermediate_steps_args = [
-        True,
-        # False,
+        # True,
+        False,
     ]
 
     resume_from_checkpoint = None
