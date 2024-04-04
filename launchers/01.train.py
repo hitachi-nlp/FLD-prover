@@ -173,7 +173,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-04.context=4096')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -421,13 +422,13 @@ def main():
     ]
 
     context_lengths = [
-        2048,
-        # 4096,
+        # 2048,
+        4096,
     ]
 
     proof_intermediate_steps_args = [
-        # True,
-        False,
+        True,
+        # False,
     ]
 
     resume_from_checkpoint = None
