@@ -396,21 +396,21 @@ def main():
         # 'FT.step-5000',
         # 'FT.step-10000',
 
-        # 'FT.step-30_bs-64',
-        # 'FT.step-100_bs-64',
+        # 'FT.bs-64__step-30',
+        # 'FT.bs-64__step-100',
 
-        # 'FT.step-1000__bs-128',
-        # 'FT.step-2500__bs-128',
-        # 'FT.step-5000__bs-128',
+        # 'FT.bs-128__step-1000',
+        # 'FT.bs-128__step-2500',
+        # 'FT.bs-128__step-5000',
 
-        # 'FT.step-76__bs-256',
-        'FT.step-152__bs-256',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.step-800__bs-256',      # NeurIPS 100k
-        # 'FT.step-1250__bs-256',   # JSAI
-        # 'FT.step-2500__bs-256',
+        # 'FT.bs-256__step-76',
+        # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
+        'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-1250',   # JSAI
+        # 'FT.bs-256__step-2500',
 
-        # 'FT.step-1250__bs-512',
-        # 'FT.step-2500__bs-512',
+        # 'FT.bs-512__step-1250',
+        # 'FT.bs-512__step-2500',
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
