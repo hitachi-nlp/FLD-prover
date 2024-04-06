@@ -28,47 +28,6 @@ from FLD_user_shared_settings import (
 logger = logging.getLogger(__name__)
 
 
-_OTHER_MODELS = [
-
-        # ============================ multilingual ============================
-        # ('google/mt5-base', 'seq2seq', 'google/mt5-base'),
-        # ('google/mt5-large', 'seq2seq', 'google/mt5-large'),
-
-
-        # ============================ Japanese ============================
-        # -------------- < 1B params --------------
-
-        # ('retrieva-jp/t5-small-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        # ('retrieva-jp/t5-base-long', 'seq2seq', 'retrieva-jp/t5-base-long'),
-        # ('retrieva-jp/t5-large-long', 'seq2seq', 'retrieva-jp/t5-large-long'),
-        # ('megagonlabs/t5-base-japanese-web', 'seq2seq', 'retrieva-jp/t5-base-long'),
-
-        # ('cyberagent/open-calm-small', 'causal', 'cyberagent/open-calm-small'),
-        # ('cyberagent/open-calm-medium', 'causal', 'cyberagent/open-calm-medium'),
-        # ('cyberagent/open-calm-large', 'causal', 'cyberagent/open-calm-large'),
-
-        # ('rinna/japanese-gpt-neox-small', 'causal', 'cyberagent/open-calm-small'),
-
-        # ('facebook/xglm-564M', 'causal', 'facebook/xglm-564M'),  # should use deepspeed
-
-
-        # --------------- rejected models ---------------------
-
-        # ('line-corporation/japanese-large-lm-3.6b-instruction-sft', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b-instruction-ppo', 'causal', 'cyberagent/open-calm-3b'),
-        # ('stabilityai/japanese-stablelm-instruct-alpha-7b-v2', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('matsuo-lab/weblab-10b-instruction-sft', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast-instruct', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-instruct-full-jaster-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('tokyotech-llm/Swallow-13b-instruct-hf', 'causal', 'matsuo-lab/weblab-10b'),
-
-
-        # ('cyberagent/calm2-7b-chat', 'causal', 'cyberagent/open-calm-7b'),   # the training fails somehow
-
-]
-
-
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
@@ -86,13 +45,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_fix')
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.elyza_before')
-
     # output_top_dir = Path('./outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
     # output_top_dir = Path('./outputs/01.train.py/2023-12-06.D8')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
     # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
 
@@ -134,54 +88,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-21.trial_learning')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-22.trial_learning')
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-22.other_logical_datasets')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-03-23.other_logical_datasets')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.latest.num_proc=per_gpu.bs-10.nccl_timeout')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.trial2')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half.num_proc=1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half.num_proc=4')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half.num_proc=4')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half.num_proc=all')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.bs_and_checkpoint.4k_with_bs_half.num_proc=all.short')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-12.1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-12.1.multinode')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-12.1.eval_steps')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-32')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-5')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-5.no_save')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-5.no_save.koreeda_library')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-5.no_save.max_new_tokens=1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.cuda-11.8.bs-5.no_save.max_new_tokens=1.node--2')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=all')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=all.logic_preprocess_num_proc=None')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.context=4096')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.instruction_tuning')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.large_models')
-
-    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.all')
+    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.all')
+    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -293,8 +201,8 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        '2024-02-14.translation_speedup.translation-v3',
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
@@ -318,9 +226,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -356,19 +264,19 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
+            1.0,
+            [],
             False,
         ),
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -424,8 +332,8 @@ def main():
     ]
 
     context_lengths = [
-        2048,
-        # 4096,
+        # 2048,
+        4096,
     ]
 
     proof_intermediate_steps_args = [
@@ -698,16 +606,13 @@ def main():
                                                 )
 
                                                 if run_mode == 'deepspeed':
-                                                    # for max_eval_arg_name in ['max_eval_samples', 'max_predict_samples', 'logic_max_eval_samples']:
-                                                    for max_eval_arg_name in ['logic_max_eval_samples']:
+                                                    for max_eval_arg_name in ['logic_eval_max_samples']:
                                                         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
                                                         if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
                                                             raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
                                                 setting.update(get_model_setting(model_name))
-
                                                 setting.update(get_tokenizer_setting(model_name))
-
                                                 setting.update(
                                                     get_generation_setting(
                                                         script_type,
@@ -716,14 +621,12 @@ def main():
                                                         generation_max_length=setting.get('max_target_length', None),
                                                    ),
                                                 )
-
                                                 setting.update({
                                                     'do_train': True,
                                                     # 'do_eval': True,   # automatically set by evaluation_strategy=step
                                                     'do_eval_in_outerloop': False,
                                                     'do_predict': False,
                                                 })
-
                                                 setting.update({
                                                     'script_type': script_type,
                                                     'seed': seed,
@@ -770,9 +673,9 @@ def main():
 
                                                 if seed >= 2:  # for compatibility with older experiments of jpn
                                                     setting.update({
-                                                        'random_sample_max_train_samples': True,
-                                                        'random_sample_max_eval_samples': True,
-                                                        'random_sample_logic_max_eval_samples': True,
+                                                        'train_random_sampling': True,
+                                                        'eval_random_sampling': True,
+                                                        'logic_eval_random_sampling': True,
                                                     })
 
                                                 output_dir = make_output_dir(setting, output_top_dir)
@@ -803,6 +706,7 @@ def main():
                                         engine.n_resource = n_resouce_org
 
     logger.info('------------- ./01.train.py finished !! -----------')
+
 
 
 if __name__ == '__main__':

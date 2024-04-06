@@ -71,6 +71,7 @@ class Processor(ABC):
         padding='longest',
     )  -> Dict[str, List[Any]]:
 
+
         def _prepare_tokenized_targets(targets, max_length, **kwargs):
             return prepare_tokenized_targets(targets, self._tokenizer, padding, max_length, **kwargs)
 

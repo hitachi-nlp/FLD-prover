@@ -62,7 +62,7 @@ from transformers.trainer_callback import TrainerCallback, TrainerState, Trainer
 from transformers.trainer_callback import CallbackHandler
 from transformers.testing_utils import CaptureLogger
 from transformers.trainer_utils import get_last_checkpoint
-from transformers.utils import check_min_version, send_example_telemetry
+from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 from peft import LoraConfig, TaskType as PeftTaskType, get_peft_model
 from logger_setup import setup as setup_logger
@@ -92,6 +92,7 @@ logger = logging.getLogger(__name__)
 
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
+
 
 @dataclass
 class ModelArguments:
@@ -235,7 +236,7 @@ class DataTrainingArguments:
             )
         },
     )
-    random_sample_max_train_samples: bool = field(
+    train_random_sampling: bool = field(
         default=False,
         metadata={
             "help": (
@@ -262,7 +263,7 @@ class DataTrainingArguments:
             )
         },
     )
-    random_sample_max_eval_samples: bool = field(
+    eval_random_sampling: bool = field(
         default=False,
         metadata={
             "help": (
@@ -272,10 +273,10 @@ class DataTrainingArguments:
         },
     )
 
-    logic_max_eval_samples: Optional[int] = field(
+    logic_eval_max_samples: Optional[int] = field(
         default=None,
     )
-    random_sample_logic_max_eval_samples: bool = field(
+    logic_eval_random_sampling: bool = field(
         default=False,
     )
 
@@ -292,7 +293,7 @@ class DataTrainingArguments:
     )
     preprocess_batch_size: Optional[int] = field(
         default=1000,
-            metadata={
+        metadata={
             "help": (
                 "Batch size for preprocessing."
                 "XXX: dataset preprocessing with multiple workers and large batch size may hang without any error message."
@@ -302,7 +303,7 @@ class DataTrainingArguments:
         }
     )
 
-    logic_proof_eval_padding: Optional[str] = field(
+    logic_eval_padding: Optional[str] = field(
         default="longest",
     )
 
@@ -424,15 +425,477 @@ class DataTrainingArguments:
             self.val_max_target_length = self.max_target_length
 
 
-def main():
-    # See all possible arguments in src/transformers/training_args.py
-    # or by passing the --help flag to this script.
-    # We now keep distinct sets of args, for a cleaner separation of concerns.
+def take(dataset, max_samples: int, random_sampling: bool):
+    if isinstance(dataset, IterableDataset):
+        dataset = dataset.take(max_samples)
+    else:
+        _max_samples = min(len(dataset), max_samples)
+        if random_sampling:
+            indexes = np.random.choice(len(dataset), _max_samples, replace=False)
+        else:
+            indexes = np.arange(_max_samples)
+        dataset = dataset.select(indexes)
+    return dataset
 
-    logging.getLogger().handlers.clear()  # remove handler automatically added
+
+def FLD_map_schema(examples: Dict[str, List[Any]]):
+    keys = list(examples.keys())
+    batch_size = len(examples[keys[0]])
+    examples_list = [
+        {key: values[i] for key, values in examples.items()}
+        for i in range(batch_size)
+    ]
+    examples_list = [
+        load_deduction(example).dict()
+        for example in examples_list
+    ]
+    return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+
+
+def load_raw_dataset_by_name(data_args,
+                             model_args,
+                             dataset_name: str,
+                             dataset_config_name: str):
+    raw_datasets = load_dataset(
+        dataset_name,
+        dataset_config_name,
+        cache_dir=model_args.cache_dir,
+        use_auth_token=True if model_args.use_auth_token else None,
+        streaming=data_args.streaming,
+    )
+    if "validation" not in raw_datasets.keys():
+        if "dev" in raw_datasets.keys():
+            raw_datasets["validation"] = raw_datasets["dev"]
+        else:
+            raw_datasets["validation"] = load_dataset(
+                dataset_name,
+                dataset_config_name,
+                split=f"train[:{data_args.validation_split_percentage}%]",
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+                streaming=data_args.streaming,
+            )
+            raw_datasets["train"] = load_dataset(
+                dataset_name,
+                dataset_config_name,
+                split=f"train[{data_args.validation_split_percentage}%:]",
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+                streaming=data_args.streaming,
+            )
+
+    large_dataset_name = 'DKYoon/SlimPajama-6B'
+    if dataset_name == large_dataset_name:
+        max_samples = 2000000  # 1 / 3 of all, about 2B tokens, 300k samples of 4k token block
+        raw_datasets['train'] = take(raw_datasets['train'], max_samples, False)
+        logger.warning('We will only take first %d samples from the training set of %s to save disk',
+                       max_samples,
+                       large_dataset_name)
+
+    return raw_datasets
+
+
+def load_raw_dataset_by_files(data_args,
+                              model_args,
+                              train_file: Optional[str],
+                              validation_file: Optional[str],
+                              file_type: str,
+                              keep_linebreaks: bool,
+                              streaming: bool):
+    data_files = {}
+    dataset_args = {}
+    if train_file is not None:
+        data_files["train"] = train_file
+    if validation_file is not None:
+        data_files["validation"] = validation_file
+
+    extension = file_type
+    if extension == "txt":
+        extension = "text"
+        dataset_args["keep_linebreaks"] = keep_linebreaks
+
+    if len(data_files) > 0:
+        raw_datasets = load_dataset(
+            extension,
+            data_files=data_files,
+            cache_dir=model_args.cache_dir,
+            use_auth_token=True if model_args.use_auth_token else None,
+            streaming=data_args.streaming,
+            **dataset_args,
+        )
+
+        if "validation" not in raw_datasets.keys():
+            raw_datasets["validation"] = load_dataset(
+                extension,
+                data_files=data_files,
+                split=f"train[:{data_args.validation_split_percentage}%]",
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+                streaming=data_args.streaming,
+                **dataset_args,
+            )
+            raw_datasets["train"] = load_dataset(
+                extension,
+                data_files=data_files,
+                split=f"train[{data_args.validation_split_percentage}%:]",
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+                streaming=data_args.streaming,
+                **dataset_args,
+            )
+    else:
+        raw_datasets = DatasetDict()
+
+    return raw_datasets
+
+
+def parse_listed_option(option: str) -> Optional[List[str]]:
+    return [name or None for name in option.split('::')] if option is not None else []
+
+
+def load_raw_datasets(data_args, model_args):
+    dataset_names = parse_listed_option(data_args.dataset_names)
+    dataset_config_names = parse_listed_option(data_args.dataset_config_names)
+    train_files = parse_listed_option(data_args.train_files)
+    validation_files = parse_listed_option(data_args.validation_files)
+    file_types = parse_listed_option(data_args.file_types)
+
+    raw_datasets_list = []
+    if len(dataset_names) > 0:
+        for i in range(len(dataset_names)):
+            raw_datasets_list.append(
+                load_raw_dataset_by_name(
+                    data_args,
+                    model_args,
+                    dataset_names[i],
+                    dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
+                )
+            )
+    else:
+        for i in range(len(train_files)):
+            raw_datasets_list.append(
+                load_raw_dataset_by_files(
+                    data_args,
+                    model_args,
+                    train_files[i],
+                    validation_files[i] if validation_files[i] != 'None' else None,
+                    file_types[i] if file_types[i] != 'None' else 'json',
+                    data_args.keep_linebreaks,
+                    data_args.streaming,
+                )
+            )
+    return raw_datasets_list
+
+
+def tokenize_datasets(training_args,
+                      data_args,
+                      raw_datasets_list,
+                      tokenizer,
+                      block_size):
+    if len(raw_datasets_list) == 0:
+        tokenized_datasets_list = []
+    else:
+        tokenized_datasets_list = []
+
+        for raw_datasets in raw_datasets_list:
+            if training_args.do_train:
+                column_names = list(raw_datasets["train"].features)
+            elif training_args.do_eval or data_args.do_eval_in_outerloop:
+                column_names = list(raw_datasets["validation"].features)
+            else:
+                column_names = None
+            text_column_name = data_args.text_column_name\
+                or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
+
+            # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
+            tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
+
+            def tokenize_function(examples):
+                with CaptureLogger(tok_logger) as cl:
+                    output = tokenizer(examples[text_column_name])
+                # clm input could be much much longer than block_size
+                if "Token indices sequence length is longer than the" in cl.out:
+                    tok_logger.warning(
+                        "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
+                        " before being passed to the model."
+                    )
+                return output
+
+            desc = "[non-logic dataset] tokenize_function()"
+            dataset_map_kwargs = {
+                'batched': True,
+                'batch_size': data_args.preprocess_batch_size,
+                'num_proc': data_args.preprocessing_num_workers,
+                'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                'desc': desc,
+            }
+
+            with training_args.main_process_first(desc=desc):
+                # avoid long text, which make tokenizer too slow
+                raw_datasets = raw_datasets.filter(lambda x: len(x[text_column_name]) < 100_000)
+                tokenized_datasets = raw_datasets.map(tokenize_function, remove_columns=column_names, **dataset_map_kwargs)
+
+            def group_texts(examples):
+                concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
+                total_length = len(concatenated_examples[list(examples.keys())[0]])
+                # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
+                # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
+                total_length = (total_length // block_size) * block_size
+                # Split by chunks of max_len.
+                result = {
+                    k: [t[i: i + block_size] for i in range(0, total_length, block_size)]
+                    for k, t in concatenated_examples.items()
+                }
+                result["labels"] = result["input_ids"].copy()
+                return result
+
+            desc = f"[non-logic dataset] group_texts()"
+            with training_args.main_process_first(desc=desc):
+                tokenized_datasets = tokenized_datasets.map(group_texts, **dataset_map_kwargs)
+
+            tokenized_datasets_list.append(tokenized_datasets)
+
+    return tokenized_datasets_list
+
+
+def load_logic_data_processor(data_args, tokenizer, block_size):
+    preprocessor_args = [
+        LMType.CAUSAL,
+        tokenizer,
+    ]
+    preprocessor_kwargs = {
+        'prompt_prefix': data_args.source_prefix,
+        # 'padding': logic_padding,
+        'max_source_length': block_size,
+        'max_target_length': block_size,
+        'proof_intermediate_steps': data_args.proof_intermediate_steps,
+        'proof_sampling': False,
+        'sample_negative_proof': False,
+        'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
+        'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
+        'instruction': data_args.instruction,
+        # 'log_examples': data_args.log_examples,
+    }
+
+    if data_args.logic_dataset_type == 'FLD':
+        processor_cls = FLDProcessor
+    elif data_args.logic_dataset_type == 'rule_taker':
+        processor_cls = RuleTakerProcessor
+    elif data_args.logic_dataset_type == 'proof_writer':
+        processor_cls = ProofWriterProcessor
+    elif data_args.logic_dataset_type == 'pararule_plus':
+        processor_cls = PararulePlusProcessor
+    elif data_args.logic_dataset_type == 'robust_lr':
+        processor_cls = RobustLRProcessor
+    else:
+        raise ValueError()
+
+    return processor_cls(*preprocessor_args, **preprocessor_kwargs)
+
+
+@profile
+def _maybe_logic_preprocess(data_args,
+                            logic_data_processor,
+                            examples,
+                            mode):
+    if data_args.logic_dataset_type == 'FLD':
+        logic_key = 'hypothesis'
+    elif data_args.logic_dataset_type == 'rule_taker':
+        logic_key = 'context'
+    elif data_args.logic_dataset_type == 'proof_writer':
+        logic_key = 'theory'
+    elif data_args.logic_dataset_type == 'pararule_plus':
+        logic_key = 'context'
+    elif data_args.logic_dataset_type == 'robust_lr':
+        logic_key = 'context'
+    else:
+        raise ValueError()
+
+    if logic_key not in examples:
+        return examples
+
+    logic_indexes = [i for i in range(len(examples[logic_key]))
+                     if examples[logic_key][i] is not None]
+    non_logic_indexes = [i for i in range(len(examples[logic_key]))
+                         if i not in logic_indexes]
+    num_logic_examples = len(logic_indexes)
+    num_non_logic_examples = len(non_logic_indexes)
+
+    logic_examples = {
+        key: [values[i] for i in logic_indexes]
+        for key, values in examples.items()
+    }
+    non_logic_examples = {
+        key: [values[i] for i in non_logic_indexes]
+        for key, values in examples.items()
+    }
+
+    if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
+        i_example = 0
+        logger.info(
+            '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
+        for key, values in non_logic_examples.items():
+            if len(values) > 0:
+                logger.info('%s: "%s"', key, values[i_example])
+        data_args.log_non_logic_examples = False  # only log once, as too much logs break the stream, leading to sigkill
+
+    if mode in ["train", "eval"]:
+        logic_preproc_split = "train"
+        # logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_eval_padding
+        logic_padding = "max_length"   # 'longest' leads to error as the shape of tensors will be diferrent in a batch
+        feature_names = ['input_ids', 'attention_mask', 'labels']
+
+    elif mode == "logic_eval":
+        logic_preproc_split = "eval"
+        logic_padding = data_args.logic_eval_padding
+        feature_names = list(logic_examples.keys())
+
+    else:
+        raise ValueError()
+
+    if num_logic_examples > 0:
+        logic_processed = logic_data_processor.preprocess(
+            logic_examples,
+            logic_preproc_split,
+            padding=logic_padding,
+        )
+        logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
+    else:
+        logic_processed = {}
+
+    if mode == "logic_eval":
+        return logic_processed
+    else:
+        if num_logic_examples > 0 and num_non_logic_examples > 0:
+            processed = {
+                key: torch.concat((logic_processed[key], torch.tensor(
+                    non_logic_examples[key], dtype=logic_processed[key].dtype)))
+                for key in feature_names
+            }
+        elif num_logic_examples > 0:
+            processed = {key: vals for key, vals in logic_processed.items() if key in feature_names}
+        else:
+            processed = {key: vals for key, vals in non_logic_examples.items() if key in feature_names}
+
+        return processed
+
+
+def load_logic_raw_datasets(data_args, model_args):
+    if data_args.logic_dataset_name is not None:
+        logic_raw_datasets = load_raw_dataset_by_name(data_args.logic_dataset_name,
+                                                      data_args.logic_dataset_config_name,
+                                                      data_args.streaming)
+    else:
+        logic_raw_datasets = load_raw_dataset_by_files(data_args,
+                                                       model_args,
+                                                       data_args.logic_train_fileg,
+                                                       data_args.logic_validation_file,
+                                                       'json',
+                                                       data_args.keep_linebreaks,
+                                                       False)
+    if data_args.logic_dataset_type == 'FLD':
+        # load and dump once to normalize the schema from different versions of datasets.
+        logic_raw_datasets = logic_raw_datasets.map(
+            FLD_map_schema,
+            batched=True,
+            batch_size=data_args.preprocess_batch_size,
+            num_proc=data_args.preprocessing_num_workers,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc="[logic dataset] mapping schema",
+        )
+
+    return logic_raw_datasets
+
+
+def make_interleave_datasets(data_args,
+                             datasets: List[Dataset],
+                             logic_dataset: Optional[Dataset],
+                             dataset_probs: List[float]):
+    logger.info('making interleave datasets ...')
+    if len(datasets) == 0 and logic_dataset is None:
+        raise ValueError()
+
+    if len(datasets) == 0:
+        dataset_prob_tot = 0.0
+        logic_dataset_prob = 1.0
+    elif logic_dataset is None:
+        dataset_prob_tot = 1.0
+        logic_dataset_prob = 0.0
+
+    else:
+        logic_dataset_prob = data_args.logic_dataset_prob
+        dataset_prob_tot = 1 - data_args.logic_dataset_prob
+
+    all_datasets = datasets.copy()
+    all_probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
+    if logic_dataset is not None:
+        all_datasets.append(logic_dataset)
+        all_probs.append(logic_dataset_prob)
+
+    all_datasets = [dataset for dataset, prob in zip(all_datasets, all_probs) if prob > 0.0]
+    all_probs = [prob for prob in all_probs if prob > 0.0]
+
+    logger.info('dataset probabilities: %s', all_probs)
+    if len(all_datasets) == 1:
+        return all_datasets[0]
+    else:
+        return interleave_datasets(
+            all_datasets,
+            probabilities=all_probs,
+            seed=0,
+            # stopping_strategy="all_exhausted",
+            stopping_strategy="first_exhausted",  # "all_exhausted" will yield dataset that does not respect probs
+        )
+
+
+def make_generation_settings(data_args, tokenizer, model, config):
+    generation_config = GenerationConfig.from_model_config(config)
+    generation_config.max_time = data_args.generation_timeout
+    generation_handle_args = [
+        LMType.CAUSAL,
+        tokenizer,
+        model,
+    ]
+    generation_handled_kwargs = {
+        'eos_token_id': tokenizer.eos_token_id,
+        'top_k': data_args.generation_top_k,
+        'num_beams': data_args.generation_num_beams,
+        'num_return_sequences': data_args.generation_num_return_sequences,
+        'do_sample': data_args.generation_do_sample,
+        'temperature': data_args.generation_temperature,
+        'repetition_penalty': data_args.generation_repetition_penalty,
+        'max_length': min(data_args.generation_max_length + 1, model.config.max_position_embeddings),
+        'max_new_tokens': data_args.generation_max_new_tokens,
+    }
+    return generation_config, generation_handle_args, generation_handled_kwargs
+
+
+def setup_seq2seq_trainer_class(klass,
+                                data_args,
+                                generation_handle_args,
+                                generation_handled_kwargs):
+    klass.evaluate = generation_handled(
+        klass.evaluate,
+        *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
+        **generation_handled_kwargs,
+    )
+    klass.predict = generation_handled(
+        klass.predict,
+        *generation_handle_args,
+        timeout_from_call=data_args.evaluation_timeout,
+        timeout_msg_title='generation aborted because "evaluate()" took too long',
+        **generation_handled_kwargs,
+    )
+
+
+
+@profile
+def main():
+    logging.getLogger().handlers.clear()
     setup_logger(do_stderr=True, level=logging.INFO)
     logging.getLogger('absl').setLevel(logging.WARNING)
-    # os.environ['TOKENIZERS_PARALLELISM'] = 'false'
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
@@ -443,9 +906,7 @@ def main():
         deepspeed.init_distributed(timeout=timeout)
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
-    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
-        # If we pass only one argument to the script and it's the path to a json file,
-        # let's parse it to get our arguments.
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):  # json file specifiying the arguments
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -453,15 +914,9 @@ def main():
         logger.critical(training_args.dataloader_num_workers)
         raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (generation of proofs) (but I don\'t know why)')
 
-    # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
-    # information sent is the one passed as arguments along with your Python/PyTorch versions.
-    send_example_telemetry("run_clm", model_args, data_args)
-
     if training_args.should_log:
-        # The default of training_args.log_level is passive, so we set log level at info here to have that default.
         transformers.utils.logging.set_verbosity_info()
 
-    # Initialize our Trainer
     if training_args.remove_unused_columns:
         raise ValueError(
             'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
@@ -497,152 +952,6 @@ def main():
 
     # Set seed before initializing model.
     set_seed(training_args.seed)
-
-    # Get the datasets: you can either provide your own CSV/JSON/TXT training and evaluation files (see below)
-    # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
-    # (the dataset will be downloaded automatically from the datasets Hub).
-    #
-    # For CSV/JSON files, this script will use the column called 'text' or the first column if no column called
-    # 'text' is found. You can easily tweak this behavior (see below).
-    #
-    # In distributed training, the load_dataset function guarantee that only one local process can concurrently
-    # download the dataset.
-    def load_raw_dataset_by_name(dataset_name: str,
-                                 dataset_config_name: str,
-                                 streaming: bool):
-        # Downloading and loading a dataset from the hub.
-        raw_datasets = load_dataset(
-            dataset_name,
-            dataset_config_name,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-            streaming=streaming,
-            # download_config=DownloadConfig(resume_download=True),
-        )
-        if "validation" not in raw_datasets.keys():
-            if "dev" in raw_datasets.keys():
-                raw_datasets["validation"] = raw_datasets["dev"]
-            else:
-                raw_datasets["validation"] = load_dataset(
-                    dataset_name,
-                    dataset_config_name,
-                    split=f"train[:{data_args.validation_split_percentage}%]",
-                    # split=f"train",
-                    cache_dir=model_args.cache_dir,
-                    use_auth_token=True if model_args.use_auth_token else None,
-                    streaming=streaming,
-                    # download_config=DownloadConfig(resume_download=True),
-                )
-                raw_datasets["train"] = load_dataset(
-                    dataset_name,
-                    dataset_config_name,
-                    split=f"train[{data_args.validation_split_percentage}%:]",
-                    # split=f"train",
-                    cache_dir=model_args.cache_dir,
-                    use_auth_token=True if model_args.use_auth_token else None,
-                    streaming=streaming,
-                    # download_config=DownloadConfig(resume_download=True),
-                )
-        return raw_datasets
-
-    def load_raw_dataset_by_files(train_file: Optional[str],
-                                  validation_file: Optional[str],
-                                  file_type: str,
-                                  keep_linebreaks: bool,
-                                  streaming: bool):
-        data_files = {}
-        dataset_args = {}
-        if train_file is not None:
-            data_files["train"] = train_file
-        if validation_file is not None:
-            data_files["validation"] = validation_file
-
-        extension = file_type
-        if extension == "txt":
-            extension = "text"
-            dataset_args["keep_linebreaks"] = keep_linebreaks
-
-        if len(data_files) > 0:
-            raw_datasets = load_dataset(
-                extension,
-                data_files=data_files,
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=streaming,
-                **dataset_args,
-                # download_config=DownloadConfig(resume_download=True),
-            )
-
-            # If no validation data is there, validation_split_percentage will be used to divide the dataset.
-            if "validation" not in raw_datasets.keys():
-                raw_datasets["validation"] = load_dataset(
-                    extension,
-                    data_files=data_files,
-                    split=f"train[:{data_args.validation_split_percentage}%]",
-                    cache_dir=model_args.cache_dir,
-                    use_auth_token=True if model_args.use_auth_token else None,
-                    streaming=streaming,
-                    **dataset_args,
-                    # download_config=DownloadConfig(resume_download=True),
-                )
-                raw_datasets["train"] = load_dataset(
-                    extension,
-                    data_files=data_files,
-                    split=f"train[{data_args.validation_split_percentage}%:]",
-                    cache_dir=model_args.cache_dir,
-                    use_auth_token=True if model_args.use_auth_token else None,
-                    streaming=streaming,
-                    **dataset_args,
-                    # download_config=DownloadConfig(resume_download=True),
-                )
-        else:
-            raw_datasets = DatasetDict()
-
-        return raw_datasets
-
-    dataset_names = [name or None for name in data_args.dataset_names.split(
-        '::')] if data_args.dataset_names is not None else []
-    dataset_config_names = [name or None for name in data_args.dataset_config_names.split(
-        '::')] if data_args.dataset_config_names is not None else []
-    train_files = [name or None for name in data_args.train_files.split('::')] if data_args.train_files is not None else []
-    validation_files = [name or None for name in data_args.validation_files.split(
-        '::')] if data_args.validation_files is not None else []
-    file_types = [name or None for name in data_args.file_types.split('::')] if data_args.file_types is not None else []
-    dataset_probs = [float(prob) for prob in data_args.dataset_probs.split('::')
-                     ] if data_args.dataset_probs is not None else []
-    raw_datasets_list = []
-    if len(dataset_names) > 0:
-        for i in range(len(dataset_names)):
-            raw_datasets_list.append(load_raw_dataset_by_name(dataset_names[i],
-                                                              dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
-                                                              data_args.streaming))
-    else:
-        for i in range(len(train_files)):
-            raw_datasets_list.append(load_raw_dataset_by_files(train_files[i],
-                                                               validation_files[i] if validation_files[i] != 'None' else None,
-                                                               file_types[i] if file_types[i] != 'None' else 'json',
-                                                               data_args.keep_linebreaks,
-                                                               data_args.streaming))
-
-    logic_dataset_streaming = data_args.streaming
-    if data_args.logic_dataset_name is not None:
-        logic_raw_datasets = load_raw_dataset_by_name(data_args.logic_dataset_name,
-                                                      data_args.logic_dataset_config_name,
-                                                      logic_dataset_streaming)
-    else:
-        logic_raw_datasets = load_raw_dataset_by_files(data_args.logic_train_fileg,
-                                                       data_args.logic_validation_file,
-                                                       'json',
-                                                       False,
-                                                       logic_dataset_streaming)
-
-    # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
-    # https://huggingface.co/docs/datasets/loading_datasets.html.
-
-    # Load pretrained model and tokenizer
-    # Distributed training:
-    # The .from_pretrained methods guarantee that only one local process can concurrently
-    # download model & vocab.
 
     config_kwargs = {
         "cache_dir": model_args.cache_dir,
@@ -734,333 +1043,47 @@ def main():
             )
             raise ValueError(msg)
 
-    if len(raw_datasets_list) == 0:
-        lm_datasets_list = []
-    else:
-        lm_datasets_list = []
+    raw_datasets_list = load_raw_datasets(data_args, model_args)
+    tokenized_datasets_list = tokenize_datasets(training_args,
+                                                data_args,
+                                                raw_datasets_list,
+                                                tokenizer,
+                                                block_size)
 
-        for raw_datasets in raw_datasets_list:
-            if training_args.do_train:
-                column_names = list(raw_datasets["train"].features)
-            elif training_args.do_eval or data_args.do_eval_in_outerloop:
-                column_names = list(raw_datasets["validation"].features)
-            else:
-                column_names = None
-            text_column_name = data_args.text_column_name\
-                or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
-
-            # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
-            tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
-
-            def tokenize_function(examples):
-                with CaptureLogger(tok_logger) as cl:
-                    output = tokenizer(examples[text_column_name])
-                # clm input could be much much longer than block_size
-                if "Token indices sequence length is longer than the" in cl.out:
-                    tok_logger.warning(
-                        "^^^^^^^^^^^^^^^^ Please ignore the warning above - this long input will be chunked into smaller bits"
-                        " before being passed to the model."
-                    )
-                return output
-
-            # Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.
-            def group_texts(examples):
-                # Concatenate all texts.
-                concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-                total_length = len(concatenated_examples[list(examples.keys())[0]])
-                # We drop the small remainder, and if the total_length < block_size  we exclude this batch and return an empty dict.
-                # We could add padding if the model supported it instead of this drop, you can customize this part to your needs.
-                total_length = (total_length // block_size) * block_size
-                # Split by chunks of max_len.
-                result = {
-                    k: [t[i: i + block_size] for i in range(0, total_length, block_size)]
-                    for k, t in concatenated_examples.items()
-                }
-                result["labels"] = result["input_ids"].copy()
-                return result
-
-            desc = "[non-logic dataset] tokenize_function()"
-            with training_args.main_process_first(desc=desc):
-                # avoid long text, which make tokenizer too slow
-                raw_datasets = raw_datasets.filter(lambda x: len(x[text_column_name]) < 100_000)
-
-                if not data_args.streaming:
-                    tokenized_datasets = raw_datasets.map(
-                        tokenize_function,
-                        batched=True,
-                        batch_size=data_args.preprocess_batch_size,
-                        num_proc=data_args.preprocessing_num_workers,
-                        remove_columns=column_names,
-                        load_from_cache_file=not data_args.overwrite_cache,
-                        desc=desc,
-                    )
-                else:
-                    tokenized_datasets = raw_datasets.map(
-                        tokenize_function,
-                        batched=True,
-                        batch_size=data_args.preprocess_batch_size,
-                        num_proc=data_args.preprocessing_num_workers,
-                        remove_columns=column_names,
-                        desc=desc,
-                    )
-
-            # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
-            # for each of those groups of 1,000 texts. You can adjust that batch_size here but a higher value might be slower
-            # to preprocess.
-            #
-            # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
-            # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
-
-            desc = f"[non-logic dataset] group_texts()"
-            with training_args.main_process_first(desc=desc):
-                if not data_args.streaming:
-                    lm_datasets = tokenized_datasets.map(
-                        group_texts,
-                        batched=True,
-                        batch_size=data_args.preprocess_batch_size,
-                        num_proc=data_args.preprocessing_num_workers,
-                        load_from_cache_file=not data_args.overwrite_cache,
-                        desc=desc,
-                    )
-                else:
-                    lm_datasets = tokenized_datasets.map(
-                        group_texts,
-                        batched=True,
-                        batch_size=data_args.preprocess_batch_size,
-                        num_proc=data_args.preprocessing_num_workers,
-                        desc=desc,
-                    )
-
-            lm_datasets_list.append(lm_datasets)
-
-    preprocessor_args = [
-        LMType.CAUSAL,
-        tokenizer,
-    ]
-    preprocessor_kwargs = {
-        'prompt_prefix': data_args.source_prefix,
-        # 'padding': logic_padding,
-        'max_source_length': block_size,
-        'max_target_length': block_size,
-        'proof_intermediate_steps': data_args.proof_intermediate_steps,
-        'proof_sampling': False,
-        'sample_negative_proof': False,
-        'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
-        'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
-        'instruction': data_args.instruction,
-        # 'log_examples': data_args.log_examples,
-    }
-
-    if data_args.logic_dataset_type == 'FLD':
-        processor_cls = FLDProcessor
-    elif data_args.logic_dataset_type == 'rule_taker':
-        processor_cls = RuleTakerProcessor
-    elif data_args.logic_dataset_type == 'proof_writer':
-        processor_cls = ProofWriterProcessor
-    elif data_args.logic_dataset_type == 'pararule_plus':
-        processor_cls = PararulePlusProcessor
-    elif data_args.logic_dataset_type == 'robust_lr':
-        processor_cls = RobustLRProcessor
-    else:
-        raise ValueError()
-
-    logic_data_processor = processor_cls(*preprocessor_args, **preprocessor_kwargs)
+    logic_data_processor = load_logic_data_processor(data_args, tokenizer, block_size)
     data_args.log_non_logic_examples = True
 
-    def _maybe_logic_preprocess(examples: Dict[str, List[Any]], mode: str):
-        if data_args.logic_dataset_type == 'FLD':
-            logic_key = 'hypothesis'
-        elif data_args.logic_dataset_type == 'rule_taker':
-            logic_key = 'context'
-        elif data_args.logic_dataset_type == 'proof_writer':
-            logic_key = 'theory'
-        elif data_args.logic_dataset_type == 'pararule_plus':
-            logic_key = 'context'
-        elif data_args.logic_dataset_type == 'robust_lr':
-            logic_key = 'context'
-        else:
-            raise ValueError()
+    logic_raw_datasets = load_logic_raw_datasets(data_args, model_args)
 
-        if logic_key not in examples:
-            return examples
-
-        logic_indexes = [i for i in range(len(examples[logic_key]))
-                         if examples[logic_key][i] is not None]
-        non_logic_indexes = [i for i in range(len(examples[logic_key]))
-                             if i not in logic_indexes]
-        num_logic_examples = len(logic_indexes)
-        num_non_logic_examples = len(non_logic_indexes)
-
-        logic_examples = {
-            key: [values[i] for i in logic_indexes]
-            for key, values in examples.items()
-        }
-        non_logic_examples = {
-            key: [values[i] for i in non_logic_indexes]
-            for key, values in examples.items()
-        }
-
-        if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
-            i_example = 0
-            logger.info(
-                '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
-            for key, values in non_logic_examples.items():
-                if len(values) > 0:
-                    logger.info('%s: "%s"', key, values[i_example])
-            data_args.log_non_logic_examples = False  # only log once, as too much logs break the stream, leading to sigkill
-
-        if mode in ["train", "eval"]:
-            logic_preproc_split = "train"
-            # logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_proof_eval_padding
-            logic_padding = "max_length"   # 'longest' leads to error as the shape of tensors will be diferrent in a batch
-            feature_names = ['input_ids', 'attention_mask', 'labels']
-
-        elif mode == "proof_eval":
-            logic_preproc_split = "eval"
-            logic_padding = data_args.logic_proof_eval_padding
-            feature_names = list(logic_examples.keys())
-
-        else:
-            raise ValueError()
-
-        if num_logic_examples > 0:
-            logic_processed = logic_data_processor.preprocess(
-                logic_examples,
-                logic_preproc_split,
-                padding=logic_padding,
-            )
-            logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
-
-        else:
-            logic_processed = {}
-
-        if mode == "proof_eval":
-            return logic_processed
-
-        else:
-            if num_logic_examples > 0 and num_non_logic_examples > 0:
-                processed = {
-                    key: torch.concat((logic_processed[key], torch.tensor(
-                        non_logic_examples[key], dtype=logic_processed[key].dtype)))
-                    for key in feature_names
-                }
-            elif num_logic_examples > 0:
-                processed = {key: vals for key, vals in logic_processed.items() if key in feature_names}
-            else:
-                processed = {key: vals for key, vals in non_logic_examples.items() if key in feature_names}
-
-            return processed
-
-    if data_args.logic_dataset_type == 'FLD':
-        # load and dump once to normalize the schema from different versions of datasets.
-        # to always reflect the modification of the preprocessing
-        # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
-
-        def FLD_map_schema(examples: Dict[str, List[Any]]):
-            keys = list(examples.keys())
-            batch_size = len(examples[keys[0]])
-            examples_list = [
-                {key: values[i] for key, values in examples.items()}
-                for i in range(batch_size)
-            ]
-            examples_list = [
-                load_deduction(example).dict()
-                for example in examples_list
-            ]
-            return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
-
-        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
-        logic_raw_datasets = logic_raw_datasets.map(
-            # lambda example: load_deduction(example).dict(),
-            FLD_map_schema,
-            batched=True,
-            batch_size=data_args.preprocess_batch_size,
-            num_proc=data_args.preprocessing_num_workers,
-            # load_from_cache_file = None if logic_dataset_streaming else False,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc="[logic dataset] mapping schema",
-        )
-
-    logic_lm_datasets = logic_raw_datasets
-
-    def make_interleave_datasets(datasets: List[Dataset], logic_dataset: Optional[Dataset]):
-        logger.info('making interleave datasets ...')
-        if len(datasets) == 0 and logic_dataset is None:
-            raise ValueError()
-
-        if len(datasets) == 0:
-            dataset_prob_tot = 0.0
-            logic_dataset_prob = 1.0
-        elif logic_dataset is None:
-            dataset_prob_tot = 1.0
-            logic_dataset_prob = 0.0
-
-        else:
-            logic_dataset_prob = data_args.logic_dataset_prob
-            dataset_prob_tot = 1 - data_args.logic_dataset_prob
-
-        all_datasets = datasets.copy()
-        all_probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
-        if logic_dataset is not None:
-            all_datasets.append(logic_dataset)
-            all_probs.append(logic_dataset_prob)
-
-        all_datasets = [dataset for dataset, prob in zip(all_datasets, all_probs) if prob > 0.0]
-        all_probs = [prob for prob in all_probs if prob > 0.0]
-
-        logger.info('dataset probabilities: %s', all_probs)
-        if len(all_datasets) == 1:
-            return all_datasets[0]
-        else:
-            if any(max_sample_arg is not None for max_sample_arg in [data_args.max_train_samples,
-                                                                     data_args.random_sample_max_train_samples,
-                                                                     data_args.max_eval_samples,
-                                                                     data_args.random_sample_max_eval_samples,
-                                                                     data_args.logic_max_eval_samples,
-                                                                     data_args.random_sample_logic_max_eval_samples]):
-                logger.warning('[kind warning] max sample seems to be set, with which only few datasets might be sampled.')
-            return interleave_datasets(
-                all_datasets,
-                probabilities=all_probs,
-                seed=0,
-                # stopping_strategy="all_exhausted",
-                stopping_strategy="first_exhausted",  # "all_exhausted" will yield dataset that does not respect probs
-            )
+    dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
     if training_args.do_train:
-        train_dataset = make_interleave_datasets([lm_datasets["train"] for lm_datasets in lm_datasets_list],
-                                                 logic_lm_datasets.get("train", None))
-
+        train_dataset = make_interleave_datasets(
+            data_args,
+            [tokenized_datasets["train"] for tokenized_datasets in tokenized_datasets_list],
+            logic_raw_datasets.get("train", None),
+            dataset_probs,
+        )
         if data_args.num_train_examples_skip > 0:
             logger.info('skip %d examples from the training dataset', data_args.num_train_examples_skip)
             train_dataset = train_dataset.skip(data_args.num_train_examples_skip)
-
         if data_args.max_train_samples is not None:
-            if isinstance(train_dataset, IterableDataset):
-                train_dataset = train_dataset.take(data_args.max_train_samples)
-            else:
-                max_train_samples = min(len(train_dataset), data_args.max_train_samples)
-                if data_args.random_sample_max_train_samples:
-                    indexes = np.random.choice(len(train_dataset), max_train_samples, replace=False)
-                else:
-                    indexes = np.arange(max_train_samples)
-                train_dataset = train_dataset.select(indexes)
+            train_dataset = take(train_dataset,
+                                 data_args.max_train_samples,
+                                 data_args.train_random_sampling)
     else:
         train_dataset = None
 
     if training_args.do_eval or data_args.do_eval_in_outerloop:
-        eval_dataset = make_interleave_datasets([lm_datasets["validation"] for lm_datasets in lm_datasets_list],
-                                                logic_lm_datasets.get("validation", None))
-        if data_args.max_eval_samples is not None:
-            if isinstance(eval_dataset, IterableDataset):
-                eval_dataset = eval_dataset.take(data_args.max_eval_samples)
-            else:
-                max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
-                if data_args.random_sample_max_eval_samples:
-                    indexes = np.random.choice(len(eval_dataset), max_eval_samples, replace=False)
-                else:
-                    indexes = np.arange(max_eval_samples)
-                eval_dataset = eval_dataset.select(indexes)
+        eval_dataset = make_interleave_datasets(
+            data_args,
+            [tokenized_datasets["validation"] for tokenized_datasets in tokenized_datasets_list],
+            logic_raw_datasets.get("validation", None),
+            dataset_probs,
+        )
+        eval_dataset = take(eval_dataset,
+                            data_args.max_eval_samples,
+                            data_args.eval_random_sampling)
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
@@ -1081,81 +1104,51 @@ def main():
     else:
         eval_dataset = None
 
-    # We set FLD preprocesssing function to the interleaved datasets.
-    # Setting preprocesssing function directly to FLD_lm_datasets, e.g., FLD_lm_datasets["train"].set_transform(), does not work
-    # as interleave_datasets() does not respect that processing in the current implementation
+    # Wr do the FLD preprocessing here after making interleaved datasets,
+    # as the current implementation of interleave_datasets() ignores the processing specified on each dataset.
 
-    # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
     desc = "[logic + non-logic interleaved dataset] _maybe_logic_preprocess()"
+    logic_dataset_map_kwargs = {
+        'batched': True,
+        'batch_size': data_args.preprocess_batch_size,
+        'load_from_cache_file': not data_args.overwrite_cache,
+
+        # num_proc >= 1 leads to hangup.
+        # 'num_proc': data_args.preprocessing_num_workers,
+        'num_proc': None,
+
+    }
+
     if train_dataset:
+        _desc = desc + ' on train split'
         data_args.log_non_logic_examples = data_args.log_examples
         logic_data_processor.log_examples = data_args.log_examples
-
-        train_dataset = train_dataset.map(
-            lambda examples: _maybe_logic_preprocess(examples, 'train'),
-            batched=True,
-            batch_size=data_args.preprocess_batch_size,
-            # num_proc=data_args.preprocessing_num_workers,
-            num_proc=None,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc=desc  + ' on train split',
-        )
+        with training_args.main_process_first(desc=_desc):
+            train_dataset = train_dataset.map(
+                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'train'),
+                desc=_desc,
+                **logic_dataset_map_kwargs,
+            )
 
     if eval_dataset:
+        _desc = desc + ' on eval split'
         data_args.log_non_logic_examples = data_args.log_examples
         logic_data_processor.log_examples = data_args.log_examples
+        with training_args.main_process_first(desc=_desc):
+            eval_dataset = eval_dataset.map(
+                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'eval'),
+                desc=_desc,
+                **logic_dataset_map_kwargs,
+            )
 
-        eval_dataset = eval_dataset.map(
-            lambda examples: _maybe_logic_preprocess(examples, 'eval'),
-            batched=True,
-            batch_size=data_args.preprocess_batch_size,
-            # num_proc=data_args.preprocessing_num_workers,
-            num_proc=None,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc=desc  + ' on eval split',
-        )
-
-    collator = RemoveUnusedColumnsCollator(return_tensors='pt')
-
-    new_generation_config = GenerationConfig.from_model_config(config)
-    new_generation_config.max_time = data_args.generation_timeout
-    training_args.generation_config = new_generation_config
+    generation_config, generation_handle_args, generation_handled_kwargs = make_generation_settings(
+        data_args, tokenizer, model, config
+    )
+    training_args.generation_config = generation_config
     training_args.predict_with_generate = True
-    generation_handle_args = [
-        LMType.CAUSAL,
-        tokenizer,
-        model,
-    ]
-    generation_max_length = min(data_args.generation_max_length + 1, model.config.max_position_embeddings)
-    generation_handled_kwargs = {
-        'eos_token_id': tokenizer.eos_token_id,
-        'top_k': data_args.generation_top_k,
-        'num_beams': data_args.generation_num_beams,
-        'num_return_sequences': data_args.generation_num_return_sequences,
-        'do_sample': data_args.generation_do_sample,
-        'temperature': data_args.generation_temperature,
-        'repetition_penalty': data_args.generation_repetition_penalty,
-        'max_length': generation_max_length,
-        'max_new_tokens': data_args.generation_max_new_tokens,
-    }
-    ForceCallMetricsSeq2SeqTrainer.evaluate = generation_handled(
-        ForceCallMetricsSeq2SeqTrainer.evaluate,
-        *generation_handle_args,
-        timeout_from_call=data_args.evaluation_timeout,
-        timeout_msg_title='generation aborted because "evaluate()" took too long',
-        **generation_handled_kwargs,
-    )
-    ForceCallMetricsSeq2SeqTrainer.predict = generation_handled(
-        ForceCallMetricsSeq2SeqTrainer.predict,
-        *generation_handle_args,
-        timeout_from_call=data_args.evaluation_timeout,
-        timeout_msg_title='generation aborted because "evaluate()" took too long',
-        **generation_handled_kwargs,
-    )
 
-    if "validation" in logic_lm_datasets:
-        logic_eval_dataset = logic_lm_datasets["validation"]
-
+    if "validation" in logic_raw_datasets:
+        logic_eval_dataset = logic_raw_datasets["validation"]
         data_args.log_non_logic_examples = data_args.log_examples
         logic_data_processor.log_examples = data_args.log_examples
 
@@ -1165,38 +1158,33 @@ def main():
             **generation_handled_kwargs,
             is_generate_func=False,
         )
-        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
-        logic_eval_dataset = generation_handled_map(
-            lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
-            batched=True,
-            batch_size=data_args.preprocess_batch_size,
-            # num_proc=data_args.preprocessing_num_workers,
-            num_proc=None,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc=desc + ' on proof_eval split',
-        )
 
-        if data_args.logic_max_eval_samples is not None:
-            if isinstance(logic_eval_dataset, IterableDataset):
-                if data_args.random_sample_logic_max_eval_samples:
-                    logger.warning('random_sample_logic_max_eval_samples is ignored because of the streaming mode')
-                logic_eval_dataset = logic_eval_dataset.take(data_args.logic_max_eval_samples)
-            else:
-                if data_args.logic_max_eval_samples < len(logic_eval_dataset):
-                    if data_args.random_sample_logic_max_eval_samples:
-                        indexes = np.random.choice(len(logic_eval_dataset),
-                                                   data_args.logic_max_eval_samples, replace=False)
-                    else:
-                        indexes = np.arange(data_args.logic_max_eval_samples)
-                    logic_eval_dataset = logic_eval_dataset.select(indexes)
+        if data_args.logic_eval_max_samples is not None:
+            logic_eval_dataset = take(logic_eval_dataset,
+                                      data_args.logic_eval_max_samples,
+                                      data_args.logic_eval_random_sampling)
+
+        _desc = desc + ' on logic_eval split'
+        with training_args.main_process_first(desc=_desc):
+            logic_eval_dataset = generation_handled_map(
+                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'logic_eval'),
+                desc=_desc,
+                **logic_dataset_map_kwargs,
+            )
     else:
         logic_eval_dataset = None
 
     logic_data_processor.eval_dataset = logic_eval_dataset
     logic_compute_metrics = logic_data_processor.compute_metrics
 
+    setup_seq2seq_trainer_class(ForceCallMetricsSeq2SeqTrainer,
+                                data_args,
+                                generation_handle_args,
+                                generation_handled_kwargs)
+    collator = RemoveUnusedColumnsCollator(return_tensors='pt')
+
     def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
-                                   do_compute_metrics=True):
+                                     do_compute_metrics=True):
         return ForceCallMetricsSeq2SeqTrainer(
             model,
             other=other_trainer,
@@ -1217,19 +1205,16 @@ def main():
         def on_evaluate(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
             self._logic_seq2seq_trainer.state = state
             self._logic_seq2seq_trainer.evaluate(
-                metric_key_prefix="proof_eval"
+                metric_key_prefix="logic_eval"
             )
 
     # Initialize our Trainer
     trainer = Trainer(
         model=model,
         args=training_args,
-
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
-
         tokenizer=tokenizer,
-        # Data collator will default to DataCollatorWithPadding, so we change it.
         data_collator=collator,
         compute_metrics = compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
@@ -1252,7 +1237,6 @@ def main():
             logger.info("*** Save Model ***")
             trainer.save_model()  # Saves the tokenizer too for easy upload
         metrics = train_result.metrics
-
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
@@ -1260,7 +1244,6 @@ def main():
     # Evaluation
     if data_args.do_eval_in_outerloop:
         logger.info("*** Evaluate ***")
-
         metrics = trainer.evaluate()
 
         try:
@@ -1268,7 +1251,6 @@ def main():
         except OverflowError:
             perplexity = float("inf")
         metrics["perplexity"] = perplexity
-
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
 
@@ -1277,20 +1259,13 @@ def main():
             raise ValueError(f'interactive_mode is not supported for {data_args.logic_dataset_type}')
         data_args.log_non_logic_examples = data_args.log_examples
         logic_data_processor.log_examples = data_args.log_examples
-
         launch(
             _build_logic_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
-            lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
+            lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'logic_eval'),
             data_args.interactive_mode,
             gradio_port=data_args.gradio_port,
         )
-        return
-
-
-def _mp_fn(index):
-    # For xla_spawn (TPUs)
-    main()
 
 
 if __name__ == "__main__":
