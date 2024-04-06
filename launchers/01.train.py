@@ -202,13 +202,13 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3',
         # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # 'hf.tasksource/ruletaker',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # 'hf.qbao775/PARARULE-Plus',
@@ -279,13 +279,13 @@ def main():
             False,
         ),
 
-        (
-            0.0,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
 
         # (
@@ -338,8 +338,8 @@ def main():
     ]
 
     proof_intermediate_steps_args = [
-        # True,
-        False,
+        True,
+        # False,
     ]
 
 
