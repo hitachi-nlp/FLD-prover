@@ -338,8 +338,8 @@ def main():
     ]
 
     proof_intermediate_steps_args = [
-        True,
-        # False,
+        # True,
+        False,
     ]
 
 
