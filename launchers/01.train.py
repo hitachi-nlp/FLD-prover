@@ -202,16 +202,16 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        # '2024-02-14.translation_speedup.translation-v3',
-        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        '2024-03-29.JSAI_best.D8',
-        '2024-03-29.JSAI_best.theorems',
+        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-03-29.JSAI_best.D8',
+        # '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
-        'hf.tasksource/ruletaker',
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        'hf.qbao775/PARARULE-Plus',
+        # 'hf.tasksource/ruletaker',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
     ]
@@ -227,9 +227,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
