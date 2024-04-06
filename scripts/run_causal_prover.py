@@ -693,7 +693,6 @@ def load_logic_data_processor(data_args, tokenizer, block_size):
     return processor_cls(*preprocessor_args, **preprocessor_kwargs)
 
 
-@profile
 def _maybe_logic_preprocess(data_args,
                             logic_data_processor,
                             examples,
