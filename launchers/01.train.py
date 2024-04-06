@@ -90,7 +90,7 @@ def main():
 
     # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
 
-    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.various_corpora')
+    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.context-4k')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -203,15 +203,15 @@ def main():
 
         # ---------------------------------- FLD-variants ------------------------------------
         '2024-02-14.translation_speedup.translation-v3',
-        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        '2024-03-29.JSAI_best.D8',
-        '2024-03-29.JSAI_best.theorems',
+        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-03-29.JSAI_best.D8',
+        # '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
-        '2024-03-29.FLD_v2',
-        'hf.tasksource/ruletaker',
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        'hf.qbao775/PARARULE-Plus',
+        # '2024-03-29.FLD_v2',
+        # 'hf.tasksource/ruletaker',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
     ]
@@ -279,13 +279,13 @@ def main():
             False,
         ),
 
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.0,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
 
         # (
@@ -333,8 +333,8 @@ def main():
     ]
 
     context_lengths = [
-        2048,
-        # 4096,
+        # 2048,
+        4096,
     ]
 
     proof_intermediate_steps_args = [
