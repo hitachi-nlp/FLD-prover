@@ -44,7 +44,8 @@ class Processor(ABC):
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
                  eval_dataset=None,
-                 log_examples=False,):
+                 log_examples=False,
+                 log_only_first_example=True):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
         self._prompt_prefix = prompt_prefix
@@ -60,7 +61,8 @@ class Processor(ABC):
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
         self.eval_dataset = eval_dataset
-        self._log_examples = log_examples
+        self.log_examples = log_examples
+        self._log_only_first_example = log_only_first_example
 
     def preprocess(
         self,
@@ -104,7 +106,9 @@ class Processor(ABC):
             proof_steps.append(next_proof_step)
             gold_proofs.append(gold_proof)
 
-            if self._log_examples:
+            if self.log_examples:
+                if self._log_only_first_example and i_example > 0:
+                    continue
                 logger.info(
                     '------------------------------ preprocess_function [example=%d] ------------------------------', i_example)
                 logger.info('prompt             : "%s"', prompt_w_partial_proof)
@@ -186,7 +190,7 @@ class Processor(ABC):
         if 'token_type_ids' in forward_inputs:
             forward_inputs.pop('token_type_ids', None)
 
-        if self._log_examples:
+        if self.log_examples:
             inputs_decoded = self._tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
             if 'labels' in forward_inputs:
                 labels_decoded = self._tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))

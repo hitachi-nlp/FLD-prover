@@ -93,9 +93,6 @@ logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
-MAP = True  # temporary to keep old code
-
-
 @dataclass
 class ModelArguments:
     """
@@ -294,7 +291,7 @@ class DataTrainingArguments:
         },
     )
     preprocess_batch_size: Optional[int] = field(
-        default=5,
+        default=1000,
             metadata={
             "help": (
                 "Batch size for preprocessing."
@@ -454,7 +451,7 @@ def main():
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     if training_args.dataloader_num_workers > 1:
         logger.critical(training_args.dataloader_num_workers)
-        raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (but I don\'t know why)')
+        raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (generation of proofs) (but I don\'t know why)')
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -639,40 +636,6 @@ def main():
                                                        False,
                                                        logic_dataset_streaming)
 
-    if data_args.preprocessing_num_workers >= 2 and data_args.preprocess_batch_size > 10:
-        logger.critical('kind warning: dataset preprocessing with multiple workers and large batch size may hang without any error message.'
-                        '\nSee: https://discuss.huggingface.co/t/datasets-mapper-hanging-issue/32995'
-                        '\nNote that the fix introduced in the link did not work for me')
-
-    if data_args.logic_dataset_type == 'FLD':
-
-        # load and dump once to normalize the schema from different versions of datasets.
-        # to always reflect the modification of the preprocessing
-        # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
-
-        def FLD_unify_schema(examples: Dict[str, List[Any]]):
-            keys = list(examples.keys())
-            batch_size = len(examples[keys[0]])
-            examples_list = [
-                {key: values[i] for key, values in examples.items()}
-                for i in range(batch_size)
-            ]
-            examples_list = [
-                load_deduction(example).dict()
-                for example in examples_list
-            ]
-            return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
-
-        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
-        logic_raw_datasets = logic_raw_datasets.map(
-            # lambda example: load_deduction(example).dict(),
-            FLD_unify_schema,
-            batched=True,
-            batch_size=data_args.preprocess_batch_size,
-            num_proc=data_args.preprocessing_num_workers,
-            **({} if logic_dataset_streaming else {'load_from_cache_file': False}),
-        )
-
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -816,7 +779,8 @@ def main():
                 result["labels"] = result["input_ids"].copy()
                 return result
 
-            with training_args.main_process_first(desc="dataset map tokenization"):
+            desc = "[non-logic dataset] tokenize_function()"
+            with training_args.main_process_first(desc=desc):
                 # avoid long text, which make tokenizer too slow
                 raw_datasets = raw_datasets.filter(lambda x: len(x[text_column_name]) < 100_000)
 
@@ -828,7 +792,7 @@ def main():
                         num_proc=data_args.preprocessing_num_workers,
                         remove_columns=column_names,
                         load_from_cache_file=not data_args.overwrite_cache,
-                        desc="Running tokenizer on dataset",
+                        desc=desc,
                     )
                 else:
                     tokenized_datasets = raw_datasets.map(
@@ -837,6 +801,7 @@ def main():
                         batch_size=data_args.preprocess_batch_size,
                         num_proc=data_args.preprocessing_num_workers,
                         remove_columns=column_names,
+                        desc=desc,
                     )
 
             # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
@@ -846,7 +811,8 @@ def main():
             # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
             # https://huggingface.co/docs/datasets/package_reference/main_classes.html#datasets.Dataset.map
 
-            with training_args.main_process_first(desc="grouping texts together"):
+            desc = f"[non-logic dataset] group_texts()"
+            with training_args.main_process_first(desc=desc):
                 if not data_args.streaming:
                     lm_datasets = tokenized_datasets.map(
                         group_texts,
@@ -854,7 +820,7 @@ def main():
                         batch_size=data_args.preprocess_batch_size,
                         num_proc=data_args.preprocessing_num_workers,
                         load_from_cache_file=not data_args.overwrite_cache,
-                        desc=f"Grouping texts in chunks of {block_size}",
+                        desc=desc,
                     )
                 else:
                     lm_datasets = tokenized_datasets.map(
@@ -862,6 +828,7 @@ def main():
                         batched=True,
                         batch_size=data_args.preprocess_batch_size,
                         num_proc=data_args.preprocessing_num_workers,
+                        desc=desc,
                     )
 
             lm_datasets_list.append(lm_datasets)
@@ -881,7 +848,7 @@ def main():
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
-        'log_examples': data_args.log_examples,
+        # 'log_examples': data_args.log_examples,
     }
 
     if data_args.logic_dataset_type == 'FLD':
@@ -896,7 +863,9 @@ def main():
         processor_cls = RobustLRProcessor
     else:
         raise ValueError()
+
     logic_data_processor = processor_cls(*preprocessor_args, **preprocessor_kwargs)
+    data_args.log_non_logic_examples = True
 
     def _maybe_logic_preprocess(examples: Dict[str, List[Any]], mode: str):
         if data_args.logic_dataset_type == 'FLD':
@@ -930,12 +899,15 @@ def main():
             key: [values[i] for i in non_logic_indexes]
             for key, values in examples.items()
         }
-        if data_args.log_examples:
-            for i_example in range(num_non_logic_examples):
-                logger.info(
-                    '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
-                for key, values in non_logic_examples.items():
+
+        if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
+            i_example = 0
+            logger.info(
+                '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
+            for key, values in non_logic_examples.items():
+                if len(values) > 0:
                     logger.info('%s: "%s"', key, values[i_example])
+            data_args.log_non_logic_examples = False  # only log once, as too much logs break the stream, leading to sigkill
 
         if mode in ["train", "eval"]:
             logic_preproc_split = "train"
@@ -957,6 +929,7 @@ def main():
                 logic_preproc_split,
                 padding=logic_padding,
             )
+            logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
 
         else:
             logic_processed = {}
@@ -978,9 +951,40 @@ def main():
 
             return processed
 
+    if data_args.logic_dataset_type == 'FLD':
+        # load and dump once to normalize the schema from different versions of datasets.
+        # to always reflect the modification of the preprocessing
+        # load_from_cache_file=False to ensure that the change of source code is immediately reflect on.
+
+        def FLD_map_schema(examples: Dict[str, List[Any]]):
+            keys = list(examples.keys())
+            batch_size = len(examples[keys[0]])
+            examples_list = [
+                {key: values[i] for key, values in examples.items()}
+                for i in range(batch_size)
+            ]
+            examples_list = [
+                load_deduction(example).dict()
+                for example in examples_list
+            ]
+            return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
+
+        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
+        logic_raw_datasets = logic_raw_datasets.map(
+            # lambda example: load_deduction(example).dict(),
+            FLD_map_schema,
+            batched=True,
+            batch_size=data_args.preprocess_batch_size,
+            num_proc=data_args.preprocessing_num_workers,
+            # load_from_cache_file = None if logic_dataset_streaming else False,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc="[logic dataset] mapping schema",
+        )
+
     logic_lm_datasets = logic_raw_datasets
 
     def make_interleave_datasets(datasets: List[Dataset], logic_dataset: Optional[Dataset]):
+        logger.info('making interleave datasets ...')
         if len(datasets) == 0 and logic_dataset is None:
             raise ValueError()
 
@@ -990,17 +994,23 @@ def main():
         elif logic_dataset is None:
             dataset_prob_tot = 1.0
             logic_dataset_prob = 0.0
+
         else:
             logic_dataset_prob = data_args.logic_dataset_prob
             dataset_prob_tot = 1 - data_args.logic_dataset_prob
 
-        probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
+        all_datasets = datasets.copy()
+        all_probs = [dataset_prob_tot * dataset_probs[i] / sum(dataset_probs) for i in range(len(datasets))]
         if logic_dataset is not None:
-            datasets.append(logic_dataset)
-            probs.append(logic_dataset_prob)
+            all_datasets.append(logic_dataset)
+            all_probs.append(logic_dataset_prob)
 
-        if len(datasets) == 1:
-            return datasets[0]
+        all_datasets = [dataset for dataset, prob in zip(all_datasets, all_probs) if prob > 0.0]
+        all_probs = [prob for prob in all_probs if prob > 0.0]
+
+        logger.info('dataset probabilities: %s', all_probs)
+        if len(all_datasets) == 1:
+            return all_datasets[0]
         else:
             if any(max_sample_arg is not None for max_sample_arg in [data_args.max_train_samples,
                                                                      data_args.random_sample_max_train_samples,
@@ -1010,10 +1020,11 @@ def main():
                                                                      data_args.random_sample_logic_max_eval_samples]):
                 logger.warning('[kind warning] max sample seems to be set, with which only few datasets might be sampled.')
             return interleave_datasets(
-                datasets,
-                probabilities=probs,
+                all_datasets,
+                probabilities=all_probs,
                 seed=0,
-                stopping_strategy="all_exhausted",
+                # stopping_strategy="all_exhausted",
+                stopping_strategy="first_exhausted",  # "all_exhausted" will yield dataset that does not respect probs
             )
 
     if training_args.do_train:
@@ -1075,32 +1086,34 @@ def main():
     # as interleave_datasets() does not respect that processing in the current implementation
 
     # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
+    desc = "[logic + non-logic interleaved dataset] _maybe_logic_preprocess()"
     if train_dataset:
-        if MAP:
-            train_dataset = train_dataset.map(
-                lambda examples: _maybe_logic_preprocess(examples, 'train'),
-                batched=True,
-                batch_size=data_args.preprocess_batch_size,
-                num_proc=data_args.preprocessing_num_workers,
-            )
-        else:
-            train_dataset.set_transform(
-                lambda examples: _maybe_logic_preprocess(examples, 'train'),
-                num_proc=data_args.preprocessing_num_workers,
-            )
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_data_processor.log_examples = data_args.log_examples
+
+        train_dataset = train_dataset.map(
+            lambda examples: _maybe_logic_preprocess(examples, 'train'),
+            batched=True,
+            batch_size=data_args.preprocess_batch_size,
+            # num_proc=data_args.preprocessing_num_workers,
+            num_proc=None,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc=desc  + ' on train split',
+        )
+
     if eval_dataset:
-        if MAP:
-            eval_dataset = eval_dataset.map(
-                lambda examples: _maybe_logic_preprocess(examples, 'eval'),
-                batched=True,
-                batch_size=data_args.preprocess_batch_size,
-                num_proc=data_args.preprocessing_num_workers,
-            )
-        else:
-            eval_dataset.set_transform(
-                lambda examples: _maybe_logic_preprocess(examples, 'eval'),
-                num_proc=data_args.preprocessing_num_workers,
-            )
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_data_processor.log_examples = data_args.log_examples
+
+        eval_dataset = eval_dataset.map(
+            lambda examples: _maybe_logic_preprocess(examples, 'eval'),
+            batched=True,
+            batch_size=data_args.preprocess_batch_size,
+            # num_proc=data_args.preprocessing_num_workers,
+            num_proc=None,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc=desc  + ' on eval split',
+        )
 
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
@@ -1143,23 +1156,25 @@ def main():
     if "validation" in logic_lm_datasets:
         logic_eval_dataset = logic_lm_datasets["validation"]
 
-        if MAP:
-            generation_handled_map = generation_handled(
-                logic_eval_dataset.map,
-                *generation_handle_args,
-                **generation_handled_kwargs,
-                is_generate_func=False,
-            )
-            # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
-            logic_eval_dataset = generation_handled_map(
-                lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
-                batched=True,
-                batch_size=data_args.preprocess_batch_size,
-                num_proc=data_args.preprocessing_num_workers,
-            )
-        else:
-            logic_eval_dataset.set_transform(
-                lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'))
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_data_processor.log_examples = data_args.log_examples
+
+        generation_handled_map = generation_handled(
+            logic_eval_dataset.map,
+            *generation_handle_args,
+            **generation_handled_kwargs,
+            is_generate_func=False,
+        )
+        # XXX: if the program hangs here, try decrease data_args.preprocess_batch_size
+        logic_eval_dataset = generation_handled_map(
+            lambda examples: _maybe_logic_preprocess(examples, 'proof_eval'),
+            batched=True,
+            batch_size=data_args.preprocess_batch_size,
+            # num_proc=data_args.preprocessing_num_workers,
+            num_proc=None,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc=desc + ' on proof_eval split',
+        )
 
         if data_args.logic_max_eval_samples is not None:
             if isinstance(logic_eval_dataset, IterableDataset):
@@ -1260,6 +1275,9 @@ def main():
     if data_args.interactive_mode is not None:
         if data_args.logic_dataset_type != 'FLD':
             raise ValueError(f'interactive_mode is not supported for {data_args.logic_dataset_type}')
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_data_processor.log_examples = data_args.log_examples
+
         launch(
             _build_logic_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,

@@ -173,9 +173,15 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-01.large_nodes.proof_intermediate_steps=False.num_proc=1.small_nodes.large_batch')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=all')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.num_proc=all.logic_preprocess_num_proc=None')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.many_datasets.proof_intermediate_step=False')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-04.context=4096')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-04.instruction_tuning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.instruction_tuning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-04.large_models')
+
+    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.all')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -281,23 +287,24 @@ def main():
         # '2024-02-14.translation_speedup.theorems',
         # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
         # '2024-02-14.translation_speedup.translation-v2',
-        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
         # '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
 
 
+        # ---------------------------------- FLD-variants ------------------------------------
+        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-03-29.JSAI_best.D8',
+        # '2024-03-29.JSAI_best.theorems',
+
         # ---------------------------------- other datasets ------------------------------------
+        # '2024-03-29.FLD_v2',
         # 'hf.tasksource/ruletaker',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # 'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
-
-        # ---------------------------------- 2024-03-29.H100 ------------------------------------
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
-        # '2024-03-29.FLD_v2',
     ]
 
 
@@ -311,16 +318,12 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('stabilityai/stablelm-2-1_6b', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('h2oai/h2o-danube-1.8b-base', 'causal', 'cyberagent/open-calm-3b'),
-
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ============================ japanese     ============================
 
@@ -359,13 +362,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.0,
@@ -376,13 +379,13 @@ def main():
         # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'tatsu-lab/alpaca', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'tatsu-lab/alpaca', None)
+        #     ],
+        #     False,
+        # ),
     ]
 
     learnings = [
@@ -420,7 +423,6 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
-
     context_lengths = [
         2048,
         # 4096,
@@ -431,11 +433,21 @@ def main():
         # False,
     ]
 
+
+
+
+
+
+
+
+
+    
+
+
+
+
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
-
-    # save_model = False
-    save_model = True
 
     # dry_run = True
     dry_run = False
@@ -545,6 +557,8 @@ def main():
 
     epoch = None
 
+    save_after_eval = False
+
     # hf_bug_zero_lr_offset = 0
     hf_bug_zero_lr_offset = 20
 
@@ -585,7 +599,7 @@ def main():
                                 for seed in seeds:
                                     for model_name, lm_type, model_name_for_batch_size in model_settings:
 
-                                        n_resouce_org = engine.n_resource
+                                        n_resouce_org = engine.n_resource if isinstance(engine, QsubEngine) else 1
                                         if model_name.find('70b') >= 0 and engine.n_resource < 2:
                                             logger.warning(f'70B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
                                             engine.n_resource = 2
@@ -668,7 +682,7 @@ def main():
                                                     get_save_eval_step_setting(
                                                         max_steps = max_steps or setting['max_steps'],
                                                         eval_steps = eval_steps or setting['eval_steps'],
-                                                        do_save_model=save_model,
+                                                        save_after_eval=save_after_eval,
                                                     )
                                                 )
 
@@ -741,6 +755,8 @@ def main():
                                                     'weight_decay': 0.0,
 
                                                     'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                    'preprocess_batch_size': 1000,
+
                                                     # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
                                                     'lora': False,
