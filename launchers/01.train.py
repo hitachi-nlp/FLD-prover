@@ -88,8 +88,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
 
-    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.all')
-    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
+    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
+
+    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.various_corpora')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -201,16 +202,16 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-02-14.translation_speedup.translation-v3',
         '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
+        '2024-03-29.JSAI_best.D8',
+        '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
-        # '2024-03-29.FLD_v2',
-        # 'hf.tasksource/ruletaker',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # 'hf.qbao775/PARARULE-Plus',
+        '2024-03-29.FLD_v2',
+        'hf.tasksource/ruletaker',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
     ]
@@ -264,19 +265,19 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        (
-            1.0,
-            [],
-            False,
-        ),
-
         # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
+        #     1.0,
+        #     [],
         #     False,
         # ),
+
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.0,
@@ -332,8 +333,8 @@ def main():
     ]
 
     context_lengths = [
-        # 2048,
-        4096,
+        2048,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
@@ -353,9 +354,6 @@ def main():
 
 
 
-
-    resume_from_checkpoint = None
-    # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
     # dry_run = True
     dry_run = False
@@ -410,6 +408,9 @@ def main():
         # gpu_name_for_batch_size = 'V100.mem=16.run=vanilla.cntx=2048'
         # gpu_name_for_batch_size = 'V100.mem=16.run=deepspeed.cntx=2048'
         gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=2048'
+
+    resume_from_checkpoint = None
+    # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
