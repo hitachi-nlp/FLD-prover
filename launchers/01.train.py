@@ -203,15 +203,15 @@ def main():
 
         # ---------------------------------- FLD-variants ------------------------------------
         # '2024-02-14.translation_speedup.translation-v3',
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        '2024-03-29.JSAI_best.D8',
+        '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
-        '2024-03-29.FLD_v2',
-        # 'hf.tasksource/ruletaker',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # 'hf.qbao775/PARARULE-Plus',
+        # '2024-03-29.FLD_v2',
+        'hf.tasksource/ruletaker',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
     ]
