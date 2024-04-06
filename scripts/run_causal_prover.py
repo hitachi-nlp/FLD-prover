@@ -899,6 +899,11 @@ def main():
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
 
+    # Is this OK? without this magic code, the preprocessing of logic dataset with multiprocess will hang up,
+    # possibly because of the torch.where operation used in the processing.
+    # https://github.com/pytorch/pytorch/issues/82843#issuecomment-1215281193
+    torch.set_num_threads(1)  
+
     # MUST be placed at top (here) !!
     if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
         # https://github.com/huggingface/accelerate/issues/223
@@ -1114,8 +1119,8 @@ def main():
         'load_from_cache_file': not data_args.overwrite_cache,
 
         # num_proc >= 1 leads to hangup.
-        # 'num_proc': data_args.preprocessing_num_workers,
-        'num_proc': None,
+        'num_proc': data_args.preprocessing_num_workers,
+        # 'num_proc': None,
 
     }
 
