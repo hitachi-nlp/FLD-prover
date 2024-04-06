@@ -890,7 +890,6 @@ def setup_seq2seq_trainer_class(klass,
 
 
 
-@profile
 def main():
     logging.getLogger().handlers.clear()
     setup_logger(do_stderr=True, level=logging.INFO)
