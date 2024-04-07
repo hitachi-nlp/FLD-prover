@@ -95,7 +95,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.context=4k')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-07.large_models')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -232,9 +233,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
