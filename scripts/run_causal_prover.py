@@ -768,6 +768,7 @@ def load_logic_raw_datasets(data_args, model_args):
     if data_args.logic_dataset_name is not None:
         logic_raw_datasets = load_raw_dataset_by_name(data_args.logic_dataset_name,
                                                       data_args.logic_dataset_config_name,
+                                                      data_args.keep_linebreaks,
                                                       data_args.streaming)
     else:
         logic_raw_datasets = load_raw_dataset_by_files(data_args,
