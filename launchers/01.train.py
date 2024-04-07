@@ -94,7 +94,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-07.context=4k')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.context=4k')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -283,13 +284,13 @@ def main():
             False,
         ),
 
-        (
-            0.0,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
 
         # (
@@ -337,13 +338,13 @@ def main():
     ]
 
     context_lengths = [
-        # 2048,
-        4096,
+        2048,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
-        True,
-        # False,
+        # True,
+        False,
     ]
 
 
