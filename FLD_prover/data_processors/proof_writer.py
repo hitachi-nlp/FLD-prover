@@ -25,7 +25,6 @@ class ProofWriterProcessor(Processor):
         self,
         example,
         split: str,
-        padding='longest',
     ) -> Tuple[str, str, str]:
         facts, hypothesis, gold_proof = self._get_logic(example, 'train')
         prompt = ' ; '.join([

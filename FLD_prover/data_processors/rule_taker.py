@@ -17,7 +17,6 @@ class RuleTakerProcessor(Processor):
         self,
         example,
         split: str,
-        padding='longest',
     ) -> Tuple[str, str, str]:
  
 

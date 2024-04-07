@@ -90,7 +90,9 @@ def main():
 
     # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
 
-    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.context-4k')
+    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.context-4k')
+
+    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -227,9 +229,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -265,19 +267,19 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
+            1.0,
+            [],
             False,
         ),
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -303,7 +305,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        # 'debug.middle',
+        'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -317,7 +319,8 @@ def main():
 
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-800.debug',
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -362,7 +365,7 @@ def main():
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine()
+    engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
@@ -371,7 +374,7 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
 
     hours = 24
@@ -395,22 +398,29 @@ def main():
 
 
     # ------------------------------------ fixed settings -------------------------------------------
-    if isinstance(engine, SubprocessEngine):
-        region = 'haic'
-        n_gpus_per_node = 1
-        n_cpus_per_node = 1
-        n_total_gpus = 1
-        is_V100 = False
+    # if isinstance(engine, SubprocessEngine):
+    #     region = 'haic'
+    #     n_gpus_per_node = 1
+    #     n_cpus_per_node = 1
+    #     n_total_gpus = 1
+    #     is_V100 = False
 
-        # n_gpus_per_node = 4
-        # n_total_gpus = 4
+    #     # n_gpus_per_node = 4
+    #     # n_total_gpus = 4
 
-        # gpu_name_for_batch_size = 'V100.mem=16.run=vanilla.cntx=2048'
-        # gpu_name_for_batch_size = 'V100.mem=16.run=deepspeed.cntx=2048'
-        gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=2048'
+    #     # gpu_name_for_batch_size = 'V100.mem=16.run=vanilla.cntx=2048'
+    #     # gpu_name_for_batch_size = 'V100.mem=16.run=deepspeed.cntx=2048'
+
+    #     # gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=2048'
+
+    #     gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=4096'
+    #     gpu_name_for_batch_size = 'H100.mem=80.run=deepspeed.cntx=4096'
 
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
+
+    # quota of HAIC is low
+    save_model_on_eval = False
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
@@ -462,11 +472,10 @@ def main():
     # max_eval_samples = 5
     # max_eval_samples = 301
     # max_eval_samples = 151
-    max_eval_samples = 152
+    # max_eval_samples = 152
 
     epoch = None
 
-    save_after_eval = False
 
     # hf_bug_zero_lr_offset = 0
     hf_bug_zero_lr_offset = 20
@@ -494,10 +503,9 @@ def main():
     for logic_dataset_uname in logic_dataset_unames:
         for context_len in context_lengths:
 
-            if isinstance(engine, QsubEngine):
-                region = engine.region
-                n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
-                is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
+            region = engine.region
+            n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
+            is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
 
             for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                 for learning in learnings:
@@ -508,7 +516,7 @@ def main():
                                 for seed in seeds:
                                     for model_name, lm_type, model_name_for_batch_size in model_settings:
 
-                                        n_resouce_org = engine.n_resource if isinstance(engine, QsubEngine) else 1
+                                        n_resouce_org = engine.n_resource
                                         if model_name.find('70b') >= 0 and engine.n_resource < 2:
                                             logger.warning(f'70B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
                                             engine.n_resource = 2
@@ -561,7 +569,7 @@ def main():
                                                         warmup_ratio=warmup_ratio,
                                                         train_effective_batch_size=train_effective_batch_size,
                                                         num_evals=num_evals,
-                                                        max_eval_samples=max_eval_samples,
+                                                        # max_eval_samples=max_eval_samples,
                                                         logic_dataset_prob=logic_dataset_prob,
                                                         hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
                                                         n_gpus=n_total_gpus,
@@ -591,7 +599,7 @@ def main():
                                                     get_save_eval_step_setting(
                                                         max_steps = max_steps or setting['max_steps'],
                                                         eval_steps = eval_steps or setting['eval_steps'],
-                                                        save_after_eval=save_after_eval,
+                                                        save_model_on_eval=save_model_on_eval,
                                                     )
                                                 )
 
@@ -620,6 +628,7 @@ def main():
                                                         generation_timeout=generation_timeout,
                                                         evaluation_timeout=evaluation_timeout,
                                                         generation_max_length=setting.get('max_target_length', None),
+                                                        generation_max_prompt_length=setting.get('max_prompt_length', None),
                                                    ),
                                                 )
                                                 setting.update({

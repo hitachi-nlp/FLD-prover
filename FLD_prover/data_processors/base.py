@@ -33,8 +33,8 @@ class Processor(ABC):
                  lm_type: LMType,
                  tokenizer,
                  prompt_prefix='',
-                 max_source_length=1024,
-                 max_target_length=1024,
+                 max_length=1024,
+                 max_prompt_length=1024,
                  ignore_index=-100,
                  proof_intermediate_steps=False,
                  proof_sampling='stepwise',
@@ -49,8 +49,8 @@ class Processor(ABC):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
         self._prompt_prefix = prompt_prefix
-        self._max_source_length = max_source_length
-        self._max_target_length = max_target_length
+        self._max_length = max_length
+        self._max_prompt_length = max_prompt_length
         self._ignore_index = ignore_index
             
         self._proof_intermediate_steps = proof_intermediate_steps
@@ -67,7 +67,7 @@ class Processor(ABC):
     def preprocess(
         self,
         examples,
-        split: str,
+        mode: str,
         padding='longest',
     )  -> Dict[str, List[Any]]:
 
@@ -97,19 +97,14 @@ class Processor(ABC):
         proof_steps: List[str] = []
         gold_proofs: List[str] = []
         for i_example, example in enumerate(unbatched_examples):
-            (
-                prompt_w_partial_proof,
-                next_proof_step,
-                gold_proof,
-            ) = self._make_in_out(example, split, padding)
+            prompt_w_partial_proof, next_proof_step, gold_proof = self._make_in_out(example, mode)
 
             prompts_w_partial_proof.append(prompt_w_partial_proof)
             proof_steps.append(next_proof_step)
             gold_proofs.append(gold_proof)
 
-            if self.log_examples:
-                if self._log_only_first_example and i_example > 0:
-                    continue
+            if self.log_examples\
+                    and not (self._log_only_first_example and i_example > 0):
                 logger.info(
                     '------------------------------ preprocess_function [example=%d] ------------------------------', i_example)
                 logger.info('prompt             : "%s"', prompt_w_partial_proof)
@@ -119,16 +114,15 @@ class Processor(ABC):
         # without this additional token, we can not accurately calculate the prompt length
         # as the token
         forward_inputs: Dict[str, Any] = {}
-        if split == 'train':
+        if mode == 'auto_regression':
             _proof_steps_w_eos = [step + f' {self._tokenizer.eos_token}' for step in proof_steps]
 
             if any(_targets is None for _targets in proof_steps):
                 raise ValueError()
 
             if self._lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_source_length))
-                forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos,
-                                                                      self._max_target_length)["input_ids"]
+                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
+                forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos, self._max_length - self._max_prompt_length)["input_ids"]
                 forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"])
 
             elif self._lm_type == LMType.CAUSAL:
@@ -141,7 +135,7 @@ class Processor(ABC):
                     prompt_ids = [
                         _prepare_tokenized_inputs(
                             [prompt],
-                            self._max_source_length,
+                            self._max_length,
                             padding='longest',
                             return_length=True,
                             # add_special_tokens=False,
@@ -152,7 +146,7 @@ class Processor(ABC):
 
                 inputs_with_targets = [f'{prompt}{proof_step}'
                                        for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
-                forward_inputs.update(_prepare_tokenized_inputs(inputs_with_targets, self._max_source_length))
+                forward_inputs.update(_prepare_tokenized_inputs(inputs_with_targets, self._max_length))
                 forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
 
                 forward_inputs["labels"] = _mask_labels_by_ignore_index(
@@ -162,18 +156,18 @@ class Processor(ABC):
             else:
                 raise NotImplementedError()
 
-        elif split == 'eval':
+        elif mode == 'generation':
             if self._lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_source_length))
+                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
 
             elif self._lm_type == LMType.CAUSAL:
                 _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
+                # def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
                 forward_inputs.update(
                     _prepare_tokenized_inputs(
                         _prompts,
-                        self._max_source_length,
-                        # add_special_tokens=False
+                        self._max_prompt_length,
                     )
                 )
 
@@ -199,6 +193,8 @@ class Processor(ABC):
                 labels_decoded = [None] * len(inputs_decoded)
 
             for i_example, (input_decoded, label_decoded) in enumerate(zip(inputs_decoded, labels_decoded)):
+                if self._log_only_first_example and i_example > 0:
+                    break
                 logger.info('------------ [example=%d] tokenized inputs ----------------', i_example)
                 logger.info(input_decoded)
                 if label_decoded is not None:

@@ -303,9 +303,9 @@ class DataTrainingArguments:
         }
     )
 
-    logic_eval_padding: Optional[str] = field(
-        default="longest",
-    )
+    # logic_eval_padding: Optional[str] = field(
+    #     default="longest",
+    # )
 
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
@@ -322,26 +322,6 @@ class DataTrainingArguments:
     )
     keep_linebreaks: bool = field(
         default=True, metadata={"help": "Whether to keep line breaks when using TXT files or not."}
-    )
-    max_target_length: Optional[int] = field(
-        default=128,
-        metadata={
-            "help": (
-                "The maximum total sequence length for target text after tokenization. Sequences longer "
-                "than this will be truncated, sequences shorter will be padded."
-            )
-        },
-    )
-    val_max_target_length: Optional[int] = field(
-        default=None,
-        metadata={
-            "help": (
-                "The maximum total sequence length for validation target text after tokenization. Sequences longer "
-                "than this will be truncated, sequences shorter will be padded. Will default to `max_target_length`."
-                "This argument is also used to override the ``max_length`` param of ``model.generate``, which is used "
-                "during ``evaluate`` and ``predict``."
-            )
-        },
     )
 
     include_prompt_for_causal_lm_loss: bool = field(
@@ -393,6 +373,10 @@ class DataTrainingArguments:
         default=2000,
     )
 
+    generation_max_prompt_length: int = field(
+        default=1000,
+    )
+
     generation_max_new_tokens: int = field(
         default=None,
     )
@@ -420,9 +404,6 @@ class DataTrainingArguments:
     def __post_init__(self):
         if self.streaming:
             require_version("datasets>=2.0.0", "The streaming feature requires `datasets>=2.0.0`")
-
-        if self.val_max_target_length is None:
-            self.val_max_target_length = self.max_target_length
 
 
 def take(dataset, max_samples: int, random_sampling: bool):
@@ -658,16 +639,17 @@ def tokenize_datasets(training_args,
     return tokenized_datasets_list
 
 
-def load_logic_data_processor(data_args, tokenizer, block_size):
+def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_length):
     preprocessor_args = [
         LMType.CAUSAL,
         tokenizer,
     ]
+
     preprocessor_kwargs = {
         'prompt_prefix': data_args.source_prefix,
         # 'padding': logic_padding,
-        'max_source_length': block_size,
-        'max_target_length': block_size,
+        'max_length': max_length,
+        'max_prompt_length': max_prompt_length,
         'proof_intermediate_steps': data_args.proof_intermediate_steps,
         'proof_sampling': False,
         'sample_negative_proof': False,
@@ -738,15 +720,15 @@ def _maybe_logic_preprocess(data_args,
                 logger.info('%s: "%s"', key, values[i_example])
         data_args.log_non_logic_examples = False  # only log once, as too much logs break the stream, leading to sigkill
 
-    if mode in ["train", "eval"]:
-        logic_preproc_split = "train"
-        # logic_padding = "max_length" if data_args.logic_dataset_prob != 1.0 else data_args.logic_eval_padding
+    if mode == "auto_regression":
+        logic_preproc_mode = "auto_regression"
         logic_padding = "max_length"   # 'longest' leads to error as the shape of tensors will be diferrent in a batch
         feature_names = ['input_ids', 'attention_mask', 'labels']
 
-    elif mode == "logic_eval":
-        logic_preproc_split = "eval"
-        logic_padding = data_args.logic_eval_padding
+    elif mode == "generation":
+        logic_preproc_mode = "generation"
+        # logic_padding = data_args.logic_eval_padding
+        logic_padding = "max_length"  # must be 'max_length', otherwise ends with error saying tensor shape differs in a batch
         feature_names = list(logic_examples.keys())
 
     else:
@@ -755,16 +737,14 @@ def _maybe_logic_preprocess(data_args,
     if num_logic_examples > 0:
         logic_processed = logic_data_processor.preprocess(
             logic_examples,
-            logic_preproc_split,
+            logic_preproc_mode,
             padding=logic_padding,
         )
         logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
     else:
         logic_processed = {}
 
-    if mode == "logic_eval":
-        return logic_processed
-    else:
+    if mode in "auto_regression":
         if num_logic_examples > 0 and num_non_logic_examples > 0:
             processed = {
                 key: torch.concat((logic_processed[key], torch.tensor(
@@ -777,6 +757,11 @@ def _maybe_logic_preprocess(data_args,
             processed = {key: vals for key, vals in non_logic_examples.items() if key in feature_names}
 
         return processed
+    elif mode == "generation":
+        return logic_processed
+    else:
+        raise ValueError()
+
 
 
 def load_logic_raw_datasets(data_args, model_args):
@@ -857,7 +842,7 @@ def make_generation_settings(data_args, tokenizer, model, config):
     ]
     generation_handled_kwargs = {
         'eos_token_id': tokenizer.eos_token_id,
-        'top_k': data_args.generation_top_k,
+        # 'top_k': data_args.generation_top_k,
         'num_beams': data_args.generation_num_beams,
         'num_return_sequences': data_args.generation_num_return_sequences,
         'do_sample': data_args.generation_do_sample,
@@ -866,6 +851,9 @@ def make_generation_settings(data_args, tokenizer, model, config):
         'max_length': min(data_args.generation_max_length + 1, model.config.max_position_embeddings),
         'max_new_tokens': data_args.generation_max_new_tokens,
     }
+    # set top k if not None
+    if data_args.generation_top_k is not None:
+        generation_handled_kwargs['top_k'] = data_args.generation_top_k
     return generation_config, generation_handle_args, generation_handled_kwargs
 
 
@@ -889,7 +877,6 @@ def setup_seq2seq_trainer_class(klass,
     )
 
 
-
 def main():
     logging.getLogger().handlers.clear()
     setup_logger(do_stderr=True, level=logging.INFO)
@@ -900,7 +887,7 @@ def main():
     # Is this OK? without this magic code, the preprocessing of logic dataset with multiprocess will hang up,
     # possibly because of the torch.where operation used in the processing.
     # https://github.com/pytorch/pytorch/issues/82843#issuecomment-1215281193
-    torch.set_num_threads(1)  
+    torch.set_num_threads(1)
 
     # MUST be placed at top (here) !!
     if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
@@ -1053,7 +1040,7 @@ def main():
                                                 tokenizer,
                                                 block_size)
 
-    logic_data_processor = load_logic_data_processor(data_args, tokenizer, block_size)
+    logic_dataset_processor = make_logic_data_processor(data_args, tokenizer, block_size, block_size)
     data_args.log_non_logic_examples = True
 
     logic_raw_datasets = load_logic_raw_datasets(data_args, model_args)
@@ -1125,10 +1112,10 @@ def main():
     if train_dataset:
         _desc = desc + ' on train split'
         data_args.log_non_logic_examples = data_args.log_examples
-        logic_data_processor.log_examples = data_args.log_examples
+        logic_dataset_processor.log_examples = data_args.log_examples
         with training_args.main_process_first(desc=_desc):
             train_dataset = train_dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'train'),
+                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
                 desc=_desc,
                 **logic_dataset_map_kwargs,
             )
@@ -1136,10 +1123,10 @@ def main():
     if eval_dataset:
         _desc = desc + ' on eval split'
         data_args.log_non_logic_examples = data_args.log_examples
-        logic_data_processor.log_examples = data_args.log_examples
+        logic_dataset_processor.log_examples = data_args.log_examples
         with training_args.main_process_first(desc=_desc):
             eval_dataset = eval_dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'eval'),
+                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
                 desc=_desc,
                 **logic_dataset_map_kwargs,
             )
@@ -1150,10 +1137,20 @@ def main():
     training_args.generation_config = generation_config
     training_args.predict_with_generate = True
 
+    logic_eval_dataset_processor = make_logic_data_processor(data_args,
+                                                             tokenizer,
+                                                             data_args.generation_max_length,
+                                                             data_args.generation_max_prompt_length)
     if "validation" in logic_raw_datasets:
         logic_eval_dataset = logic_raw_datasets["validation"]
+
+        if data_args.logic_eval_max_samples is not None:
+            logic_eval_dataset = take(logic_eval_dataset,
+                                      data_args.logic_eval_max_samples,
+                                      data_args.logic_eval_random_sampling)
+
         data_args.log_non_logic_examples = data_args.log_examples
-        logic_data_processor.log_examples = data_args.log_examples
+        logic_eval_dataset_processor.log_examples = data_args.log_examples
 
         generation_handled_map = generation_handled(
             logic_eval_dataset.map,
@@ -1162,23 +1159,21 @@ def main():
             is_generate_func=False,
         )
 
-        if data_args.logic_eval_max_samples is not None:
-            logic_eval_dataset = take(logic_eval_dataset,
-                                      data_args.logic_eval_max_samples,
-                                      data_args.logic_eval_random_sampling)
-
         _desc = desc + ' on logic_eval split'
         with training_args.main_process_first(desc=_desc):
             logic_eval_dataset = generation_handled_map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'logic_eval'),
+                lambda examples: _maybe_logic_preprocess(data_args,
+                                                         logic_eval_dataset_processor,
+                                                         examples,
+                                                         'generation'),
                 desc=_desc,
                 **logic_dataset_map_kwargs,
             )
     else:
         logic_eval_dataset = None
 
-    logic_data_processor.eval_dataset = logic_eval_dataset
-    logic_compute_metrics = logic_data_processor.compute_metrics
+    logic_eval_dataset_processor.eval_dataset = logic_eval_dataset
+    logic_compute_metrics = logic_eval_dataset_processor.compute_metrics
 
     setup_seq2seq_trainer_class(ForceCallMetricsSeq2SeqTrainer,
                                 data_args,
@@ -1261,11 +1256,11 @@ def main():
         if data_args.logic_dataset_type != 'FLD':
             raise ValueError(f'interactive_mode is not supported for {data_args.logic_dataset_type}')
         data_args.log_non_logic_examples = data_args.log_examples
-        logic_data_processor.log_examples = data_args.log_examples
+        logic_eval_dataset_processor.log_examples = data_args.log_examples
         launch(
             _build_logic_seq2seq_trainer(other_trainer=trainer, do_compute_metrics=False),
             tokenizer,
-            lambda examples: _maybe_logic_preprocess(data_args, logic_data_processor, examples, 'logic_eval'),
+            lambda examples: _maybe_logic_preprocess(data_args, logic_eval_dataset_processor, examples, 'generation'),
             data_args.interactive_mode,
             gradio_port=data_args.gradio_port,
         )
