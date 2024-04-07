@@ -88,11 +88,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
     # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
 
-    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-06.debug')
 
-    # output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.context-4k')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-06.context-4k')
 
-    output_top_dir = Path('./outputs.lustre/01.train.py/2024-4-06.debug')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -229,12 +229,12 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ============================ japanese     ============================
 
@@ -267,11 +267,11 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
         # (
         #     0.5,
@@ -290,13 +290,13 @@ def main():
         # ),
 
 
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'tatsu-lab/alpaca', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.0,
+            [
+                (1.0, 'tatsu-lab/alpaca', None)
+            ],
+            False,
+        ),
     ]
 
     learnings = [
@@ -305,7 +305,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        'debug.middle',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -318,9 +318,8 @@ def main():
         # 'FT.bs-128__step-5000',
 
         # 'FT.bs-256__step-76',
-        # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
+        'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-800',        # NeurIPS 100k
-        # 'FT.bs-256__step-800.debug',
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -336,8 +335,8 @@ def main():
     ]
 
     context_lengths = [
-        # 2048,
-        4096,
+        2048,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
@@ -358,14 +357,13 @@ def main():
 
 
 
-    # dry_run = True
     dry_run = False
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-    engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
@@ -374,7 +372,7 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
 
     hours = 24
