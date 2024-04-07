@@ -319,8 +319,8 @@ def main():
         # 'FT.bs-128__step-5000',
 
         # 'FT.bs-256__step-76',
-        'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
+        'FT.bs-256__step-800',        # NeurIPS 100k
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
