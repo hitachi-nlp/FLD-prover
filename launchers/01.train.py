@@ -92,7 +92,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-06.context-4k')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -205,15 +206,15 @@ def main():
 
         # ---------------------------------- FLD-variants ------------------------------------
         '2024-02-14.translation_speedup.translation-v3',
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        '2024-03-29.JSAI_best.D8',
+        '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
-        # '2024-03-29.FLD_v2',
-        # 'hf.tasksource/ruletaker',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # 'hf.qbao775/PARARULE-Plus',
+        '2024-03-29.FLD_v2',
+        'hf.tasksource/ruletaker',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.qbao775/PARARULE-Plus',
 
         # # 'hf.tasksource/robustLR',  # XXX not available yet
     ]
@@ -229,12 +230,12 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ============================ japanese     ============================
 
@@ -273,13 +274,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.0,
@@ -290,13 +291,13 @@ def main():
         # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'tatsu-lab/alpaca', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'tatsu-lab/alpaca', None)
+        #     ],
+        #     False,
+        # ),
     ]
 
     learnings = [
