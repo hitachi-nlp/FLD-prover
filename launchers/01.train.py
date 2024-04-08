@@ -93,11 +93,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-06.context-4k')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.context=4k')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-07.large_models')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
 
@@ -209,15 +209,15 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        # '2024-02-14.translation_speedup.translation-v3',
+        '2024-02-14.translation_speedup.translation-v3',
         # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
-        'hf.tasksource/ruletaker',
-        'hf.qbao775/PARARULE-Plus',
+        # 'hf.tasksource/ruletaker',
+        # 'hf.qbao775/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
@@ -345,8 +345,8 @@ def main():
     ]
 
     proof_intermediate_steps_args = [
-        True,
-        # False,
+        # True,
+        False,
     ]
 
 
