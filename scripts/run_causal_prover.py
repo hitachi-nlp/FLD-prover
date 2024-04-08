@@ -714,7 +714,7 @@ def _maybe_logic_preprocess(data_args,
     if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
         i_example = 0
         logger.info(
-            '------------------------------ preprocess_function [non-FLD example=%d] ------------------------------', i_example)
+            '------------------------------ preprocess_function [non-logic example=%d] ------------------------------', i_example)
         for key, values in non_logic_examples.items():
             if len(values) > 0:
                 logger.info('%s: "%s"', key, values[i_example])
@@ -766,10 +766,10 @@ def _maybe_logic_preprocess(data_args,
 
 def load_logic_raw_datasets(data_args, model_args):
     if data_args.logic_dataset_name is not None:
-        logic_raw_datasets = load_raw_dataset_by_name(data_args.logic_dataset_name,
-                                                      data_args.logic_dataset_config_name,
-                                                      data_args.keep_linebreaks,
-                                                      data_args.streaming)
+        logic_raw_datasets = load_raw_dataset_by_name(data_args,
+                                                      model_args,
+                                                      data_args.logic_dataset_name,
+                                                      data_args.logic_dataset_config_name)
     else:
         logic_raw_datasets = load_raw_dataset_by_files(data_args,
                                                        model_args,
