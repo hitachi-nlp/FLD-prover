@@ -93,6 +93,8 @@ logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
+LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE = True
+
 
 @dataclass
 class ModelArguments:
@@ -730,7 +732,6 @@ def _maybe_logic_preprocess(data_args,
         # logic_padding = data_args.logic_eval_padding
         logic_padding = "max_length"  # must be 'max_length', otherwise ends with error saying tensor shape differs in a batch
         feature_names = list(logic_examples.keys())
-
     else:
         raise ValueError()
 
@@ -763,7 +764,6 @@ def _maybe_logic_preprocess(data_args,
         raise ValueError()
 
 
-
 def load_logic_raw_datasets(data_args, model_args):
     if data_args.logic_dataset_name is not None:
         logic_raw_datasets = load_raw_dataset_by_name(data_args,
@@ -789,6 +789,7 @@ def load_logic_raw_datasets(data_args, model_args):
             desc="[logic dataset] mapping schema",
         )
 
+    logic_raw_datasets = logic_raw_datasets.filter(lambda x: x is not None)
     return logic_raw_datasets
 
 
@@ -1046,15 +1047,40 @@ def main():
 
     logic_raw_datasets = load_logic_raw_datasets(data_args, model_args)
 
+    desc = "[logic dataset] _maybe_logic_preprocess()"
+    maybe_logic_preprocess_map_kwargs = {
+        'batched': True,
+        'batch_size': data_args.preprocess_batch_size,
+        'load_from_cache_file': not data_args.overwrite_cache,
+        'num_proc': data_args.preprocessing_num_workers,
+    }
+
+    if LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
+        logic_processed_dataset = logic_raw_datasets
+        for split, dataset in list(logic_raw_datasets.items()):
+            _desc = desc + f' on {split} split'
+            data_args.log_non_logic_examples = data_args.log_examples
+            logic_dataset_processor.log_examples = data_args.log_examples
+            with training_args.main_process_first(desc=_desc):
+                logic_processed_dataset[split] = dataset.map(
+                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                    desc=_desc,
+                    **maybe_logic_preprocess_map_kwargs,
+
+                )
+    else:
+        logic_processed_dataset = logic_raw_datasets
+
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
     if training_args.do_train:
         train_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["train"] for tokenized_datasets in tokenized_datasets_list],
-            logic_raw_datasets.get("train", None),
+            logic_processed_dataset.get("train", None),
             dataset_probs,
         )
+
         if data_args.num_train_examples_skip > 0:
             logger.info('skip %d examples from the training dataset', data_args.num_train_examples_skip)
             train_dataset = train_dataset.skip(data_args.num_train_examples_skip)
@@ -1069,7 +1095,7 @@ def main():
         eval_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["validation"] for tokenized_datasets in tokenized_datasets_list],
-            logic_raw_datasets.get("validation", None),
+            logic_processed_dataset.get("validation", None),
             dataset_probs,
         )
         eval_dataset = take(eval_dataset,
@@ -1099,38 +1125,28 @@ def main():
     # as the current implementation of interleave_datasets() ignores the processing specified on each dataset.
 
     desc = "[logic + non-logic interleaved dataset] _maybe_logic_preprocess()"
-    logic_dataset_map_kwargs = {
-        'batched': True,
-        'batch_size': data_args.preprocess_batch_size,
-        'load_from_cache_file': not data_args.overwrite_cache,
 
-        # num_proc >= 1 leads to hangup.
-        'num_proc': data_args.preprocessing_num_workers,
-        # 'num_proc': None,
-
-    }
-
-    if train_dataset:
-        _desc = desc + ' on train split'
-        data_args.log_non_logic_examples = data_args.log_examples
-        logic_dataset_processor.log_examples = data_args.log_examples
-        with training_args.main_process_first(desc=_desc):
-            train_dataset = train_dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                desc=_desc,
-                **logic_dataset_map_kwargs,
-            )
-
-    if eval_dataset:
-        _desc = desc + ' on eval split'
-        data_args.log_non_logic_examples = data_args.log_examples
-        logic_dataset_processor.log_examples = data_args.log_examples
-        with training_args.main_process_first(desc=_desc):
-            eval_dataset = eval_dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                desc=_desc,
-                **logic_dataset_map_kwargs,
-            )
+    if not LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
+        if train_dataset:
+            _desc = desc + ' on train split'
+            data_args.log_non_logic_examples = data_args.log_examples
+            logic_dataset_processor.log_examples = data_args.log_examples
+            with training_args.main_process_first(desc=_desc):
+                train_dataset = train_dataset.map(
+                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                    desc=_desc,
+                    **maybe_logic_preprocess_map_kwargs,
+                )
+        if eval_dataset:
+            _desc = desc + ' on eval split'
+            data_args.log_non_logic_examples = data_args.log_examples
+            logic_dataset_processor.log_examples = data_args.log_examples
+            with training_args.main_process_first(desc=_desc):
+                eval_dataset = eval_dataset.map(
+                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                    desc=_desc,
+                    **maybe_logic_preprocess_map_kwargs,
+                )
 
     generation_config, generation_handle_args, generation_handled_kwargs = make_generation_settings(
         data_args, tokenizer, model, config
@@ -1138,12 +1154,13 @@ def main():
     training_args.generation_config = generation_config
     training_args.predict_with_generate = True
 
+    logic_eval_raw_datasets = load_logic_raw_datasets(data_args, model_args)
     logic_eval_dataset_processor = make_logic_data_processor(data_args,
                                                              tokenizer,
                                                              data_args.generation_max_length,
                                                              data_args.generation_max_prompt_length)
-    if "validation" in logic_raw_datasets:
-        logic_eval_dataset = logic_raw_datasets["validation"]
+    if "validation" in logic_eval_raw_datasets:
+        logic_eval_dataset = logic_eval_raw_datasets["validation"]
 
         if data_args.logic_eval_max_samples is not None:
             logic_eval_dataset = take(logic_eval_dataset,
@@ -1168,7 +1185,7 @@ def main():
                                                          examples,
                                                          'generation'),
                 desc=_desc,
-                **logic_dataset_map_kwargs,
+                **maybe_logic_preprocess_map_kwargs,
             )
     else:
         logic_eval_dataset = None
