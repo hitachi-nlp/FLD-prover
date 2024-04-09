@@ -282,21 +282,21 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
         (
-            0.0,
+            0.5,
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
             False,
         ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
 
         # (
@@ -343,15 +343,22 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
+    # XXX: quota of HAIC is low
+    save_model_on_eval = False
+    # save_model_on_eval = True
+
+
     context_lengths = [
         2048,
         # 4096,
     ]
 
+
     proof_intermediate_steps_args = [
         True,
         # False,
     ]
+
 
     float_precisions = [
         'bf16',
@@ -409,6 +416,7 @@ def main():
 
 
 
+
     # ------------------------------------ fixed settings -------------------------------------------
     # if isinstance(engine, SubprocessEngine):
     #     region = 'haic'
@@ -431,9 +439,6 @@ def main():
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
-    # quota of HAIC is low
-    save_model_on_eval = False
-
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
 
@@ -444,6 +449,8 @@ def main():
         # False,       # better for chat-model?
         True,      # better for non-chat model, somehow.
     ]
+
+    save_model_at_end = not save_model_on_eval
 
     seeds = [
         0,
@@ -627,6 +634,7 @@ def main():
                                                         get_save_eval_step_setting(
                                                             max_steps = max_steps or setting['max_steps'],
                                                             eval_steps = eval_steps or setting['eval_steps'],
+                                                            save_model_at_end=save_model_at_end,
                                                             save_model_on_eval=save_model_on_eval,
                                                         )
                                                     )
