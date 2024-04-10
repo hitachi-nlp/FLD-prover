@@ -102,7 +102,7 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.randomly_include')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
 
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
@@ -215,10 +215,12 @@ def main():
 
 
         # ---------------------------------- FLD-variants ------------------------------------
-        '2024-02-14.translation_speedup.translation-v3',
+        # '2024-02-14.translation_speedup.translation-v3',
         # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
+
+        '2024-03-29.JSAI_best.no_aug',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
@@ -316,7 +318,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        'debug.middle',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -330,7 +332,7 @@ def main():
 
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.bs-256__step-800',        # NeurIPS 100k
+        'FT.bs-256__step-800',        # NeurIPS 100k
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -346,8 +348,8 @@ def main():
     ]
 
     # XXX: quota of HAIC is low
-    save_model_on_eval = False
-    # save_model_on_eval = True
+    # save_model_on_eval = False
+    save_model_on_eval = True
 
 
     context_lengths = [
@@ -357,7 +359,7 @@ def main():
 
 
     proof_intermediate_steps_args = [
-        # 'include',
+        'include',
         # 'exclude',
         'randomly_include',
     ]
