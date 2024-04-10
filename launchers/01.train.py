@@ -742,6 +742,7 @@ def main():
                                                         output_dir,
                                                         delay = i_job * 0.5,
                                                         hours=_hours,
+                                                        force=True,  # assuming that we do not have many jobs
                                                         dry_run=dry_run
                                                     )
                                                     i_job += 1
