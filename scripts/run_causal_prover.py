@@ -339,8 +339,8 @@ class DataTrainingArguments:
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
 
-    proof_intermediate_steps: bool = field(
-        default=True,
+    proof_intermediate_steps: str = field(
+        default='include',
     )
 
     no_subproof_for_unknown: bool = field(

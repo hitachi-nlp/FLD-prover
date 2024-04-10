@@ -100,7 +100,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.save_cache')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.randomly_include')
 
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
@@ -314,7 +316,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        # 'debug.middle',
+        'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -328,7 +330,7 @@ def main():
 
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-800',        # NeurIPS 100k
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -355,15 +357,16 @@ def main():
 
 
     proof_intermediate_steps_args = [
-        True,
-        # False,
+        # 'include',
+        # 'exclude',
+        'randomly_include',
     ]
 
 
     float_precisions = [
         'bf16',
-        'fp16',
-        'fp32',
+        # 'fp16',
+        # 'fp32',
     ]
 
 

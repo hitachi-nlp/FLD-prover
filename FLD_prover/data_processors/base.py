@@ -36,7 +36,7 @@ class Processor(ABC):
                  max_length=1024,
                  max_prompt_length=1024,
                  ignore_index=-100,
-                 proof_intermediate_steps=False,
+                 proof_intermediate_steps='include',
                  proof_sampling='stepwise',
                  sample_negative_proof=False,
                  no_subproof_for_unknown=False,
@@ -53,6 +53,8 @@ class Processor(ABC):
         self._max_prompt_length = max_prompt_length
         self._ignore_index = ignore_index
             
+        if proof_intermediate_steps not in ['include', 'exclude', 'randomly_include']:
+            raise ValueError(f"proof_intermediate_steps must be one of ['include', 'exclude', 'randomly_include'], but got {proof_intermediate_steps}")
         self._proof_intermediate_steps = proof_intermediate_steps
         self._proof_sampling = proof_sampling
         self._sample_negative_proof = sample_negative_proof

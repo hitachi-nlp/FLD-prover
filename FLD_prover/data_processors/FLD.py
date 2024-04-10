@@ -1,5 +1,6 @@
 from typing import Optional, Any, Tuple, Dict
 import logging
+import random
 
 from FLD_task import (
     load_deduction,
@@ -84,9 +85,18 @@ class FLDProcessor(Processor):
         )
 
     def _get_serial(self, example, split: str) -> SerializedDeduction:
+        if self._proof_intermediate_steps == 'include':
+            intermediate_steps = True
+        elif self._proof_intermediate_steps == 'exclude':
+            intermediate_steps = False
+        elif self._proof_intermediate_steps == 'randomly_include':
+            intermediate_steps = random.choice([True, False])
+        else:
+            raise ValueError(f'Invalid proof_intermediate_steps: {self._proof_intermediate_steps}')
+
         return serialize(
             load_deduction(example),
-            intermediate_steps=self._proof_intermediate_steps,
+            intermediate_steps=intermediate_steps,
             stepwise=(self._proof_sampling == 'stepwise'),
             sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
             include_max_subproof_for_unknown=not self._no_subproof_for_unknown,
