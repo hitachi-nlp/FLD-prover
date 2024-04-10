@@ -100,9 +100,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.save_cache')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
 
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
@@ -216,11 +216,12 @@ def main():
 
         # ---------------------------------- FLD-variants ------------------------------------
         # '2024-02-14.translation_speedup.translation-v3',
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
-        '2024-03-29.JSAI_best.no_aug',
+        # '2024-03-29.JSAI_best.no_aug',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
@@ -286,21 +287,21 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
-
         # (
-        #     0.0,
+        #     0.5,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
         #     False,
         # ),
+
+        (
+            0.0,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
 
         # (
@@ -332,7 +333,8 @@ def main():
 
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        'FT.bs-256__step-800',        # NeurIPS 100k
+        'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
+        # 'FT.bs-256__step-800',        # NeurIPS 100k
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -361,14 +363,14 @@ def main():
     proof_intermediate_steps_args = [
         'include',
         # 'exclude',
-        'randomly_include',
+        # 'randomly_include',
     ]
 
 
     float_precisions = [
+        'fp32',
         'bf16',
         # 'fp16',
-        # 'fp32',
     ]
 
 
