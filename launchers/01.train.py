@@ -221,9 +221,9 @@ def main():
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
-        # '2024-03-29.JSAI_best.no_aug',
-        '2024-03-29.JSAI_best.D8.no_aug',
-        '2024-03-29.JSAI_best.theorems.no_aug',
+        '2024-03-29.JSAI_best.no_aug',
+        # '2024-03-29.JSAI_best.D8.no_aug',
+        # '2024-03-29.JSAI_best.theorems.no_aug',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
@@ -289,21 +289,21 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
         (
-            0.25,
+            0.5,
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
             False,
         ),
+
+        # (
+        #     0.25,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -344,8 +344,8 @@ def main():
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
-        # 'FT.bs-256__step-800',        # NeurIPS 100k
-        'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
+        'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -377,6 +377,14 @@ def main():
         # 'randomly_include',
     ]
 
+
+    lrates = [
+        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
+        # 1e-4,
+
+        3e-5,
+        # 1e-5,
+    ]
 
 
 
@@ -470,13 +478,6 @@ def main():
         0,
         # 1,
         # 2,
-    ]
-
-    lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        # 1e-4,
-
-        1e-5,   # NLP_2024
     ]
 
     base_setting_name = 'default'
