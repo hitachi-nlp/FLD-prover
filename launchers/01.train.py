@@ -217,7 +217,7 @@ def main():
         # ---------------------------------- 2024-03-29.H100 ------------------------------------
         # '2024-02-14.translation_speedup.translation-v3',
 
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
@@ -226,7 +226,7 @@ def main():
         # '2024-03-29.JSAI_best.theorems.no_aug',
 
         # ---------------------------------- other datasets ------------------------------------
-        '2024-03-29.FLD_v2',
+        # '2024-03-29.FLD_v2',
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
@@ -290,12 +290,21 @@ def main():
         # ),
 
         (
-            0.5,
+            0.75,
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
             False,
         ),
+
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.25,
@@ -344,7 +353,8 @@ def main():
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
-        'FT.bs-256__step-800',        # NeurIPS 100k
+        'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
+        # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
@@ -373,7 +383,7 @@ def main():
 
     proof_intermediate_steps_args = [
         'include',
-        'exclude',
+        # 'exclude',
         # 'randomly_include',
     ]
 
