@@ -221,12 +221,12 @@ def main():
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
-        '2024-03-29.JSAI_best.no_aug',
+        # '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.D8.no_aug',
         # '2024-03-29.JSAI_best.theorems.no_aug',
 
         # ---------------------------------- other datasets ------------------------------------
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
@@ -372,7 +372,7 @@ def main():
 
 
     proof_intermediate_steps_args = [
-        # 'include',
+        'include',
         'exclude',
         # 'randomly_include',
     ]
