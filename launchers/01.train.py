@@ -372,8 +372,8 @@ def main():
 
 
     proof_intermediate_steps_args = [
-        'include',
-        # 'exclude',
+        # 'include',
+        'exclude',
         # 'randomly_include',
     ]
 
@@ -382,8 +382,8 @@ def main():
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
         # 1e-4,
 
-        3e-5,
-        # 1e-5,
+        # 3e-5,
+        1e-5,
     ]
 
 
