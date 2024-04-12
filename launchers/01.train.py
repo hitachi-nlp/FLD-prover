@@ -102,7 +102,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
 
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
@@ -222,8 +223,11 @@ def main():
         # '2024-03-29.JSAI_best.theorems',
 
         # '2024-03-29.JSAI_best.no_aug',
-        '2024-03-29.JSAI_best.D8.no_aug',
-        '2024-03-29.JSAI_best.theorems.no_aug',
+        # '2024-03-29.JSAI_best.D8.no_aug',
+        # '2024-03-29.JSAI_best.theorems.no_aug',
+
+        '2024-03-29.JSAI_best.no_aug.dstrctr-10',
+        '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
@@ -289,21 +293,21 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
         (
-            0.25,
+            0.5,
             [
                 (1.0, 'DKYoon/SlimPajama-6B', None)
             ],
             False,
         ),
+
+        # (
+        #     0.25,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.0,
@@ -344,8 +348,8 @@ def main():
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
-        # 'FT.bs-256__step-800',        # NeurIPS 100k
-        'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
+        'FT.bs-256__step-800',        # NeurIPS 100k
+        # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
