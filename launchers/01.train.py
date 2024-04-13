@@ -102,8 +102,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
 
 
     # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
@@ -222,12 +222,12 @@ def main():
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
-        # '2024-03-29.JSAI_best.no_aug',
+        '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.D8.no_aug',
         # '2024-03-29.JSAI_best.theorems.no_aug',
 
-        '2024-03-29.JSAI_best.no_aug.dstrctr-10',
-        '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
+        # '2024-03-29.JSAI_best.no_aug.dstrctr-10',
+        # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
 
         # ---------------------------------- other datasets ------------------------------------
         # '2024-03-29.FLD_v2',
@@ -381,6 +381,16 @@ def main():
         # 'randomly_include',
     ]
 
+    lrates = [
+        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
+        # 1e-4,
+
+        # 1e-5,   # NLP_2024
+        3e-6,   # NLP_2024
+    ]
+
+
+
 
 
 
@@ -409,8 +419,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
 
     hours = 24
 
@@ -474,13 +484,6 @@ def main():
         0,
         # 1,
         # 2,
-    ]
-
-    lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        # 1e-4,
-
-        1e-5,   # NLP_2024
     ]
 
     base_setting_name = 'default'
