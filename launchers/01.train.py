@@ -218,7 +218,7 @@ def main():
         # ---------------------------------- 2024-03-29.H100 ------------------------------------
         # '2024-02-14.translation_speedup.translation-v3',
 
-        '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
+        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
         # '2024-03-29.JSAI_best.D8',
         # '2024-03-29.JSAI_best.theorems',
 
@@ -230,7 +230,7 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
 
         # ---------------------------------- other datasets ------------------------------------
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
@@ -301,13 +301,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.25,
@@ -364,10 +364,13 @@ def main():
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
-        'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
+        # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
         # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
-
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
+
+        # 'FT.bs-512__step-1200',
+        'FT.bs-768__step-1200',
+
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
 
@@ -403,19 +406,9 @@ def main():
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
         # 1e-4,
 
-        # 1e-5,   # NLP_2024
-        3e-6,   # NLP_2024
-    ]
-
-
-
-
-    lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        # 1e-4,
-
         # 3e-5,
         1e-5,
+        # 3e-6,   # NLP_2024
     ]
 
 
@@ -446,7 +439,7 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
     hours = 24
 
