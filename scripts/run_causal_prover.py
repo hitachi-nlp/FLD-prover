@@ -35,13 +35,18 @@ import datetime
 import numpy as np
 import deepspeed
 import datasets
-from datasets.download.download_config import DownloadConfig
-from datasets import interleave_datasets, DatasetDict
 import evaluate
 import torch
-from datasets import load_dataset
 from torch.utils.data import Dataset
-from datasets import IterableDataset
+from datasets.download.download_config import DownloadConfig
+from datasets import (
+    get_dataset_config_names,
+    load_dataset,
+    concatenate_datasets,
+    DatasetDict,
+    IterableDataset,
+    interleave_datasets,
+)
 
 
 import transformers
@@ -220,7 +225,13 @@ class DataTrainingArguments:
     logic_dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    logic_train_fileg: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
+    logic_dataset_concatenate_all_configs: bool = field(
+        default=False,
+    )
+    logic_dataset_concatenate_all_splits_into_train: bool = field(
+        default=False,
+    )
+    logic_train_file: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
     logic_validation_file: Optional[str] = field(
         default=None,
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
@@ -422,8 +433,9 @@ def take(dataset, max_samples: int, random_sampling: bool):
 
 
 def FLD_map_schema(examples: Dict[str, List[Any]]):
-    keys = list(examples.keys())
-    batch_size = len(examples[keys[0]])
+    orig_keys = list(examples.keys())
+    batch_size = len(examples[orig_keys[0]])
+
     examples_list = [
         {key: values[i] for key, values in examples.items()}
         for i in range(batch_size)
@@ -432,20 +444,54 @@ def FLD_map_schema(examples: Dict[str, List[Any]]):
         load_deduction(example).dict()
         for example in examples_list
     ]
+
+    keys = list(examples_list[0].keys())
     return {key: [examples_list[i][key] for i in range(batch_size)] for key in keys}
 
 
 def load_raw_dataset_by_name(data_args,
                              model_args,
                              dataset_name: str,
-                             dataset_config_name: str):
-    raw_datasets = load_dataset(
-        dataset_name,
-        dataset_config_name,
-        cache_dir=model_args.cache_dir,
-        use_auth_token=True if model_args.use_auth_token else None,
-        streaming=data_args.streaming,
-    )
+                             dataset_config_name: str,
+                             concatenate_all_configs=False,
+                             concatenate_all_splits_into_train=False):
+    if concatenate_all_configs:
+        configs = get_dataset_config_names(dataset_name)
+        logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
+
+        raw_datasets_list = {}
+        for _dataset_config_name in configs:
+            _raw_datasets = load_dataset(
+                dataset_name,
+                _dataset_config_name,
+                cache_dir=model_args.cache_dir,
+                use_auth_token=True if model_args.use_auth_token else None,
+                streaming=data_args.streaming,
+            )
+            raw_datasets_list[_dataset_config_name] = _raw_datasets
+
+        major_datasets = raw_datasets_list[configs[0]]
+        raw_datasets = major_datasets
+        split_names = set(major_datasets.keys())
+        for split_name in split_names:
+            split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
+            raw_datasets[split_name] = concatenate_datasets(split_datasets)
+
+    else:
+        raw_datasets = load_dataset(
+            dataset_name,
+            dataset_config_name,
+            cache_dir=model_args.cache_dir,
+            use_auth_token=True if model_args.use_auth_token else None,
+            streaming=data_args.streaming,
+        )
+
+    if concatenate_all_splits_into_train:
+        logger.info('We will concatenate all splits of %s into the training set', dataset_name)
+        split_names = set(raw_datasets.keys())
+        split_datasets = [raw_datasets[split_name] for split_name in split_names]
+        raw_datasets['train'] = concatenate_datasets(split_datasets)
+
     if "validation" not in raw_datasets.keys():
         if "dev" in raw_datasets.keys():
             raw_datasets["validation"] = raw_datasets["dev"]
@@ -484,7 +530,13 @@ def load_raw_dataset_by_files(data_args,
                               validation_file: Optional[str],
                               file_type: str,
                               keep_linebreaks: bool,
-                              streaming: bool):
+                              streaming: bool,
+                              concatenate_all_configs=False,
+                              concatenate_all_splits_into_train=False):
+
+    if concatenate_all_configs or concatenate_all_splits_into_train:
+        raise NotImplementedError()
+
     data_files = {}
     dataset_args = {}
     if train_file is not None:
@@ -766,18 +818,27 @@ def _maybe_logic_preprocess(data_args,
 
 def load_logic_raw_datasets(data_args, model_args):
     if data_args.logic_dataset_name is not None:
-        logic_raw_datasets = load_raw_dataset_by_name(data_args,
-                                                      model_args,
-                                                      data_args.logic_dataset_name,
-                                                      data_args.logic_dataset_config_name)
+        logic_raw_datasets = load_raw_dataset_by_name(
+            data_args,
+            model_args,
+            data_args.logic_dataset_name,
+            data_args.logic_dataset_config_name,
+            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
+            concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
+        )
     else:
-        logic_raw_datasets = load_raw_dataset_by_files(data_args,
-                                                       model_args,
-                                                       data_args.logic_train_fileg,
-                                                       data_args.logic_validation_file,
-                                                       'json',
-                                                       data_args.keep_linebreaks,
-                                                       False)
+        logic_raw_datasets = load_raw_dataset_by_files(
+            data_args,
+            model_args,
+            data_args.logic_train_file,
+            data_args.logic_validation_file,
+            'json',
+            data_args.keep_linebreaks,
+            False,
+            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
+            concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
+        )
+
     if data_args.logic_dataset_type == 'FLD':
         # load and dump once to normalize the schema from different versions of datasets.
         logic_raw_datasets = logic_raw_datasets.map(
