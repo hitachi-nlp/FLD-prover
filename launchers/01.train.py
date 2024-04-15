@@ -102,10 +102,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
-
-    output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
 
 
@@ -240,7 +239,7 @@ def main():
         # '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.D8.no_aug',
         # '2024-03-29.JSAI_best.theorems.no_aug',
-        # '2024-03-29.JSAI_best.theorems-0.1.no_aug',
+        '2024-03-29.JSAI_best.theorems-0.1.no_aug',
 
         # '2024-03-29.JSAI_best.no_aug.dstrctr-10',
         # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
@@ -250,8 +249,8 @@ def main():
         # 'hf.hitachi-nlp/FLD.v2__default',
 
         # '2024-03-29.FLD_v2',
-        '2024-03-29.JSAI_best.no_aug.trnsl-v2',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # 'hf.hitachi-nlp/ruletaker',
@@ -417,7 +416,7 @@ def main():
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # --------- dataset = 300k, logic=0.5 -----------
-        # 'FT.bs-384__step-1200',
+        # 'FT.bs-384__step-1560',
         # 'FT.bs-512__step-1200',
         # 'FT.bs-640__step-940',
         # 'FT.bs-768__step-1200',
@@ -492,8 +491,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)   # OK, haic-5,6
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)   # OK, haic-5,6
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)     # OK,   NG=haicxh8-7
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)    # NG, haicxh8-13がダメ？
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
