@@ -246,9 +246,9 @@ def main():
 
         # ---------------------------------- other datasets ------------------------------------
 
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__default',
 
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
@@ -256,8 +256,8 @@ def main():
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
     ]
 
-    logic_dataset_concatenate_all_configs = True
-    logic_dataset_concatenate_all_splits_into_train = True
+    logic_dataset_concatenate_all_configs = False
+    logic_dataset_concatenate_all_splits_into_train = False
 
 
 
@@ -391,7 +391,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        'debug.middle',
+        # 'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -411,7 +411,7 @@ def main():
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # 'FT.bs-512__step-1200',
-        # 'FT.bs-768__step-1200',
+        'FT.bs-768__step-1200',
 
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
@@ -484,9 +484,9 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
     hours = 24
 
