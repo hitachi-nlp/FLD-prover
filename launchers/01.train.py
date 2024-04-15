@@ -102,11 +102,18 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
 
+    output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
-    # XXX ****************** Monitor deepspeed after launching, as it sometimes hangs!!!!!!! ***************
+
+
+
+
+
+
+
 
     DATASETS_DIRS = [
         # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
@@ -132,6 +139,14 @@ def main():
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
         './outputs.FLD/00.create_corpus/2024-03-29',
     ]
+
+
+
+
+
+
+
+
 
 
     logic_dataset_unames = [
@@ -230,13 +245,26 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
 
         # ---------------------------------- other datasets ------------------------------------
-        '2024-03-29.FLD_v2',
+
+        'hf.hitachi-nlp/FLD.v2__default',
+
+        # '2024-03-29.FLD_v2',
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
     ]
+
+    logic_dataset_concatenate_all_configs = True
+    logic_dataset_concatenate_all_splits_into_train = True
+
+
+
+
+
+
+
 
 
     model_settings = [
@@ -273,6 +301,14 @@ def main():
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
     ]
+
+
+
+
+
+
+
+
 
     """
     (
@@ -343,13 +379,19 @@ def main():
         # ),
     ]
 
+
+
+
+
+
+
     learnings = [
         # 'debug.ZS',
         # 'debug.micro',
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        # 'debug.middle',
+        'debug.middle',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -369,7 +411,7 @@ def main():
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # 'FT.bs-512__step-1200',
-        'FT.bs-768__step-1200',
+        # 'FT.bs-768__step-1200',
 
         # 'FT.bs-256__step-1250',   # JSAI
         # 'FT.bs-256__step-2500',
@@ -385,16 +427,19 @@ def main():
         # 'LLM_FS.shot-30000',
     ]
 
+
+
+
+
+
     # XXX: quota of HAIC is low
     # save_model_on_eval = False
     save_model_on_eval = True
-
 
     context_lengths = [
         2048,
         # 4096,
     ]
-
 
     proof_intermediate_steps_args = [
         'include',
@@ -406,9 +451,9 @@ def main():
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
         # 1e-4,
 
-        # 3e-5,
+        # 3e-5,   # NeurIPS 2024, worse than 1e-5
         1e-5,
-        # 3e-6,   # NLP_2024
+        # 3e-6,   # ??
     ]
 
 
@@ -439,7 +484,9 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
     hours = 24
 
@@ -689,11 +736,11 @@ def main():
                                                     )
                                                 )
 
-                                                if run_mode == 'deepspeed':
-                                                    for max_eval_arg_name in ['logic_eval_max_samples']:
-                                                        max_eval_arg_sample = setting.get(max_eval_arg_name, None)
-                                                        if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
-                                                            raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
+                                                # if run_mode == 'deepspeed':
+                                                #     for max_eval_arg_name in ['logic_eval_max_samples']:
+                                                #         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
+                                                #         if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
+                                                #             raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
                                                 setting.update(get_model_setting(model_name))
                                                 setting.update(get_tokenizer_setting(model_name))
@@ -719,6 +766,9 @@ def main():
                                                     'logic_dataset_uname': logic_dataset_uname,
                                                     # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
                                                     # 'other_dataset_config_name': other_dataset_config_names,
+
+                                                    'logic_dataset_concatenate_all_configs': logic_dataset_concatenate_all_configs,
+                                                    'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
 
                                                     'resume_from_checkpoint': resume_from_checkpoint,
                                                     'num_train_examples_skip': num_train_examples_skip,
