@@ -410,8 +410,10 @@ def main():
         # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
+        # dataset = 300k, logic=0.5
+        'FT.bs-384__step-1200',
         # 'FT.bs-512__step-1200',
-        'FT.bs-640__step-940',
+        # 'FT.bs-640__step-940',
         # 'FT.bs-768__step-1200',
 
         # 'FT.bs-256__step-1250',   # JSAI
@@ -486,9 +488,9 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)   # OK, haic-5,6
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)     # NG, haic-5,6,7,  OK=haic-8,9,10
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)     # OK,   NG=haicxh8-7
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)    # NG, haicxh8-13がダメ？
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
     hours = 24
