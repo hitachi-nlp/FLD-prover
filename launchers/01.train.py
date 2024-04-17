@@ -468,10 +468,10 @@ def main():
     # (optimizer, annal_w, annal_tau, annal_t0, pretrain_coef)
     optimizer_setings = [
         # (None, None, None, None, None),
-        ('rec_adam', 1.0, None, None, 50),
-        ('rec_adam', 1.0, None, None, 500),
         ('rec_adam', 1.0, None, None, 5000),
-        ('rec_adam', 1.0, None, None, 50000),
+        ('rec_adam', 1.0, None, None, 500),
+        # ('rec_adam', 1.0, None, None, 50),
+        # ('rec_adam', 1.0, None, None, 50000),
     ]
 
 
@@ -501,7 +501,9 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
+
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)

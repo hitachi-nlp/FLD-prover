@@ -983,7 +983,10 @@ def main():
     if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
         # https://github.com/huggingface/accelerate/issues/223
         timeout = datetime.timedelta(seconds=3600 * 10)  # large for preprocessing on large dataset
-        deepspeed.init_distributed(timeout=timeout)
+        deepspeed.init_distributed(
+            timeout=timeout,
+            distributed_port=os.environ.get('RUN_CAUSAL_PROVER_DEEPSPEED_PORT', None),  # the default port is 29500, but we want to avoid conflict
+        )
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):  # json file specifiying the arguments
