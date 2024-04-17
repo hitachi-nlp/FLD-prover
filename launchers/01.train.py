@@ -102,9 +102,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
 
 
@@ -239,7 +239,7 @@ def main():
         # '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.D8.no_aug',
         # '2024-03-29.JSAI_best.theorems.no_aug',
-        '2024-03-29.JSAI_best.theorems-0.1.no_aug',
+        # '2024-03-29.JSAI_best.theorems-0.1.no_aug',
 
         # '2024-03-29.JSAI_best.no_aug.dstrctr-10',
         # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
@@ -248,7 +248,7 @@ def main():
 
         # 'hf.hitachi-nlp/FLD.v2__default',
 
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
@@ -341,21 +341,21 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
-
         # (
-        #     0.25,
+        #     0.5,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
         #     False,
         # ),
+
+        (
+            0.25,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.25,
@@ -412,20 +412,18 @@ def main():
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
         # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
-        'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
+        # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # --------- dataset = 300k, logic=0.5 -----------
         # 'FT.bs-384__step-1560',
         # 'FT.bs-512__step-1200',
         # 'FT.bs-640__step-940',
-        # 'FT.bs-768__step-1200',
 
-        # 'FT.bs-256__step-1250',   # JSAI
-        # 'FT.bs-256__step-2500',
+        # --------- dataset = 300k, logic=0.25 -----------
+        'FT.bs-768__step-1560',
 
-        # 'FT.bs-512__step-1250',
-        # 'FT.bs-512__step-2500',
+
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
@@ -491,12 +489,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)   # OK, haic-5,6
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)     # OK,   NG=haicxh8-7
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)    # NG, haicxh8-13がダメ？
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
     hours = 24
 
