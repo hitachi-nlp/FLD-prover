@@ -277,13 +277,13 @@ def main():
         # ============================ english      ============================
 
         # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
-        ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
+        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
@@ -329,11 +329,11 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
         # (
         #     0.75,
@@ -343,13 +343,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None)
+            ],
+            False,
+        ),
 
         # (
         #     0.25,
@@ -415,7 +415,7 @@ def main():
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
         # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
-        # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
+        'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # --------- dataset = 300k, logic=0.5 -----------
@@ -468,9 +468,11 @@ def main():
     # (optimizer, annal_w, annal_tau, annal_t0, pretrain_coef)
     optimizer_setings = [
         # (None, None, None, None, None),
-        ('rec_adam', 0.5, None, None, 5000.0),
+        ('rec_adam', 1.0, None, None, 50),
+        ('rec_adam', 1.0, None, None, 500),
+        ('rec_adam', 1.0, None, None, 5000),
+        ('rec_adam', 1.0, None, None, 50000),
     ]
-
 
 
 
@@ -486,11 +488,11 @@ def main():
 
     dry_run = False
 
-    run_mode = 'vanilla'
+    # run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    # run_mode = 'deepspeed'
+    run_mode = 'deepspeed'
 
-    engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
@@ -499,10 +501,10 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)   # OK, haic-5,6
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)     # OK,   NG=haicxh8-7
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)    # NG, haicxh8-13がダメ？
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
