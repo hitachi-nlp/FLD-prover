@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
-from transformers import Seq2SeqTrainer
+from transformers import Seq2SeqTrainer, Trainer
 from transformers.deepspeed import deepspeed_init, is_deepspeed_zero3_enabled
 from transformers.trainer import Trainer
 from transformers.utils import (
@@ -33,9 +33,142 @@ if is_torch_tpu_available(check_device=False):
     import torch_xla.core.xla_model as xm
     import torch_xla.debug.metrics as met
     import torch_xla.distributed.parallel_loader as pl
+from transformers.utils import is_sagemaker_mp_enabled
 
+from packaging import version
+if is_sagemaker_mp_enabled():
+    import smdistributed.modelparallel.torch as smp
+    from smdistributed.modelparallel import __version__ as SMP_VERSION
+
+    IS_SAGEMAKER_MP_POST_1_10 = version.parse(SMP_VERSION) >= version.parse("1.10")
+
+    from transformers.trainer_pt_utils import smp_forward_backward, smp_forward_only, smp_gather, smp_nested_concat
+else:
+    IS_SAGEMAKER_MP_POST_1_10 = False
+
+
+from rec_adam import RecAdam
 
 logger = logging.getLogger(__name__)
+
+
+class TrainerWithRecAdam(Trainer):
+
+    def __init__(
+        self,
+        *args,
+        rec_adam_regularization='l2',
+        rec_adam_anneal_fun='sigmoid',
+        rec_adam_anneal_w=1.0,
+        rec_adam_anneal_tau=None,
+        rec_adam_anneal_t0=None,
+        rec_adam_pretrain_coef=5000.0,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.rec_adam_regularization = rec_adam_regularization
+        self.rec_adam_anneal_fun = rec_adam_anneal_fun
+        self.rec_adam_anneal_w = rec_adam_anneal_w
+        self.rec_adam_anneal_tau = rec_adam_anneal_tau
+        self.rec_adam_anneal_t0 = rec_adam_anneal_t0
+        self.rec_adam_pretrain_coef = rec_adam_pretrain_coef
+
+    
+    def create_optimizer_and_scheduler(self, num_training_steps: int):
+        self.create_optimizer()
+        if IS_SAGEMAKER_MP_POST_1_10 and smp.state.cfg.fp16:
+            # If smp >= 1.10 and fp16 is enabled, we unwrap the optimizer
+            optimizer = self.optimizer.optimizer
+        else:
+            optimizer = self.optimizer
+        self.create_scheduler(num_training_steps=num_training_steps, optimizer=optimizer)
+
+    def create_optimizer(self):
+        """
+        Setup the optimizer.
+
+        We provide a reasonable default that works well. If you want to use something else, you can pass a tuple in the
+        Trainer's init through `optimizers`, or subclass and override this method in a subclass.
+        """
+        opt_model = self.model_wrapped if is_sagemaker_mp_enabled() else self.model
+
+        if self.optimizer is None:
+            decay_parameters = self.get_decay_parameter_names(opt_model)
+
+            def should_decay_param(n):
+                return n in decay_parameters
+
+            def is_original_arch_param(n):
+                # return model_args.model_type in n
+                return True   # TODO: implement logic to judge whether the parameter is from the original architecture or added one.
+
+            initial_parameters = [(n, p.detach()) for n, p in opt_model.named_parameters() if p.requires_grad]
+            update_parameter = [(n, p) for n, p in opt_model.named_parameters() if p.requires_grad]
+
+            optimizer_grouped_parameters = [
+                {
+                    "params": [p for n, p in update_parameter if should_decay_param(n) and is_original_arch_param(n)],
+                    "weight_decay": self.args.weight_decay,
+                    "anneal_w": self.rec_adam_anneal_w,
+                    "pretrain_params": [p_p for p_n, p_p in initial_parameters if should_decay_param(p_n) and is_original_arch_param(p_n)]
+                },
+                {
+                    "params": [p for n, p in update_parameter if should_decay_param(n) and not is_original_arch_param(n)],
+                    "weight_decay": self.args.weight_decay,
+                    "anneal_w": -1.0,
+                    "pretrain_params": [p_p for p_n, p_p in initial_parameters if should_decay_param(p_n) and not is_original_arch_param(p_n)]
+                },
+
+                {
+                    "params": [p for n, p in update_parameter if not should_decay_param(n) and is_original_arch_param(n)],
+                    "weight_decay": 0.0,
+                    "anneal_w": self.rec_adam_anneal_w,
+                    "pretrain_params": [p_p for p_n, p_p in initial_parameters if not should_decay_param(p_n) and is_original_arch_param(p_n)]
+                },
+                {
+                    "params": [p for n, p in update_parameter if not should_decay_param(n) and not is_original_arch_param(n)],
+                    "weight_decay": 0.0,
+                    "anneal_w": -1.0,
+                    "pretrain_params": [p_p for p_n, p_p in initial_parameters if not should_decay_param(p_n) and not is_original_arch_param(p_n)]
+                }
+            ]
+
+            if self.rec_adam_anneal_t0 is None:
+                if self.args.max_steps is None:
+                    raise ValueError('rec_adam_anneal_t0 must be specified if max_steps is not specified')
+
+                logger.info(f'rec_adam_anneal_t0 is not specified, set to the half of the max_steps: {self.args.max_steps / 2}')
+                self.rec_adam_anneal_t0 = self.args.max_steps / 2
+
+            if self.rec_adam_anneal_tau is None:
+                logger.info(f'rec_adam_anneal_tau is not specified, set to the 1/3 of the rec_adam_anneal_t0: {self.rec_adam_anneal_t0 / 3}')
+                self.rec_adam_anneal_tau = self.rec_adam_anneal_t0 / 3  # factor will be 0.95 at steps = 2 x t0
+
+            # optimizer_cls, optimizer_kwargs = Trainer.get_optimizer_cls_and_kwargs(self.args)
+
+            self.optimizer = RecAdam(
+                optimizer_grouped_parameters,
+
+                lr=self.args.learning_rate,
+                eps=self.args.adam_epsilon,
+                betas=(self.args.adam_beta1, self.args.adam_beta2),
+                weight_decay=self.args.weight_decay,
+
+                regularization=self.rec_adam_regularization,
+                anneal_fun=self.rec_adam_anneal_fun,
+                anneal_tau=self.rec_adam_anneal_tau,
+                anneal_t0=self.rec_adam_anneal_t0,
+
+                pretrain_coef=self.rec_adam_pretrain_coef,
+            )
+
+            # logger.critical('!!!!!!!!!!!!!!!!!!!!!' + str(self.optimizer))
+
+        if is_sagemaker_mp_enabled():
+            self.optimizer = smp.DistributedOptimizer(self.optimizer)
+
+        return self.optimizer
+
 
 
 class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):

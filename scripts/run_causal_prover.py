@@ -66,7 +66,6 @@ from transformers.generation.configuration_utils import GenerationConfig
 from transformers.trainer_callback import TrainerCallback, TrainerState, TrainerControl
 from transformers.trainer_callback import CallbackHandler
 from transformers.trainer_utils import get_last_checkpoint
-from transformers.trainer import Trainer, get_parameter_names, ALL_LAYERNORM_LAYERS
 from transformers.testing_utils import CaptureLogger
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
@@ -80,14 +79,13 @@ from FLD_prover.data_processors import (
     RobustLRProcessor,
     ProofWriterProcessor,
 )
-from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer
+from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, TrainerWithRecAdam
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
 from FLD_prover.generation import generation_handled
 from FLD_prover.interactive import launch
 from FLD_task import load_deduction
-from rec_adam import RecAdam
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -409,6 +407,10 @@ class DataTrainingArguments:
 
     optimizer: str = field(
         default=None,
+    )
+
+    rec_adam_regularization: str = field(
+        default='l2',
     )
 
     rec_adam_anneal_fun: str = field(
@@ -983,9 +985,11 @@ def main():
     if any(arg.find('--deepspeed') >= 0 for arg in sys.argv):
         # https://github.com/huggingface/accelerate/issues/223
         timeout = datetime.timedelta(seconds=3600 * 10)  # large for preprocessing on large dataset
+        deepspeed_port = os.environ.get('RUN_CAUSAL_PROVER_DEEPSPEED_PORT', None)
+        logger.info('initialize deepspeed with timeout=%s, port=%s', timeout, deepspeed_port)
         deepspeed.init_distributed(
             timeout=timeout,
-            distributed_port=os.environ.get('RUN_CAUSAL_PROVER_DEEPSPEED_PORT', None),  # the default port is 29500, but we want to avoid conflict
+            distributed_port=deepspeed_port,
         )
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
@@ -1315,84 +1319,26 @@ def main():
                 metric_key_prefix="logic_eval"
             )
 
-    optimizer = None
     if data_args.optimizer is None:
-        optimizer = None
+        trainer_cls = Trainer
+        trainer_kwargs = {}
     elif data_args.optimizer == 'rec_adam':
-        decay_parameters = get_parameter_names(model, ALL_LAYERNORM_LAYERS)
-        decay_parameters = [name for name in decay_parameters if "bias" not in name]
+        trainer_cls = TrainerWithRecAdam
+        trainer_kwargs = {
+            'rec_adam_regularization': data_args.rec_adam_regularization,
+            'rec_adam_anneal_fun': data_args.rec_adam_anneal_fun,
+            'rec_adam_anneal_w': data_args.rec_adam_anneal_w,
+            'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
+            'rec_adam_anneal_t0': data_args.rec_adam_anneal_t0,
+            'rec_adam_pretrain_coef': data_args.rec_adam_pretrain_coef,
+        }
 
-        def should_decay_param(n):
-            return n in decay_parameters
-
-        def is_original_arch_param(n):
-            # return model_args.model_type in n
-            return True   # TODO: implement logic to judge whether the parameter is from the original architecture or added one.
-
-        initial_parameters = [(n, p.detach()) for n, p in model.named_parameters() if p.requires_grad]
-        update_parameter = [(n, p) for n, p in model.named_parameters() if p.requires_grad]
-
-        optimizer_grouped_parameters = [
-            {
-                "params": [p for n, p in update_parameter if should_decay_param(n) and is_original_arch_param(n)],
-                "weight_decay": training_args.weight_decay,
-                "anneal_w": data_args.rec_adam_anneal_w,
-                "pretrain_params": [p_p for p_n, p_p in initial_parameters if should_decay_param(p_n) and is_original_arch_param(p_n)]
-            },
-            {
-                "params": [p for n, p in update_parameter if should_decay_param(n) and not is_original_arch_param(n)],
-                "weight_decay": training_args.weight_decay,
-                "anneal_w": -1.0,
-                "pretrain_params": [p_p for p_n, p_p in initial_parameters if should_decay_param(p_n) and not is_original_arch_param(p_n)]
-            },
-
-            {
-                "params": [p for n, p in update_parameter if not should_decay_param(n) and is_original_arch_param(n)],
-                "weight_decay": 0.0,
-                "anneal_w": data_args.rec_adam_anneal_w,
-                "pretrain_params": [p_p for p_n, p_p in initial_parameters if not should_decay_param(p_n) and is_original_arch_param(p_n)]
-            },
-            {
-                "params": [p for n, p in update_parameter if not should_decay_param(n) and not is_original_arch_param(n)],
-                "weight_decay": 0.0,
-                "anneal_w": -1.0,
-                "pretrain_params": [p_p for p_n, p_p in initial_parameters if not should_decay_param(p_n) and not is_original_arch_param(p_n)]
-            }
-        ]
-
-        if data_args.rec_adam_anneal_t0 is None:
-            if training_args.max_steps is None:
-                raise ValueError('rec_adam_anneal_t0 must be specified if max_steps is not specified')
-
-            logger.info(f'rec_adam_anneal_t0 is not specified, set to the half of the max_steps: {training_args.max_steps / 2}')
-            data_args.rec_adam_anneal_t0 = training_args.max_steps / 2
-
-        if data_args.rec_adam_anneal_tau is None:
-            logger.info(f'rec_adam_anneal_tau is not specified, set to the 1/3 of the rec_adam_anneal_t0: {data_args.rec_adam_anneal_t0 / 3}')
-            data_args.rec_adam_anneal_tau = data_args.rec_adam_anneal_t0 / 3  # factor will be 0.95 at steps = 2 x t0
- 
-        
-        optimizer = RecAdam(
-            optimizer_grouped_parameters,
-
-            lr=training_args.learning_rate,
-            eps=training_args.adam_epsilon,
-            betas=(training_args.adam_beta1, training_args.adam_beta2),
-            weight_decay=training_args.weight_decay,
-
-            anneal_fun=data_args.rec_adam_anneal_fun,
-            anneal_tau=data_args.rec_adam_anneal_tau,
-            anneal_t0=data_args.rec_adam_anneal_t0,
-
-            pretrain_coef=data_args.rec_adam_pretrain_coef,
-        )
     else:
         raise ValueError(f'Unknown optimizer: {model_args.optimizer}')
 
     # Initialize our Trainer
-    trainer = Trainer(
+    trainer = trainer_cls(
         model=model,
-        optimizers=(optimizer, None),
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
@@ -1401,6 +1347,7 @@ def main():
         compute_metrics = compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
+        **trainer_kwargs,
     )
     callbacks = trainer.callback_handler.callbacks + [LogicEvaluationCallback(trainer)]
     trainer.callback_handler = CallbackHandler(

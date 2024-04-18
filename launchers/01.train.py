@@ -329,11 +329,11 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
+        (
+            1.0,
+            [],
+            False,
+        ),
 
         # (
         #     0.75,
@@ -343,13 +343,13 @@ def main():
         #     False,
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
 
         # (
         #     0.25,
@@ -397,7 +397,7 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        # 'debug.middle',
+        'debug.middle',
         # 'debug.large',
 
         # 'FT.step-5000',
@@ -415,7 +415,7 @@ def main():
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
         # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
         # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
-        'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
+        # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # --------- dataset = 300k, logic=0.5 -----------
@@ -465,13 +465,24 @@ def main():
         # 3e-6,   # ??
     ]
 
-    # (optimizer, annal_w, annal_tau, annal_t0, pretrain_coef)
+    # (optimizer, regularization, annal_w, annal_tau, annal_t0, pretrain_coef)
     optimizer_setings = [
-        # (None, None, None, None, None),
-        ('rec_adam', 1.0, None, None, 5000),
-        ('rec_adam', 1.0, None, None, 500),
-        # ('rec_adam', 1.0, None, None, 50),
-        # ('rec_adam', 1.0, None, None, 50000),
+        # (None, None, None, None, None, None),
+
+        # ('rec_adam', 'l2', 1.0, 1, 0, 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 1.0, None, None, 1),
+        # ('rec_adam', 'l2', 1.0, None, None, 10),
+        # ('rec_adam', 'l2', 1.0, None, None, 100),
+        # ('rec_adam', 'l2', 1.0, None, None, 1000),
+        ('rec_adam', 'l2', 1.0, None, None, 10000),
+
+        # ('rec_adam', 'l1', 1.0, 1, 0, 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l1', 1.0, None, None, 1),
+        # ('rec_adam', 'l1', 1.0, None, None, 10),
+        # ('rec_adam', 'l1', 1.0, None, None, 100),
+        # ('rec_adam', 'l1', 1.0, None, None, 1000),
+        # ('rec_adam', 'l1', 1.0, None, None, 10000),
+
     ]
 
 
@@ -492,7 +503,7 @@ def main():
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    # ------------------------------- ABCI --------------------------------
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
 
@@ -501,16 +512,22 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # ------------------------------- HAIC --------------------------------
+    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
+
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
+
     hours = 24
+
 
 
 
@@ -638,7 +655,7 @@ def main():
             for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                 for learning in learnings:
 
-                    for optimizer, rec_adam_anneal_w, rec_adam_anneal_tau, rec_adam_anneal_t0, rec_adam_pretrain_coef in optimizer_setings:
+                    for optimizer, rec_adam_regularization, rec_adam_anneal_w, rec_adam_anneal_tau, rec_adam_anneal_t0, rec_adam_pretrain_coef in optimizer_setings:
 
                         for sample_negative_proof in sample_negative_proof_args:
                             for proof_intermediate_steps in proof_intermediate_steps_args:
@@ -714,6 +731,7 @@ def main():
                                                             warmup_ratio=warmup_ratio,
      
                                                             optimizer=optimizer,
+                                                            rec_adam_regularization=rec_adam_regularization,
                                                             rec_adam_anneal_fun='sigmoid',
                                                             rec_adam_anneal_w=rec_adam_anneal_w,
                                                             rec_adam_anneal_tau=rec_adam_anneal_tau,
