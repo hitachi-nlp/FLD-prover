@@ -107,6 +107,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
+
     output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
 
 
@@ -472,21 +473,17 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, anneal_tau, anneal_t0, fisher_coef)
     optimizer_setings = [
-        (None, None, None, None, None, None),
+        # (None, None, None, None, None, None),
+        # ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
 
-        ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
-        ('rec_adam', 'l2', 0.5, 0, 0, 300),
-        ('rec_adam', 'l2', 0.5, 0, 0, 1000),
-        ('rec_adam', 'l2', 0.5, 0, 0, 3000),
-        ('rec_adam', 'l2', 0.5, 0, 0, 10000),
-        ('rec_adam', 'l2', 0.5, 0, 0, 30000),
+        ('rec_adam', 'l2', 0.5, 0, 0, 30),
+        ('rec_adam', 'l2', 0.5, 0, 0, 100),
+        # ('rec_adam', 'l2', 0.5, 0, 0, 300),
+        # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
 
-        ('rec_adam', 'l1', 0.5, 0, 0, 0),   # should be the same as vanilla adam
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.3),
-        ('rec_adam', 'l1', 0.5, 0, 0, 1),
-        ('rec_adam', 'l1', 0.5, 0, 0, 3),
-        ('rec_adam', 'l1', 0.5, 0, 0, 10),  # loss diverges
-        ('rec_adam', 'l1', 0.5, 0, 0, 30),  # loss diverges
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
     ]
 
 
