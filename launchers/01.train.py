@@ -106,7 +106,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
 
 
 
@@ -397,8 +398,9 @@ def main():
         # 'debug.tiny',
         # 'debug.tiny.bs-32',
         # 'debug.tiny.bs-32.max_train_samples-10000',
-        'debug.middle',
+        # 'debug.middle',
         # 'debug.large',
+        # 'debug.very_large',
 
         # 'FT.step-5000',
         # 'FT.step-10000',
@@ -413,10 +415,13 @@ def main():
         # --------- dataset = 100k --------------------
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama
+        # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama only or logic only
         # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
         # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
+
+        # --------- dataset = 300k, logic=1.0 -----------
+        'FT.bs-256__step-1170',
 
         # --------- dataset = 300k, logic=0.5 -----------
         # 'FT.bs-384__step-1560',
@@ -465,24 +470,23 @@ def main():
         # 3e-6,   # ??
     ]
 
-    # (optimizer, regularization, annal_w, annal_tau, annal_t0, pretrain_coef)
+    # (optimizer, regularization, anneal_target_task_weight, anneal_tau, anneal_t0, fisher_coef)
     optimizer_setings = [
-        # (None, None, None, None, None, None),
+        (None, None, None, None, None, None),
 
-        # ('rec_adam', 'l2', 1.0, 1, 0, 0),   # should be the same as vanilla adam
-        # ('rec_adam', 'l2', 1.0, None, None, 1),
-        # ('rec_adam', 'l2', 1.0, None, None, 10),
-        # ('rec_adam', 'l2', 1.0, None, None, 100),
-        # ('rec_adam', 'l2', 1.0, None, None, 1000),
-        ('rec_adam', 'l2', 1.0, None, None, 10000),
+        ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
+        ('rec_adam', 'l2', 0.5, 0, 0, 300),
+        ('rec_adam', 'l2', 0.5, 0, 0, 1000),
+        ('rec_adam', 'l2', 0.5, 0, 0, 3000),
+        ('rec_adam', 'l2', 0.5, 0, 0, 10000),
+        ('rec_adam', 'l2', 0.5, 0, 0, 30000),
 
-        # ('rec_adam', 'l1', 1.0, 1, 0, 0),   # should be the same as vanilla adam
-        # ('rec_adam', 'l1', 1.0, None, None, 1),
-        # ('rec_adam', 'l1', 1.0, None, None, 10),
-        # ('rec_adam', 'l1', 1.0, None, None, 100),
-        # ('rec_adam', 'l1', 1.0, None, None, 1000),
-        # ('rec_adam', 'l1', 1.0, None, None, 10000),
-
+        ('rec_adam', 'l1', 0.5, 0, 0, 0),   # should be the same as vanilla adam
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.3),
+        ('rec_adam', 'l1', 0.5, 0, 0, 1),
+        ('rec_adam', 'l1', 0.5, 0, 0, 3),
+        ('rec_adam', 'l1', 0.5, 0, 0, 10),  # loss diverges
+        ('rec_adam', 'l1', 0.5, 0, 0, 30),  # loss diverges
     ]
 
 
@@ -518,6 +522,7 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
+
     engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
@@ -655,7 +660,7 @@ def main():
             for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                 for learning in learnings:
 
-                    for optimizer, rec_adam_regularization, rec_adam_anneal_w, rec_adam_anneal_tau, rec_adam_anneal_t0, rec_adam_pretrain_coef in optimizer_setings:
+                    for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_anneal_tau, rec_adam_anneal_t0, rec_adam_fisher_coef in optimizer_setings:
 
                         for sample_negative_proof in sample_negative_proof_args:
                             for proof_intermediate_steps in proof_intermediate_steps_args:
@@ -715,6 +720,10 @@ def main():
                                                 proof_sampling = seq2seq_proof_sampling
 
                                             for lrate in lrates:
+                                                lrate_org = lrate
+                                                if optimizer == 'rec_adam':
+                                                    lrate = lrate * 2
+
                                                 for instruction in instruction_args:
 
                                                     setting = {}
@@ -732,11 +741,11 @@ def main():
      
                                                             optimizer=optimizer,
                                                             rec_adam_regularization=rec_adam_regularization,
-                                                            rec_adam_anneal_fun='sigmoid',
-                                                            rec_adam_anneal_w=rec_adam_anneal_w,
+                                                            rec_adam_anneal_type='sigmoid',
+                                                            rec_adam_target_task_weight=rec_adam_target_task_weight,
                                                             rec_adam_anneal_tau=rec_adam_anneal_tau,
                                                             rec_adam_anneal_t0=rec_adam_anneal_t0,
-                                                            rec_adam_pretrain_coef=rec_adam_pretrain_coef,
+                                                            rec_adam_fisher_coef=rec_adam_fisher_coef,
 
                                                             train_effective_batch_size=train_effective_batch_size,
                                                             num_evals=num_evals,
@@ -783,7 +792,7 @@ def main():
                                                             n_gpus=n_total_gpus,
                                                             model_name=model_name_for_batch_size if proof_sampling == 'all_at_once' else model_name_for_batch_size + '.stepwise',
                                                             train_effective_batch_size=setting.get('train_effective_batch_size', None),
-                                                            batch_size_per_gpu_factor = 1/2 if fp32 else 1.0,
+                                                            batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
                                                         )
                                                     )
 
@@ -844,8 +853,12 @@ def main():
                                                         'learning_rate': lrate,
                                                         'weight_decay': 0.0,
 
-                                                        'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
-                                                        'preprocess_batch_size': 1000,
+                                                        # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                        # 'preprocess_batch_size': 1000,
+
+                                                        'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
+                                                        'preprocess_batch_size': 500,
+
 
                                                         # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
@@ -891,6 +904,7 @@ def main():
                                                         logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
                                                         time.sleep(60 * 10)
 
+                                                lrate = lrate_org
                                                 engine.n_resource = n_resouce_org
 
     logger.info('------------- ./01.train.py finished !! -----------')

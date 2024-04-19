@@ -413,11 +413,11 @@ class DataTrainingArguments:
         default='l2',
     )
 
-    rec_adam_anneal_fun: str = field(
+    rec_adam_anneal_type: str = field(
         default='sigmoid',
     )
 
-    rec_adam_anneal_w: float = field(
+    rec_adam_target_task_weight: float = field(
         default=1.0,
     )
 
@@ -429,7 +429,7 @@ class DataTrainingArguments:
         default=None,
     )
 
-    rec_adam_pretrain_coef: float = field(
+    rec_adam_fisher_coef: float = field(
         default=5000.0,
     )
 
@@ -1326,11 +1326,11 @@ def main():
         trainer_cls = TrainerWithRecAdam
         trainer_kwargs = {
             'rec_adam_regularization': data_args.rec_adam_regularization,
-            'rec_adam_anneal_fun': data_args.rec_adam_anneal_fun,
-            'rec_adam_anneal_w': data_args.rec_adam_anneal_w,
+            'rec_adam_anneal_type': data_args.rec_adam_anneal_type,
+            'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
             'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
             'rec_adam_anneal_t0': data_args.rec_adam_anneal_t0,
-            'rec_adam_pretrain_coef': data_args.rec_adam_pretrain_coef,
+            'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
         }
 
     else:

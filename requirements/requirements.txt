@@ -2,7 +2,8 @@ sentencepiece != 0.1.92  # XXX SHOULD BE INSTALLED BEFORE TRANSFORMERS
 
 # transformers==4.34.0
 # transformers==4.36.0
-transformers==4.35.2
+# transformers==4.35.2
+transformers==4.37
 # git+https://github.com/huggingface/transformers
 
 
