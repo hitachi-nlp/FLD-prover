@@ -476,14 +476,18 @@ def main():
         # (None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
 
-        ('rec_adam', 'l2', 0.5, 0, 0, 30),
-        ('rec_adam', 'l2', 0.5, 0, 0, 100),
+
+        # ('rec_adam', 'l2', 0.5, 0, 0, 30),
+        # ('rec_adam', 'l2', 0.5, 0, 0, 100),
         # ('rec_adam', 'l2', 0.5, 0, 0, 300),
         # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
 
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
+        ('rec_adam', 'l2', 0.5, None, None, 300),
+
+
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
     ]
 
 
