@@ -476,7 +476,7 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, anneal_tau, anneal_t0, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None),
-        ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
 
 
         # ('rec_adam', 'l2', 0.5, 0, 0, 30),
@@ -486,6 +486,8 @@ def main():
         # ('rec_adam', 'l2', 0.5, None, None, 300),   # annealing
 
 
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.001),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
