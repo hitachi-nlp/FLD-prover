@@ -288,8 +288,8 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -365,14 +365,6 @@ def main():
         # ),
 
         # (
-        #     0.25,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
-        # (
         #     0.0,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
@@ -380,14 +372,6 @@ def main():
         #     False,
         # ),
 
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'tatsu-lab/alpaca', None)
-        #     ],
-        #     False,
-        # ),
     ]
 
 
@@ -481,13 +465,14 @@ def main():
 
         # ('rec_adam', 'l2', 0.5, 0, 0, 30),
         # ('rec_adam', 'l2', 0.5, 0, 0, 100),
-        ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
+        # ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
         # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
         # ('rec_adam', 'l2', 0.5, None, None, 300),   # annealing
 
 
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
+        ('rec_adam', 'l1', 0.5, 0, 0, 0.0003),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.001),
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
