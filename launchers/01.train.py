@@ -108,7 +108,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-4-20.production')
 
 
 
@@ -248,20 +250,21 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.dstrctr-10',
         # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
 
-        # ---------------------------------- other datasets ------------------------------------
+        # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
+
+        'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2.D8',
+        '2024-03-29.FLD_v2.theorems-0.03',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-
-
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-
-        # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
     ]
 
     logic_dataset_concatenate_all_configs = False
@@ -413,16 +416,18 @@ def main():
         # 'FT.bs-128__step-2500',
         # 'FT.bs-128__step-5000',
 
+        # --------- dataset = 100k, logic=1.0/0.0--------------------
+        'FT.bs-256__step-390',
+
         # --------- dataset = 100k --------------------
         # 'FT.bs-256__step-76',
         # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.bs-256__step-400',        # NeurIPS 100k slim-pajama only or logic only
         # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
         # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
         # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
 
         # --------- dataset = 300k, logic=1.0 -----------
-        'FT.bs-256__step-1170',
+        # 'FT.bs-256__step-1170',
 
         # --------- dataset = 300k, logic=0.5 -----------
         # 'FT.bs-384__step-1560',
@@ -447,9 +452,6 @@ def main():
 
 
 
-    # XXX: quota of HAIC is low
-    # save_model_on_eval = False
-    save_model_on_eval = True
 
     context_lengths = [
         2048,
@@ -479,10 +481,9 @@ def main():
 
         # ('rec_adam', 'l2', 0.5, 0, 0, 30),
         # ('rec_adam', 'l2', 0.5, 0, 0, 100),
-        # ('rec_adam', 'l2', 0.5, 0, 0, 300),
+        ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
         # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
-
-        ('rec_adam', 'l2', 0.5, None, None, 300),
+        # ('rec_adam', 'l2', 0.5, None, None, 300),   # annealing
 
 
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
@@ -589,7 +590,8 @@ def main():
 
     float_precision = 'bf16'
 
-    save_model_at_end = not save_model_on_eval
+    save_model_on_eval = True
+    save_model_at_end = False
 
     seeds = [
         0,
