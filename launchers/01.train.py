@@ -288,8 +288,8 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -481,13 +481,13 @@ def main():
 
         # ('rec_adam', 'l2', 0.5, 0, 0, 30),
         # ('rec_adam', 'l2', 0.5, 0, 0, 100),
-        # ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
+        ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
         # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
         # ('rec_adam', 'l2', 0.5, None, None, 300),   # annealing
 
 
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
-        ('rec_adam', 'l1', 0.5, 0, 0, 0.001),
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
+        # ('rec_adam', 'l1', 0.5, 0, 0, 0.001),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
         # ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
@@ -527,8 +527,8 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
