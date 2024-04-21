@@ -407,14 +407,11 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390',
-        # 'FT.bs-256__step-390.wrmp-100',
-        # 'FT.bs-256__step-390.wrmp-200',
-        'FT.bs-512__step-195.wrmp-100',
+        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-512__step-195.wrmp-100',
 
 
         # --------- dataset = 300k, logic=1.0 -----------
-        # 'FT.bs-256__step-1170',
         # 'FT.bs-256__step-1170.wrmp-200',
         # 'FT.bs-512__step-586.wrmp-200',
 
