@@ -307,11 +307,11 @@ def main():
 
         # 'hf.hitachi-nlp/FLD.v2__default',
 
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
         # '2024-03-29.FLD_v2.theorems-0.03',
 
-        '2024-03-29.JSAI_best.no_aug',
+        # '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
@@ -447,9 +447,9 @@ def main():
     ]
 
     proof_intermediate_steps_args = [
-        'include',
-        # 'exclude',
-        # 'randomly_include',
+        # 'include',
+        'exclude',
+        'randomly_include',
     ]
 
     lrates = [
