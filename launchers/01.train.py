@@ -407,13 +407,13 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-200',
         # 'FT.bs-512__step-195.wrmp-100',
 
 
         # --------- dataset = 300k, logic=1.0 -----------
         # 'FT.bs-256__step-1170.wrmp-200',
-        # 'FT.bs-512__step-586.wrmp-200',
+        'FT.bs-512__step-586.wrmp-200',
 
 
         # --------- dataset = 300k, logic=0.5 -----------
@@ -472,9 +472,9 @@ def main():
         # ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 30),
-        ('rec_adam', 'l2', 0.5, 100),
-        # ('rec_adam', 'l2', 0.5, 300),           # the best
-        ('rec_adam', 'l2', 0.5, 1000),
+        # ('rec_adam', 'l2', 0.5, 100),
+        ('rec_adam', 'l2', 0.5, 300),           # the best
+        # ('rec_adam', 'l2', 0.5, 1000),
 
         # l1 regularization alwayss ends up with mess
         # ('rec_adam', 'l1', 0.5, 0.001),
@@ -518,9 +518,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
