@@ -461,8 +461,8 @@ def main():
 
         # 3e-5,
         # 1e-5,
-        # 3e-6,
-        1e-6,
+        3e-6,
+        # 1e-6,
     ]
 
 
@@ -472,9 +472,9 @@ def main():
         # ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 30),
-        # ('rec_adam', 'l2', 0.5, 100),
-        ('rec_adam', 'l2', 0.5, 300),           # the best
-        # ('rec_adam', 'l2', 0.5, 1000),
+        ('rec_adam', 'l2', 0.5, 100),
+        # ('rec_adam', 'l2', 0.5, 300),           # the best
+        ('rec_adam', 'l2', 0.5, 1000),
 
         # l1 regularization alwayss ends up with mess
         # ('rec_adam', 'l1', 0.5, 0.001),
