@@ -113,7 +113,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
 
 
 
@@ -146,6 +148,49 @@ def main():
 
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
         './outputs.FLD/00.create_corpus/2024-03-29',
+    ]
+
+
+
+
+
+
+
+    model_settings = [
+        # ============================ english      ============================
+
+        # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
+        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
+
+        # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
+        # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
+
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        # ============================ japanese     ============================
+
+        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
+        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
+        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
     ]
 
 
@@ -255,69 +300,21 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
 
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.FLD_v2',
-        # '2024-03-29.FLD_v2.D8',
-        # '2024-03-29.FLD_v2.theorems-0.03',
+        '2024-03-29.FLD_v2.D8',
+        '2024-03-29.FLD_v2.theorems-0.03',
+        '2024-03-29.JSAI_best.no_aug',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
-
-    logic_dataset_concatenate_all_configs = False
-    logic_dataset_concatenate_all_splits_into_train = False
-
-
-
-
-
-
-
-
-
-    model_settings = [
-        # ============================ english      ============================
-
-        # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
-        # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
-
-        # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
-        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
-        # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ============================ japanese     ============================
-
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-    ]
-
 
 
 
@@ -407,13 +404,13 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390.wrmp-200',
+        'FT.bs-256__step-390.wrmp-200',
         # 'FT.bs-512__step-195.wrmp-100',
 
 
         # --------- dataset = 300k, logic=1.0 -----------
         # 'FT.bs-256__step-1170.wrmp-200',
-        'FT.bs-512__step-586.wrmp-200',
+        # 'FT.bs-512__step-586.wrmp-200',
 
 
         # --------- dataset = 300k, logic=0.5 -----------
@@ -456,12 +453,8 @@ def main():
     ]
 
     lrates = [
-        # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
-        # 1e-4,
-
-        # 3e-5,
         # 1e-5,
-        3e-6,
+        3e-6,    # the best
         # 1e-6,
     ]
 
@@ -517,10 +510,10 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
@@ -648,6 +641,13 @@ def main():
 
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
+        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
+            logic_dataset_concatenate_all_configs = True
+            logic_dataset_concatenate_all_splits_into_train = True
+        else:
+            logic_dataset_concatenate_all_configs = False
+            logic_dataset_concatenate_all_splits_into_train = False
+
         for context_len in context_lengths:
 
             region = engine.region

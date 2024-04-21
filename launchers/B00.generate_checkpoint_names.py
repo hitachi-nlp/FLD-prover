@@ -5,32 +5,44 @@ from typing import List, Optional, Tuple, Dict
 import json
 from collections import OrderedDict
 
-from logger_setup import setup as setup_logger
+# from logger_setup import setup as setup_logger
 import click
 from lab import make_name
 
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 @click.command()
 def main():
-    setup_logger()
+    # setup_logger()
 
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional/'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
 
     CHECKPOINTS = [
-        97,
-        194,
-        291,
-        388,
+        # 97,
+        # 194,
+        # 291,
+        # 388,
+
+        58,
+        116,
+        174,
+        232,
+        290,
+        348,
+        406,
+        464,
+        522,
+        580,
     ]
 
     PARAMS = [
         'logic_dataset_uname',
         'learning',
         'learning_rate',
-        'lr_scheduler_type',
+        'rec_adam_fisher_coef',
+        # 'lr_scheduler_type',
     ]
 
     input_dir = Path(TOP_DIR)
