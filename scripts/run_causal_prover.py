@@ -422,15 +422,15 @@ class DataTrainingArguments:
     )
 
     rec_adam_anneal_tau: int = field(
-        default=None,
+        default=0,
     )
 
     rec_adam_anneal_t0: int = field(
-        default=None,
+        default=0,
     )
 
     rec_adam_fisher_coef: float = field(
-        default=5000.0,
+        default=300.0,
     )
 
     interactive_mode: str = field(

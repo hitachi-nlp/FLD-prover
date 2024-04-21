@@ -111,8 +111,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production')
+
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.llama2')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
 
 
 
@@ -290,11 +291,11 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -404,29 +405,32 @@ def main():
         # 'FT.bs-128__step-2500',
         # 'FT.bs-128__step-5000',
 
-        # --------- dataset = 100k, logic=1.0/0.0--------------------
-        'FT.bs-256__step-390',
-        'FT.bs-256__step-390.wrmp-100',
-        'FT.bs-256__step-390.wrmp-200',
 
-        # --------- dataset = 100k --------------------
-        # 'FT.bs-256__step-76',
-        # 'FT.bs-256__step-152',      # NeurIPS Alpaca 3 epochs with context 2048
-        # 'FT.bs-256__step-520',          # NeurIPS 100k, logic=0.75
-        # 'FT.bs-256__step-800',        # NeurIPS 100k, logic=0.5
-        # 'FT.bs-256__step-1600'          # NeurIPS 100k, logic=0.25
+        # --------- dataset = 100k, logic=1.0--------------------
+        # 'FT.bs-256__step-390',
+        # 'FT.bs-256__step-390.wrmp-100',
+        # 'FT.bs-256__step-390.wrmp-200',
+        'FT.bs-512__step-195.wrmp-100',
+
 
         # --------- dataset = 300k, logic=1.0 -----------
         # 'FT.bs-256__step-1170',
+        # 'FT.bs-256__step-1170.wrmp-200',
+        # 'FT.bs-512__step-586.wrmp-200',
+
 
         # --------- dataset = 300k, logic=0.5 -----------
         # 'FT.bs-384__step-1560',
         # 'FT.bs-512__step-1200',
         # 'FT.bs-640__step-940',
 
+
         # --------- dataset = 300k, logic=0.25 -----------
         # 'FT.bs-768__step-1560',
 
+
+        # --------- others --------------------
+        # 'FT.bs-256__step-152',      # Alpaca 3 epochs with context 2048
 
 
         # ---- JFLD experiments ----
@@ -458,34 +462,26 @@ def main():
         # much better on FLD performance than 1e-05, but could degratde on other downstream tasks?
         # 1e-4,
 
-        3e-5,
-        1e-5,
-        3e-6,   # ??
+        # 3e-5,
+        # 1e-5,
+        # 3e-6,
+        1e-6,
     ]
 
-    lr_scheduler_types = [
-        'linear',
-        'constant_with_warmup',
-    ]
 
-    # (optimizer, regularization, anneal_target_task_weight, anneal_tau, anneal_t0, fisher_coef)
+    # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 0, 0, 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
 
+        # ('rec_adam', 'l2', 0.5, 30),
+        # ('rec_adam', 'l2', 0.5, 100),
+        ('rec_adam', 'l2', 0.5, 300),           # the best
+        # ('rec_adam', 'l2', 0.5, 1000),
 
-        # ('rec_adam', 'l2', 0.5, 0, 0, 30),
-        # ('rec_adam', 'l2', 0.5, 0, 0, 100),
-        ('rec_adam', 'l2', 0.5, 0, 0, 300),           # the best
-        # ('rec_adam', 'l2', 0.5, 0, 0, 1000),
-        # ('rec_adam', 'l2', 0.5, None, None, 300),   # annealing
-
-
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.001),
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.003),
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.01),
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.03),
-        # ('rec_adam', 'l1', 0.5, 0, 0, 0.1),
+        # l1 regularization alwayss ends up with mess
+        # ('rec_adam', 'l1', 0.5, 0.001),
+        # ('rec_adam', 'l1', 0.5, 0.003),
     ]
 
 
@@ -498,6 +494,8 @@ def main():
     
 
 
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
     dry_run = False
@@ -522,10 +520,10 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
 
@@ -576,9 +574,6 @@ def main():
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
-
-    skip_if_exists = False
-    # skip_if_exists = True
 
     instruction_args = [
         # False,       # better for chat-model?
@@ -643,6 +638,11 @@ def main():
     steps_upper = None
     train_effective_batch_size = None
 
+    lr_scheduler_types = [
+        'linear',
+        # 'constant_with_warmup',
+    ]
+
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
@@ -660,7 +660,7 @@ def main():
             for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                 for learning in learnings:
 
-                    for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_anneal_tau, rec_adam_anneal_t0, rec_adam_fisher_coef in optimizer_setings:
+                    for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
 
                         for sample_negative_proof in sample_negative_proof_args:
                             for proof_intermediate_steps in proof_intermediate_steps_args:
@@ -744,8 +744,6 @@ def main():
                                                                 rec_adam_regularization=rec_adam_regularization,
                                                                 rec_adam_anneal_type='sigmoid',
                                                                 rec_adam_target_task_weight=rec_adam_target_task_weight,
-                                                                rec_adam_anneal_tau=rec_adam_anneal_tau,
-                                                                rec_adam_anneal_t0=rec_adam_anneal_t0,
                                                                 rec_adam_fisher_coef=rec_adam_fisher_coef,
 
                                                                 train_effective_batch_size=train_effective_batch_size,
