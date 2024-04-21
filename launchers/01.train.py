@@ -442,14 +442,14 @@ def main():
 
 
     context_lengths = [
-        2048,
-        # 4096,
+        # 2048,
+        4096,
     ]
 
     proof_intermediate_steps_args = [
-        # 'include',
-        'exclude',
-        'randomly_include',
+        'include',
+        # 'exclude',
+        # 'randomly_include',
     ]
 
     lrates = [

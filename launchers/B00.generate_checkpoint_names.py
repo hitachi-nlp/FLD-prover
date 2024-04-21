@@ -17,24 +17,14 @@ from lab import make_name
 def main():
     # setup_logger()
 
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-2024-4-22.production.llama3/'
 
     CHECKPOINTS = [
-        # 97,
-        # 194,
-        # 291,
-        # 388,
-
-        58,
-        116,
-        174,
-        232,
-        290,
-        348,
-        406,
-        464,
-        522,
-        580,
+        97,
+        194,
+        291,
+        388,
     ]
 
     PARAMS = [
