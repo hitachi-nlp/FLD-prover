@@ -305,15 +305,15 @@ def main():
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
-
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.FLD_v2',
+
+        # '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
         # '2024-03-29.FLD_v2.theorems-0.03',
-        # '2024-03-29.JSAI_best.no_aug',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug',
+        '2024-03-29.JSAI_best.no_aug.trnsl-v2',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
 
@@ -462,11 +462,11 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None),
-        ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 30),
         # ('rec_adam', 'l2', 0.5, 100),
-        # ('rec_adam', 'l2', 0.5, 300),           # the best
+        ('rec_adam', 'l2', 0.5, 300),           # the best
         # ('rec_adam', 'l2', 0.5, 1000),
 
         # l1 regularization alwayss ends up with mess
