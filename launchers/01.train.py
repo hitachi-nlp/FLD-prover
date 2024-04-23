@@ -457,8 +457,8 @@ def main():
 
     lrates = [
         # 1e-5,
-        3e-6,    # the best
-        # 1e-6,
+        # 3e-6,    # the best
+        1e-6,
     ]
 
 
@@ -468,8 +468,8 @@ def main():
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),           # the best
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),           # the best
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
 
         # l1 regularization always ends up with mess
@@ -480,44 +480,14 @@ def main():
 
 
 
-
-
-
-
-    
-
-
-    skip_if_exists = False
-    # skip_if_exists = True
-
-
-    dry_run = False
-
-
-    # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
-
-
-
-    # ------------------------------- ABCI --------------------------------
-    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
-
-
     # ------------------------------- HAIC --------------------------------
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
@@ -548,6 +518,18 @@ def main():
 
 
     # ------------------------------------ fixed settings -------------------------------------------
+
+
+    # ------------------------------- ABCI --------------------------------
+    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
+
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
+
+
     # if isinstance(engine, SubprocessEngine):
     #     region = 'haic'
     #     n_gpus_per_node = 1
@@ -565,6 +547,16 @@ def main():
 
     #     gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=4096'
     #     gpu_name_for_batch_size = 'H100.mem=80.run=deepspeed.cntx=4096'
+
+
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
+
+    dry_run = False
+
+    skip_if_exists = False
+    # skip_if_exists = True
 
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
