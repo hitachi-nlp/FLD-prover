@@ -18,7 +18,7 @@ def main():
     # setup_logger()
 
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-2024-4-22.production.llama3/'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-22.production.llama3/'
 
     CHECKPOINTS = [
         97,
@@ -29,9 +29,12 @@ def main():
 
     PARAMS = [
         'logic_dataset_uname',
-        'learning',
-        'learning_rate',
-        'rec_adam_fisher_coef',
+        'optimizer',
+        'proof_intermediate_steps',
+        'block_size',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
         # 'lr_scheduler_type',
     ]
 

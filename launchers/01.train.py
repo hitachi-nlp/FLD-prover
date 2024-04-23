@@ -115,7 +115,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
 
 
 
@@ -407,6 +408,8 @@ def main():
         'FT.bs-256__step-390.wrmp-200',
         # 'FT.bs-512__step-195.wrmp-100',
 
+        # --------- dataset = 200k, logic=1.0--------------------
+        # 'FT.bs-256__step-780.wrmp-400',
 
         # --------- dataset = 300k, logic=1.0 -----------
         # 'FT.bs-256__step-1170.wrmp-200',
@@ -442,36 +445,36 @@ def main():
 
 
     context_lengths = [
-        # 2048,
-        4096,
+        2048,
+        # 4096,
     ]
 
     proof_intermediate_steps_args = [
         'include',
         # 'exclude',
-        # 'randomly_include',
+        # 'randomly_include',   # the best
     ]
 
     lrates = [
         # 1e-5,
         3e-6,    # the best
-        # 1e-6,
+        1e-6,
     ]
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 0),   # should be the same as vanilla adam
+        # (None, None, None, None, None, None, None),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
-        # ('rec_adam', 'l2', 0.5, 30),
-        # ('rec_adam', 'l2', 0.5, 100),
-        ('rec_adam', 'l2', 0.5, 300),           # the best
-        # ('rec_adam', 'l2', 0.5, 1000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),           # the best
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
 
-        # l1 regularization alwayss ends up with mess
-        # ('rec_adam', 'l1', 0.5, 0.001),
-        # ('rec_adam', 'l1', 0.5, 0.003),
+        # l1 regularization always ends up with mess
+        # ('rec_adam', 'l1', 0.5, 'immediately_from_beginning', 0.001),
+        # ('rec_adam', 'l1', 0.5, 'immediately_from_beginning', 0.003),
     ]
 
 
@@ -490,9 +493,12 @@ def main():
 
     dry_run = False
 
+
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
+
+
 
     # ------------------------------- ABCI --------------------------------
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -516,6 +522,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+
 
 
     hours = 24
@@ -657,7 +664,7 @@ def main():
             for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                 for learning in learnings:
 
-                    for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
+                    for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_anneal_schedule, rec_adam_fisher_coef in optimizer_setings:
 
                         for sample_negative_proof in sample_negative_proof_args:
                             for proof_intermediate_steps in proof_intermediate_steps_args:
@@ -742,6 +749,7 @@ def main():
                                                                 rec_adam_anneal_type='sigmoid',
                                                                 rec_adam_target_task_weight=rec_adam_target_task_weight,
                                                                 rec_adam_fisher_coef=rec_adam_fisher_coef,
+                                                                rec_adam_anneal_schedule=rec_adam_anneal_schedule,
 
                                                                 train_effective_batch_size=train_effective_batch_size,
                                                                 num_evals=num_evals,

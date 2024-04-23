@@ -421,11 +421,15 @@ class DataTrainingArguments:
         default=1.0,
     )
 
-    rec_adam_anneal_tau: int = field(
-        default=0,
+    rec_adam_anneal_schedule: str = field(
+        default=None,
     )
 
     rec_adam_anneal_t0: int = field(
+        default=0,
+    )
+
+    rec_adam_anneal_tau: int = field(
         default=0,
     )
 
@@ -1328,8 +1332,9 @@ def main():
             'rec_adam_regularization': data_args.rec_adam_regularization,
             'rec_adam_anneal_type': data_args.rec_adam_anneal_type,
             'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
-            'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
+            'rec_adam_anneal_schedule': data_args.rec_adam_anneal_schedule,
             'rec_adam_anneal_t0': data_args.rec_adam_anneal_t0,
+            'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
             'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
         }
 

@@ -60,8 +60,9 @@ class TrainerWithRecAdam(Trainer):
         rec_adam_regularization='l2',
         rec_adam_anneal_type='sigmoid',
         rec_adam_target_task_weight=1.0,
-        rec_adam_anneal_tau=0,
+        rec_adam_anneal_schedule='t0',
         rec_adam_anneal_t0=0,
+        rec_adam_anneal_tau=0,
         rec_adam_fisher_coef=300,
         **kwargs,
     ):
@@ -69,28 +70,14 @@ class TrainerWithRecAdam(Trainer):
         self.rec_adam_regularization = rec_adam_regularization
         self.rec_adam_anneal_type = rec_adam_anneal_type
         self.rec_adam_target_task_weight = rec_adam_target_task_weight
-        self.rec_adam_anneal_tau = rec_adam_anneal_tau
+        self.rec_adam_anneal_schedule = rec_adam_anneal_schedule
         self.rec_adam_anneal_t0 = rec_adam_anneal_t0
+        self.rec_adam_anneal_tau = rec_adam_anneal_tau
         self.rec_adam_fisher_coef = rec_adam_fisher_coef
 
     def create_optimizer(self):
         opt_model = self.model_wrapped if is_sagemaker_mp_enabled() else self.model
         if self.optimizer is None:
-
-            # if self.rec_adam_anneal_t0 is None:
-            #     if args.max_steps is None:
-            #         raise ValueError('rec_adam_anneal_t0 must be specified if max_steps is not specified')
-
-            #     logger.info(f'rec_adam_anneal_t0 is not specified, set to the half of the max_steps: {args.max_steps / 2}')
-            #     anneal_t0 = args.max_steps / 2
-            # else:
-            #     anneal_t0 = self.rec_adam_anneal_t0
-
-            # if self.rec_adam_anneal_tau is None:
-            #     logger.info(f'rec_adam_anneal_tau is not specified, set to the 1/3 of the rec_adam_anneal_t0: {anneal_t0 / 3}')
-            #     anneal_tau = anneal_t0 / 3  # factor will be 0.95 at steps = 2 x t0
-            # else:
-            #     anneal_tau = self.rec_adam_anneal_tau
 
             self.optimizer = build_rec_adam_optimizer(
                 self.args,
@@ -98,6 +85,7 @@ class TrainerWithRecAdam(Trainer):
                 target_task_weight=self.rec_adam_target_task_weight,
                 regularization=self.rec_adam_regularization,
                 anneal_type=self.rec_adam_anneal_type,
+                anneal_schedule=self.rec_adam_anneal_schedule,
                 anneal_tau=self.rec_adam_anneal_tau,
                 anneal_t0=self.rec_adam_anneal_t0,
                 fisher_coef=self.rec_adam_fisher_coef,
