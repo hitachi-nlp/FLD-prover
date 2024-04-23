@@ -116,7 +116,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production.more')
 
 
 
@@ -308,9 +309,15 @@ def main():
 
         # 'hf.hitachi-nlp/FLD.v2__default',
 
+
         '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
         # '2024-03-29.FLD_v2.theorems-0.03',
+
+        # '2024-03-29.FLD_v2.theorems-0.3.fix',
+        # '2024-03-29.FLD_v2.theorems-0.1.fix',
+        # '2024-03-29.FLD_v2.theorems-0.03.fix',
+
 
         # '2024-03-29.JSAI_best.no_aug',
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
@@ -405,11 +412,14 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390.wrmp-200',
-        # 'FT.bs-512__step-195.wrmp-100',
+        'FT.bs-256__step-390.wrmp-200',
 
         # --------- dataset = 200k, logic=1.0--------------------
         'FT.bs-256__step-780.wrmp-400',
+
+        # --------- dataset = 300k, logic=1.0--------------------
+        'FT.bs-256__step-1172.wrmp-600',
+
 
         # --------- dataset = 300k, logic=1.0 -----------
         # 'FT.bs-256__step-1170.wrmp-200',
@@ -457,8 +467,8 @@ def main():
 
     lrates = [
         # 1e-5,
-        # 3e-6,    # the best
-        1e-6,
+        3e-6,    # the best
+        # 1e-6,
     ]
 
 
@@ -467,10 +477,15 @@ def main():
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),           # the best
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
+
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
+        ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
+        ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 10000),
+        # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 30000),
 
         # l1 regularization always ends up with mess
         # ('rec_adam', 'l1', 0.5, 'immediately_from_beginning', 0.001),
@@ -492,6 +507,11 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+
+
+
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
@@ -554,9 +574,6 @@ def main():
     run_mode = 'deepspeed'
 
     dry_run = False
-
-    skip_if_exists = False
-    # skip_if_exists = True
 
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
