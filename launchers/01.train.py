@@ -116,8 +116,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production.more')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
 
 
 
@@ -310,13 +309,13 @@ def main():
         # 'hf.hitachi-nlp/FLD.v2__default',
 
 
-        # '2024-03-29.FLD_v2',
+        '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
         # '2024-03-29.FLD_v2.theorems-0.03',
 
-        '2024-03-29.FLD_v2.theorems-0.3.fix',
-        '2024-03-29.FLD_v2.theorems-0.1.fix',
-        '2024-03-29.FLD_v2.theorems-0.03.fix',
+        # '2024-03-29.FLD_v2.theorems-0.3.fix',
+        # '2024-03-29.FLD_v2.theorems-0.1.fix',
+        # '2024-03-29.FLD_v2.theorems-0.03.fix',
 
 
         # '2024-03-29.JSAI_best.no_aug',
@@ -418,7 +417,7 @@ def main():
         'FT.bs-256__step-780.wrmp-400',
 
         # --------- dataset = 300k, logic=1.0--------------------
-        # 'FT.bs-256__step-1172.wrmp-600',
+        'FT.bs-256__step-1172.wrmp-600',
 
 
         # --------- dataset = 300k, logic=1.0 -----------
@@ -479,12 +478,12 @@ def main():
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
 
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
         ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
-        # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 10000),
+        ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 10000),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 30000),
 
         # l1 regularization always ends up with mess
