@@ -19,8 +19,7 @@ def main():
 
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-22.production.llama3/'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production.more'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
 
     CHECKPOINTS = [
         97,
