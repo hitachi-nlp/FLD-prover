@@ -19,27 +19,20 @@ def main():
 
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-20.production.additional.additional/'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-22.production.llama3/'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production'
 
     CHECKPOINTS = [
         97,
         194,
         291,
         388,
-        485,
-        582,
-        679,
-        776,
-        873,
-        970,
-        1067,
-        1164,
     ]
 
     PARAMS = [
         'logic_dataset_uname',
-        # 'optimizer',
-        # 'proof_intermediate_steps',
+        'proof_intermediate_steps',
+        'optimizer',
         # 'block_size',
         'learning',
         'learning_rate',

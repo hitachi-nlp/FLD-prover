@@ -302,23 +302,27 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__default',
 
 
-        '2024-03-29.FLD_v2',
+        # '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
         # '2024-03-29.FLD_v2.theorems-0.3.fix',
         # '2024-03-29.FLD_v2.theorems-0.1.fix',
-        '2024-03-29.FLD_v2.theorems-0.03.fix',
+        # '2024-03-29.FLD_v2.theorems-0.03.fix',
+
 
         # '2024-03-29.JSAI_best.no_aug',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-v2.theorems-0.03',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
 
@@ -490,7 +494,7 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
