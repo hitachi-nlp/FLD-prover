@@ -312,8 +312,8 @@ def main():
 
         # '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.D8',
-        # '2024-03-29.FLD_v2.theorems-0.3.fix',
-        # '2024-03-29.FLD_v2.theorems-0.1.fix',
+        '2024-03-29.FLD_v2.theorems-0.3.fix',
+        '2024-03-29.FLD_v2.theorems-0.1.fix',
         # '2024-03-29.FLD_v2.theorems-0.03.fix',
 
 
