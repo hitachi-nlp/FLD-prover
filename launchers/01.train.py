@@ -174,8 +174,8 @@ def main():
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -304,12 +304,12 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__default',
 
 
         # '2024-03-29.FLD_v2',
@@ -317,7 +317,7 @@ def main():
         # '2024-03-29.FLD_v2.theorems-0.1.fix',
         # '2024-03-29.FLD_v2.theorems-0.03.fix',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.03',
@@ -485,10 +485,10 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
 
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
@@ -503,7 +503,7 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
@@ -511,7 +511,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
 
 
 
