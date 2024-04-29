@@ -304,12 +304,12 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/FLD.v2__default',
 
 
         # '2024-03-29.FLD_v2',
@@ -317,7 +317,7 @@ def main():
         # '2024-03-29.FLD_v2.theorems-0.1.fix',
         # '2024-03-29.FLD_v2.theorems-0.03.fix',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.03',
@@ -422,7 +422,8 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-200',
+        'FT.bs-256__step-390.wrmp-200.few_save',
 
         # --------- dataset = 200k, logic=1.0--------------------
         # 'FT.bs-256__step-780.wrmp-400',
