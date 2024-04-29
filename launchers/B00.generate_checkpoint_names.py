@@ -31,13 +31,14 @@ def main():
     ]
 
     PARAMS = [
+        'model_name',
         'logic_dataset_uname',
-        'proof_intermediate_steps',
-        'optimizer',
+        # 'proof_intermediate_steps',
+        # 'optimizer',
         # 'block_size',
         'learning',
-        'learning_rate',
-        'rec_adam_anneal_schedule',
+        # 'learning_rate',
+        # 'rec_adam_anneal_schedule',
         'rec_adam_fisher_coef',
         # 'lr_scheduler_type',
     ]
