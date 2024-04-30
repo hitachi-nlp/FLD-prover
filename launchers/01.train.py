@@ -486,10 +486,10 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
 
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
@@ -504,14 +504,14 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
 
