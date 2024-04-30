@@ -178,8 +178,11 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
         # ============================ japanese     ============================
 
@@ -470,25 +473,6 @@ def main():
 
 
 
-
-    context_lengths = [
-        2048,
-        # 4096,
-    ]
-
-    proof_intermediate_steps_args = [
-        # 'include',
-        # 'exclude',
-        'randomly_include',   # the best
-    ]
-
-    lrates = [
-        # 1e-5,
-        3e-6,    # the best
-        # 1e-6,
-    ]
-
-
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
@@ -593,6 +577,25 @@ def main():
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
+
+
+    context_lengths = [
+        2048,
+        # 4096,
+    ]
+
+    proof_intermediate_steps_args = [
+        # 'include',
+        # 'exclude',
+        'randomly_include',   # the best
+    ]
+
+    lrates = [
+        # 1e-5,
+        3e-6,    # the best
+        # 1e-6,
+    ]
+
 
     instruction_args = [
         # False,       # better for chat-model?
