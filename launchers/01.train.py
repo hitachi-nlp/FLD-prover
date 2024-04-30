@@ -119,7 +119,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
 
 
 
@@ -170,15 +171,15 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('2024-01-31.multitask.FLD_dtst_prb=0.0', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('2024-02-14.translation_speedup.translation-v3', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ============================ japanese     ============================
 
@@ -305,9 +306,9 @@ def main():
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
         'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # '2024-03-29.FLD_v2',
@@ -491,10 +492,10 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
 
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
@@ -509,7 +510,7 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
