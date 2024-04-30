@@ -305,11 +305,11 @@ def main():
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
         'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/FLD.v2__default',
 
 
         # '2024-03-29.FLD_v2',
@@ -486,10 +486,10 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
 
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
         # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
