@@ -24,9 +24,9 @@ def main():
     TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.additional'
 
     CHECKPOINTS = [
-        97,
-        194,
-        291,
+        # 97,
+        # 194,
+        # 291,
         388,
     ]
 
@@ -34,13 +34,13 @@ def main():
         'model_name',
         'logic_dataset_uname',
         # 'proof_intermediate_steps',
-        # 'optimizer',
+        'optimizer',
         # 'block_size',
         'learning',
         # 'learning_rate',
         # 'rec_adam_anneal_schedule',
         'rec_adam_fisher_coef',
-        # 'lr_scheduler_type',
+        'lr_scheduler_type',
     ]
 
     input_dir = Path(TOP_DIR)
