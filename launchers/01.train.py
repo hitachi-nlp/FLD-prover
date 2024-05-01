@@ -181,8 +181,10 @@ def main():
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+
+        ('microsoft/phi-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ============================ japanese     ============================
 
@@ -494,7 +496,7 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)

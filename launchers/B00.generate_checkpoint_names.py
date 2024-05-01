@@ -21,7 +21,8 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-22.production.llama3/'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.additional'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.additional'
+    TOP_DIR = './outputs/01.train.py/2024-4-24.finalize_production.other_llms'
 
     CHECKPOINTS = [
         # 97,
@@ -40,7 +41,7 @@ def main():
         # 'learning_rate',
         # 'rec_adam_anneal_schedule',
         'rec_adam_fisher_coef',
-        'lr_scheduler_type',
+        # 'lr_scheduler_type',
     ]
 
     input_dir = Path(TOP_DIR)
