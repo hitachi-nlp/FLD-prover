@@ -191,16 +191,19 @@ def main():
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+
+        # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
         # ============================ japanese     ============================
 
@@ -327,9 +330,9 @@ def main():
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
         'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # '2024-03-29.FLD_v2',
@@ -495,8 +498,6 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
-
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
     ]
 
