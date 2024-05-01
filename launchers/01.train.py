@@ -184,9 +184,8 @@ def main():
         # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
-        # ('microsoft/phi-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        ('Qwen/CodeQwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ============================ japanese     ============================
 
