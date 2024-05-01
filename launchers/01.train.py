@@ -313,9 +313,9 @@ def main():
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
         'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # '2024-03-29.FLD_v2',
@@ -482,11 +482,8 @@ def main():
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
 
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
-
-        # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 300),
-        # ('rec_adam', 'l2', 0.5, 'gradually_from_middle', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
     ]
 
 
