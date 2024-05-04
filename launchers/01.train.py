@@ -120,7 +120,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
 
 
 
@@ -153,6 +154,7 @@ def main():
 
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
         './outputs.FLD/00.create_corpus/2024-03-29',
+        './outputs.FLD/00.create_corpus/2024-05-03.ablation',
     ]
 
 
@@ -179,7 +181,7 @@ def main():
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -197,13 +199,13 @@ def main():
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
 
@@ -332,10 +334,18 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+
+
+        # ------------------------------- 2024-05-03.ablation --------------------------------
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
 
 
         # '2024-03-29.FLD_v2',
@@ -455,8 +465,8 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390.wrmp-200',
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
 
         # --------- dataset = 200k, logic=1.0--------------------
         # 'FT.bs-256__step-780.wrmp-400',
@@ -513,8 +523,8 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
