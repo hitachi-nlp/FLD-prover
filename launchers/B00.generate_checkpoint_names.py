@@ -22,13 +22,13 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-23.refine_production'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.additional'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.other_llms'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-05-03.ablation'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.other_llms'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-05-03.ablation'
 
     CHECKPOINTS = [
-        97,
-        194,
-        291,
+        # 97,
+        # 194,
+        # 291,
         388,
     ]
 
