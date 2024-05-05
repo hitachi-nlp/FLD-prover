@@ -186,19 +186,19 @@ def main():
 
 
         # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
 
@@ -528,9 +528,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
