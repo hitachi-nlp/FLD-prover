@@ -341,11 +341,13 @@ def main():
 
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
 
 
         # '2024-03-29.FLD_v2',
@@ -465,8 +467,8 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        'FT.bs-256__step-390.wrmp-200',
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200',
+        'FT.bs-256__step-390.wrmp-200.few_save',
 
         # --------- dataset = 200k, logic=1.0--------------------
         # 'FT.bs-256__step-780.wrmp-400',
