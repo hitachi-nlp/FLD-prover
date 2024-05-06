@@ -189,7 +189,7 @@ def main():
         # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -197,7 +197,7 @@ def main():
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -206,7 +206,7 @@ def main():
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
@@ -336,9 +336,9 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
@@ -469,8 +469,8 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390.wrmp-200',
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
 
         # --------- dataset = 200k, logic=1.0--------------------
         # 'FT.bs-256__step-780.wrmp-400',
@@ -514,10 +514,17 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),   # should be the same as vanilla adam
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
 
+
+    lrates = [
+        # 1e-5,
+        3e-6,    # the best
+        1e-6,
+    ]
 
 
 
@@ -623,11 +630,6 @@ def main():
         'randomly_include',   # the best
     ]
 
-    lrates = [
-        # 1e-5,
-        3e-6,    # the best
-        # 1e-6,
-    ]
 
 
     instruction_args = [
