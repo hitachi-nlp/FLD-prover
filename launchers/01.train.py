@@ -185,15 +185,15 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -202,14 +202,14 @@ def main():
 
 
 
-        # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
         # ============================ japanese     ============================
@@ -469,8 +469,8 @@ def main():
 
 
         # --------- dataset = 100k, logic=1.0--------------------
-        'FT.bs-256__step-390.wrmp-200',
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200',
+        'FT.bs-256__step-390.wrmp-200.few_save',
 
         # --------- dataset = 200k, logic=1.0--------------------
         # 'FT.bs-256__step-780.wrmp-400',
@@ -523,7 +523,7 @@ def main():
     lrates = [
         # 1e-5,
         3e-6,    # the best
-        1e-6,
+        # 1e-6,
     ]
 
 
@@ -547,8 +547,8 @@ def main():
 
 
 
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
