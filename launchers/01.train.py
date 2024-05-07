@@ -120,6 +120,7 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
+
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
 
@@ -350,10 +351,14 @@ def main():
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-5-3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-8-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-1-2',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
 
@@ -545,8 +550,8 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
