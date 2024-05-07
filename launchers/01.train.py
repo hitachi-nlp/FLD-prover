@@ -120,8 +120,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
-    # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
 
 
 
@@ -181,35 +181,36 @@ def main():
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
 
-        ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # XXX! does not work for now!
+        # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
         # ============================ japanese     ============================
@@ -339,17 +340,27 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
+
+
+
+
+
 
 
         # '2024-03-29.FLD_v2',
@@ -515,8 +526,8 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
 
 
@@ -535,7 +546,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
