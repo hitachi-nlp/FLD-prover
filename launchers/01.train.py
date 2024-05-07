@@ -121,8 +121,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
-    # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
 
 
 
@@ -182,8 +182,8 @@ def main():
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -341,7 +341,7 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
@@ -351,9 +351,9 @@ def main():
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-5-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-8-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-1-2',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-2',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
 
@@ -530,8 +530,8 @@ def main():
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
@@ -551,10 +551,10 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
