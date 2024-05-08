@@ -121,8 +121,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
-    # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
 
 
@@ -340,10 +340,10 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
@@ -356,6 +356,9 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-2',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-1',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-0',
+
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
 
@@ -533,9 +536,9 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
