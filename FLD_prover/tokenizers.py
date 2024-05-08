@@ -24,47 +24,32 @@ def load(name: str,
             trust_remote_code=trust_remote_code,
         )
 
-    # if tokenizer.eos_token == tokenizer.pad_token:
-    #     # If the eos token is the same as the pad token,
-    #     # the eos token in the labels will be replaced to ignore token (i.e., -100) as well as the pad tokens,
-    #     # and the models will not learn to predict the eos token at the end of text.
-    #     # see the followings:
-    #     #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1573966012
-    #     #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285
-    #     if name.find('ELYZA') >= 0:
-    #         # elyza defaults: eos='</s>', pad='</s>'
-    #         tokenizer.pad_token = '<PAD>'
-    #     else:
-    #         logger.critical('EOS token and PAD token is the same.'
-    #                         'If you train the model in this setting,'
-    #                         'the model could learn not to generate EOS, as the PAD token is ignored in the loss.'
-    #                         'Please implement the hack as the above.')
+    if name.find('mistralai') >= 0:
+        # See here: https://medium.com/@parikshitsaikia1619/mistral-mastery-fine-tuning-fast-inference-guide-62e163198b06#:~:text=Setting%20Up%20Tokenizer
+        tokenizer.pad_token = tokenizer.unk_token
+        tokenizer.padding_side = "right"
+    else:
 
-    # if name == "line-corporation/japanese-large-lm-3.6b-instruction-sft":
-    #     # For this model, we can not load the remote setting properly, possible due to the sentencepiece mapping.
-    #     # We force reset the pad token.
-    #     tokenizer.pad_token = '<pad>'
+        # PAD_TOKEN = '[PAD]'
+        PAD_TOKEN = '<hono_pad>'
+        if name == 'stabilityai/stablelm-2-1_6b':
+            # this model allow only pre-registerd tokens
+            PAD_TOKEN = '<|extra0|>'
 
-    # PAD_TOKEN = '[PAD]'
-    PAD_TOKEN = '<hono_pad>'
-    if name == 'stabilityai/stablelm-2-1_6b':
-        # this model allow only pre-registerd tokens
-        PAD_TOKEN = '<|extra0|>'
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
 
-    if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
+        elif tokenizer.pad_token == tokenizer.eos_token:
+            # If the eos token is the same as the pad token,
+            # the eos token in the labels will be replaced to ignore token (i.e., -100) as well as the pad tokens,
+            # and the models will not learn to predict the eos token at the end of text.
+            # see the followings:
+            #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1573966012
+            #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285
 
-    elif tokenizer.pad_token == tokenizer.eos_token:
-        # If the eos token is the same as the pad token,
-        # the eos token in the labels will be replaced to ignore token (i.e., -100) as well as the pad tokens,
-        # and the models will not learn to predict the eos token at the end of text.
-        # see the followings:
-        #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1573966012
-        #     - https://github.com/huggingface/transformers/issues/22794#issuecomment-1598977285
+            # XXX: this will not replace tokenizer.pad_token_id
+            # tokenizer.pad_token = PAD_TOKEN
 
-        # XXX: this will not replace tokenizer.pad_token_id
-        # tokenizer.pad_token = PAD_TOKEN
-
-        tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
+            tokenizer.add_special_tokens({'pad_token': PAD_TOKEN})
 
     return tokenizer
