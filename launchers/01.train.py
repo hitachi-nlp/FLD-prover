@@ -122,8 +122,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
-    output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
+    output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
 
 
 
@@ -338,39 +339,15 @@ def main():
 
         # '2024-03-29.FLD_v2.D8',
 
+
+
+
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-
-
-        # ------------------------------- 2024-05-03.ablation --------------------------------
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-2',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-1',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-0',
-
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
-
-
-
-
-
 
 
         # '2024-03-29.FLD_v2',
@@ -393,11 +370,47 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.theorems-0.03',
 
-
-
-        # --------------------------- pending ---------------------------
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
+
+
+
+
+        # ------------------------------- 2024-05-03.ablation --------------------------------
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-0',
+
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
+
+
+
+
+        # ----------------------------------- ./outputs/00.create_corpus/2024-05-08.ref_prob --------------------------
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
+
+
+
 
 
     ]
