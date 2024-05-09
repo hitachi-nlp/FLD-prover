@@ -158,6 +158,7 @@ def main():
         './outputs.FLD/00.create_corpus/20230122.past_FLD',
         './outputs.FLD/00.create_corpus/2024-03-29',
         './outputs.FLD/00.create_corpus/2024-05-03.ablation',
+        './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
     ]
 
 
