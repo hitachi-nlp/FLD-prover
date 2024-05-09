@@ -356,7 +356,6 @@ def main():
         # '2024-03-29.FLD_v2.theorems-0.1.fix',
         # '2024-03-29.FLD_v2.theorems-0.03.fix',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.03',
@@ -402,13 +401,24 @@ def main():
 
 
         # ----------------------------------- ./outputs/00.create_corpus/2024-05-08.ref_prob --------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-5-5',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.theorems-0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.theorems-0.2',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.30',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.40',
 
 
 
