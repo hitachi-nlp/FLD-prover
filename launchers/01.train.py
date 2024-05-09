@@ -123,8 +123,8 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
-    output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
+    # output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
 
 
 
@@ -185,7 +185,7 @@ def main():
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -201,7 +201,7 @@ def main():
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mistral-7B-Instruct-v0.2', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
@@ -345,10 +345,10 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/FLD.v2__default',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # '2024-03-29.FLD_v2',
@@ -412,13 +412,13 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.30',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.40',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.30',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.40',
 
 
 
@@ -570,8 +570,8 @@ def main():
 
     lrates = [
         # 1e-5,
-        3e-6,    # the best
-        # 1e-6,
+        # 3e-6,    # the best
+        1e-6,
     ]
 
 
