@@ -121,9 +121,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
 
 
@@ -186,7 +186,7 @@ def main():
 
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -201,7 +201,7 @@ def main():
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -344,9 +344,9 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/FLD.v2__default',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
@@ -559,8 +559,8 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
@@ -570,7 +570,7 @@ def main():
     lrates = [
         # 1e-5,
         3e-6,    # the best
-        # 1e-6,
+        1e-6,
     ]
 
 
@@ -582,9 +582,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
