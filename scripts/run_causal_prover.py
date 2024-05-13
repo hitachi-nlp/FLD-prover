@@ -85,6 +85,7 @@ from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
 from FLD_prover.generation import generation_handled
 from FLD_prover.interactive import launch
+from FLD_prover.mixtral_deepspeed_monkey_patch import replace_mixtral_moe_with_dense_impl
 from FLD_task import load_deduction
 
 
@@ -979,6 +980,7 @@ def main():
     logging.getLogger('absl').setLevel(logging.WARNING)
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
+    replace_mixtral_moe_with_dense_impl()
 
     # Is this OK? without this magic code, the preprocessing of logic dataset with multiprocess will hang up,
     # possibly because of the torch.where operation used in the processing.

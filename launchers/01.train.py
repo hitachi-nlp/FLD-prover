@@ -586,9 +586,10 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
 
