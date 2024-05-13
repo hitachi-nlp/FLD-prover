@@ -33,7 +33,7 @@ def load(name: str,
         tokenizer.padding_side = "right"
 
     elif name.find('Qwen') >= 0:
-        tokenizer.pad_token = tokenizer.unk_token
+        tokenizer.pad_token = tokenizer.special_tokens['<extra_0>']
 
     elif name.find('StableBeluga') >= 0:
         tokenizer.pad_token = tokenizer.unk_token

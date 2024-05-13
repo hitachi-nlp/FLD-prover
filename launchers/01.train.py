@@ -123,9 +123,9 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk')
 
 
 
@@ -196,6 +196,7 @@ def main():
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -203,7 +204,7 @@ def main():
 
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -581,7 +582,7 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
@@ -589,7 +590,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
 
