@@ -24,10 +24,15 @@ def load(name: str,
             trust_remote_code=trust_remote_code,
         )
 
+    # logger.critical(str(tokenizer.pad_token))
+    # logger.critical(str(tokenizer.special_tokens['<extra_0>']))
+    # logger.critical(str(tokenizer.unk_token))
     if name.find('mistralai') >= 0:
         # See here: https://medium.com/@parikshitsaikia1619/mistral-mastery-fine-tuning-fast-inference-guide-62e163198b06#:~:text=Setting%20Up%20Tokenizer
         tokenizer.pad_token = tokenizer.unk_token
         tokenizer.padding_side = "right"
+    elif name.find('Qwen') >= 0:
+        tokenizer.pad_token = tokenizer.unk_token
     else:
 
         # PAD_TOKEN = '[PAD]'
