@@ -27,7 +27,8 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-05-03.ablation'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-05-08.ref_prob'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk'
+    TOP_DIR = './outputs.FLD-prover//01.train.py/2024-5-13.large_models'
 
     CHECKPOINTS = [
         # 97,
