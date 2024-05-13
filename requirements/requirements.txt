@@ -42,6 +42,7 @@ tensorboard
 gradio
 tbparse
 scikit-learn
+tiktoken
 
 git+https://github.com/google-research/bleurt.git
 
