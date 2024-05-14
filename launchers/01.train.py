@@ -180,13 +180,13 @@ def main():
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
-        ('CohereForAI/c4ai-command-r-plus', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('CohereForAI/c4ai-command-r-plus', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
@@ -350,10 +350,10 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
 
         # '2024-03-29.FLD_v2',
@@ -590,7 +590,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
@@ -598,7 +598,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
 
 
 
