@@ -937,6 +937,13 @@ def make_generation_settings(data_args, tokenizer, model, config):
         tokenizer,
         model,
     ]
+
+    if hasattr(model.config, "max_position_embeddings"):
+        max_position_embeddings = model.config.max_position_embeddings
+        max_length = min(data_args.generation_max_length + 1, max_position_embeddings)
+    else:
+        max_length = data_args.generation_max_length
+
     generation_handled_kwargs = {
         'eos_token_id': tokenizer.eos_token_id,
         # 'top_k': data_args.generation_top_k,
@@ -945,7 +952,7 @@ def make_generation_settings(data_args, tokenizer, model, config):
         'do_sample': data_args.generation_do_sample,
         'temperature': data_args.generation_temperature,
         'repetition_penalty': data_args.generation_repetition_penalty,
-        'max_length': min(data_args.generation_max_length + 1, model.config.max_position_embeddings),
+        'max_length': max_length,
         'max_new_tokens': data_args.generation_max_new_tokens,
     }
     # set top k if not None
