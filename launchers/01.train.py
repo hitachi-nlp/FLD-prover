@@ -426,7 +426,11 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.05',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
@@ -599,11 +603,11 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
@@ -1021,7 +1025,7 @@ def main():
                                                             engine,
                                                             command,
                                                             output_dir,
-                                                            delay = i_job * 0.5,
+                                                            # delay = i_job * 0.5,
                                                             hours=_hours,
                                                             force=True,  # assuming that we do not have many jobs
                                                             dry_run=dry_run

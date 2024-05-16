@@ -8,7 +8,8 @@ transformers==4.37
 
 
 # tokenizers==v0.13.4.rc3
-tokenizers==0.14.1
+# tokenizers==0.14.1
+tokenizers
 
 accelerate >= 0.21.0
 # accelerate==0.18.0
