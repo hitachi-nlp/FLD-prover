@@ -174,8 +174,8 @@ def main():
         # ============================ english      ============================
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -362,8 +362,11 @@ def main():
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
 
+        # -- rejected --
         # '2024-03-29.FLD_v2',
         # '2024-03-29.FLD_v2.theorems-0.3.fix',
         # '2024-03-29.FLD_v2.theorems-0.1.fix',
@@ -387,13 +390,15 @@ def main():
         # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
 
 
-
-
         # ------------------------------- 2024-05-03.ablation --------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
+
+        # -- rejected --
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
@@ -405,16 +410,14 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
 
 
-
-
         # ----------------------------------- ./outputs/00.create_corpus/2024-05-08.ref_prob --------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-5-5',
@@ -576,9 +579,9 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),   # the best for llama3
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
@@ -599,9 +602,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
