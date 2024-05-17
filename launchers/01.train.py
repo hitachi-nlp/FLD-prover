@@ -175,7 +175,7 @@ def main():
 
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -184,7 +184,7 @@ def main():
 
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('tiiuae/falcon-40b', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -361,9 +361,9 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
 
         # -- rejected --
@@ -588,8 +588,8 @@ def main():
 
 
     lrates = [
-        # 1e-5,
-        3e-6,    # the best
+        1e-5,
+        # 3e-6,    # the best
         # 1e-6,
     ]
 
