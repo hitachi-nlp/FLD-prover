@@ -176,12 +176,12 @@ def main():
 
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -362,7 +362,7 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
@@ -445,11 +445,10 @@ def main():
         # ------------------------------------- ./outputs/00.create_corpus/2024-05-19.ablation_with_theorems --------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.voc-100',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.dstrct-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.rule-G_MP',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.stps-3-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.transl_sttng-1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.voc-100',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.dstrct-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1.transl_sttng-1',
 
 
     ]
@@ -588,8 +587,8 @@ def main():
     optimizer_setings = [
         # (None, None, None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
@@ -598,8 +597,8 @@ def main():
 
     lrates = [
         # 1e-5,
-        3e-6,    # the best
-        # 1e-6,
+        # 3e-6,    # the best
+        1e-6,
     ]
 
 
