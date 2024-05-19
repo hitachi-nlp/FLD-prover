@@ -361,7 +361,7 @@ def main():
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
-        # 'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/ruletaker',
         'hf.hitachi-nlp/PARARULE-Plus',
         'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
