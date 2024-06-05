@@ -128,7 +128,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-5-13.large_models')
-    output_top_dir = Path('./outputs/01.train.py/2024-5-19.flight')
+    # output_top_dir = Path('./outputs/01.train.py/2024-5-19.flight')
+    output_top_dir = Path('./outputs/01.train.py/2024-5-22.submission_final')
 
 
 
@@ -175,7 +176,7 @@ def main():
     model_settings = [
         # ============================ english      ============================
 
-        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -188,7 +189,7 @@ def main():
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
