@@ -48,7 +48,8 @@ def mask_labels_by_ignore_index(labels,
                                 pad_token_id,
                                 mask_id=-100,
                                 mask_lengths: Optional[List[int]] = None,
-                                mask_pad_tokens=True):
+                                mask_pad_tokens=True,
+                                attention_mask=None):
     """
     [OpenCALM-7BをLoRAでinstruction tuningするための実装解説](https://qiita.com/m__k/items/173ade78990b7d6a4be4)
     """
@@ -64,6 +65,11 @@ def mask_labels_by_ignore_index(labels,
 
     if mask_pad_tokens:
         labels = torch.where(labels != pad_token_id, labels, mask_id)
+
+    # この友成方式でやりたいが，上のロジック=「pad_token部分をmaskする」としてしまっているので，意味が無い．
+    # 上のロジックを外すことは簡単ではない．「プロンプトをマスクする」時に使われているから．
+    # if attention_mask is not None:
+    #     labels[attention_mask == 0] = mask_id
 
     return labels
 

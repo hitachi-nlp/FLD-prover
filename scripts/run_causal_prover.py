@@ -58,7 +58,6 @@ from transformers import (
     HfArgumentParser,
     Trainer,
     TrainingArguments,
-    default_data_collator,
     is_torch_tpu_available,
     set_seed,
 )

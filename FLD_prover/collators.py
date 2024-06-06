@@ -61,16 +61,6 @@ _REMOVE_NAMES = [
 ]
 
 
-class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
-
-    def __call__(self, features, return_tensors=None):
-        for feature in features:
-            for remove_name in _REMOVE_NAMES:
-                if remove_name in feature:
-                    feature.pop(remove_name, None)
-        return super().__call__(features, return_tensors=return_tensors)
-
-
 class RemoveUnusedColumnsCollator:
 
     def __init__(self,

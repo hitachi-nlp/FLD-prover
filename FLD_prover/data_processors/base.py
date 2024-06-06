@@ -80,13 +80,16 @@ class Processor(ABC):
         def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
             return prepare_tokenized_inputs(inputs, self._tokenizer, padding, max_length, **kwargs)
 
-        def _mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
+        def _mask_labels_by_ignore_index(labels,
+                                         attention_mask=None,
+                                         mask_lengths: Optional[List[int]] = None):
             return mask_labels_by_ignore_index(labels,
                                                self._tokenizer.pad_token_id,
                                                mask_id=self._ignore_index,
                                                mask_lengths=mask_lengths,
                                                # mask_pad_tokens = padding == "max_length" and ignore_pad_token_for_loss,
-                                               mask_pad_tokens=self._ignore_pad_token_for_loss)
+                                               mask_pad_tokens=self._ignore_pad_token_for_loss,
+                                               attention_mask=attention_mask)
 
         def _unmask_by_pad_token(tensor):
             return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
@@ -125,7 +128,8 @@ class Processor(ABC):
             if self._lm_type == LMType.SEQ_2_SEQ:
                 forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
                 forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos, self._max_length - self._max_prompt_length)["input_ids"]
-                forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"])
+                forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"],
+                                                                        forward_inputs["attention_mask"])
 
             elif self._lm_type == LMType.CAUSAL:
                 # just for getting length
@@ -154,6 +158,7 @@ class Processor(ABC):
                 forward_inputs["labels"] = _mask_labels_by_ignore_index(
                     forward_inputs["labels"],
                     mask_lengths=prompt_lengths,
+                    attention_mask=forward_inputs["attention_mask"],
                 )
             else:
                 raise NotImplementedError()
