@@ -1109,11 +1109,11 @@ def main():
         # model.gradient_checkpointing_enable()
         for name, param in model.named_parameters():
             if 'attn' in name or 'model.norm.weight' in name:   # model.norm.weiht is somwhow needed, otherwise exception
-                 logger.info('parameter "%s" : requires_grad=True', name)
-                 param.requires_grad = True
-             else:
-                 param.requires_grad = False
-                 logger.info('parameter "%s" : requires_grad=False, as it is not attention parameter', name)
+                logger.info('parameter "%s" : requires_grad=True', name)
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
+                logger.info('parameter "%s" : requires_grad=False, as it is not attention parameter', name)
 
     model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
