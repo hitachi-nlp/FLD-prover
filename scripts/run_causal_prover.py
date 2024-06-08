@@ -437,6 +437,10 @@ class DataTrainingArguments:
         default=300.0,
     )
 
+    train_only_attention: bool = field(
+        default=False,
+    )
+
     interactive_mode: str = field(
         default=None,
     )
@@ -1099,6 +1103,17 @@ def main():
         model = AutoModelForCausalLM.from_config(config)
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
+
+    if data_args.train_only_attention:
+        # model.enable_input_require_grads()
+        # model.gradient_checkpointing_enable()
+        for name, param in model.named_parameters():
+            if 'attn' in name or 'model.norm.weight' in name:   # model.norm.weiht is somwhow needed, otherwise exception
+                 logger.info('parameter "%s" : requires_grad=True', name)
+                 param.requires_grad = True
+             else:
+                 param.requires_grad = False
+                 logger.info('parameter "%s" : requires_grad=False, as it is not attention parameter', name)
 
     model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 

@@ -129,9 +129,13 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-5-13.large_models')
     # output_top_dir = Path('./outputs/01.train.py/2024-5-19.flight')
-    output_top_dir = Path('./outputs/01.train.py/2024-5-22.submission_final')
+    # output_top_dir = Path('./outputs/01.train.py/2024-5-22.submission_final')
 
 
+
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT.1')
 
 
 
@@ -180,11 +184,11 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
@@ -464,7 +468,7 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
 
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
@@ -495,6 +499,16 @@ def main():
             [],
             False,
         ),
+
+
+        # (
+        #     1.0,
+        #     [
+        #         (1.0, 'venketh/SlimPajama-62B', None)
+        #     ],
+        #     False,
+        # ),
+
 
         # (
         #     0.75,
@@ -602,13 +616,12 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None, None, None, None, None),
+        # (None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
         ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 30000),
     ]
 
 
@@ -619,13 +632,19 @@ def main():
     ]
 
 
+    train_only_attention_args = [
+        False,
+        True,
+    ]
+
+
 
     # ------------------------------- HAIC --------------------------------
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
@@ -639,8 +658,8 @@ def main():
 
 
 
-    # skip_if_exists = False
-    skip_if_exists = True
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
 
@@ -678,24 +697,6 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-
-    # if isinstance(engine, SubprocessEngine):
-    #     region = 'haic'
-    #     n_gpus_per_node = 1
-    #     n_cpus_per_node = 1
-    #     n_total_gpus = 1
-    #     is_V100 = False
-
-    #     # n_gpus_per_node = 4
-    #     # n_total_gpus = 4
-
-    #     # gpu_name_for_batch_size = 'V100.mem=16.run=vanilla.cntx=2048'
-    #     # gpu_name_for_batch_size = 'V100.mem=16.run=deepspeed.cntx=2048'
-
-    #     # gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=2048'
-
-    #     gpu_name_for_batch_size = 'H100.mem=80.run=vanilla.cntx=4096'
-    #     gpu_name_for_batch_size = 'H100.mem=80.run=deepspeed.cntx=4096'
 
 
     # run_mode = 'vanilla'
@@ -749,10 +750,6 @@ def main():
     eval_steps = None
     num_evals = None
 
-    num_train_examples_skip = None
-    # num_train_examples_skip = 1000
-    # num_train_examples_skip = 256 * 1250
-
     sample_negative_proof_args = [
         # True,
         False,    # better for 'all_at_once'
@@ -763,40 +760,13 @@ def main():
         # False,
     ]
 
-    # max_eval_samples = 5
-    # max_eval_samples = 301
-    # max_eval_samples = 151
-    # max_eval_samples = 152
-
     epoch = None
 
-
-    # hf_bug_zero_lr_offset = 0
-    hf_bug_zero_lr_offset = 20
-
-    # slow eneration is most likely the repetitions coming from underfitting, so we can safely discard such generations.
-    # generation_timeout = 1
-    generation_timeout = 3600 * 2
-
-    # too long evaluation. we cut it off due to the same reason as above.
-    # evaluation_timeout = 1
-    evaluation_timeout = 3600 * 10
 
     warmup_ratio = None
     warmup_steps = None
     steps_upper = None
     train_effective_batch_size = None
-
-    lr_scheduler_types = [
-        'linear',
-        # 'constant_with_warmup',
-    ]
-
-    # script_type = 'run_prover'
-    script_type = 'run_causal_prover'
-
-    # seq2seq_proof_sampling = 'stepwise'
-    seq2seq_proof_sampling = 'all_at_once'
 
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
@@ -870,16 +840,12 @@ def main():
                                                 fp16 = False
                                                 bf16 = True
 
-                                            if lm_type == 'causal':
-                                                proof_sampling = 'all_at_once'
-                                            else:
-                                                proof_sampling = seq2seq_proof_sampling
+                                            for lrate in lrates:
+                                                lrate_org = lrate
+                                                if optimizer == 'rec_adam':
+                                                    lrate = lrate * 2
 
-                                            for lr_scheduler_type in lr_scheduler_types:
-                                                for lrate in lrates:
-                                                    lrate_org = lrate
-                                                    if optimizer == 'rec_adam':
-                                                        lrate = lrate * 2
+                                                for train_only_attention in train_only_attention_args:
 
                                                     for instruction in instruction_args:
 
@@ -889,7 +855,6 @@ def main():
 
                                                         setting.update(
                                                             get_learning_setting(
-                                                                script_type,
                                                                 learning,
                                                                 epoch=epoch,
                                                                 steps_upper=steps_upper,
@@ -903,12 +868,12 @@ def main():
                                                                 rec_adam_fisher_coef=rec_adam_fisher_coef,
                                                                 rec_adam_anneal_schedule=rec_adam_anneal_schedule,
 
+                                                                train_only_attention=train_only_attention,
+
                                                                 train_effective_batch_size=train_effective_batch_size,
                                                                 num_evals=num_evals,
                                                                 # max_eval_samples=max_eval_samples,
 
-                                                                                                                        logic_dataset_prob=logic_dataset_prob,
-                                                                hf_bug_zero_lr_offset=hf_bug_zero_lr_offset,
                                                                 n_gpus=n_total_gpus,
                                                             )
                                                         )
@@ -919,7 +884,6 @@ def main():
                                                         other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
                                                         setting.update(
                                                             get_dataset_setting(
-                                                                script_type,
                                                                 dataset_uname=logic_dataset_uname,
                                                                 top_dirs=DATASETS_DIRS,
                                                                 other_dataset_names=other_dataset_names,
@@ -943,10 +907,9 @@ def main():
 
                                                         setting.update(
                                                             get_batch_setting(
-                                                                script_type,
                                                                 gpu_name=gpu_name_for_batch_size,
                                                                 n_gpus=n_total_gpus,
-                                                                model_name=model_name_for_batch_size if proof_sampling == 'all_at_once' else model_name_for_batch_size + '.stepwise',
+                                                                model_name=model_name_for_batch_size,
                                                                 train_effective_batch_size=setting.get('train_effective_batch_size', None),
                                                                 batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
                                                             )
@@ -962,9 +925,6 @@ def main():
                                                         setting.update(get_tokenizer_setting(model_name))
                                                         setting.update(
                                                             get_generation_setting(
-                                                                script_type,
-                                                                generation_timeout=generation_timeout,
-                                                                evaluation_timeout=evaluation_timeout,
                                                                 generation_max_length=setting.get('max_target_length', None),
                                                                 generation_max_prompt_length=setting.get('max_prompt_length', None),
                                                            ),
@@ -976,7 +936,6 @@ def main():
                                                             'do_predict': False,
                                                         })
                                                         setting.update({
-                                                            'script_type': script_type,
                                                             'seed': seed,
 
                                                             'logic_dataset_uname': logic_dataset_uname,
@@ -987,7 +946,6 @@ def main():
                                                             'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
 
                                                             'resume_from_checkpoint': resume_from_checkpoint,
-                                                            'num_train_examples_skip': num_train_examples_skip,
 
                                                             'base_setting_name': base_setting_name,
 
@@ -999,16 +957,12 @@ def main():
                                                             # 'save_total_limit': save_total_limit,
 
                                                             # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                                            'proof_sampling': proof_sampling,
                                                             'learning': learning,
                                                             'sample_negative_proof': sample_negative_proof,
                                                             'proof_intermediate_steps': proof_intermediate_steps,
                                                             'no_subproof_for_unknown': no_subproof_for_unknown,
 
-                                                            'lr_scheduler_type': 'linear',
                                                             'learning_rate': lrate,
-                                                            'lr_scheduler_type': lr_scheduler_type,
-                                                            'weight_decay': 0.0,
 
                                                             # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
                                                             # 'preprocess_batch_size': 1000,
@@ -1018,8 +972,6 @@ def main():
 
 
                                                             # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
-
-                                                            'lora': False,
 
                                                             'ddp_timeout': 3600 * 10,
 
@@ -1039,8 +991,7 @@ def main():
                                                         if skip_if_exists and (output_dir / 'log.txt').exists():
                                                             logger.info(f'Skipping "{output_dir}"')
                                                             continue
-                                                        command = make_command(script_type,
-                                                                               output_dir,
+                                                        command = make_command(output_dir,
                                                                                setting,
                                                                                run_mode,
                                                                                region,

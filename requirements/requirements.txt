@@ -44,6 +44,7 @@ gradio
 tbparse
 scikit-learn
 tiktoken
+zstandard
 
 git+https://github.com/google-research/bleurt.git
 
