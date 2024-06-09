@@ -499,9 +499,36 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
+
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #     ],
+        #     False,
+        # ),
+
+
+
         (
-            1.0,
-            [],
+            0.00,
+            [
+                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+            ],
             False,
         ),
 
@@ -523,22 +550,6 @@ def main():
             False,
         ),
 
-
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
 
     ]
 
