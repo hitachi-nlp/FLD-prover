@@ -116,6 +116,10 @@ class ModelArguments:
             )
         },
     )
+    from_scratch: bool = field(
+        default=False,
+    )
+
     model_type: Optional[str] = field(
         default=None,
         metadata={"help": "If training from scratch, pass a model type from the list: " + ", ".join(MODEL_TYPES)},
@@ -1078,7 +1082,11 @@ def main():
         trust_remote_code=True,
     )
 
-    if model_args.model_name_or_path:
+    if model_args.from_scratch:
+        model = AutoModelForCausalLM.from_config(config)
+        n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
+        logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
+    else:
         torch_dtype = (
             model_args.torch_dtype
             if model_args.torch_dtype in ["auto", None]
@@ -1095,10 +1103,6 @@ def main():
             low_cpu_mem_usage=model_args.low_cpu_mem_usage,
             trust_remote_code=True,
         )
-    else:
-        model = AutoModelForCausalLM.from_config(config)
-        n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
-        logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
     update_parameter_names = []
     if data_args.update_parameters == 'all':
