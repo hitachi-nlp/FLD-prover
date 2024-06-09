@@ -669,7 +669,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
@@ -679,7 +679,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
 
-
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
 
     skip_if_exists = False
     # skip_if_exists = True
@@ -994,8 +994,8 @@ def main():
                                                                 # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
                                                                 # 'preprocess_batch_size': 500,
 
-                                                                # [XXX] may hang!
-                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                                # [XXX] may hang???
+                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node)),
                                                                 'preprocess_batch_size': 1000,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
