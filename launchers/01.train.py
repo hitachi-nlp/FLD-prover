@@ -980,9 +980,12 @@ def main():
                                                                 # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
                                                                 # 'preprocess_batch_size': 1000,
 
-                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
-                                                                'preprocess_batch_size': 500,
+                                                                # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
+                                                                # 'preprocess_batch_size': 500,
 
+                                                                # [XXX] may hang!
+                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                                'preprocess_batch_size': 1000,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
