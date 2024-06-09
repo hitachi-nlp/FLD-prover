@@ -663,6 +663,8 @@ def main():
 
 
     # ------------------------------- HAIC --------------------------------
+    hours = None
+
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
@@ -678,15 +680,16 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
+    # hours = 24
 
     engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
 
 
 
-    hours = 24
 
 
 
@@ -831,7 +834,7 @@ def main():
                                                 if model_name.find('70b') >= 0:
                                                     _hours = min(_hours * 2, 72)
                                             else:
-                                                _hours = hours
+                                                _hours = hours or 24
 
                                             # V100 is only compatible with fp16, but not bf16,
                                             # but fp16 and deepspeed sometimes causes "Loss scale already at minimum" error.
