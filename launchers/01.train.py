@@ -135,7 +135,8 @@ def main():
 
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT.1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT.1')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-09')
 
 
 
@@ -468,10 +469,10 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
 
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
     ]
 
 
@@ -511,23 +512,16 @@ def main():
 
 
         # (
-        #     0.75,
+        #     1.0,
         #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
         #     ],
         #     False,
         # ),
+
 
         # (
         #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
-        #     ],
-        #     False,
-        # ),
-
-        # (
-        #     0.25,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
@@ -632,9 +626,10 @@ def main():
     ]
 
 
-    train_only_attention_args = [
-        False,
-        True,
+    update_parameters_args = [
+        'all',
+        # 'attention',
+        # 'mlp',
     ]
 
 
@@ -770,7 +765,7 @@ def main():
 
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
-        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
+        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default' or logic_dataset_uname.find('proofwriter') >= 0:
             logic_dataset_concatenate_all_configs = True
             logic_dataset_concatenate_all_splits_into_train = True
         else:
@@ -845,7 +840,7 @@ def main():
                                                 if optimizer == 'rec_adam':
                                                     lrate = lrate * 2
 
-                                                for train_only_attention in train_only_attention_args:
+                                                for update_parameters in update_parameters_args:
 
                                                     for instruction in instruction_args:
 
@@ -868,7 +863,7 @@ def main():
                                                                 rec_adam_fisher_coef=rec_adam_fisher_coef,
                                                                 rec_adam_anneal_schedule=rec_adam_anneal_schedule,
 
-                                                                train_only_attention=train_only_attention,
+                                                                update_parameters=update_parameters,
 
                                                                 train_effective_batch_size=train_effective_batch_size,
                                                                 num_evals=num_evals,

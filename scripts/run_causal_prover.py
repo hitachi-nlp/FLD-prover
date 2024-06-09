@@ -437,8 +437,8 @@ class DataTrainingArguments:
         default=300.0,
     )
 
-    train_only_attention: bool = field(
-        default=False,
+    update_parameters: str = field(
+        default='all',
     )
 
     interactive_mode: str = field(
@@ -492,6 +492,13 @@ def load_raw_dataset_by_name(data_args,
                              dataset_config_name: str,
                              concatenate_all_configs=False,
                              concatenate_all_splits_into_train=False):
+    load_dataset_kwargs = {
+        # 'on_bad_lines': 'skip',
+        # 'error_bad_lines': False,
+        'cache_dir': model_args.cache_dir,
+        'streaming': data_args.streaming,
+        'use_auth_token': True if model_args.use_auth_token else None,
+    }
     if concatenate_all_configs:
         configs = get_dataset_config_names(dataset_name)
         logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
@@ -501,9 +508,7 @@ def load_raw_dataset_by_name(data_args,
             _raw_datasets = load_dataset(
                 dataset_name,
                 _dataset_config_name,
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
+                **load_dataset_kwargs,
             )
             raw_datasets_list[_dataset_config_name] = _raw_datasets
 
@@ -518,9 +523,7 @@ def load_raw_dataset_by_name(data_args,
         raw_datasets = load_dataset(
             dataset_name,
             dataset_config_name,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-            streaming=data_args.streaming,
+            **load_dataset_kwargs,
         )
 
     if concatenate_all_splits_into_train:
@@ -537,17 +540,13 @@ def load_raw_dataset_by_name(data_args,
                 dataset_name,
                 dataset_config_name,
                 split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
+                **load_dataset_kwargs,
             )
             raw_datasets["train"] = load_dataset(
                 dataset_name,
                 dataset_config_name,
                 split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
+                **load_dataset_kwargs,
             )
 
     large_dataset_name = 'DKYoon/SlimPajama-6B'
@@ -586,33 +585,30 @@ def load_raw_dataset_by_files(data_args,
         extension = "text"
         dataset_args["keep_linebreaks"] = keep_linebreaks
 
+    dataset_args.update({
+        'data_files': data_files,
+        'streaming': data_args.streaming,
+        'use_auth_token': True if model_args.use_auth_token else None,
+        'cache_dir': model_args.cache_dir,
+        # 'on_bad_lines': 'skip',
+        # 'error_bad_lines': False,
+    })
+
     if len(data_files) > 0:
         raw_datasets = load_dataset(
             extension,
-            data_files=data_files,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-            streaming=data_args.streaming,
             **dataset_args,
         )
 
         if "validation" not in raw_datasets.keys():
             raw_datasets["validation"] = load_dataset(
                 extension,
-                data_files=data_files,
                 split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
                 **dataset_args,
             )
             raw_datasets["train"] = load_dataset(
                 extension,
-                data_files=data_files,
                 split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
                 **dataset_args,
             )
     else:
@@ -1104,16 +1100,34 @@ def main():
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
-    if data_args.train_only_attention:
+    update_parameter_names = []
+    if data_args.update_parameters == 'all':
+        update_parameter_names = [name for name, params in model.named_parameters()]
+    elif data_args.update_parameters == 'attention':
         # model.enable_input_require_grads()
         # model.gradient_checkpointing_enable()
-        for name, param in model.named_parameters():
-            if 'attn' in name or 'model.norm.weight' in name:   # model.norm.weiht is somwhow needed, otherwise exception
-                logger.info('parameter "%s" : requires_grad=True', name)
-                param.requires_grad = True
-            else:
-                param.requires_grad = False
-                logger.info('parameter "%s" : requires_grad=False, as it is not attention parameter', name)
+        # model.norm.weiht is somwhow needed, otherwise exception
+        update_parameter_names = [name for name, params in model.named_parameters()
+                                  if 'attn' in name or 'model.norm.weight' in name]
+    elif data_args.update_parameters == 'mlp':
+        update_parameter_names = [name for name, params in model.named_parameters()
+                                  if 'mlp' in name or 'model.norm.weight' in name]
+    else:
+        raise ValueError(data_args.update_parameters)
+    freeze_parameter_names = [name for name, params in model.named_parameters()
+                              if name not in update_parameter_names]
+
+    logger.info('-- [update_parameters="%s"] will update the following parameters --', data_args.update_parameters)
+    for name, param in model.named_parameters():
+        if name in update_parameter_names:
+            logger.info(name)
+            param.requires_grad = True
+
+    logger.info('-- [update_parameters="%s"] will freeze the following parameters --', data_args.update_parameters)
+    for name, param in model.named_parameters():
+        if name in freeze_parameter_names:
+            logger.info(name)
+            param.requires_grad = False
 
     model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
