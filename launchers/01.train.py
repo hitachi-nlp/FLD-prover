@@ -499,6 +499,9 @@ def main():
         # as the connection to huggingface.co via pyarrow library fails,
         # possibly due to the redirection forced by the proxy.
 
+
+        # ------------------------ NeurIPS 2024 -----------------------
+
         # (
         #     1.0,
         #     [],
@@ -524,22 +527,23 @@ def main():
 
 
 
-        (
-            0.00,
-            [
-                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-            ],
-            False,
-        ),
+        # ------------------------ LPT -----------------------
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #     ],
+        #     False,
+        # ),
 
 
-        (
-            0.01,
-            [
-                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.01,
+        #     [
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #     ],
+        #     False,
+        # ),
 
 
         (
@@ -998,7 +1002,7 @@ def main():
                                                                 # 'preprocess_batch_size': 500,
 
                                                                 # [XXX] may hang???
-                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node)),
+                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node / int(min(2, n_gpus_per_node)))),
                                                                 'preprocess_batch_size': 1000,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
