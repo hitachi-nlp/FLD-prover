@@ -15,6 +15,9 @@ def load(name: str,
                                                    additional_special_tokens=['▁▁'],
                                                    use_auth_token=True if use_auth_token else None)
     else:
+        if name.find('pythia') >= 0:
+            name = 'EleutherAI/pythia-70m-deduped'
+            revision = "step3000"
         tokenizer = AutoTokenizer.from_pretrained(
             name,
             cache_dir=cache_dir,

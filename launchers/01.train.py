@@ -137,7 +137,19 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT.1')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-09')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.set_transform')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-8')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-12')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-64')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-32')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-16')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-8')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT')
 
 
 
@@ -187,7 +199,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -202,13 +214,6 @@ def main():
 
         # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-
-        # ('tiiuae/falcon-40b', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        
-        # ('CohereForAI/c4ai-command-r-plus', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
 
 
 
@@ -243,6 +248,12 @@ def main():
 
         # XXX! does not work for now!
         # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
+
+
+        # ============================ LPT     ============================
+
+        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+
 
 
         # ============================ japanese     ============================
@@ -528,13 +539,14 @@ def main():
 
 
         # ------------------------ LPT -----------------------
-        # (
-        #     0.00,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-        #     ],
-        #     False,
-        # ),
+
+        (
+            0.00,
+            [
+                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+            ],
+            False,
+        ),
 
 
         # (
@@ -557,6 +569,8 @@ def main():
 
     ]
 
+    # preprocess_keep_in_memory = False
+    preprocess_keep_in_memory = True
 
 
 
@@ -572,16 +586,6 @@ def main():
         # 'debug.middle',
         # 'debug.large',
         # 'debug.very_large',
-
-        # 'FT.step-5000',
-        # 'FT.step-10000',
-
-        # 'FT.bs-64__step-30',
-        # 'FT.bs-64__step-100',
-
-        # 'FT.bs-128__step-1000',
-        # 'FT.bs-128__step-2500',
-        # 'FT.bs-128__step-5000',
 
 
         # --------- dataset = 100k, logic=1.0--------------------
@@ -623,7 +627,9 @@ def main():
 
 
         # ---- LPT ----------
-        'LPT.bs-1024__step-24000.wrmp-100',
+        # 'LPT.bs-1024__step-24000.wrmp-100',
+        'LPT.bs-2048__step-12000.wrmp-100',
+        # 'LPT.bs-8192__step-3000.wrmp-100',
     ]
 
 
@@ -647,14 +653,16 @@ def main():
         # 3e-6,    # the best
         # 1e-6,
 
-        1e-4,    # LPT, from Pythia
+        3e-4,    # LPT, from Pythia
     ]
+
 
     update_parameters_args = [
         'all',
         # 'attention',
         # 'mlp',
     ]
+
 
     from_scratch_args = [
         # False,
@@ -686,7 +694,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
     # hours = 24
 
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     hours = 72
 
     skip_if_exists = False
@@ -1003,9 +1013,11 @@ def main():
 
                                                                 # [XXX] may hang???
                                                                 'preprocessing_num_workers': max(1, int(n_cpus_per_node / int(min(2, n_gpus_per_node)))),
-                                                                'preprocess_batch_size': 1000,
+                                                                'preprocess_batch_size': 500,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+
+                                                                'preprocess_keep_in_memory': preprocess_keep_in_memory,
 
                                                                 'ddp_timeout': 3600 * 10,
 

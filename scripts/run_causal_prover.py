@@ -320,6 +320,9 @@ class DataTrainingArguments:
             )
         }
     )
+    preprocess_keep_in_memory: bool = field(
+        default=False,
+    )
 
     # logic_eval_padding: Optional[str] = field(
     #     default="longest",
@@ -699,6 +702,7 @@ def tokenize_datasets(training_args,
                 'batch_size': data_args.preprocess_batch_size,
                 'num_proc': data_args.preprocessing_num_workers,
                 'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                'keep_in_memory': data_args.preprocess_keep_in_memory,
                 'desc': desc,
             }
 
@@ -882,6 +886,7 @@ def load_logic_raw_datasets(data_args, model_args):
             FLD_map_schema,
             batched=True,
             batch_size=data_args.preprocess_batch_size,
+            keep_in_memory=data_args.preprocess_keep_in_memory,
             num_proc=data_args.preprocessing_num_workers,
             load_from_cache_file=not data_args.overwrite_cache,
             desc="[logic dataset] mapping schema",
@@ -1082,16 +1087,16 @@ def main():
         trust_remote_code=True,
     )
 
+    torch_dtype = (
+        model_args.torch_dtype
+        if model_args.torch_dtype in ["auto", None]
+        else getattr(torch, model_args.torch_dtype)
+    )
     if model_args.from_scratch:
-        model = AutoModelForCausalLM.from_config(config)
+        model = AutoModelForCausalLM.from_config(config, torch_dtype=torch_dtype)
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
     else:
-        torch_dtype = (
-            model_args.torch_dtype
-            if model_args.torch_dtype in ["auto", None]
-            else getattr(torch, model_args.torch_dtype)
-        )
         model = AutoModelForCausalLM.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -1191,6 +1196,7 @@ def main():
     maybe_logic_preprocess_map_kwargs = {
         'batched': True,
         'batch_size': data_args.preprocess_batch_size,
+        'keep_in_memory': data_args.preprocess_keep_in_memory,
         'load_from_cache_file': not data_args.overwrite_cache,
         'num_proc': data_args.preprocessing_num_workers,
     }
