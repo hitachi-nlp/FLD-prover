@@ -150,7 +150,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-8')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-10.freeze')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4.do_cache')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache')
 
 
 
@@ -200,7 +204,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -253,7 +257,7 @@ def main():
 
         # ============================ LPT     ============================
 
-        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
 
 
 
@@ -483,12 +487,12 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
 
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
     ]
 
 
@@ -514,11 +518,11 @@ def main():
 
         # ------------------------ NeurIPS 2024 -----------------------
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
 
         # (
@@ -526,7 +530,8 @@ def main():
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None)
         #     ],
-        #     False,
+        #     # False,
+        #     True,
         # ),
 
         # (
@@ -541,13 +546,13 @@ def main():
 
         # ------------------------ LPT -----------------------
 
-        # (
-        #     0.00,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.00,
+            [
+                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+            ],
+            False,
+        ),
 
 
         # (
@@ -559,19 +564,19 @@ def main():
         # ),
 
 
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.03,
+            [
+                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+            ],
+            False,
+        ),
 
 
     ]
 
-    # preprocess_keep_in_memory = False
-    preprocess_keep_in_memory = True
+    preprocess_keep_in_memory = False
+    # preprocess_keep_in_memory = True
 
 
 
@@ -591,7 +596,32 @@ def main():
 
         # --------- dataset = 100k, logic=1.0--------------------
         # 'FT.bs-256__step-390.wrmp-200',
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
+
+        # --------- dataset = 200k, logic=1.0--------------------
+        # 'FT.bs-256__step-780.wrmp-400',
+
+        # --------- dataset = 300k, logic=1.0--------------------
+        # 'FT.bs-256__step-1172.wrmp-600',
+
+
+        # --------- dataset = 300k, logic=1.0 -----------
+        # 'FT.bs-256__step-1170.wrmp-200',
+        # 'FT.bs-512__step-586.wrmp-200',
+
+
+        # --------- dataset = 300k, logic=0.5 -----------
+        # 'FT.bs-384__step-1560',
+        # 'FT.bs-512__step-1200',
+        # 'FT.bs-640__step-940',
+
+
+        # --------- dataset = 300k, logic=0.25 -----------
+        # 'FT.bs-768__step-1560',
+
+
+        # --------- others --------------------
+        # 'FT.bs-256__step-152',      # Alpaca 3 epochs with context 2048
 
 
         # ---- JFLD experiments ----
@@ -604,7 +634,7 @@ def main():
 
         # ---- LPT ----------
         # 'LPT.bs-1024__step-24000.wrmp-100',
-        # 'LPT.bs-2048__step-12000.wrmp-100',
+        'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-8192__step-3000.wrmp-100',
     ]
 
@@ -615,48 +645,48 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None, None, None),
+        (None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
     ]
 
 
     lrates = [
         # 1e-5,
-        3e-6,    # the best for ALPT
+        # 3e-6,    # the best
         # 1e-6,
 
-        # 3e-4,    # LPT, from Pythia
+        3e-4,    # LPT, from Pythia
     ]
 
 
     update_parameters_args = [
         'all',
-        'attention',
-        'mlp',
+        # 'attention',
+        # 'mlp',
     ]
 
 
     from_scratch_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
 
-    weight_decay = None    # ALPT
-    # weight_decay = 0.01   # LPT, from Pythia
+    # weight_decay = None
+    weight_decay = 0.01   # LPT, from Pythia
 
 
     # ------------------------------- HAIC --------------------------------
-    hours = None
+    # hours = None
 
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
@@ -668,12 +698,12 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
-    hours = 24
+    # hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    # hours = 72
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
@@ -989,7 +1019,8 @@ def main():
 
                                                                 # [XXX] may hang???
                                                                 # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
-                                                                'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
+                                                                # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
+                                                                'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
                                                                 'preprocess_batch_size': 500,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),

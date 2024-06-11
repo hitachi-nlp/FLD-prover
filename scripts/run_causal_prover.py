@@ -700,11 +700,14 @@ def tokenize_datasets(training_args,
             dataset_map_kwargs = {
                 'batched': True,
                 'batch_size': data_args.preprocess_batch_size,
-                'num_proc': data_args.preprocessing_num_workers,
-                'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
-                'keep_in_memory': data_args.preprocess_keep_in_memory,
-                'desc': desc,
             }
+            if not data_args.streaming:
+                dataset_map_kwargs.update({
+                    'num_proc': data_args.preprocessing_num_workers,
+                    'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                    'keep_in_memory': data_args.preprocess_keep_in_memory,
+                    'desc': desc,
+                })
 
             with training_args.main_process_first(desc=desc):
                 # avoid long text, which make tokenizer too slow
@@ -882,14 +885,20 @@ def load_logic_raw_datasets(data_args, model_args):
 
     if data_args.logic_dataset_type == 'FLD':
         # load and dump once to normalize the schema from different versions of datasets.
+        dataset_map_kwargs = {}
+        if not data_args.streaming:
+            dataset_map_kwargs.update({
+                'num_proc': data_args.preprocessing_num_workers,
+                'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                'keep_in_memory': data_args.preprocess_keep_in_memory,
+                'desc': '[logic dataset] mapping schema',
+            })
+
         logic_raw_datasets = logic_raw_datasets.map(
             FLD_map_schema,
             batched=True,
             batch_size=data_args.preprocess_batch_size,
-            keep_in_memory=data_args.preprocess_keep_in_memory,
-            num_proc=data_args.preprocessing_num_workers,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc="[logic dataset] mapping schema",
+            **dataset_map_kwargs,
         )
 
     logic_raw_datasets = logic_raw_datasets.filter(lambda x: x is not None)
@@ -1197,10 +1206,15 @@ def main():
     maybe_logic_preprocess_map_kwargs = {
         'batched': True,
         'batch_size': data_args.preprocess_batch_size,
-        'keep_in_memory': data_args.preprocess_keep_in_memory,
-        'load_from_cache_file': not data_args.overwrite_cache,
-        'num_proc': data_args.preprocessing_num_workers,
     }
+    if not data_args.streaming:
+        maybe_logic_preprocess_map_kwargs.update({
+            'num_proc': data_args.preprocessing_num_workers,
+            'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+            'keep_in_memory': data_args.preprocess_keep_in_memory,
+            'desc': desc,
+        })
+
 
     if LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
         logic_processed_dataset = logic_raw_datasets
@@ -1211,7 +1225,6 @@ def main():
             with training_args.main_process_first(desc=_desc):
                 logic_processed_dataset[split] = dataset.map(
                     lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
                     **maybe_logic_preprocess_map_kwargs,
 
                 )
@@ -1281,7 +1294,6 @@ def main():
             with training_args.main_process_first(desc=_desc):
                 train_dataset = train_dataset.map(
                     lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
                     **maybe_logic_preprocess_map_kwargs,
                 )
         if eval_dataset:
@@ -1291,7 +1303,6 @@ def main():
             with training_args.main_process_first(desc=_desc):
                 eval_dataset = eval_dataset.map(
                     lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
                     **maybe_logic_preprocess_map_kwargs,
                 )
 
@@ -1331,7 +1342,6 @@ def main():
                                                          logic_eval_dataset_processor,
                                                          examples,
                                                          'generation'),
-                desc=_desc,
                 **maybe_logic_preprocess_map_kwargs,
             )
     else:
