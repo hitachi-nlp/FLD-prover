@@ -540,13 +540,13 @@ def main():
 
         # ------------------------ LPT -----------------------
 
-        (
-            0.00,
-            [
-                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #     ],
+        #     False,
+        # ),
 
 
         # (
@@ -1012,7 +1012,8 @@ def main():
                                                                 # 'preprocess_batch_size': 500,
 
                                                                 # [XXX] may hang???
-                                                                'preprocessing_num_workers': max(1, int(n_cpus_per_node / int(min(2, n_gpus_per_node)))),
+                                                                # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
+                                                                'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
                                                                 'preprocess_batch_size': 500,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
