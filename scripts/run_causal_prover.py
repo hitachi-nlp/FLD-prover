@@ -1112,17 +1112,18 @@ def main():
     update_parameter_names = []
     if data_args.update_parameters == 'all':
         update_parameter_names = [name for name, params in model.named_parameters()]
-    elif data_args.update_parameters == 'attention':
-        # model.enable_input_require_grads()
-        # model.gradient_checkpointing_enable()
-        # model.norm.weiht is somwhow needed, otherwise exception
-        update_parameter_names = [name for name, params in model.named_parameters()
-                                  if 'attn' in name or 'model.norm.weight' in name]
-    elif data_args.update_parameters == 'mlp':
-        update_parameter_names = [name for name, params in model.named_parameters()
-                                  if 'mlp' in name or 'model.norm.weight' in name]
     else:
-        raise ValueError(data_args.update_parameters)
+        model.enable_input_require_grads()
+        model.gradient_checkpointing_enable()
+        if data_args.update_parameters == 'attention':
+            # model.norm.weiht is somwhow needed, otherwise exception
+            update_parameter_names = [name for name, params in model.named_parameters()
+                                      if 'attn' in name or 'model.norm.weight' in name]  
+        elif data_args.update_parameters == 'mlp':
+            update_parameter_names = [name for name, params in model.named_parameters()
+                                      if 'mlp' in name or 'model.norm.weight' in name]
+        else:
+            raise ValueError(data_args.update_parameters)
     freeze_parameter_names = [name for name, params in model.named_parameters()
                               if name not in update_parameter_names]
 
