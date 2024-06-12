@@ -154,7 +154,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4.do_cache')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-2')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets-2.9')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets.pyarrow.newest')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.newest')
 
 
 
@@ -701,8 +708,10 @@ def main():
     # hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
     hours = 72
 
     skip_if_exists = False
