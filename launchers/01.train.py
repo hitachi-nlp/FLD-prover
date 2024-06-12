@@ -161,7 +161,17 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets-2.9')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets.pyarrow.newest')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.newest')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.newest')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.2.9')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--1')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--4.after_single')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--1.proc-32')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--4.proc-32')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--15.proc-32')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32')
 
 
 
@@ -711,6 +721,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
     hours = 72
 
@@ -928,6 +939,7 @@ def main():
                                                                     train_effective_batch_size=train_effective_batch_size,
                                                                     num_evals=num_evals,
                                                                     # max_eval_samples=max_eval_samples,
+                                                                    logic_dataset_prob=logic_dataset_prob,
 
                                                                     n_gpus=n_total_gpus,
                                                                 )
@@ -1029,7 +1041,10 @@ def main():
                                                                 # [XXX] may hang???
                                                                 # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
                                                                 # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
-                                                                'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
+                                                                # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
+
+                                                                # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                'preprocessing_num_workers': 32,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
                                                                 'preprocess_batch_size': 500,
 
                                                                 # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
