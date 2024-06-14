@@ -31,26 +31,37 @@ def main():
     # TOP_DIR = './outputs.FLD-prover//01.train.py/2024-5-13.large_models'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-5-19.flight'
 
-    TOP_DIR = './outputs/01.train.py/2024-06-08.LPT'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
 
     CHECKPOINTS = [
+        # ---------- NeurIPS -----------
         # 97,
         # 194,
         # 291,
-        388,
+        # 388,
+
+        # ---------- LPT -----------
+        12000
     ]
 
     PARAMS = [
+        # ------------ NeurIPS ------------
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+
+        # ------------ LPT ------------
         'model_name',
         'logic_dataset_uname',
-        # 'proof_intermediate_steps',
-        'optimizer',
-        # 'block_size',
+        'dataset_names',
+        'logic_dataset_prob',
         'learning',
         'learning_rate',
-        # 'rec_adam_anneal_schedule',
-        'rec_adam_fisher_coef',
-        # 'lr_scheduler_type',
+
     ]
 
     input_dir = Path(TOP_DIR)

@@ -171,7 +171,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--1.proc-32')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--4.proc-32')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--15.proc-32')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.7B')
 
 
 
@@ -274,7 +276,8 @@ def main():
 
         # ============================ LPT     ============================
 
-        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
@@ -581,13 +584,13 @@ def main():
         # ),
 
 
-        (
-            0.03,
-            [
-                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
-            ],
-            False,
-        ),
+        # (
+        #     0.03,
+        #     [
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #     ],
+        #     False,
+        # ),
 
 
     ]
@@ -676,7 +679,8 @@ def main():
         # 3e-6,    # the best
         # 1e-6,
 
-        3e-4,    # LPT, from Pythia
+        # 3e-4,    # LPT-1B, from Pythia
+        1.2e-4,    # LPT-7B, from Pythia
     ]
 
 
@@ -721,7 +725,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
     hours = 72
 

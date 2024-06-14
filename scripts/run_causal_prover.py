@@ -1003,7 +1003,7 @@ def setup_seq2seq_trainer_class(klass,
 
 def main():
     logging.getLogger().handlers.clear()
-    setup_logger(do_stderr=True, level=logging.INFO)
+    setup_logger(do_stderr=True, level=logging.INFO, clear_other_handlers=True)
     logging.getLogger('absl').setLevel(logging.WARNING)
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
