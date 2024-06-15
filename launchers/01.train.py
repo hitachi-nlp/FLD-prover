@@ -173,7 +173,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--15.proc-32')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.7B')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.7B')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=False')
 
 
 
@@ -276,8 +279,8 @@ def main():
 
         # ============================ LPT     ============================
 
-        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
@@ -548,7 +551,7 @@ def main():
         # (
         #     0.5,
         #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #         (1.0, 'DKYoon/SlimPajama-6B', None, None)
         #     ],
         #     # False,
         #     True,
@@ -557,7 +560,7 @@ def main():
         # (
         #     0.0,
         #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None)
+        #         (1.0, 'DKYoon/SlimPajama-6B', None, None)
         #     ],
         #     False,
         # ),
@@ -566,10 +569,20 @@ def main():
 
         # ------------------------ LPT -----------------------
 
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
+        #     ],
+        #     False,
+        # ),
+
+
+        # streaming and slicing to download only subsets: https://huggingface.co/docs/datasets/stream#split-dataset
         (
             0.00,
             [
-                (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
             ],
             False,
         ),
@@ -578,7 +591,7 @@ def main():
         # (
         #     0.01,
         #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
         #     ],
         #     False,
         # ),
@@ -587,7 +600,7 @@ def main():
         # (
         #     0.03,
         #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None)
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
         #     ],
         #     False,
         # ),
@@ -679,8 +692,8 @@ def main():
         # 3e-6,    # the best
         # 1e-6,
 
-        # 3e-4,    # LPT-1B, from Pythia
-        1.2e-4,    # LPT-7B, from Pythia
+        3e-4,    # LPT-1B, from Pythia
+        # 1.2e-4,    # LPT-7B, from Pythia
     ]
 
 
@@ -721,10 +734,10 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
     # hours = 24
 
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
@@ -955,12 +968,14 @@ def main():
                                                             other_dataset_probs = [other_dataset[0] for other_dataset in other_datasets]
                                                             other_dataset_names = [other_dataset[1] for other_dataset in other_datasets]
                                                             other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
+                                                            other_dataset_take_n_s = [other_dataset[3] for other_dataset in other_datasets]
                                                             setting.update(
                                                                 get_dataset_setting(
                                                                     dataset_uname=logic_dataset_uname,
                                                                     top_dirs=DATASETS_DIRS,
                                                                     other_dataset_names=other_dataset_names,
                                                                     other_dataset_config_names=other_dataset_config_names,
+                                                                    other_dataset_take_n_s=other_dataset_take_n_s,
                                                                     other_dataset_probs=other_dataset_probs,
                                                                     use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
                                                                     use_test_as_train=setting.get('use_test_as_train', use_test_as_train),

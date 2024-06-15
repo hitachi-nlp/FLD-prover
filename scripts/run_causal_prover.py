@@ -202,6 +202,9 @@ class DataTrainingArguments:
     dataset_config_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset config names separated by ::"}
     )
+    dataset_take_n_s: Optional[str] = field(
+        default=None, metadata={"help": "Dataset take 'n' separated by ::"}
+    )
     dataset_probs: Optional[str] = field(
         default=None, metadata={"help": "Dataset probabilities separated by ::"}
     )
@@ -497,6 +500,7 @@ def load_raw_dataset_by_name(data_args,
                              model_args,
                              dataset_name: str,
                              dataset_config_name: str,
+                             dataset_take_n: int = None,
                              concatenate_all_configs=False,
                              concatenate_all_splits_into_train=False):
     load_dataset_kwargs = {
@@ -539,6 +543,13 @@ def load_raw_dataset_by_name(data_args,
         split_datasets = [raw_datasets[split_name] for split_name in split_names]
         raw_datasets['train'] = concatenate_datasets(split_datasets)
 
+    if dataset_take_n is not None:
+        for split_name in list(raw_datasets.keys()):
+            if split_name == 'train':
+                raw_datasets[split_name] = take(raw_datasets[split_name], dataset_take_n, False)
+            else:
+                raw_datasets[split_name] = take(raw_datasets[split_name], 100000, False)  # 100k is just a heuristics
+
     if "validation" not in raw_datasets.keys():
         if "dev" in raw_datasets.keys():
             raw_datasets["validation"] = raw_datasets["dev"]
@@ -555,14 +566,6 @@ def load_raw_dataset_by_name(data_args,
                 split=f"train[{data_args.validation_split_percentage}%:]",
                 **load_dataset_kwargs,
             )
-
-    large_dataset_name = 'DKYoon/SlimPajama-6B'
-    if dataset_name == large_dataset_name:
-        max_samples = 2000000  # 1 / 3 of all, about 2B tokens, 300k samples of 4k token block
-        raw_datasets['train'] = take(raw_datasets['train'], max_samples, False)
-        logger.warning('We will only take first %d samples from the training set of %s to save disk',
-                       max_samples,
-                       large_dataset_name)
 
     return raw_datasets
 
@@ -631,6 +634,7 @@ def parse_listed_option(option: str) -> Optional[List[str]]:
 def load_raw_datasets(data_args, model_args):
     dataset_names = parse_listed_option(data_args.dataset_names)
     dataset_config_names = parse_listed_option(data_args.dataset_config_names)
+    dataset_take_n_s = parse_listed_option(data_args.dataset_take_n_s)
     train_files = parse_listed_option(data_args.train_files)
     validation_files = parse_listed_option(data_args.validation_files)
     file_types = parse_listed_option(data_args.file_types)
@@ -644,6 +648,7 @@ def load_raw_datasets(data_args, model_args):
                     model_args,
                     dataset_names[i],
                     dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
+                    dataset_take_n=int(dataset_take_n_s[i]) if dataset_take_n_s[i] != 'None' else None,
                 )
             )
     else:
@@ -673,14 +678,13 @@ def tokenize_datasets(training_args,
         tokenized_datasets_list = []
 
         for raw_datasets in raw_datasets_list:
-            if training_args.do_train:
+            if training_args.do_train and raw_datasets["train"].features is not None:
                 column_names = list(raw_datasets["train"].features)
-            elif training_args.do_eval or data_args.do_eval_in_outerloop:
+            elif (training_args.do_eval or data_args.do_eval_in_outerloop) and raw_datasets["validation"].features is not None:
                 column_names = list(raw_datasets["validation"].features)
             else:
-                column_names = None
-            text_column_name = data_args.text_column_name\
-                or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
+                column_names = ['text']
+            text_column_name = data_args.text_column_name or ("text" if "text" in column_names else column_names[0])
 
             # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
             tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
@@ -709,13 +713,11 @@ def tokenize_datasets(training_args,
                     'desc': desc,
                 })
 
-            logger.critical('0')
             with training_args.main_process_first(desc=desc):
                 # avoid long text, which make tokenizer too slow
                 raw_datasets = raw_datasets.filter(lambda x: len(x[text_column_name]) < 100_000)
                 tokenized_datasets = raw_datasets.map(tokenize_function, remove_columns=column_names, **dataset_map_kwargs)
 
-            logger.critical('1')
             def group_texts(examples):
                 concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
                 total_length = len(concatenated_examples[list(examples.keys())[0]])
@@ -734,7 +736,6 @@ def tokenize_datasets(training_args,
             with training_args.main_process_first(desc=desc):
                 tokenized_datasets = tokenized_datasets.map(group_texts, **dataset_map_kwargs)
 
-            logger.critical('2')
             tokenized_datasets_list.append(tokenized_datasets)
 
     return tokenized_datasets_list
@@ -1200,13 +1201,10 @@ def main():
                                                 tokenizer,
                                                 block_size)
 
-    logger.critical('3')
     logic_dataset_processor = make_logic_data_processor(data_args, tokenizer, block_size, block_size)
     data_args.log_non_logic_examples = True
 
-    logger.critical('4')
     logic_raw_datasets = load_logic_raw_datasets(data_args, model_args)
-    logger.critical('5')
 
     desc = "[logic dataset] _maybe_logic_preprocess()"
     maybe_logic_preprocess_map_kwargs = {
@@ -1221,7 +1219,6 @@ def main():
             'desc': desc,
         })
 
-    logger.critical('6')
 
     if LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
         logic_processed_dataset = logic_raw_datasets
@@ -1237,7 +1234,6 @@ def main():
                 )
     else:
         logic_processed_dataset = logic_raw_datasets
-    logger.critical('7')
 
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
@@ -1258,7 +1254,6 @@ def main():
                                  data_args.train_random_sampling)
     else:
         train_dataset = None
-    logger.critical('8')
 
     if training_args.do_eval or data_args.do_eval_in_outerloop:
         eval_dataset = make_interleave_datasets(
@@ -1290,7 +1285,6 @@ def main():
     else:
         eval_dataset = None
 
-    logger.critical('9')
     # Wr do the FLD preprocessing here after making interleaved datasets,
     # as the current implementation of interleave_datasets() ignores the processing specified on each dataset.
 
@@ -1316,7 +1310,6 @@ def main():
                     **maybe_logic_preprocess_map_kwargs,
                 )
 
-    logger.critical('10')
     generation_config, generation_handle_args, generation_handled_kwargs = make_generation_settings(
         data_args, tokenizer, model, config
     )
@@ -1328,7 +1321,6 @@ def main():
                                                              tokenizer,
                                                              data_args.generation_max_length,
                                                              data_args.generation_max_prompt_length)
-    logger.critical('11')
     if "validation" in logic_eval_raw_datasets:
         logic_eval_dataset = logic_eval_raw_datasets["validation"]
 
@@ -1359,18 +1351,15 @@ def main():
     else:
         logic_eval_dataset = None
 
-    logger.critical('12')
     logic_eval_dataset_processor.eval_dataset = logic_eval_dataset
     logic_compute_metrics = logic_eval_dataset_processor.compute_metrics
 
-    logger.critical('13')
     setup_seq2seq_trainer_class(ForceCallMetricsSeq2SeqTrainer,
                                 data_args,
                                 generation_handle_args,
                                 generation_handled_kwargs)
     collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
-    logger.critical('14')
     def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                      do_compute_metrics=True):
         return ForceCallMetricsSeq2SeqTrainer(
@@ -1431,7 +1420,6 @@ def main():
     trainer.callback_handler = CallbackHandler(
         callbacks, trainer.model, trainer.tokenizer, trainer.optimizer, trainer.lr_scheduler
     )
-    logger.critical('15')
 
     # Training
     if training_args.do_train:

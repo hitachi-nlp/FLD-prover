@@ -14,7 +14,7 @@ from FLD_user_shared_settings import (
     get_base_setting,
     get_dataset_setting,
     get_batch_setting,
-    get_qsub_gpu_setting,
+    get_qsub_cpu_gpu_setting,
     get_generation_setting,
     get_model_setting,
     get_tokenizer_setting,
@@ -29,68 +29,73 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-
     output_top_dir = Path('./outputs/02.interactive.py')
 
     # ---------------------------------- 2023-07-27.compare_models.large_steps ------------------------------------
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
-
-    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
-    # checkpoint = Path('./outputs/01.train.py/20231021.knowledge/dtst_nm=20231021.knowledge.D3.complex-0.3.w_knowledge')
-    # checkpoint = Path('./outputs/01.train.py/20231103.knowledge')
-
-    # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
-
-    # checkpoint = ('TinyLlama/TinyLlama-1.1B-Chat-v0.6', 'causal', 'all_at_once')
-    # checkpoint = ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'all_at_once')
-
-    # best model on the basis of lm-eval
-    # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
-
-
-    # checkpoint = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-5000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=5000/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-5000/')
 
     # checkpoint = ('meta-llama/Llama-2-7b-hf', 'causal', 'all_at_once')
     # gradio_port = 9200
 
-    checkpoint = Path('outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0')
+    checkpoint = Path('outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32/lgc_dtst_nm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large/mdl_nm=EleutherAI/pythia-1b/blck_sz=2048/dtst_cnfg_nms=None/dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6/dtst_prbs=1.0/frm_scrtch=True/instrctn=True/lrnng=LPT.bs-2048__step-12000.wrmp-100/lrnng_rt=0.0003/lgc_dtst_cnctnt_all_cnfgs=False/lgc_dtst_cnctnt_all_splts_int_trn=False/lgc_dtst_prb=0.0/lgc_dtst_typ=FLD/mx_stps=12000/n_sbprf_fr_unknwn=True/optmzr=None/prf_intrmdt_stps=randomly_include/rc_adm_annl_schdl=None/rc_adm_annl_typ=sigmoid/rc_adm_fshr_cf=None/rc_adm_rglrztn=None/rc_adm_trgt_tsk_wght=None/smpl_ngtv_prf=False/sd=0/trn_effctv_btch_sz=2048/updt_prmtrs=all/wrmp_stps=100/wght_dcy=0.01/checkpoint-12000')
+    gradio_port = 9200
+
+    checkpoint = Path('outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32/lgc_dtst_nm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large/mdl_nm=EleutherAI/pythia-1b/blck_sz=2048/dtst_cnfg_nms=None/dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6/dtst_prbs=1.0/frm_scrtch=True/instrctn=True/lrnng=LPT.bs-2048__step-12000.wrmp-100/lrnng_rt=0.0003/lgc_dtst_cnctnt_all_cnfgs=False/lgc_dtst_cnctnt_all_splts_int_trn=False/lgc_dtst_prb=0.03/lgc_dtst_typ=FLD/mx_stps=12000/n_sbprf_fr_unknwn=True/optmzr=None/prf_intrmdt_stps=randomly_include/rc_adm_annl_schdl=None/rc_adm_annl_typ=sigmoid/rc_adm_fshr_cf=None/rc_adm_rglrztn=None/rc_adm_trgt_tsk_wght=None/smpl_ngtv_prf=False/sd=0/trn_effctv_btch_sz=2048/updt_prmtrs=all/wrmp_stps=100/wght_dcy=0.01/checkpoint-12000')
     gradio_port = 9201
 
-    # script_type = 'run_prover'
-    script_type = 'run_causal_prover'
+
+
+
+
 
     instruction = True
-
-    # https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-955k-token-2T
     generation_do_sample = False
     generation_temperature = 1.0
     generation_top_k = 10
-    # generation_repetition_penalty = 1.5  # XXX must tune for each model
     generation_repetition_penalty = 1.2  # XXX must tune for each model
     generation_max_length = 2000
     generation_max_new_tokens = 300
     generation_timeout = 60 * 5
-
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
 
 
-    # -------------- MEMORY REQUIREMENTS ---------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # ------------------------------------------- MEMORY REQUIREMENTS --------------------------------------------
+
+    # script_type = 'run_prover'
+    script_type = 'run_causal_prover'
+
+
+    context_len = 2048
+
     # OK: V100 x 4 + deepspeed 
     # NG: A100 x 1 + deepspeed
     # NG: A100 x 1 + vanilla
 
-    # run_mode = 'vanilla'
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
     
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -104,6 +109,7 @@ def main():
         # n_gpus = None  # specify this when running through QsubEngine
     elif isinstance(engine, QsubEngine):
         n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        _, n_gpus, _, _ = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
 
     hours = 12
 
@@ -205,10 +211,11 @@ def main():
 
     output_dir = make_output_dir(setting, output_top_dir,
                                  dirname_ignore_params=['model_name_or_path'])
-    command = make_command(script_type,
-                           output_dir,
+    command = make_command(output_dir,
                            setting,
                            run_mode,
+                           engine.region,
+                           script_type=script_type,
                            n_gpus_per_node=n_gpus)
 
     run_by_engine(
