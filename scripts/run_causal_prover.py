@@ -502,40 +502,56 @@ def load_raw_dataset_by_name(data_args,
                              dataset_config_name: str,
                              dataset_take_n: int = None,
                              concatenate_all_configs=False,
-                             concatenate_all_splits_into_train=False):
+                             concatenate_all_splits_into_train=False,
+                             only_subset_for_slimpajama=True):
     load_dataset_kwargs = {
         # 'on_bad_lines': 'skip',
         # 'error_bad_lines': False,
         'cache_dir': model_args.cache_dir,
         'streaming': data_args.streaming,
         'use_auth_token': True if model_args.use_auth_token else None,
+        'num_proc': data_args.preprocessing_num_workers,
     }
-    if concatenate_all_configs:
-        configs = get_dataset_config_names(dataset_name)
-        logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
 
-        raw_datasets_list = {}
-        for _dataset_config_name in configs:
-            _raw_datasets = load_dataset(
-                dataset_name,
-                _dataset_config_name,
-                **load_dataset_kwargs,
-            )
-            raw_datasets_list[_dataset_config_name] = _raw_datasets
-
-        major_datasets = raw_datasets_list[configs[0]]
-        raw_datasets = major_datasets
-        split_names = set(major_datasets.keys())
-        for split_name in split_names:
-            split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
-            raw_datasets[split_name] = concatenate_datasets(split_datasets)
-
-    else:
-        raw_datasets = load_dataset(
+    if only_subset_for_slimpajama and dataset_name == 'cerebras/SlimPajama-627B':
+        load_dataset_kwargs.update({
+            'split': ['train[:10%]', 'validation', 'test'],
+        })
+        train_ds, valid_ds, test_ds = load_dataset(
             dataset_name,
             dataset_config_name,
             **load_dataset_kwargs,
         )
+        raw_datasets = DatasetDict(train=train_ds, validation=valid_ds, test=test_ds)
+
+    else:
+
+        if concatenate_all_configs:
+            configs = get_dataset_config_names(dataset_name)
+            logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
+
+            raw_datasets_list = {}
+            for _dataset_config_name in configs:
+                _raw_datasets = load_dataset(
+                    dataset_name,
+                    _dataset_config_name,
+                    **load_dataset_kwargs,
+                )
+                raw_datasets_list[_dataset_config_name] = _raw_datasets
+
+            major_datasets = raw_datasets_list[configs[0]]
+            raw_datasets = major_datasets
+            split_names = set(major_datasets.keys())
+            for split_name in split_names:
+                split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
+                raw_datasets[split_name] = concatenate_datasets(split_datasets)
+
+        else:
+            raw_datasets = load_dataset(
+                dataset_name,
+                dataset_config_name,
+                **load_dataset_kwargs,
+            )
 
     if concatenate_all_splits_into_train:
         logger.info('We will concatenate all splits of %s into the training set', dataset_name)
@@ -545,10 +561,7 @@ def load_raw_dataset_by_name(data_args,
 
     if dataset_take_n is not None:
         for split_name in list(raw_datasets.keys()):
-            if split_name == 'train':
-                raw_datasets[split_name] = take(raw_datasets[split_name], dataset_take_n, False)
-            else:
-                raw_datasets[split_name] = take(raw_datasets[split_name], 100000, False)  # 100k is just a heuristics
+            raw_datasets[split_name] = take(raw_datasets[split_name], dataset_take_n, False)
 
     if "validation" not in raw_datasets.keys():
         if "dev" in raw_datasets.keys():
@@ -1032,7 +1045,6 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     if training_args.dataloader_num_workers > 1:
-        logger.critical(training_args.dataloader_num_workers)
         raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (generation of proofs) (but I don\'t know why)')
 
     if training_args.should_log:
@@ -1048,6 +1060,9 @@ def main():
     transformers.utils.logging.set_verbosity(log_level)
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
+    logging.getLogger().handlers.clear()
+    setup_logger(do_stderr=True, level=logging.INFO, clear_other_handlers=True)
+
 
     # Log on each process the small summary:
     logger.warning(

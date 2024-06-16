@@ -176,7 +176,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.7B')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=False')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=False')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=True')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=True')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False.subset')
 
 
 
@@ -525,19 +532,8 @@ def main():
 
 
 
-    """
-    (
-        FLD_dataset_prob,
-        other_datasets,
-        streaming,
-    ),
-    """
+    # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
     multitask_setting_list = [
-
-        # streaming=True does not work in HAI cluster under the current proxy,
-        # as the connection to huggingface.co via pyarrow library fails,
-        # possibly due to the redirection forced by the proxy.
-
 
         # ------------------------ NeurIPS 2024 -----------------------
 
@@ -577,17 +573,6 @@ def main():
         #     False,
         # ),
 
-
-        # streaming and slicing to download only subsets: https://huggingface.co/docs/datasets/stream#split-dataset
-        (
-            0.00,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
-            ],
-            False,
-        ),
-
-
         # (
         #     0.01,
         #     [
@@ -606,6 +591,14 @@ def main():
         # ),
 
 
+        # streaming and slicing to download only subsets: https://huggingface.co/docs/datasets/stream#split-dataset
+        (
+            0.00,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
+            ],
+            False,
+        ),
     ]
 
     preprocess_keep_in_memory = False
@@ -808,7 +801,7 @@ def main():
         'randomly_include',   # the best
     ]
 
-
+    max_eval_samples = 10000
 
     instruction_args = [
         # False,       # better for chat-model?
@@ -957,7 +950,7 @@ def main():
 
                                                                     train_effective_batch_size=train_effective_batch_size,
                                                                     num_evals=num_evals,
-                                                                    # max_eval_samples=max_eval_samples,
+                                                                    max_eval_samples=max_eval_samples,
                                                                     logic_dataset_prob=logic_dataset_prob,
 
                                                                     n_gpus=n_total_gpus,
