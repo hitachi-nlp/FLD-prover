@@ -183,7 +183,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=True')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False.subset')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False.subset')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-06-16.slim_pajama_org_50B')
 
 
 
@@ -568,30 +570,11 @@ def main():
         # (
         #     0.00,
         #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
+        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)  # XXX SlimPajama-62B-Text-1of6 only include 1/6 of of 62B tokens
         #     ],
         #     False,
         # ),
 
-        # (
-        #     0.01,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
-        #     ],
-        #     False,
-        # ),
-
-
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)
-        #     ],
-        #     False,
-        # ),
-
-
-        # streaming and slicing to download only subsets: https://huggingface.co/docs/datasets/stream#split-dataset
         (
             0.00,
             [
@@ -599,6 +582,15 @@ def main():
             ],
             False,
         ),
+
+        (
+            0.03,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
+            ],
+            False,
+        ),
+
     ]
 
     preprocess_keep_in_memory = False
@@ -727,9 +719,10 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
     # hours = 24
 
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
