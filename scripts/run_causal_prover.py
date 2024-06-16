@@ -203,7 +203,7 @@ class DataTrainingArguments:
         default=None, metadata={"help": "Dataset config names separated by ::"}
     )
     dataset_take_n_s: Optional[str] = field(
-        default=None, metadata={"help": "Dataset take 'n' separated by ::"}
+        default=None, metadata={"help": "Dataset take 'n' separated by ::. XXX: Should be 2 x #samples you want, as we additionally filter the dataset, which typically only take aboud a half of that datsaet."}
     )
     dataset_probs: Optional[str] = field(
         default=None, metadata={"help": "Dataset probabilities separated by ::"}
@@ -503,7 +503,7 @@ def load_raw_dataset_by_name(data_args,
                              dataset_take_n: int = None,
                              concatenate_all_configs=False,
                              concatenate_all_splits_into_train=False,
-                             only_subset_for_slimpajama=True):
+                             slim_pajama_take_ratio='25%'):
     load_dataset_kwargs = {
         # 'on_bad_lines': 'skip',
         # 'error_bad_lines': False,
@@ -513,9 +513,9 @@ def load_raw_dataset_by_name(data_args,
         'num_proc': data_args.preprocessing_num_workers,
     }
 
-    if only_subset_for_slimpajama and dataset_name == 'cerebras/SlimPajama-627B':
+    if slim_pajama_take_ratio is not None and dataset_name == 'cerebras/SlimPajama-627B':
         load_dataset_kwargs.update({
-            'split': ['train[:10%]', 'validation', 'test'],
+            'split': [f'train[:{slim_pajama_take_ratio}]', 'validation', 'test'],
         })
         train_ds, valid_ds, test_ds = load_dataset(
             dataset_name,

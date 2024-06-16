@@ -578,7 +578,7 @@ def main():
         (
             0.00,
             [
-                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
             ],
             False,
         ),
@@ -586,7 +586,7 @@ def main():
         (
             0.03,
             [
-                (1.0, 'cerebras/SlimPajama-627B', None, 30826554)  # 50B token
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
             ],
             False,
         ),
@@ -722,13 +722,13 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
-    hours = 72
+    # hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
@@ -768,7 +768,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
-
+    if (engine.resource.find('xhn_s') >= 0 or engine.resource.find('xcs_s') >= 0 or engine.resource.find('xcl_s') >= 0) and hours > 24:
+        raise ValueError()
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
@@ -988,7 +989,6 @@ def main():
                                                                     batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
                                                                 )
                                                             )
-
                                                             # if run_mode == 'deepspeed':
                                                             #     for max_eval_arg_name in ['logic_eval_max_samples']:
                                                             #         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
