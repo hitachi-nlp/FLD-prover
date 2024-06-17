@@ -193,7 +193,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.slim_pajama_org_50B')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero1')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
 
 
 
