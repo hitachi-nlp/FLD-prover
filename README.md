@@ -41,7 +41,7 @@ pip install --upgrade pip
 
 # Install pytorch. This is just an example with CUDA 11.8.,
 # and users have to install torch respecting THEIR OWN CUDA versions.
-pip install torch==2.0.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
 
 # Install other packages
 pip install -r ./requirements/requirements.txt
