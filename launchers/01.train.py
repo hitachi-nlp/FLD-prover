@@ -324,9 +324,6 @@ def main():
 
 
 
-
-
-
     logic_dataset_unames = [
 
         # ---------------------------------- 20230729.case_study_finalize ------------------------------------
@@ -665,6 +662,9 @@ def main():
 
 
 
+
+    # deepspeed_stage = 'zero3'
+    deepspeed_stage = 'zero0'
 
 
 
@@ -1035,6 +1035,7 @@ def main():
                                                                 'float_precision': float_precision,
                                                                 'fp16': fp16,
                                                                 'bf16': bf16,
+                                                                'deepspeed_stage': deepspeed_stage,
 
                                                                 # 'save_total_limit': save_total_limit,
 
@@ -1088,6 +1089,7 @@ def main():
                                                                                    setting,
                                                                                    run_mode,
                                                                                    region,
+                                                                                   deepspeed_stage=deepspeed_stage,
                                                                                    n_gpus_per_node=n_gpus_per_node)
 
                                                             run_by_engine(
