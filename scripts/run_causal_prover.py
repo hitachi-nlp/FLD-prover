@@ -508,7 +508,7 @@ def load_raw_dataset_by_name(data_args,
                              dataset_take_n: int = None,
                              concatenate_all_configs=False,
                              concatenate_all_splits_into_train=False,
-                             slim_pajama_take_ratio='25%'):
+                             slim_pajama_take_ratio='15%'):
     load_dataset_kwargs = {
         # 'on_bad_lines': 'skip',
         # 'error_bad_lines': False,
