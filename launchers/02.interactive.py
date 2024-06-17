@@ -33,15 +33,27 @@ def main():
 
     # ---------------------------------- 2023-07-27.compare_models.large_steps ------------------------------------
 
-    # checkpoint = ('meta-llama/Llama-2-7b-hf', 'causal', 'all_at_once')
+    # checkpoint = 'meta-llama/Meta-Llama-3-8B'
     # gradio_port = 9200
 
-    checkpoint = Path('outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32/lgc_dtst_nm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large/mdl_nm=EleutherAI/pythia-1b/blck_sz=2048/dtst_cnfg_nms=None/dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6/dtst_prbs=1.0/frm_scrtch=True/instrctn=True/lrnng=LPT.bs-2048__step-12000.wrmp-100/lrnng_rt=0.0003/lgc_dtst_cnctnt_all_cnfgs=False/lgc_dtst_cnctnt_all_splts_int_trn=False/lgc_dtst_prb=0.0/lgc_dtst_typ=FLD/mx_stps=12000/n_sbprf_fr_unknwn=True/optmzr=None/prf_intrmdt_stps=randomly_include/rc_adm_annl_schdl=None/rc_adm_annl_typ=sigmoid/rc_adm_fshr_cf=None/rc_adm_rglrztn=None/rc_adm_trgt_tsk_wght=None/smpl_ngtv_prf=False/sd=0/trn_effctv_btch_sz=2048/updt_prmtrs=all/wrmp_stps=100/wght_dcy=0.01/checkpoint-12000')
+    # checkpoint = 'lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__prf_intrmdt_stps=randomly_include__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=6e-06__rc_adm_annl_schdl=immediately_from_beginning__rc_adm_fshr_cf=3000.chk-388'
+    # gradio_port = 9200
+
+
+    # checkpoint = 'meta-llama/Meta-Llama-3-70B'
+    # gradio_port = 9200
+
+    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06__rc_adm_fshr_cf=300.chk-388'
     gradio_port = 9200
 
-    checkpoint = Path('outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32/lgc_dtst_nm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large/mdl_nm=EleutherAI/pythia-1b/blck_sz=2048/dtst_cnfg_nms=None/dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6/dtst_prbs=1.0/frm_scrtch=True/instrctn=True/lrnng=LPT.bs-2048__step-12000.wrmp-100/lrnng_rt=0.0003/lgc_dtst_cnctnt_all_cnfgs=False/lgc_dtst_cnctnt_all_splts_int_trn=False/lgc_dtst_prb=0.03/lgc_dtst_typ=FLD/mx_stps=12000/n_sbprf_fr_unknwn=True/optmzr=None/prf_intrmdt_stps=randomly_include/rc_adm_annl_schdl=None/rc_adm_annl_typ=sigmoid/rc_adm_fshr_cf=None/rc_adm_rglrztn=None/rc_adm_trgt_tsk_wght=None/smpl_ngtv_prf=False/sd=0/trn_effctv_btch_sz=2048/updt_prmtrs=all/wrmp_stps=100/wght_dcy=0.01/checkpoint-12000')
-    gradio_port = 9201
 
+    # ------------------------------------ LPT --------------------------------
+
+    # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
+    # gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.03__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
+    # gradio_port = 9201
 
 
 
@@ -138,13 +150,13 @@ def main():
         else:
             lab_setting = {}
 
-        hf_model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
-        lm_type = lab_setting.get('lm_type', 'causal')
-        proof_sampling = lab_setting.get('proof_sampling', 'all_at_once')
+        _model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
         model_name_or_path = checkpoint_dir
     else:
-        hf_model_name, lm_type, proof_sampling = checkpoint
-        model_name_or_path = hf_model_name
+        _model_name = checkpoint
+        lm_type = 'causal'
+        proof_sampling = 'all_at_once'
+        model_name_or_path = _model_name
 
     setting = {}
 
@@ -165,9 +177,9 @@ def main():
         )
     )
 
-    setting.update(get_model_setting(hf_model_name))
+    setting.update(get_model_setting(_model_name))
 
-    setting.update(get_tokenizer_setting(hf_model_name))
+    setting.update(get_tokenizer_setting(_model_name))
 
     setting.update(
         get_generation_setting(
@@ -196,7 +208,7 @@ def main():
         'base_setting_name': base_setting_name,
 
         'lm_type': lm_type,
-        'fp16': hf_model_name.find('t5-') < 0 and hf_model_name.find('rinna/japanese-gpt2-medium') < 0,
+        'fp16': _model_name.find('t5-') < 0 and _model_name.find('rinna/japanese-gpt2-medium') < 0,
 
         'proof_sampling': proof_sampling,
 

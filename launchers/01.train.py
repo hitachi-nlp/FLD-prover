@@ -717,7 +717,6 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
-    # hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
@@ -728,7 +727,9 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
-    # hours = 72
+
+    # hours = 24
+    hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
