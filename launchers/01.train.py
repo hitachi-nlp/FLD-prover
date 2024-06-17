@@ -192,7 +192,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.speed_debug.sequential_sampler')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.slim_pajama_org_50B')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero1')
 
 
 
@@ -543,11 +544,11 @@ def main():
 
         # ------------------------ NeurIPS 2024 -----------------------
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
 
         # (
@@ -579,21 +580,21 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.00,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.00,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
+            ],
+            False,
+        ),
 
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.03,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
+            ],
+            False,
+        ),
 
     ]
 
@@ -726,8 +727,8 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
