@@ -326,6 +326,11 @@ class DataTrainingArguments:
     preprocess_keep_in_memory: bool = field(
         default=False,
     )
+    train_sampling_sequential: bool = field(
+        default=True,
+    )
+
+
 
     # logic_eval_padding: Optional[str] = field(
     #     default="longest",
@@ -1208,6 +1213,14 @@ def main():
                 f"({tokenizer.model_max_length}). Using block_size={tokenizer.model_max_length}."
             )
             raise ValueError(msg)
+
+    if data_args.train_sampling_sequential:
+        # [Slower training time per batch for increasing dataset size ](https://github.com/huggingface/transformers/issues/8818#issuecomment-1474785374)
+        import transformers.trainer as trainer
+        from transformers.trainer import SequentialSampler
+        def sampler_monkey_patch(dataset):
+            return SequentialSampler(dataset)
+        trainer.RandomSampler = sampler_monkey_patch
 
     raw_datasets_list = load_raw_datasets(data_args, model_args)
     tokenized_datasets_list = tokenize_datasets(training_args,

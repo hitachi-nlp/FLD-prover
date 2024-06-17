@@ -185,7 +185,12 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False.subset')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-06-16.slim_pajama_org_50B')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-16.slim_pajama_org_50B')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-16.dataset_back')
+
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.speed_debug')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.speed_debug.sequential_sampler')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.slim_pajama_org_50B')
 
 
 
@@ -720,9 +725,9 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
