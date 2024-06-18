@@ -28,83 +28,47 @@ from FLD_user_shared_settings import (
 logger = logging.getLogger(__name__)
 
 
+
+DATASETS_DIRS = [
+    # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+    './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+    './outputs.FLD/00.create_corpus/20230826.jpn',
+    './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+    './outputs.FLD/00.create_corpus/20230904.jpn',
+    './outputs.FLD/00.create_corpus/20230912.jpn',
+    './outputs.FLD/00.create_corpus/20230916.jpn',
+    # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
+    './outputs.FLD/00.create_corpus/20231010.large_vocab',
+    './outputs.FLD/00.create_corpus/20231012.large_vocab',
+    './outputs.FLD/00.create_corpus/20231021.knowledge',
+    './outputs.FLD/00.create_corpus/20231103.knowledge',
+    './outputs.FLD/00.create_corpus/20231203.jpn',
+    './outputs.FLD/00.create_corpus/20231213.jpn',
+    './outputs.FLD/00.create_corpus/20230120.jpn.large',
+
+    './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
+    './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
+    './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+
+    './outputs.FLD/00.create_corpus/20230122.past_FLD',
+    './outputs.FLD/00.create_corpus/2024-03-29',
+    './outputs.FLD/00.create_corpus/2024-05-03.ablation',
+    './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
+    './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
+    './outputs.FLD/00.create_corpus/2024-06-08.LPT',
+]
+
+
+
+
+
+
+
+
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    # output_top_dir = Path('./outputs/01.train.py/20230729.case_study_finalize')
-    # output_top_dir = Path('./outputs/01.train.py/20230801.case_study_finalize.fix')
-    # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231103.knowledge')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20231203.jpn.no_subproof_for_unknown')
-    # output_top_dir = Path('./outputs/01.train.py/20231206.new_models')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.no_subproof_for_unknown.max_new_tokens=None')
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-06.D8')
-
-    # output_top_dir = Path('./outputs/01.train.py/2023-12-12.logical_circuit')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231223.seed--1.timeout_fix')
-    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b')
-    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-10')
-    # output_top_dir = Path('./outputs/01.train.py/20231225.swallow-70b.node-8')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn')
-    # output_top_dir = Path('./outputs/01.train.py/20231213.jpn.seed--1')
-    # output_top_dir = Path('./outputs/01.train.py/20231226.jpn.epoch--10')
-    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--0')
-    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.swallow-70b.seed--0')
-
-    # output_top_dir = Path('./outputs/01.train.py/20231230.jpn.seed--2')
-    # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.large')
-
-    # output_top_dir = Path('./outputs/01.train.py/20230120.jpn.punipuni')
-
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.node--4')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp32')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp16.batch_size_32')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.deepspeed-0.13.fp16.batch_size_32.padding=max_len')
-
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.batch_size_32')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32')
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2.fp32.half_batch_size')
-
-    # output_top_dir = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2')
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-29.enhance_arguments')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-01-31.multitask')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-02.multitask.step-2500')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-14.translation_speedup')
-    # output_top_dir = Path('./outputs/01.train.py/2024-02-18.continual_training.2024-02-14.translation_speedup.translation-v3')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-06.debug')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-06.context-4k')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.instruction_tuning')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.various_corpora')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.proof_intermediate_steps=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.context=4k')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-07.large_models')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.save_cache')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.precision')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.no_aug')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-09.FLD_variation')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-15.FLD.v2.centered')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
 
@@ -134,101 +98,8 @@ def main():
 
 
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-08.LPT.1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.set_transform')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-8')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-12')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-64')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-32')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-16')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-09.LPT.keep_in_memory.bs-8')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-10.pythia.LPT.node-4.do_cache')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-2')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets-2.9')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.node-1.datasets.pyarrow.newest')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.newest')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.2.9')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--4.after_single')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--1.proc-32')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--4.proc-32')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--15.proc-32')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.7B')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-13.LPT.1B.silm_pajama_100B_all.streaming=True')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=True')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-15.slim_japama_100B.streaming=False.subset')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-16.slim_pajama_org_50B')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-16.dataset_back')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.speed_debug')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.speed_debug.sequential_sampler')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.slim_pajama_org_50B')
-
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
     output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
-
-
-
-
-
-
-
-    DATASETS_DIRS = [
-        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
-        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
-        './outputs.FLD/00.create_corpus/20230826.jpn',
-        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
-        './outputs.FLD/00.create_corpus/20230904.jpn',
-        './outputs.FLD/00.create_corpus/20230912.jpn',
-        './outputs.FLD/00.create_corpus/20230916.jpn',
-        # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
-        './outputs.FLD/00.create_corpus/20231010.large_vocab',
-        './outputs.FLD/00.create_corpus/20231012.large_vocab',
-        './outputs.FLD/00.create_corpus/20231021.knowledge',
-        './outputs.FLD/00.create_corpus/20231103.knowledge',
-        './outputs.FLD/00.create_corpus/20231203.jpn',
-        './outputs.FLD/00.create_corpus/20231213.jpn',
-        './outputs.FLD/00.create_corpus/20230120.jpn.large',
-
-        './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
-        './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
-        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
-
-        './outputs.FLD/00.create_corpus/20230122.past_FLD',
-        './outputs.FLD/00.create_corpus/2024-03-29',
-        './outputs.FLD/00.create_corpus/2024-05-03.ablation',
-        './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
-        './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
-        './outputs.FLD/00.create_corpus/2024-06-08.LPT',
-    ]
 
 
 
@@ -242,62 +113,40 @@ def main():
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
 
         # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-
-
-
-
-        # ('t5-base', 'seq2seq', 't5-base'),                   # for debug
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
-
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
         # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
 
-
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-
-
         # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
-
 
         # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
-
-
         # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
 
         # XXX! does not work for now!
         # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
-
-        # ============================ LPT     ============================
-
-        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
@@ -317,6 +166,14 @@ def main():
 
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+
+
+
+
+        # ============================ LPT     ============================
+
+        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
 
@@ -333,19 +190,6 @@ def main():
 
         # 'hf.hitachi-nlp/FLD.v2__default',
         # 'hf.hitachi-nlp/FLD.v2__star',
-
-        # ---------------------------------- 20231021.knowledge ------------------------------------
-        # '20231021.knowledge.D3',
-        # '20231021.knowledge.D3.w_knowledge',
-        # '20231021.knowledge.D3.w_knowledge.complex-0.3',
-
-        # ---------------------------------- 20231021.knowledge.D3 ------------------------------------
-        # '20231021.knowledge.D3',
-        # '20231021.knowledge.D3.complex-0.3',
-        # '20231021.knowledge.D3.complex-0.3.w_knowledge',
-
-        # ---------------------------------- 20231101.knowledge.D3 ------------------------------------
-        # '20231103.knowledge.D3.knowledge_factor-5.0',
 
         # ---------------------------------- 20231213.jpn ------------------------------------
         # '20231213.jpn.D1_wo_dist',
@@ -381,45 +225,6 @@ def main():
         # '20230120.jpn.punipuni.D1',
         # '20230120.jpn.punipuni.D3',
         # '20230120.jpn.punipuni.D8',
-
-
-        # -------------------------------- 20240127.logical_cirtuit.llama2 --------------------------------
-
-        # '20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3',
-        # '20231103.knowledge.D3.knowledge_factor-5.0',
-
-        # ---------------------------------- 2024-01-29.enhance_argumentsL ------------------------------------
-        # '2024-01-29.enhance_arguments.past_reproduce',
-        # '2024-01-29.enhance_arguments.theorems',
-        # '2024-01-29.enhance_arguments.theorems.allow_smaller_proofs',
-        # '2024-01-29.enhance_arguments.past_reproduce.D8',
-
-        # ---------------------------------- 2024-02-14.translation_speedup ------------------------------------
-        # '2024-02-14.translation_speedup.past_reproduce',
-        # '2024-02-14.translation_speedup.D8',
-        # '2024-02-14.translation_speedup.propositional-0.2',
-        # '2024-02-14.translation_speedup.theorems',
-        # '2024-02-14.translation_speedup.theorems.allow_smaller_proofs',
-        # '2024-02-14.translation_speedup.translation-v2',
-        # '2024-02-14.translation_speedup.translation-v3',
-        # '2024-02-14.translation_speedup.translation-v3.propositional-0.2',
-        # '2024-02-14.translation_speedup.translation-v3.propositional-0.5'
-
-
-        # ---------------------------------- 2024-03-29.H100 ------------------------------------
-        # '2024-02-14.translation_speedup.translation-v3',
-
-        # '2024-03-29.JSAI_best',    # the same as "2024-02-14.translation_speedup.translation-v3"
-        # '2024-03-29.JSAI_best.D8',
-        # '2024-03-29.JSAI_best.theorems',
-
-        # '2024-03-29.JSAI_best.D8.no_aug',
-
-        # '2024-03-29.JSAI_best.no_aug.dstrctr-10',
-        # '2024-03-29.JSAI_best.no_aug.cmplx-0.25',
-
-        # '2024-03-29.FLD_v2.D8',
-
 
 
 
@@ -610,37 +415,11 @@ def main():
         # 'debug.ZS',
         # 'debug.micro',
         # 'debug.tiny',
-        # 'debug.tiny.bs-32',
-        # 'debug.tiny.bs-32.max_train_samples-10000',
-        # 'debug.middle',
-        # 'debug.large',
-        # 'debug.very_large',
 
 
         # --------- dataset = 100k, logic=1.0--------------------
         # 'FT.bs-256__step-390.wrmp-200',
         # 'FT.bs-256__step-390.wrmp-200.few_save',
-
-        # --------- dataset = 200k, logic=1.0--------------------
-        # 'FT.bs-256__step-780.wrmp-400',
-
-        # --------- dataset = 300k, logic=1.0--------------------
-        # 'FT.bs-256__step-1172.wrmp-600',
-
-
-        # --------- dataset = 300k, logic=1.0 -----------
-        # 'FT.bs-256__step-1170.wrmp-200',
-        # 'FT.bs-512__step-586.wrmp-200',
-
-
-        # --------- dataset = 300k, logic=0.5 -----------
-        # 'FT.bs-384__step-1560',
-        # 'FT.bs-512__step-1200',
-        # 'FT.bs-640__step-940',
-
-
-        # --------- dataset = 300k, logic=0.25 -----------
-        # 'FT.bs-768__step-1560',
 
 
         # --------- others --------------------
@@ -708,36 +487,25 @@ def main():
 
 
     # ------------------------------- HAIC --------------------------------
-    # hours = None
+    hours = None
+
 
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
+
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=3)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=5)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=6)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=7)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=10)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=11)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=16)
+    hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=7)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=12)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=15)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=16)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=10)
 
-    # hours = 24
-    hours = 72
+    # hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
