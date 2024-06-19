@@ -503,8 +503,8 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     hours = 72
 
     skip_if_exists = False
