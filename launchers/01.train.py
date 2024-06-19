@@ -98,9 +98,14 @@ def main():
 
 
 
+    # ----------------------------------- LPT -----------------------------------
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0')
+
+
+    # ----------------------------------- tranfer -----------------------------------
+    output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
 
 
 
@@ -109,7 +114,7 @@ def main():
 
 
     model_settings = [
-        # ============================ english      ============================
+        # ---------------------------- english      ----------------------------
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -151,7 +156,7 @@ def main():
 
 
 
-        # ============================ japanese     ============================
+        # ---------------------------- japanese     ----------------------------
 
         # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
         # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
@@ -171,10 +176,14 @@ def main():
 
 
 
-        # ============================ LPT     ============================
+        # ---------------------------- LPT     ----------------------------
 
-        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+
+        # ---------------------------- transfer     ----------------------------
+        ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
 
@@ -334,8 +343,14 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
 
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
 
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+
+        # ------------------------------------ transfer ------------------------------------
+        '20230120.jpn.wordnet_repro_w_proposition.D3',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+
+
     ]
 
 
@@ -386,19 +401,28 @@ def main():
         #     False,
         # ),
 
-        (
-            0.00,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None)
-            ],
-            False,
-        ),
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #     ],
+        #     False,
+        # ),
+
+        # (
+        #     0.03,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #     ],
+        #     False,
+        # ),
+
+
+        # ------------------------ transfer -----------------------
 
         (
-            0.03,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None)
-            ],
+            1.0,
+            [],
             False,
         ),
 
@@ -435,27 +459,31 @@ def main():
         # 'LLM_FS.shot-30000',
 
 
-        # ---- LPT ----------
+        # ------------------------------ LPT --------------------------------
         # 'LPT.bs-1024__step-24000.wrmp-100',
-        'LPT.bs-2048__step-12000.wrmp-100',
+        # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-8192__step-3000.wrmp-100',
+
+        # ------------------------------ transfer --------------------------------
+        'FT.bs-64__step-468.wrmp-234',
     ]
 
 
 
 
-    # deepspeed_stage = 'zero3'
-    deepspeed_stage = 'zero0'
+    # deepspeed_stage = 'zero0'
+    # deepspeed_stage = 'zero2'
+    deepspeed_stage = 'zero3'
 
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        (None, None, None, None, None),
+        # (None, None, None, None, None),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
+        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
         # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
     ]
 
@@ -465,41 +493,30 @@ def main():
         # 3e-6,    # the best
         # 1e-6,
 
-        3e-4,    # LPT-1B, from Pythia
+
+        #  -------------------------------- LPT --------------------------------
+        # 3e-4,    # LPT-1B, from Pythia
         # 1.2e-4,    # LPT-7B, from Pythia
+
+        #  -------------------------------- tranfer --------------------------------
+        3e-6,    # the best
     ]
 
 
-    update_parameters_args = [
-        'all',
-        # 'attention',
-        # 'mlp',
-    ]
-
-
-    from_scratch_args = [
-        # False,
-        True,
-    ]
-
-
-    # weight_decay = None
-    weight_decay = 0.01   # LPT, from Pythia
 
 
     # ------------------------------- HAIC --------------------------------
     hours = None
 
-
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 24
+    hours = 5
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
@@ -561,11 +578,24 @@ def main():
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
 
+    from_scratch_args = [
+        False,
+        # True,
+    ]
+
+    update_parameters_args = [
+        'all',
+        # 'attention',
+        # 'mlp',
+    ]
 
     context_lengths = [
         2048,
         # 4096,
     ]
+
+    weight_decay = None
+    # weight_decay = 0.01   # LPT, from Pythia
 
     proof_intermediate_steps_args = [
         # 'include',
