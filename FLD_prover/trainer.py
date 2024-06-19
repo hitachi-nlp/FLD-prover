@@ -231,7 +231,7 @@ class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):
         if self.args.generation_config is not None:
             gen_config = self.load_generation_config(self.args.generation_config)
             self.model.generation_config = gen_config
-
+        self.is_fsdp_xla_v2_enabled = False
 
     def evaluation_loop(
         self,
