@@ -173,8 +173,8 @@ def main():
 
         # ============================ LPT     ============================
 
-        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
 
@@ -444,8 +444,8 @@ def main():
 
 
 
-    # deepspeed_stage = 'zero3'
-    deepspeed_stage = 'zero0'
+    # deepspeed_stage = 'zero0'
+    deepspeed_stage = 'zero3'
 
 
 
@@ -497,16 +497,15 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 24
+    # hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-
-    # hours = 72
+    hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
