@@ -29,38 +29,6 @@ logger = logging.getLogger(__name__)
 
 
 
-DATASETS_DIRS = [
-    # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
-    './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
-    './outputs.FLD/00.create_corpus/20230826.jpn',
-    './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
-    './outputs.FLD/00.create_corpus/20230904.jpn',
-    './outputs.FLD/00.create_corpus/20230912.jpn',
-    './outputs.FLD/00.create_corpus/20230916.jpn',
-    # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
-    './outputs.FLD/00.create_corpus/20231010.large_vocab',
-    './outputs.FLD/00.create_corpus/20231012.large_vocab',
-    './outputs.FLD/00.create_corpus/20231021.knowledge',
-    './outputs.FLD/00.create_corpus/20231103.knowledge',
-    './outputs.FLD/00.create_corpus/20231203.jpn',
-    './outputs.FLD/00.create_corpus/20231213.jpn',
-    './outputs.FLD/00.create_corpus/20230120.jpn.large',
-
-    './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
-    './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
-    './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
-
-    './outputs.FLD/00.create_corpus/20230122.past_FLD',
-    './outputs.FLD/00.create_corpus/2024-03-29',
-    './outputs.FLD/00.create_corpus/2024-05-03.ablation',
-    './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
-    './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
-    './outputs.FLD/00.create_corpus/2024-06-08.LPT',
-]
-
-
-
-
 
 
 
@@ -185,6 +153,43 @@ def main():
         # ---------------------------- transfer     ----------------------------
         ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
+
+
+
+
+
+
+    DATASETS_DIRS = [
+        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+        './outputs.FLD/00.create_corpus/20230826.jpn',
+        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+        './outputs.FLD/00.create_corpus/20230904.jpn',
+        './outputs.FLD/00.create_corpus/20230912.jpn',
+        './outputs.FLD/00.create_corpus/20230916.jpn',
+        # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
+        './outputs.FLD/00.create_corpus/20231010.large_vocab',
+        './outputs.FLD/00.create_corpus/20231012.large_vocab',
+        './outputs.FLD/00.create_corpus/20231021.knowledge',
+        './outputs.FLD/00.create_corpus/20231103.knowledge',
+        './outputs.FLD/00.create_corpus/20231203.jpn',
+        './outputs.FLD/00.create_corpus/20231213.jpn',
+        './outputs.FLD/00.create_corpus/20230120.jpn.large',
+
+        './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
+        './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
+        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+
+        './outputs.FLD/00.create_corpus/20230122.past_FLD',
+        './outputs.FLD/00.create_corpus/2024-03-29',
+        './outputs.FLD/00.create_corpus/2024-05-03.ablation',
+        './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
+        './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
+        './outputs.FLD/00.create_corpus/2024-06-08.LPT',
+        './outputs.FLD/00.create_corpus/2024-06-19.transfer',
+    ]
+
+
 
 
 
@@ -347,10 +352,8 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        '20230120.jpn.wordnet_repro_w_proposition.D3',
+        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-
-
     ]
 
 
@@ -465,14 +468,14 @@ def main():
         # 'LPT.bs-8192__step-3000.wrmp-100',
 
         # ------------------------------ transfer --------------------------------
-        'FT.bs-64__step-468.wrmp-234',
+        'FT.bs-256__step-390.wrmp-200.few_save',
     ]
 
 
 
 
     # deepspeed_stage = 'zero0'
-    # deepspeed_stage = 'zero2'
+    # deepspeed_stage = 'zero2'   # not that much speedup
     deepspeed_stage = 'zero3'
 
 
@@ -490,7 +493,7 @@ def main():
 
     lrates = [
         # 1e-5,
-        # 3e-6,    # the best
+        # 3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -499,7 +502,7 @@ def main():
         # 1.2e-4,    # LPT-7B, from Pythia
 
         #  -------------------------------- tranfer --------------------------------
-        3e-6,    # the best
+        3e-6,    # the best for ALPT
     ]
 
 
@@ -562,9 +565,6 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
-
-    if (engine.resource.find('xhn_s') >= 0 or engine.resource.find('xcs_s') >= 0 or engine.resource.find('xcl_s') >= 0) and hours > 24:
-        raise ValueError()
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
