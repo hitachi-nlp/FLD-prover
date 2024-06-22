@@ -386,13 +386,13 @@ def main():
         #     False,
         # ),
 
-        (
-            0.00,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None)
-            ],
-            False,
-        ),
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #     ],
+        #     False,
+        # ),
 
         (
             0.03,
@@ -544,9 +544,6 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
-
-    if (engine.resource.find('xhn_s') >= 0 or engine.resource.find('xcs_s') >= 0 or engine.resource.find('xcl_s') >= 0) and hours > 24:
-        raise ValueError()
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'

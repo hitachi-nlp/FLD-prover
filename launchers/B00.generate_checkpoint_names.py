@@ -32,7 +32,9 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-5-19.flight'
 
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
+
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
 
     CHECKPOINTS = [
         # ---------- NeurIPS -----------
@@ -61,7 +63,6 @@ def main():
         'logic_dataset_prob',
         'learning',
         'learning_rate',
-
     ]
 
     input_dir = Path(TOP_DIR)
