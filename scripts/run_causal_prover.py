@@ -1099,6 +1099,7 @@ def main():
         "revision": model_args.model_revision,
         "use_auth_token": True if model_args.use_auth_token else None,
         "trust_remote_code": True,
+        "use_cache": False if training_args.gradient_checkpointing else True,
     }
     config_name = model_args.config_name or model_args.model_name_or_path
     if config_name:
