@@ -66,15 +66,19 @@ def main():
 
 
 
-    # ----------------------------------- LPT -----------------------------------
+    # =================================== neurips.additional ===================================
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+
+
+    # =================================== LPT ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0')
 
 
-    # ----------------------------------- tranfer -----------------------------------
+    # =================================== tranfer ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-22.transfer.formula')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.transfer.formula')
 
 
 
@@ -86,7 +90,6 @@ def main():
         # ---------------------------- english      ----------------------------
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -144,16 +147,32 @@ def main():
 
 
 
+        # ======================================================== neurips.additional     ========================================================
 
-        # ============================ LPT     ============================
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+
+
+
+        # ======================================================== LPT     ========================================================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
-        # ============================ transfer     ============================
+        # ======================================================== transfer     ========================================================
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -347,6 +366,14 @@ def main():
 
 
 
+        # =================================== neurips.additional ===================================
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+
+
         # ---------------------------------- LPT ------------------------------------
 
         # 'hf.hitachi-nlp/ruletaker',
@@ -361,16 +388,7 @@ def main():
 
         # ------------------------------------ transfer ------------------------------------
         # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-    ]
-
-
-
-
-
-    surface_is_formula_args = [
-        # False,
-        True,
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
 
@@ -428,27 +446,31 @@ def main():
         #     False,
         # ),
 
-        (
-            0.03,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None)
-            ],
-            False,
-        ),
+        # (
+        #     0.03,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #     ],
+        #     False,
+        # ),
 
 
         # ------------------------ transfer -----------------------
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
+        (
+            1.0,
+            [],
+            False,
+        ),
 
     ]
 
-    preprocess_keep_in_memory = False
-    # preprocess_keep_in_memory = True
+
+    surface_is_formula_args = [
+        False,
+        # True,
+    ]
+
 
 
 
@@ -534,17 +556,16 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    # hours = 24
-    hours = 5
+    hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    hours = 72
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # hours = 72
 
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
@@ -883,7 +904,7 @@ def main():
 
                                                                     # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
-                                                                    'preprocess_keep_in_memory': preprocess_keep_in_memory,
+                                                                    'preprocess_keep_in_memory': False,
 
                                                                     'ddp_timeout': 3600 * 10,
 
