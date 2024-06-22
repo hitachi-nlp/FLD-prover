@@ -31,24 +31,30 @@ def main():
     # TOP_DIR = './outputs.FLD-prover//01.train.py/2024-5-13.large_models'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-5-19.flight'
 
+    # ================================================================= LPT =================================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
 
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
+    # ================================================================= transfer =================================================================
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
 
     CHECKPOINTS = [
-        # ---------- NeurIPS -----------
+        # -------------------- NeurIPS ----------------------
         # 97,
         # 194,
         # 291,
         # 388,
 
-        # ---------- LPT -----------
-        12000
+        # -------------------- LPT ----------------------
+        # 12000
+
+        # -------------------- transfer ----------------------
+        388,
     ]
 
     PARAMS = [
-        # ------------ NeurIPS ------------
+        # ------------------------ NeurIPS ------------------------
         # 'model_name',
         # 'logic_dataset_uname',
         # 'optimizer',
@@ -56,13 +62,22 @@ def main():
         # 'learning_rate',
         # 'rec_adam_fisher_coef',
 
-        # ------------ LPT ------------
+        # ------------------------ LPT ------------------------
         'model_name',
         'logic_dataset_uname',
         'dataset_names',
         'logic_dataset_prob',
         'learning',
         'learning_rate',
+
+        # -------------------- transfer ----------------------
+
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'dataset_names',
+        # 'logic_dataset_prob',
+        # 'learning',
+        # 'learning_rate',
     ]
 
     input_dir = Path(TOP_DIR)
