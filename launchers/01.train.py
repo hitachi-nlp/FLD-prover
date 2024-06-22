@@ -491,10 +491,7 @@ def main():
 
 
     # deepspeed_stage = 'zero0'
-<<<<<<< HEAD
-=======
     # deepspeed_stage = 'zero2'   # not that much speedup
->>>>>>> transfer
     deepspeed_stage = 'zero3'
 
 
@@ -537,11 +534,8 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-<<<<<<< HEAD
     # hours = 24
-=======
     hours = 5
->>>>>>> transfer
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
