@@ -96,6 +96,7 @@ class FLDProcessor(Processor):
 
         return serialize(
             load_deduction(example),
+            surface_is_formula=self._surface_is_formula,
             intermediate_steps=intermediate_steps,
             stepwise=(self._proof_sampling == 'stepwise'),
             sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
