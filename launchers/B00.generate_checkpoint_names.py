@@ -34,10 +34,10 @@ def main():
     # ================================================================= LPT =================================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
 
     # ================================================================= transfer =================================================================
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
 
     CHECKPOINTS = [
         # -------------------- NeurIPS ----------------------
@@ -47,10 +47,10 @@ def main():
         # 388,
 
         # -------------------- LPT ----------------------
-        # 12000
+        12000
 
         # -------------------- transfer ----------------------
-        388,
+        # 388,
     ]
 
     PARAMS = [
