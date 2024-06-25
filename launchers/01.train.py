@@ -67,13 +67,13 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0')
 
 
     # =================================== tranfer ===================================
@@ -153,7 +153,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -167,8 +167,7 @@ def main():
         # ======================================================== LPT     ========================================================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
@@ -367,23 +366,18 @@ def main():
 
 
         # =================================== neurips.additional ===================================
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
         # ---------------------------------- LPT ------------------------------------
-
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
-
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
 
 
         # ------------------------------------ transfer ------------------------------------
@@ -454,14 +448,22 @@ def main():
         #     False,
         # ),
 
+        (
+            0.10,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
+            ],
+            False,
+        ),
+
 
         # ------------------------ transfer -----------------------
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
     ]
 
@@ -501,12 +503,11 @@ def main():
 
 
         # ------------------------------ LPT --------------------------------
-        # 'LPT.bs-1024__step-24000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-100',
-        # 'LPT.bs-8192__step-3000.wrmp-100',
+        'LPT.bs-2048__step-13200.wrmp-132',
 
         # ------------------------------ transfer --------------------------------
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
     ]
 
 
@@ -520,9 +521,9 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None),
+        (None, None, None),
         # ('rec_adam', 1.0, 0),
-        ('rec_adam', 1.0, 300),
+        # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 10000),
@@ -536,10 +537,10 @@ def main():
 
 
         #  -------------------------------- LPT --------------------------------
-        # 3e-4,    # LPT
+        3e-4,    # LPT
 
         #  -------------------------------- tranfer --------------------------------
-        3e-6,    # the best for ALPT
+        # 3e-6,    # the best for ALPT
     ]
 
 
@@ -553,15 +554,15 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 24
+    # hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    # hours = 72
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    hours = 72
 
     skip_if_exists = False
     # skip_if_exists = True
