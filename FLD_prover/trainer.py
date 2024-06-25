@@ -46,54 +46,10 @@ if is_sagemaker_mp_enabled():
 else:
     IS_SAGEMAKER_MP_POST_1_10 = False
 
-from rec_adam import RecAdam, build_rec_adam_optimizer
+from rec_adam import RecAdamTrainer
 
 
 logger = logging.getLogger(__name__)
-
-
-class TrainerWithRecAdam(Trainer):
-
-    def __init__(
-        self,
-        *args,
-        rec_adam_regularization='l2',
-        rec_adam_anneal_type='sigmoid',
-        rec_adam_target_task_weight=1.0,
-        rec_adam_anneal_schedule='t0',
-        rec_adam_anneal_t0=0,
-        rec_adam_anneal_tau=0,
-        rec_adam_fisher_coef=300,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        self.rec_adam_regularization = rec_adam_regularization
-        self.rec_adam_anneal_type = rec_adam_anneal_type
-        self.rec_adam_target_task_weight = rec_adam_target_task_weight
-        self.rec_adam_anneal_schedule = rec_adam_anneal_schedule
-        self.rec_adam_anneal_t0 = rec_adam_anneal_t0
-        self.rec_adam_anneal_tau = rec_adam_anneal_tau
-        self.rec_adam_fisher_coef = rec_adam_fisher_coef
-
-    def create_optimizer(self):
-        opt_model = self.model_wrapped if is_sagemaker_mp_enabled() else self.model
-        if self.optimizer is None:
-
-            self.optimizer = build_rec_adam_optimizer(
-                self.args,
-                opt_model,
-                target_task_weight=self.rec_adam_target_task_weight,
-                regularization=self.rec_adam_regularization,
-                anneal_type=self.rec_adam_anneal_type,
-                anneal_schedule=self.rec_adam_anneal_schedule,
-                anneal_tau=self.rec_adam_anneal_tau,
-                anneal_t0=self.rec_adam_anneal_t0,
-                fisher_coef=self.rec_adam_fisher_coef,
-            )
-            
-        if is_sagemaker_mp_enabled():
-            self.optimizer = smp.DistributedOptimizer(self.optimizer)
-        return self.optimizer
 
 
 class ForceCallMetricsSeq2SeqTrainer(Seq2SeqTrainer):

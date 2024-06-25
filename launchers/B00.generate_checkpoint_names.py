@@ -31,9 +31,16 @@ def main():
     # TOP_DIR = './outputs.FLD-prover//01.train.py/2024-5-13.large_models'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-5-19.flight'
 
+
+    # ========================================================== LPT ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
+
+
+    # ========================================================== transfer ==========================================================
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+
 
     CHECKPOINTS = [
         # -------------------- NeurIPS ----------------------
@@ -72,6 +79,7 @@ def main():
         'logic_dataset_uname',
         # 'dataset_names',
         # 'logic_dataset_prob',
+        'surface_is_formula',
         'learning',
         'learning_rate',
 
