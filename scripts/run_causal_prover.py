@@ -78,7 +78,7 @@ from FLD_prover.data_processors import (
     RobustLRProcessor,
     ProofWriterProcessor,
 )
-from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, TrainerWithRecAdam
+from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, RecAdamTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
 from FLD_prover.collators import RemoveUnusedColumnsCollator
@@ -428,28 +428,8 @@ class DataTrainingArguments:
         default=None,
     )
 
-    rec_adam_regularization: str = field(
-        default='l2',
-    )
-
-    rec_adam_anneal_type: str = field(
-        default='sigmoid',
-    )
-
     rec_adam_target_task_weight: float = field(
         default=1.0,
-    )
-
-    rec_adam_anneal_schedule: str = field(
-        default=None,
-    )
-
-    rec_adam_anneal_t0: int = field(
-        default=0,
-    )
-
-    rec_adam_anneal_tau: int = field(
-        default=0,
     )
 
     rec_adam_fisher_coef: float = field(
@@ -1425,12 +1405,7 @@ def main():
     elif data_args.optimizer == 'rec_adam':
         trainer_cls = TrainerWithRecAdam
         trainer_kwargs = {
-            'rec_adam_regularization': data_args.rec_adam_regularization,
-            'rec_adam_anneal_type': data_args.rec_adam_anneal_type,
             'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
-            'rec_adam_anneal_schedule': data_args.rec_adam_anneal_schedule,
-            'rec_adam_anneal_t0': data_args.rec_adam_anneal_t0,
-            'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
             'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
         }
 

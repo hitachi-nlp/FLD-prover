@@ -36,8 +36,11 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
     TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
 
-    # ================================================================= transfer =================================================================
+
+    # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+
 
     CHECKPOINTS = [
         # -------------------- NeurIPS ----------------------
@@ -72,12 +75,14 @@ def main():
 
         # -------------------- transfer ----------------------
 
-        # 'model_name',
-        # 'logic_dataset_uname',
+        'model_name',
+        'logic_dataset_uname',
         # 'dataset_names',
         # 'logic_dataset_prob',
-        # 'learning',
-        # 'learning_rate',
+        'surface_is_formula',
+        'learning',
+        'learning_rate',
+
     ]
 
     input_dir = Path(TOP_DIR)

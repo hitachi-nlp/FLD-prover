@@ -520,12 +520,12 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None, None, None),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 0),
-        ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 300),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 1000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 3000),
-        # ('rec_adam', 'l2', 0.5, 'immediately_from_beginning', 10000),
+        # (None, None, None),
+        # ('rec_adam', 1.0, 0),
+        ('rec_adam', 1.0, 300),
+        # ('rec_adam', 1.0, 1000),
+        # ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 10000),
     ]
 
 
@@ -703,7 +703,7 @@ def main():
                 for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
                     for learning in learnings:
 
-                        for optimizer, rec_adam_regularization, rec_adam_target_task_weight, rec_adam_anneal_schedule, rec_adam_fisher_coef in optimizer_setings:
+                        for optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
 
                             for sample_negative_proof in sample_negative_proof_args:
                                 for proof_intermediate_steps in proof_intermediate_steps_args:
@@ -759,8 +759,8 @@ def main():
 
                                                 for lrate in lrates:
                                                     lrate_org = lrate
-                                                    if optimizer == 'rec_adam':
-                                                        lrate = lrate * 2
+                                                    # if optimizer == 'rec_adam':
+                                                    #     lrate = lrate * 2
 
                                                     for update_parameters in update_parameters_args:
                                                         for from_scratch in from_scratch_args:
@@ -779,11 +779,8 @@ def main():
                                                                         warmup_ratio=warmup_ratio,
                  
                                                                         optimizer=optimizer,
-                                                                        rec_adam_regularization=rec_adam_regularization,
-                                                                        rec_adam_anneal_type='sigmoid',
                                                                         rec_adam_target_task_weight=rec_adam_target_task_weight,
                                                                         rec_adam_fisher_coef=rec_adam_fisher_coef,
-                                                                        rec_adam_anneal_schedule=rec_adam_anneal_schedule,
 
                                                                         update_parameters=update_parameters,
 
