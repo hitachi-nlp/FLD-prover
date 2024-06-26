@@ -501,8 +501,8 @@ def main():
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
-        ('rec_adam', 1.0, 5000),
+        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
 
@@ -518,7 +518,8 @@ def main():
         # 1.2e-4,    # LPT-7B, from Pythia
 
         #  -------------------------------- tranfer --------------------------------
-        3e-6,    # the best for ALPT
+        # 3e-6,    # the best for ALPT
+        1e-6,
     ]
 
 
