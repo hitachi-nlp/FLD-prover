@@ -544,8 +544,8 @@ def main():
 
     # hours = 72
 
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 

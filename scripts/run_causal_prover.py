@@ -1402,7 +1402,7 @@ def main():
         trainer_cls = Trainer
         trainer_kwargs = {}
     elif data_args.optimizer == 'rec_adam':
-        trainer_cls = TrainerWithRecAdam
+        trainer_cls = RecAdamTrainer
         trainer_kwargs = {
             'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
             'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
