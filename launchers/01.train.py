@@ -502,7 +502,7 @@ def main():
         # 'LLM_FS.shot-30000',
 
 
-        # ------------------------------ neurip.additoinal --------------------------------
+        # ------------------------------ neurip.additional --------------------------------
         'FT.bs-256__step-390.wrmp-200.few_save',
 
 
@@ -525,7 +525,7 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        (None, None, None),
+        # (None, None, None),
         # ('rec_adam', 1.0, 0),
         ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
