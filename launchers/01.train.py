@@ -359,7 +359,7 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
+        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
@@ -368,8 +368,8 @@ def main():
 
 
     surface_is_formula_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
 
