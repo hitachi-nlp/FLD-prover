@@ -39,7 +39,8 @@ def main():
 
     # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
 
 
     CHECKPOINTS = [

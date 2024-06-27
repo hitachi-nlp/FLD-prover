@@ -74,7 +74,8 @@ def main():
 
     # ----------------------------------- tranfer -----------------------------------
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
 
 
 
@@ -147,14 +148,14 @@ def main():
 
         # ============================ LPT     ============================
 
-        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
         # ============================ transfer     ============================
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
@@ -365,11 +366,9 @@ def main():
 
 
 
-
-
     surface_is_formula_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
 
@@ -438,16 +437,40 @@ def main():
 
         # ------------------------ transfer -----------------------
 
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
+
         (
             1.0,
-            [],
+            [
+                (1.0, 'databricks/databricks-dolly-15k', None, None)
+            ],
             False,
         ),
 
+
+        # (
+        #     1.0,
+        #     [
+        #         (1.0, 'hf.databricks/databricks-dolly-15k-ja', None, None)
+        #     ],
+        #     False,
+        # ),
+
+
     ]
 
-    preprocess_keep_in_memory = False
-    # preprocess_keep_in_memory = True
+
+    is_sft_dataset = True
+    # is_sft_dataset = False
+
+    # sft_lang = 'jpn'
+    sft_lang = 'eng'
+
+
 
 
 
@@ -497,12 +520,12 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None),
+        (None, None, None),
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
-        ('rec_adam', 1.0, 5000),
+        # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
 
@@ -836,6 +859,9 @@ def main():
                                                                 setting.update({
                                                                     'seed': seed,
 
+                                                                    'is_sft_dataset': is_sft_dataset,
+                                                                    'sft_lang': sft_lang,
+
                                                                     'logic_dataset_uname': logic_dataset_uname,
                                                                     # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
                                                                     # 'other_dataset_config_name': other_dataset_config_names,
@@ -881,7 +907,7 @@ def main():
 
                                                                     # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
-                                                                    'preprocess_keep_in_memory': preprocess_keep_in_memory,
+                                                                    'preprocess_keep_in_memory': False,
 
                                                                     'ddp_timeout': 3600 * 10,
 

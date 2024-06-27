@@ -47,8 +47,7 @@ from datasets import (
     IterableDataset,
     interleave_datasets,
 )
-
-
+from trl import SFTConfig, SFTTrainer
 import transformers
 from transformers import (
     CONFIG_MAPPING,
@@ -81,7 +80,7 @@ from FLD_prover.data_processors import (
 from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, RecAdamTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
-from FLD_prover.collators import RemoveUnusedColumnsCollator
+from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForCompletionOnlyLM
 from FLD_prover.generation import generation_handled
 from FLD_prover.interactive import launch
 from FLD_prover.mixtral_deepspeed_monkey_patch import replace_mixtral_moe_with_dense_impl
@@ -98,8 +97,6 @@ logger = logging.getLogger(__name__)
 
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
-
-LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE = True
 
 
 @dataclass
@@ -196,6 +193,15 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
+    is_sft_dataset: Optional[bool] = field(
+        default=False,
+    )
+    sft_lang: str = field(
+        default='eng',
+    )
+    sft_neftune_noise_alpha: Optional[float] = field(
+        default=5,
+    )
     dataset_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset names separated by ::"}
     )
@@ -1208,11 +1214,15 @@ def main():
         trainer.RandomSampler = sampler_monkey_patch
 
     raw_datasets_list = load_raw_datasets(data_args, model_args)
-    tokenized_datasets_list = tokenize_datasets(training_args,
-                                                data_args,
-                                                raw_datasets_list,
-                                                tokenizer,
-                                                block_size)
+    if data_args.is_sft_dataset:
+        # SFTTrainer will do the tokenization
+        tokenized_datasets_list = raw_datasets_list
+    else:
+        tokenized_datasets_list = tokenize_datasets(training_args,
+                                                    data_args,
+                                                    raw_datasets_list,
+                                                    tokenizer,
+                                                    block_size)
 
     logic_dataset_processor = make_logic_data_processor(data_args, tokenizer, block_size, block_size)
     data_args.log_non_logic_examples = True
@@ -1233,18 +1243,17 @@ def main():
         })
 
 
-    if LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
-        logic_processed_dataset = logic_raw_datasets
-        for split, dataset in list(logic_raw_datasets.items()):
-            _desc = desc + f' on {split} split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                logic_processed_dataset[split] = dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    **maybe_logic_preprocess_map_kwargs,
+    logic_processed_dataset = logic_raw_datasets
+    for split, dataset in list(logic_raw_datasets.items()):
+        _desc = desc + f' on {split} split'
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_dataset_processor.log_examples = data_args.log_examples
+        with training_args.main_process_first(desc=_desc):
+            logic_processed_dataset[split] = dataset.map(
+                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                **maybe_logic_preprocess_map_kwargs,
 
-                )
+            )
     else:
         logic_processed_dataset = logic_raw_datasets
 
@@ -1303,26 +1312,6 @@ def main():
 
     desc = "[logic + non-logic interleaved dataset] _maybe_logic_preprocess()"
 
-    if not LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
-        if train_dataset:
-            _desc = desc + ' on train split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                train_dataset = train_dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    **maybe_logic_preprocess_map_kwargs,
-                )
-        if eval_dataset:
-            _desc = desc + ' on eval split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                eval_dataset = eval_dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    **maybe_logic_preprocess_map_kwargs,
-                )
-
     generation_config, generation_handle_args, generation_handled_kwargs = make_generation_settings(
         data_args, tokenizer, model, config
     )
@@ -1371,7 +1360,6 @@ def main():
                                 data_args,
                                 generation_handle_args,
                                 generation_handled_kwargs)
-    collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                      do_compute_metrics=True):
@@ -1379,7 +1367,7 @@ def main():
             model,
             other=other_trainer,
             args=training_args,
-            data_collator=collator,
+            data_collator=RemoveUnusedColumnsCollator(return_tensors='pt'),
             train_dataset=None,
             eval_dataset=logic_eval_dataset,
             tokenizer=tokenizer,
@@ -1399,14 +1387,98 @@ def main():
             )
 
     if data_args.optimizer is None:
-        trainer_cls = Trainer
-        trainer_kwargs = {}
+
+        if data_args.is_sft_dataset:
+            if len(dataset_probs) != 1:
+                raise NotImplementedError()
+            if dataset_probs[0] < 1.0:
+                raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
+
+            if data_args.sft_lang == 'eng':
+                intro = 'Please answer the question based on the given context.'
+                context_template = '### context'
+                instruction_template = '### question'
+                response_template = '### answer'
+
+            elif data_args.sft_lang == 'jpn':
+                intro = '文脈に基づいて、質問に答えてください｡'
+                context_template = '### 文脈'
+                instruction_template = '### 質問'
+                response_template = '### 回答'
+
+            else:
+                raise ValueError(data_args.sft_lang)
+
+            def formatting_prompts_func(examples):
+                output_texts = []
+
+                def guess_field(candidate_fields: List[str], not_found='raise') -> str:
+                    field = None
+                    for candidate in candidate_fields:
+                        if candidate in examples:
+                            field = candidate
+                            break
+                    if field is None:
+                        msg = f'candidate fields {str(candidate_fields)} not found in the examples'
+                        if not_found == 'raise':
+                            raise ValueError(msg)
+                        elif not_found == 'warning':
+                            logger.warning(msg)
+                        else:
+                            raise ValueError()
+                    return field
+
+                instruction_field = guess_field(['instruction', 'question'])
+                context_field = guess_field(['context'], not_found='warning')
+                response_field = guess_field(['response', 'answer'])
+
+                for i in range(len(examples[instruction_field])):
+                    instruction = examples[instruction_field][i]
+                    context = examples[context_field][i] if context_field is not None else None
+                    response = examples[response_field][i]
+                    if context is not None:
+                        text = '\n'.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + '</s>'
+                    else:
+                        text = '\n'.join([intro, instruction_template, instruction, response_template, response]) + '</s>'
+                    output_texts.append(text)
+                return output_texts
+
+            trainer_cls = SFTTrainer
+            # sft_config = SFTConfig(
+            #     output_dir=training_args.output_dir,
+            #     packing=False,
+            #     max_seq_length=block_size,
+            #     dataset_num_proc=data_args.preprocessing_num_workers,
+            #     dataset_batch_size=data_args.preprocess_batch_size,
+            #     neftune_noise_alpha: Optional[float] = None
+            #     model_init_kwargs: Optional[Dict] = None
+            #     dataset_kwargs: Optional[Dict] = None
+            #     eval_packing: Optional[bool] = None
+            #     num_of_sequences: Optional[int] = 1024
+            #     chars_per_token: Optional[float] = 3.6
+            # )
+            trainer_kwargs = {
+                'formatting_func': formatting_prompts_func,
+                'max_seq_length': block_size,
+                'neftune_noise_alpha': data_args.sft_neftune_noise_alpha,
+            }
+            collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer, return_tensors='pt')
+
+        else:
+            trainer_cls = Trainer
+            trainer_kwargs = {}
+            collator = RemoveUnusedColumnsCollator(return_tensors='pt')
+
     elif data_args.optimizer == 'rec_adam':
-        trainer_cls = RecAdamTrainer
-        trainer_kwargs = {
-            'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
-            'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
-        }
+        if data_args.is_sft_dataset:
+            raise NotImplementedError()
+        else:
+            trainer_cls = RecAdamTrainer
+            trainer_kwargs = {
+                'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
+                'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
+            }
+            collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     else:
         raise ValueError(f'Unknown optimizer: {model_args.optimizer}')
