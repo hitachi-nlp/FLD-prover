@@ -441,22 +441,22 @@ def main():
         #     False,
         # ),
 
-        (
-            1.0,
-            [
-                (1.0, 'databricks/databricks-dolly-15k', None, None)
-            ],
-            False,
-        ),
-
-
         # (
         #     1.0,
         #     [
-        #         (1.0, 'hf.databricks/databricks-dolly-15k-ja', None, None)
+        #         (1.0, 'databricks/databricks-dolly-15k', None, None)
         #     ],
         #     False,
         # ),
+
+
+        (
+            1.0,
+            [
+                (1.0, 'hf.databricks/databricks-dolly-15k-ja', None, None)
+            ],
+            False,
+        ),
 
 
     ]
@@ -464,8 +464,8 @@ def main():
     is_sft_dataset = True
     # is_sft_dataset = False
 
-    sft_lang = 'eng'
-    # sft_lang = 'jpn'
+    # sft_lang = 'eng'
+    sft_lang = 'jpn'
 
 
 
