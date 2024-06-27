@@ -39,7 +39,9 @@ def main():
 
     # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-26.sft'
 
 
     CHECKPOINTS = [
@@ -54,6 +56,7 @@ def main():
 
         # -------------------- transfer ----------------------
         # 388,
+        352,
     ]
 
     PARAMS = [
@@ -77,7 +80,7 @@ def main():
 
         'model_name',
         'logic_dataset_uname',
-        # 'dataset_names',
+        'dataset_names',
         # 'logic_dataset_prob',
         'surface_is_formula',
         'learning',

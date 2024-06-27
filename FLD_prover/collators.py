@@ -1,5 +1,7 @@
-from typing import Optional
+from typing import Optional, Dict
+
 from transformers import DataCollatorForSeq2Seq, default_data_collator
+from trl import DataCollatorForCompletionOnlyLM
 
 # taken from data_processing.preprocess_function
 _REMOVE_NAMES = [
@@ -61,6 +63,15 @@ _REMOVE_NAMES = [
 ]
 
 
+def _remove_features(features: Dict) -> Dict:
+    features_removed = features.copy()
+    for feature in features_removed:
+        for remove_name in _REMOVE_NAMES:
+            if remove_name in feature:
+                feature.pop(remove_name, None)
+    return features_removed
+
+
 class RemoveUnusedColumnsCollator:
 
     def __init__(self,
@@ -70,9 +81,18 @@ class RemoveUnusedColumnsCollator:
         self.return_tensors = return_tensors
 
     def __call__(self, features, return_tensors=None):
-        for feature in features:
-            for remove_name in _REMOVE_NAMES:
-                if remove_name in feature:
-                    feature.pop(remove_name, None)
-        return default_data_collator(features,
+        return default_data_collator(_remove_features(features),
                                      return_tensors=return_tensors or self.return_tensors)
+
+
+class RemoveUnusedColumnsCollatorForCompletionOnlyLM(RemoveUnusedColumnsCollator):
+
+    def __init__(self,
+                 response_template,
+                 tokenizer=None,
+                 return_tensors: Optional[str] = None):
+        super().__init__(return_tensors=return_tensors)
+        self._collator_for_completion = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+
+    def __call__(self, features, return_tensors=None):
+        return self._collator_for_completion(_remove_features(features))
