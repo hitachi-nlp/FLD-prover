@@ -148,18 +148,18 @@ def main():
 
         # ============================ LPT     ============================
 
-        ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
+        # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
 
         # ============================ transfer     ============================
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
         # ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
 
@@ -364,8 +364,6 @@ def main():
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
-
-
     surface_is_formula_args = [
         False,
         # True,
@@ -463,12 +461,11 @@ def main():
 
     ]
 
-
     is_sft_dataset = True
     # is_sft_dataset = False
 
-    # sft_lang = 'jpn'
     sft_lang = 'eng'
+    # sft_lang = 'jpn'
 
 
 
@@ -506,14 +503,16 @@ def main():
         # 'LPT.bs-8192__step-3000.wrmp-100',
 
         # ------------------------------ transfer --------------------------------
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
+
+        'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
     ]
 
 
 
 
-    # deepspeed_stage = 'zero0'
-    # deepspeed_stage = 'zero2'   # not that much speedup
+    # deepspeed_stage = 'zero0'   # 1B models can use this
+    # deepspeed_stage = 'zero2'   # 7B can used this, but not that much speedup
     deepspeed_stage = 'zero3'
 
 
@@ -541,9 +540,14 @@ def main():
         # 1.2e-4,    # LPT-7B, from Pythia
 
         #  -------------------------------- tranfer --------------------------------
-        3e-6,    # the best for ALPT
-        # 1e-6,
+        # 3e-6,    # for ALPT
+
+        2e-5,    # for instruction-tuning
     ]
+
+
+
+
 
 
 
