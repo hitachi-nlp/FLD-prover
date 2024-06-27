@@ -453,7 +453,7 @@ def main():
         (
             1.0,
             [
-                (1.0, 'hf.databricks/databricks-dolly-15k-ja', None, None)
+                (1.0, 'databricks/databricks-dolly-15k-ja', None, None)
             ],
             False,
         ),
