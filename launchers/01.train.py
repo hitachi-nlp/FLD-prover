@@ -123,10 +123,10 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -270,11 +270,11 @@ def main():
 
         # ------------------------ NeurIPS 2024 -----------------------
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
+        (
+            1.0,
+            [],
+            False,
+        ),
 
 
         # ------------------------ LPT -----------------------
@@ -321,23 +321,23 @@ def main():
         # ),
 
 
-        (
-            1.0,
-            [
-                (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None)
-            ],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [
+        #         (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None)
+        #     ],
+        #     False,
+        # ),
 
 
     ]
 
 
-    is_sft_dataset = True
-    # is_sft_dataset = False
+    # is_sft_dataset = True
+    is_sft_dataset = False
 
-    # sft_lang = 'eng'
-    sft_lang = 'jpn'
+    sft_lang = 'eng'
+    # sft_lang = 'jpn'
 
 
 
@@ -371,7 +371,7 @@ def main():
 
         # ------------------------------ transfer --------------------------------
         # 'FT.bs-256__step-390.wrmp-200.few_save',
-        'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
+        # 'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
     ]
 
 
@@ -385,7 +385,7 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        (None, None, None),
+        # (None, None, None),
         # ('rec_adam', 1.0, 0),
         ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
@@ -396,21 +396,28 @@ def main():
 
 
     lrates = [
+        #  -------------------------------- Neurips.additional --------------------------------
         # 1e-5,
         3e-6,    # the best for ALPT
         # 1e-6,
 
 
         #  -------------------------------- LPT --------------------------------
-        # 3e-4,    # LPT
+        # 3e-4,    # pythia-1b 
+        # 1.2e-4,    # pythia-6.9b
+
 
         #  -------------------------------- tranfer --------------------------------
         # 3e-6,    # for ALPT
-        2e-5,    # for instruction-tuning
+        # 2e-5,    # for instruction-tuning
     ]
 
-    # lr_scheduler_type = None
-    lr_scheduler_type = 'cosine'
+    lr_scheduler_type = None
+    # lr_scheduler_type = 'cosine'
+
+    weight_decay = None
+    # weight_decay = 0.01   # LPT
+
 
 
 
@@ -501,9 +508,6 @@ def main():
         2048,
         # 4096,
     ]
-
-    weight_decay = None
-    # weight_decay = 0.01   # LPT, from Pythia
 
     proof_intermediate_steps_args = [
         # 'include',
