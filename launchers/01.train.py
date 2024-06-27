@@ -75,7 +75,9 @@ def main():
     # ----------------------------------- tranfer -----------------------------------
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-06-26.cosine')
 
 
 
@@ -377,6 +379,8 @@ def main():
         2e-5,    # for instruction-tuning
     ]
 
+    # lr_scheduler_type = None
+    lr_scheduler_type = 'cosine'
 
 
 
@@ -724,6 +728,7 @@ def main():
                                                                     'no_subproof_for_unknown': no_subproof_for_unknown,
 
                                                                     'learning_rate': lrate,
+                                                                    'lr_scheduler_type': lr_scheduler_type,
                                                                     'weight_decay': weight_decay,
 
                                                                     # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
