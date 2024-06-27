@@ -93,64 +93,30 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen1.5-32B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('lmsys/vicuna-7b-v1.5', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('lmsys/vicuna-33b-v1.3', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
-        # ('TinyLlama/TinyLlama-1.1B-Chat-v1.0', 'causal', 'cyberagent/open-calm-3b'),
-
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-13b-hf', 'causal', 'meta-llama/Llama-2-13b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        # ('stabilityai/StableBeluga-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('stabilityai/StableBeluga-13B', 'causal', 'meta-llama/Llama-2-13b-hf'),
-
-        # ('microsoft/Orca-2-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('microsoft/Orca-2-13b', 'causal', 'meta-llama/Llama-2-13b-hf'),
-
-        # ('microsoft/phi-2', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # XXX! does not work for now!
-        # ('stabilityai/stablelm-2-12b', 'causal', 'meta-llama/Llama-2-13b-hf'),
-
 
 
 
         # ---------------------------- japanese     ----------------------------
 
-        # ('line-corporation/japanese-large-lm-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('rinna/japanese-gpt-neox-3.6b', 'causal', 'cyberagent/open-calm-3b'),
-        # ('cyberagent/calm2-7b', 'causal', 'cyberagent/open-calm-7b'),
-        # ('stabilityai/japanese-stablelm-base-alpha-7b', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('matsuo-lab/weblab-10b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('elyza/ELYZA-japanese-Llama-2-13b-fast', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('stockmark/stockmark-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('pfnet/plamo-13b', 'causal', 'matsuo-lab/weblab-10b'),
-        # ('llm-jp/llm-jp-13b-v1.0', 'causal', 'matsuo-lab/weblab-10b'),
         # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
 
         # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
         # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
 
 
-
-
         # ============================ LPT     ============================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
 
 
         # ============================ transfer     ============================
@@ -207,49 +173,6 @@ def main():
 
     logic_dataset_unames = [
 
-        # ---------------------------------- 20230729.case_study_finalize ------------------------------------
-        # '20230729.case_study_finalize.D3',
-        # '20230729.case_study_finalize.D8',
-
-        # 'hf.hitachi-nlp/FLD.v2__default',
-        # 'hf.hitachi-nlp/FLD.v2__star',
-
-        # ---------------------------------- 20231213.jpn ------------------------------------
-        # '20231213.jpn.D1_wo_dist',
-        # '20231213.jpn.D1',
-        # '20231213.jpn.D3',
-        # '20231213.jpn.D8',
-
-        # ---------------------------------- 20230118.jpn ------------------------------------
-        # '20230118.jpn.wordnet.D3',
-        # '20230118.jpn.wordnet.D3.argument_pred_arg_only',
-        # '20230118.jpn.wordnet.D3.argument_pred_arg_only.no_kaku',
-        # '20230118.jpn.BCCWJ.D3',
-        # '20230118.jpn.punipuni.D3',
-
-        # ---------------------------------- 20230120.jpn.punipuni ------------------------------------
-
-        # '20230120.jpn.wordnet_repro_w_proposition.D1_wo_dist',
-        # '20230120.jpn.wordnet_repro_w_proposition.D1',
-        # '20230120.jpn.wordnet_repro_w_proposition.D3',
-        # '20230120.jpn.wordnet_repro_w_proposition.D8',
-
-        # '20230120.jpn.wordnet_repro_wo_proposition.D1_wo_dist',
-        # '20230120.jpn.wordnet_repro_wo_proposition.D1',
-        # '20230120.jpn.wordnet_repro_wo_proposition.D3',
-        # '20230120.jpn.wordnet_repro_wo_proposition.D8',
-
-        # '20230120.jpn.BCCWJ.D1_wo_dist',
-        # '20230120.jpn.BCCWJ.D1',
-        # '20230120.jpn.BCCWJ.D3',
-        # '20230120.jpn.BCCWJ.D8',
-
-        # '20230120.jpn.punipuni.D1_wo_dist',
-        # '20230120.jpn.punipuni.D1',
-        # '20230120.jpn.punipuni.D3',
-        # '20230120.jpn.punipuni.D8',
-
-
 
         # ---------------------------------- NeurIPS 2024 ------------------------------------
 
@@ -262,29 +185,6 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
 
 
-        # -- rejected --
-        # '2024-03-29.FLD_v2',
-        # '2024-03-29.FLD_v2.theorems-0.3.fix',
-        # '2024-03-29.FLD_v2.theorems-0.1.fix',
-        # '2024-03-29.FLD_v2.theorems-0.03.fix',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems-0.03',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-v2.theorems-0.3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-v2.theorems-0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-v2.theorems-0.03',
-
-        # '2024-03-29.JSAI_best.no_aug',
-        # '2024-03-29.JSAI_best.no_aug.theorems-0.3',
-        # '2024-03-29.JSAI_best.no_aug.theorems-0.1',
-        # '2024-03-29.JSAI_best.no_aug.theorems-0.03',
-
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
-        # # 'hf.tasksource/robustLR',  # the training dataset is small, might be "test-only" dataset.
-
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
@@ -294,14 +194,6 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
-        # -- rejected --
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-5-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-8-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-2',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.stps-1-0',
-
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP.stps-3',
 
@@ -309,31 +201,6 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
-
-
-        # ----------------------------------- ./outputs/00.create_corpus/2024-05-08.ref_prob --------------------------
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-5-5',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.theorems-0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.theorems-0.2',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.05',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.2',
-
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.30',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.40',
 
 
 
@@ -387,34 +254,7 @@ def main():
         # ),
 
 
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None, None)
-        #     ],
-        #     # False,
-        #     True,
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None, None)
-        #     ],
-        #     False,
-        # ),
-
-
-
         # ------------------------ LPT -----------------------
-
-        # (
-        #     0.00,
-        #     [
-        #         (1.0, 'DarqueDante/SlimPajama-62B-Text-1of6', None, None)  # XXX SlimPajama-62B-Text-1of6 only include 1/6 of of 62B tokens
-        #     ],
-        #     False,
-        # ),
 
         # (
         #     0.00,
@@ -453,7 +293,7 @@ def main():
         (
             1.0,
             [
-                (1.0, 'databricks/databricks-dolly-15k-ja', None, None)
+                (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None)
             ],
             False,
         ),
@@ -479,15 +319,8 @@ def main():
         # 'debug.micro',
         # 'debug.tiny',
 
-
-        # --------- dataset = 100k, logic=1.0--------------------
-        # 'FT.bs-256__step-390.wrmp-200',
+        # ---- NeurIPS ---------
         # 'FT.bs-256__step-390.wrmp-200.few_save',
-
-
-        # --------- others --------------------
-        # 'FT.bs-256__step-152',      # Alpaca 3 epochs with context 2048
-
 
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
@@ -495,7 +328,6 @@ def main():
         # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
-
 
         # ------------------------------ LPT --------------------------------
         # 'LPT.bs-1024__step-24000.wrmp-100',
