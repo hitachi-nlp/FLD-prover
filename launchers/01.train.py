@@ -76,8 +76,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
-
-    output_top_dir = Path('./outputs/01.train.py/2024-06-26.cosine')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft.response_template')
 
 
 
@@ -379,8 +378,8 @@ def main():
         2e-5,    # for instruction-tuning
     ]
 
-    # lr_scheduler_type = None
-    lr_scheduler_type = 'cosine'
+    lr_scheduler_type = None
+    # lr_scheduler_type = 'cosine'
 
 
 
@@ -407,8 +406,8 @@ def main():
 
     # hours = 72
 
-    # skip_if_exists = False
-    skip_if_exists = True
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
 

@@ -1437,9 +1437,9 @@ def main():
                     context = examples[context_field][i] if context_field is not None else None
                     response = examples[response_field][i]
                     if context is not None:
-                        text = '\n'.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + '</s>'
+                        text = '\n '.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + '</s>'
                     else:
-                        text = '\n'.join([intro, instruction_template, instruction, response_template, response]) + '</s>'
+                        text = '\n '.join([intro, instruction_template, instruction, response_template, response]) + '</s>'
                     output_texts.append(text)
                 return output_texts
 
