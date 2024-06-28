@@ -47,7 +47,7 @@ from datasets import (
     IterableDataset,
     interleave_datasets,
 )
-from trl import SFTConfig, SFTTrainer
+from trl import SFTConfig, SFTTrainer, DataCollatorForCompletionOnlyLM
 import transformers
 from transformers import (
     CONFIG_MAPPING,
@@ -1046,10 +1046,6 @@ def main():
     if training_args.should_log:
         transformers.utils.logging.set_verbosity_info()
 
-    if training_args.remove_unused_columns:
-        raise ValueError(
-            'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
-
     log_level = training_args.get_process_log_level()
     logger.setLevel(log_level)
     datasets.utils.logging.set_verbosity(log_level)
@@ -1216,8 +1212,12 @@ def main():
     raw_datasets_list = load_raw_datasets(data_args, model_args)
     if data_args.is_sft_dataset:
         # SFTTrainer will do the tokenization
+        training_args.remove_unused_columns = True
         tokenized_datasets_list = raw_datasets_list
     else:
+        if training_args.remove_unused_columns:
+            raise ValueError(
+                'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
         tokenized_datasets_list = tokenize_datasets(training_args,
                                                     data_args,
                                                     raw_datasets_list,
@@ -1451,12 +1451,13 @@ def main():
                 'neftune_noise_alpha': data_args.sft_neftune_noise_alpha,
             }
 
-            collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(
-                # see the link for this "encode": https://discuss.huggingface.co/t/zero-loss-while-finetuning-llama2-usin-sft-trainer-and-the-use-of-collator/63831/2)
-                response_template,
-                tokenizer=tokenizer,
-                return_tensors='pt',
-            )
+            collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+            # collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(
+            #     # see the link for this "encode": https://discuss.huggingface.co/t/zero-loss-while-finetuning-llama2-usin-sft-trainer-and-the-use-of-collator/63831/2)
+            #     response_template,
+            #     tokenizer=tokenizer,
+            #     return_tensors='pt',
+            # )
 
         else:
             trainer_cls = Trainer

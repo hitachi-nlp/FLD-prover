@@ -76,7 +76,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft.response_template')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
 
 
 
