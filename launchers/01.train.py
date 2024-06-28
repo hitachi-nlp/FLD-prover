@@ -67,14 +67,14 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
-    output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
 
     # =================================== tranfer ===================================
@@ -100,7 +100,7 @@ def main():
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('gpt2-medium', 'causal', 'gpt2-medium.short_cntx'),   # for debug
 
@@ -139,7 +139,7 @@ def main():
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
+        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
 
 
         # ============================ transfer     ============================
@@ -241,15 +241,15 @@ def main():
 
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
         # ---------------------------------- LPT ------------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
 
 
         # ------------------------------------ transfer ------------------------------------
