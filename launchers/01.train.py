@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
+    import time
+    time.sleep(3600 * 6)
 
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
@@ -140,8 +142,9 @@ def main():
         # ============================ LPT     ============================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
+        ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # ============================ transfer     ============================
@@ -275,11 +278,11 @@ def main():
 
         # ------------------------ NeurIPS 2024 -----------------------
 
-        (
-            1.0,
-            [],
-            False,
-        ),
+        # (
+        #     1.0,
+        #     [],
+        #     False,
+        # ),
 
 
         # ------------------------ LPT -----------------------
@@ -292,13 +295,13 @@ def main():
         #     False,
         # ),
 
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
-        #     ],
-        #     False,
-        # ),
+        (
+            0.03,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, None)
+            ],
+            False,
+        ),
 
         # (
         #     0.10,
@@ -371,11 +374,10 @@ def main():
 
 
         # ------------------------------ LPT --------------------------------
-        # 'LPT.bs-2048__step-12000.wrmp-100',
+        'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-13200.wrmp-132',
         # 'FT.bs-512__step-1952.wrmp-200',     # 1M examples ALPT, 4 nodes
         # 'FT.bs-1024__step-2930.wrmp-300',    # 3M examples ALPT, 8 nodes
-        'FT.bs-1536__step-1953.wrmp-200',     # 3M examples ALPT, 12 nodes
 
         # ------------------------------ transfer --------------------------------
         # 'FT.bs-256__step-390.wrmp-200.few_save',
@@ -411,9 +413,8 @@ def main():
 
 
         #  -------------------------------- LPT --------------------------------
-        # 3e-4,
-
-        3e-5,    # ALPT_first
+        3e-4,
+        # 3e-5,    # ALPT_first
 
 
         #  -------------------------------- tranfer --------------------------------
@@ -443,8 +444,8 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
