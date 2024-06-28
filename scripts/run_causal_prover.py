@@ -1428,6 +1428,7 @@ def main():
                             raise ValueError()
                     return field
 
+                # TODO: https://huggingface.co/docs/trl/sft_trainer#using-tokenids-directly-for-responsetemplate
                 instruction_field = guess_field(['instruction', 'question'])
                 context_field = guess_field(['context'], not_found='warning')
                 response_field = guess_field(['response', 'answer'])
@@ -1437,32 +1438,25 @@ def main():
                     context = examples[context_field][i] if context_field is not None else None
                     response = examples[response_field][i]
                     if context is not None:
-                        text = '\n '.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + '</s>'
+                        text = '\n\n'.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + tokenizer.eos_token
                     else:
-                        text = '\n '.join([intro, instruction_template, instruction, response_template, response]) + '</s>'
+                        text = '\n\n'.join([intro, instruction_template, instruction, response_template, response]) + tokenizer.eos_token
                     output_texts.append(text)
                 return output_texts
 
             trainer_cls = SFTTrainer
-            # sft_config = SFTConfig(
-            #     output_dir=training_args.output_dir,
-            #     packing=False,
-            #     max_seq_length=block_size,
-            #     dataset_num_proc=data_args.preprocessing_num_workers,
-            #     dataset_batch_size=data_args.preprocess_batch_size,
-            #     neftune_noise_alpha: Optional[float] = None
-            #     model_init_kwargs: Optional[Dict] = None
-            #     dataset_kwargs: Optional[Dict] = None
-            #     eval_packing: Optional[bool] = None
-            #     num_of_sequences: Optional[int] = 1024
-            #     chars_per_token: Optional[float] = 3.6
-            # )
             trainer_kwargs = {
                 'formatting_func': formatting_prompts_func,
                 'max_seq_length': block_size,
                 'neftune_noise_alpha': data_args.sft_neftune_noise_alpha,
             }
-            collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer, return_tensors='pt')
+
+            collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(
+                # see the link for this "encode": https://discuss.huggingface.co/t/zero-loss-while-finetuning-llama2-usin-sft-trainer-and-the-use-of-collator/63831/2)
+                response_template,
+                tokenizer=tokenizer,
+                return_tensors='pt',
+            )
 
         else:
             trainer_cls = Trainer
