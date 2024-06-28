@@ -76,7 +76,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-0628.ALPT_first'),
+    output_top_dir = Path('./outputs/01.train.py/2024-0628.ALPT_first')
 
 
     # =================================== tranfer ===================================
@@ -373,7 +373,8 @@ def main():
         # ------------------------------ LPT --------------------------------
         # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-13200.wrmp-132',
-        'FT.bs-512__step-1952.wrmp-200',     # 1M examples ALPT
+        # 'FT.bs-512__step-1952.wrmp-200',     # 1M examples ALPT
+        'FT.bs-1024__step-2930.wrmp-300',    # 3M examples ALPT
 
         # ------------------------------ transfer --------------------------------
         # 'FT.bs-256__step-390.wrmp-200.few_save',
@@ -404,12 +405,12 @@ def main():
     lrates = [
         #  -------------------------------- Neurips.additional --------------------------------
         # 1e-5,
-        # 3e-6,    # the best for ALPT
+        3e-6,    # the best for ALPT
         # 1e-6,
 
 
         #  -------------------------------- LPT --------------------------------
-        3e-4,    # pythia-1b 
+        # 3e-4,    # pythia-1b 
         # 1.2e-4,    # pythia-6.9b
 
 
@@ -439,8 +440,8 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     hours = 24
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
