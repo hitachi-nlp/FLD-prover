@@ -523,6 +523,9 @@ def load_raw_dataset_by_name(data_args,
 
         if concatenate_all_configs:
             configs = get_dataset_config_names(dataset_name)
+            # if dataset_name.find('proofwriter') >= 0:
+            #     configs = [config for config in configs
+            #                if not (config.find('birds-electricity') >= 0 or config.find('NatLang') >= 0)]
             logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
 
             raw_datasets_list = {}

@@ -31,12 +31,18 @@ def main():
     # TOP_DIR = './outputs.FLD-prover//01.train.py/2024-5-13.large_models'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-5-19.flight'
 
+
+
+    # =================================== neurips.additional ===================================
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-06-22.neurip.additional')
+
+
     # ================================================================= LPT =================================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-08.LPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
-    TOP_DIR = './outputs/01.train.py/2024-0628.ALPT_first'
+    # TOP_DIR = './outputs/01.train.py/2024-0628.ALPT_first'
 
 
     # ========================================================== transfer ==========================================================
@@ -46,18 +52,21 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-26.sft'
 
 
+    # ONLY_SHOW_EXISTING = False
+    ONLY_SHOW_EXISTING = True
+
     CHECKPOINTS = [
         # -------------------- NeurIPS ----------------------
         # 97,
         # 194,
         # 291,
-        # 388,
+        388,
 
         # -------------------- LPT ----------------------
         # 12000,
         # 10050,
         # 13200,
-        2928,
+        # 2928,
 
         # -------------------- transfer ----------------------
         # 388,
@@ -66,20 +75,20 @@ def main():
 
     PARAMS = [
         # ------------------------ NeurIPS ------------------------
-        # 'model_name',
-        # 'logic_dataset_uname',
-        # 'optimizer',
-        # 'learning',
-        # 'learning_rate',
-        # 'rec_adam_fisher_coef',
-
-        # ------------------------ LPT ------------------------
         'model_name',
         'logic_dataset_uname',
-        'dataset_names',
-        'logic_dataset_prob',
+        'optimizer',
         'learning',
         'learning_rate',
+        'rec_adam_fisher_coef',
+
+        # ------------------------ LPT ------------------------
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'dataset_names',
+        # 'logic_dataset_prob',
+        # 'learning',
+        # 'learning_rate',
 
         # -------------------- transfer ----------------------
 
@@ -103,7 +112,12 @@ def main():
                 for key in PARAMS
             ])
             name = make_name(_settings, sep='__', short=True)
-            print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
+            checkpoint_dir = setting_path.parent / f"checkpoint-{checkpoint}"
+            if ONLY_SHOW_EXISTING:
+                if not checkpoint_dir.exists():
+                    continue
+            # print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
+            print(f"'{name}.chk-{checkpoint}': '" + str(checkpoint_dir) + "',")
 
 
 if __name__ == '__main__':
