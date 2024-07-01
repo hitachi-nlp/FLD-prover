@@ -76,7 +76,7 @@ from FLD_prover.data_processors import (
     RobustLRProcessor,
     ProofWriterProcessor,
 )
-from FLD_prover.sft import build_sft_trainer
+from FLD_prover.sft import build_sft_trainer, build_rec_adam_sft_trainer
 from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, RecAdamTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
@@ -1379,6 +1379,10 @@ def main():
                                                          'generation'),
                 **maybe_logic_preprocess_map_kwargs,
             )
+
+        if data_args.logic_dataset_prob == 0.0:
+            # we do not train on logic dataset, the inference on logic eval dataset will be too slow.
+            logic_eval_dataset = logic_eval_dataset.take(1)
     else:
         logic_eval_dataset = None
 
@@ -1415,20 +1419,23 @@ def main():
                 metric_key_prefix="logic_eval"
             )
 
+
+    if data_args.do_sft:
+        if len(dataset_probs) != 1:
+            raise NotImplementedError()
+        if dataset_probs[0] < 1.0:
+            raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
+        dataset_names = parse_listed_option(data_args.dataset_names)
+        if len(dataset_names) != 1:
+            raise NotImplementedError('For sft, we currently only support one single dataset.')
+        sft_dataset_name = dataset_names[0]
+    else:
+        sft_dataset_name = None
+
     if data_args.optimizer is None:
-
         if data_args.do_sft:
-            if len(dataset_probs) != 1:
-                raise NotImplementedError()
-            if dataset_probs[0] < 1.0:
-                raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
-            dataset_names = parse_listed_option(data_args.dataset_names)
-            if len(dataset_names) != 1:
-                raise NotImplementedError('For sft, we currently only support one single dataset.')
-
-            dataset_name = dataset_names[0]
             trainer_cls, trainer_kwargs, collator = build_sft_trainer(
-                dataset_name,
+                sft_dataset_name,
                 tokenizer,
                 block_size,
                 sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
@@ -1442,7 +1449,13 @@ def main():
 
     elif data_args.optimizer == 'rec_adam':
         if data_args.do_sft:
-            raise NotImplementedError()
+            trainer_cls, trainer_kwargs, collator = build_rec_adam_sft_trainer(
+                sft_dataset_name,
+                tokenizer,
+                block_size,
+                sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
+                lang=data_args.sft_lang,
+            )
         else:
             trainer_cls = RecAdamTrainer
             trainer_kwargs = {

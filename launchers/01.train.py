@@ -332,7 +332,7 @@ def main():
         (
             0.0,
             [
-                (1.0, 'shunk031/jsnli', None, None, None)
+                (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
             ],
         ),
 
@@ -487,8 +487,8 @@ def main():
 
     # hours = 72
 
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
