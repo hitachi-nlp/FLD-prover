@@ -520,7 +520,6 @@ def load_raw_dataset_by_name(data_args,
         raw_datasets = DatasetDict(train=train_ds, validation=valid_ds, test=test_ds)
 
     else:
-
         if concatenate_all_configs:
             configs = get_dataset_config_names(dataset_name)
             logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))

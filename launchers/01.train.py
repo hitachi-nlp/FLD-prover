@@ -75,8 +75,8 @@ def main():
     # ----------------------------------- tranfer -----------------------------------
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
 
 
 
@@ -126,7 +126,12 @@ def main():
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
     ]
 
 
@@ -228,7 +233,7 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
+        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
@@ -276,19 +281,19 @@ def main():
 
         # ------------------------ transfer -----------------------
 
-        # (
-        #     1.0,
-        #     [],
-        #     False,
-        # ),
-
         (
-            0.0,
-            [
-                (1.0, 'databricks/databricks-dolly-15k', None, None)
-            ],
+            1.0,
+            [],
             False,
         ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'databricks/databricks-dolly-15k', None, None)
+        #     ],
+        #     False,
+        # ),
 
 
         # (
@@ -302,8 +307,8 @@ def main():
 
     ]
 
-    is_sft_dataset = True
-    # is_sft_dataset = False
+    # is_sft_dataset = True
+    is_sft_dataset = False
 
     sft_lang = 'eng'
     # sft_lang = 'jpn'
@@ -320,25 +325,37 @@ def main():
         # 'debug.micro',
         # 'debug.tiny',
 
-        # ---- NeurIPS ---------
+
+        # =========================== NeurIPS ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
 
-        # ---- JFLD experiments ----
+
+        # =========================== JFLD experiments ===========================
         # 'LLM_FS.shot-5',
         # 'LLM_FS.shot-100',
         # 'LLM_FS.shot-1000',
         # 'LLM_FS.shot-10000',
         # 'LLM_FS.shot-30000',
+        
 
-        # ------------------------------ LPT --------------------------------
+        # =========================== LPT ===========================
         # 'LPT.bs-1024__step-24000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-8192__step-3000.wrmp-100',
 
-        # ------------------------------ transfer --------------------------------
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
 
-        'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
+        # =========================== transfer ===========================
+        # 'FT.bs-256__step-390.wrmp-200.few_save',   # ALPT
+
+        # 'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
+
+        'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
+    ]
+
+    max_train_samples_args = [
+        10,
+        100,
+        1000,
     ]
 
 
@@ -347,19 +364,6 @@ def main():
     # deepspeed_stage = 'zero0'   # 1B models can use this
     # deepspeed_stage = 'zero2'   # 7B can used this, but not that much speedup
     deepspeed_stage = 'zero3'
-
-
-
-    # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
-    optimizer_setings = [
-        (None, None, None),
-        # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
-        # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
-        # ('rec_adam', 1.0, 5000),
-        # ('rec_adam', 1.0, 10000),
-    ]
 
 
     lrates = [
@@ -373,13 +377,27 @@ def main():
         # 1.2e-4,    # LPT-7B, from Pythia
 
         #  -------------------------------- tranfer --------------------------------
-        # 3e-6,    # for ALPT
-
-        2e-5,    # for instruction-tuning
+        3e-6,    # ALPT
+        # 2e-5,    # instruction-tuning
     ]
 
     lr_scheduler_type = None
     # lr_scheduler_type = 'cosine'
+
+
+    # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
+    optimizer_setings = [
+        # (None, None, None),
+        # ('rec_adam', 1.0, 0),
+        # ('rec_adam', 1.0, 300),
+        # ('rec_adam', 1.0, 1000),
+        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 5000),
+        # ('rec_adam', 1.0, 10000),
+    ]
+
+
+
 
 
 
@@ -537,260 +555,262 @@ def main():
 
         for surface_is_formula in surface_is_formula_args:
 
-            for context_len in context_lengths:
+            for max_train_samples in max_train_samples_args:
 
-                region = engine.region
-                n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
-                is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
+                for context_len in context_lengths:
 
-                for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
-                    for learning in learnings:
+                    region = engine.region
+                    n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
+                    is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
 
-                        for optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
+                    for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
+                        for learning in learnings:
 
-                            for sample_negative_proof in sample_negative_proof_args:
-                                for proof_intermediate_steps in proof_intermediate_steps_args:
-                                    for no_subproof_for_unknown in no_subproof_for_unknown_args:
-                                        for seed in seeds:
-                                            for model_name, lm_type, model_name_for_batch_size in model_settings:
+                            for optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
 
-                                                n_resouce_org = engine.n_resource
-                                                if model_name.find('70b') >= 0 and engine.n_resource < 2:
-                                                    logger.warning(f'70B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
-                                                    engine.n_resource = 2
+                                for sample_negative_proof in sample_negative_proof_args:
+                                    for proof_intermediate_steps in proof_intermediate_steps_args:
+                                        for no_subproof_for_unknown in no_subproof_for_unknown_args:
+                                            for seed in seeds:
+                                                for model_name, lm_type, model_name_for_batch_size in model_settings:
 
+                                                    n_resouce_org = engine.n_resource
+                                                    if model_name.find('70b') >= 0 and engine.n_resource < 2:
+                                                        logger.warning(f'70B model requires at least 2 nodes, without that the training or inference (generation) will be sig-killed. We use 3 nodes.')
+                                                        engine.n_resource = 2
 
-                                                if learning.find('LLM_FS') >= 0:
-                                                    if learning == 'LLM_FS.shot-30000':
-                                                        _hours = 50
+                                                    if learning.find('LLM_FS') >= 0:
+                                                        if learning == 'LLM_FS.shot-30000':
+                                                            _hours = 50
+                                                        else:
+                                                            _hours = 25
+                                                        if model_name.find('70b') >= 0:
+                                                            _hours = min(_hours * 2, 72)
                                                     else:
-                                                        _hours = 25
-                                                    if model_name.find('70b') >= 0:
-                                                        _hours = min(_hours * 2, 72)
-                                                else:
-                                                    _hours = hours or 24
+                                                        _hours = hours or 24
 
-                                                # V100 is only compatible with fp16, but not bf16,
-                                                # but fp16 and deepspeed sometimes causes "Loss scale already at minimum" error.
-                                                # Therefore, we use fp32 for V100.
-                                                # https://github.com/microsoft/DeepSpeed/issues/4017#issuecomment-1754820339
-                                                should_force_fp32 = (
-                                                    model_name.find('t5-') >= 0\
-                                                    or (is_V100\
-                                                        and (model_name.find('rinna/japanese-gpt2-medium') >= 0\
-                                                             or model_name.find('llama') >= 0\
-                                                             or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
-                                                        )
-                                                )
-                                                if should_force_fp32 and float_precision in ['fp16', 'bf16']:
-                                                    logger.warning(f'Forcing to use fp32 for {model_name}.')
-                                                    fp32 = True
-                                                    fp16 = False
-                                                    bf16 = False
-                                                elif float_precision == 'fp32':
-                                                    fp32 = True
-                                                    fp16 = False
-                                                    bf16 = False
-                                                elif float_precision == 'fp16':
-                                                    fp32 = False
-                                                    fp16 = True
-                                                    bf16 = False
-                                                elif float_precision == 'bf16':
-                                                    fp32 = False
-                                                    fp16 = False
-                                                    bf16 = True
+                                                    # V100 is only compatible with fp16, but not bf16,
+                                                    # but fp16 and deepspeed sometimes causes "Loss scale already at minimum" error.
+                                                    # Therefore, we use fp32 for V100.
+                                                    # https://github.com/microsoft/DeepSpeed/issues/4017#issuecomment-1754820339
+                                                    should_force_fp32 = (
+                                                        model_name.find('t5-') >= 0\
+                                                        or (is_V100\
+                                                            and (model_name.find('rinna/japanese-gpt2-medium') >= 0\
+                                                                 or model_name.find('llama') >= 0\
+                                                                 or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
+                                                            )
+                                                    )
+                                                    if should_force_fp32 and float_precision in ['fp16', 'bf16']:
+                                                        logger.warning(f'Forcing to use fp32 for {model_name}.')
+                                                        fp32 = True
+                                                        fp16 = False
+                                                        bf16 = False
+                                                    elif float_precision == 'fp32':
+                                                        fp32 = True
+                                                        fp16 = False
+                                                        bf16 = False
+                                                    elif float_precision == 'fp16':
+                                                        fp32 = False
+                                                        fp16 = True
+                                                        bf16 = False
+                                                    elif float_precision == 'bf16':
+                                                        fp32 = False
+                                                        fp16 = False
+                                                        bf16 = True
 
-                                                for lrate in lrates:
-                                                    lrate_org = lrate
-                                                    # if optimizer == 'rec_adam':
-                                                    #     lrate = lrate * 2
+                                                    for lrate in lrates:
+                                                        lrate_org = lrate
+                                                        # if optimizer == 'rec_adam':
+                                                        #     lrate = lrate * 2
 
-                                                    for update_parameters in update_parameters_args:
-                                                        for from_scratch in from_scratch_args:
-                                                            for instruction in instruction_args:
+                                                        for update_parameters in update_parameters_args:
+                                                            for from_scratch in from_scratch_args:
+                                                                for instruction in instruction_args:
 
-                                                                setting = {}
+                                                                    setting = {}
 
-                                                                setting.update(get_base_setting(base_setting_name))
+                                                                    setting.update(get_base_setting(base_setting_name))
 
-                                                                setting.update(
-                                                                    get_learning_setting(
-                                                                        learning,
-                                                                        epoch=epoch,
-                                                                        steps_upper=steps_upper,
-                                                                        warmup_steps=warmup_steps,
-                                                                        warmup_ratio=warmup_ratio,
-                 
-                                                                        optimizer=optimizer,
-                                                                        rec_adam_target_task_weight=rec_adam_target_task_weight,
-                                                                        rec_adam_fisher_coef=rec_adam_fisher_coef,
+                                                                    setting.update(
+                                                                        get_learning_setting(
+                                                                            learning,
+                                                                            epoch=epoch,
+                                                                            steps_upper=steps_upper,
+                                                                            warmup_steps=warmup_steps,
+                                                                            warmup_ratio=warmup_ratio,
+                     
+                                                                            optimizer=optimizer,
+                                                                            rec_adam_target_task_weight=rec_adam_target_task_weight,
+                                                                            rec_adam_fisher_coef=rec_adam_fisher_coef,
 
-                                                                        update_parameters=update_parameters,
+                                                                            update_parameters=update_parameters,
 
-                                                                        train_effective_batch_size=train_effective_batch_size,
-                                                                        num_evals=num_evals,
-                                                                        max_eval_samples=max_eval_samples,
-                                                                        logic_dataset_prob=logic_dataset_prob,
+                                                                            train_effective_batch_size=train_effective_batch_size,
+                                                                            num_evals=num_evals,
+                                                                            max_eval_samples=max_eval_samples,
+                                                                            logic_dataset_prob=logic_dataset_prob,
 
-                                                                        n_gpus=n_total_gpus,
+                                                                            n_gpus=n_total_gpus,
+                                                                        )
                                                                     )
-                                                                )
 
 
-                                                                other_dataset_probs = [other_dataset[0] for other_dataset in other_datasets]
-                                                                other_dataset_names = [other_dataset[1] for other_dataset in other_datasets]
-                                                                other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
-                                                                other_dataset_take_n_s = [other_dataset[3] for other_dataset in other_datasets]
-                                                                setting.update(
-                                                                    get_dataset_setting(
-                                                                        dataset_uname=logic_dataset_uname,
-                                                                        top_dirs=DATASETS_DIRS,
-                                                                        other_dataset_names=other_dataset_names,
-                                                                        other_dataset_config_names=other_dataset_config_names,
-                                                                        other_dataset_take_n_s=other_dataset_take_n_s,
-                                                                        other_dataset_probs=other_dataset_probs,
-                                                                        use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
-                                                                        use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
-                                                                        streaming=streaming,
-                                                                        surface_is_formula=surface_is_formula,
-                                                                        instruction=instruction,
+                                                                    other_dataset_probs = [other_dataset[0] for other_dataset in other_datasets]
+                                                                    other_dataset_names = [other_dataset[1] for other_dataset in other_datasets]
+                                                                    other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
+                                                                    other_dataset_take_n_s = [other_dataset[3] for other_dataset in other_datasets]
+                                                                    setting.update(
+                                                                        get_dataset_setting(
+                                                                            dataset_uname=logic_dataset_uname,
+                                                                            top_dirs=DATASETS_DIRS,
+                                                                            other_dataset_names=other_dataset_names,
+                                                                            other_dataset_config_names=other_dataset_config_names,
+                                                                            other_dataset_take_n_s=other_dataset_take_n_s,
+                                                                            other_dataset_probs=other_dataset_probs,
+                                                                            use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
+                                                                            use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
+                                                                            streaming=streaming,
+                                                                            surface_is_formula=surface_is_formula,
+                                                                            instruction=instruction,
+                                                                        )
                                                                     )
-                                                                )
 
-                                                                setting.update(
-                                                                    get_save_eval_step_setting(
-                                                                        max_steps = max_steps or setting['max_steps'],
-                                                                        eval_steps = eval_steps or setting['eval_steps'],
-                                                                        save_model_at_end=save_model_at_end,
-                                                                        save_model_on_eval=save_model_on_eval,
+                                                                    setting.update(
+                                                                        get_save_eval_step_setting(
+                                                                            max_steps = max_steps or setting['max_steps'],
+                                                                            eval_steps = eval_steps or setting['eval_steps'],
+                                                                            save_model_at_end=save_model_at_end,
+                                                                            save_model_on_eval=save_model_on_eval,
+                                                                        )
                                                                     )
-                                                                )
 
-                                                                setting.update(
-                                                                    get_batch_setting(
-                                                                        gpu_name=gpu_name_for_batch_size,
-                                                                        n_gpus=n_total_gpus,
-                                                                        model_name=model_name_for_batch_size,
-                                                                        train_effective_batch_size=setting.get('train_effective_batch_size', None),
-                                                                        batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
+                                                                    setting.update(
+                                                                        get_batch_setting(
+                                                                            gpu_name=gpu_name_for_batch_size,
+                                                                            n_gpus=n_total_gpus,
+                                                                            model_name=model_name_for_batch_size,
+                                                                            train_effective_batch_size=setting.get('train_effective_batch_size', None),
+                                                                            batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
+                                                                        )
                                                                     )
-                                                                )
-                                                                # if run_mode == 'deepspeed':
-                                                                #     for max_eval_arg_name in ['logic_eval_max_samples']:
-                                                                #         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
-                                                                #         if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
-                                                                #             raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
+                                                                    # if run_mode == 'deepspeed':
+                                                                    #     for max_eval_arg_name in ['logic_eval_max_samples']:
+                                                                    #         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
+                                                                    #         if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
+                                                                    #             raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
-                                                                setting.update(get_model_setting(model_name, from_scratch=from_scratch))
-                                                                setting.update(get_tokenizer_setting(model_name))
-                                                                setting.update(
-                                                                    get_generation_setting(
-                                                                        generation_max_length=setting.get('max_target_length', None),
-                                                                        generation_max_prompt_length=setting.get('max_prompt_length', None),
-                                                                   ),
-                                                                )
-                                                                setting.update({
-                                                                    'do_train': True,
-                                                                    # 'do_eval': True,   # automatically set by evaluation_strategy=step
-                                                                    'do_eval_in_outerloop': False,
-                                                                    'do_predict': False,
-                                                                })
-                                                                setting.update({
-                                                                    'seed': seed,
-
-                                                                    'is_sft_dataset': is_sft_dataset,
-                                                                    'sft_lang': sft_lang,
-
-                                                                    'logic_dataset_uname': logic_dataset_uname,
-                                                                    # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
-                                                                    # 'other_dataset_config_name': other_dataset_config_names,
-
-                                                                    'logic_dataset_concatenate_all_configs': logic_dataset_concatenate_all_configs,
-                                                                    'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
-
-                                                                    'resume_from_checkpoint': resume_from_checkpoint,
-
-                                                                    'base_setting_name': base_setting_name,
-
-                                                                    'lm_type': lm_type,
-                                                                    'float_precision': float_precision,
-                                                                    'fp16': fp16,
-                                                                    'bf16': bf16,
-                                                                    'deepspeed_stage': deepspeed_stage,
-
-                                                                    # 'save_total_limit': save_total_limit,
-
-                                                                    # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                                                    'learning': learning,
-                                                                    'sample_negative_proof': sample_negative_proof,
-                                                                    'proof_intermediate_steps': proof_intermediate_steps,
-                                                                    'no_subproof_for_unknown': no_subproof_for_unknown,
-
-                                                                    'learning_rate': lrate,
-                                                                    'lr_scheduler_type': lr_scheduler_type,
-                                                                    'weight_decay': weight_decay,
-
-                                                                    # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
-                                                                    # 'preprocess_batch_size': 1000,
-
-                                                                    # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
-                                                                    # 'preprocess_batch_size': 500,
-
-                                                                    # [XXX] may hang???
-                                                                    # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
-                                                                    # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
-                                                                    # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
-
-                                                                    # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                    'preprocessing_num_workers': 32,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                    'preprocess_batch_size': 500,
-
-                                                                    # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
-
-                                                                    'preprocess_keep_in_memory': False,
-
-                                                                    'ddp_timeout': 3600 * 10,
-
-                                                                    'gpu_name_for_batch_size': gpu_name_for_batch_size,
-                                                                    'use_auth_token': True,
-                                                                    'log_examples': True,
-                                                                })
-
-                                                                if seed >= 2:  # for compatibility with older experiments of jpn
+                                                                    setting.update(get_model_setting(model_name, from_scratch=from_scratch))
+                                                                    setting.update(get_tokenizer_setting(model_name))
+                                                                    setting.update(
+                                                                        get_generation_setting(
+                                                                            generation_max_length=setting.get('max_target_length', None),
+                                                                            generation_max_prompt_length=setting.get('max_prompt_length', None),
+                                                                       ),
+                                                                    )
                                                                     setting.update({
-                                                                        'train_random_sampling': True,
-                                                                        'eval_random_sampling': True,
-                                                                        'logic_eval_random_sampling': True,
+                                                                        'do_train': True,
+                                                                        # 'do_eval': True,   # automatically set by evaluation_strategy=step
+                                                                        'do_eval_in_outerloop': False,
+                                                                        'do_predict': False,
+                                                                    })
+                                                                    setting.update({
+                                                                        'seed': seed,
+
+                                                                        'is_sft_dataset': is_sft_dataset,
+                                                                        'sft_lang': sft_lang,
+
+                                                                        'logic_dataset_uname': logic_dataset_uname,
+                                                                        'max_train_samples': max_train_samples,
+                                                                        # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
+                                                                        # 'other_dataset_config_name': other_dataset_config_names,
+
+                                                                        'logic_dataset_concatenate_all_configs': logic_dataset_concatenate_all_configs,
+                                                                        'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
+
+                                                                        'resume_from_checkpoint': resume_from_checkpoint,
+
+                                                                        'base_setting_name': base_setting_name,
+
+                                                                        'lm_type': lm_type,
+                                                                        'float_precision': float_precision,
+                                                                        'fp16': fp16,
+                                                                        'bf16': bf16,
+                                                                        'deepspeed_stage': deepspeed_stage,
+
+                                                                        # 'save_total_limit': save_total_limit,
+
+                                                                        # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                                                        'learning': learning,
+                                                                        'sample_negative_proof': sample_negative_proof,
+                                                                        'proof_intermediate_steps': proof_intermediate_steps,
+                                                                        'no_subproof_for_unknown': no_subproof_for_unknown,
+
+                                                                        'learning_rate': lrate,
+                                                                        'lr_scheduler_type': lr_scheduler_type,
+                                                                        'weight_decay': weight_decay,
+
+                                                                        # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                                        # 'preprocess_batch_size': 1000,
+
+                                                                        # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
+                                                                        # 'preprocess_batch_size': 500,
+
+                                                                        # [XXX] may hang???
+                                                                        # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
+                                                                        # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
+                                                                        # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
+
+                                                                        # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                        'preprocessing_num_workers': 32,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                        'preprocess_batch_size': 500,
+
+                                                                        # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+
+                                                                        'preprocess_keep_in_memory': False,
+
+                                                                        'ddp_timeout': 3600 * 10,
+
+                                                                        'gpu_name_for_batch_size': gpu_name_for_batch_size,
+                                                                        'use_auth_token': True,
+                                                                        'log_examples': True,
                                                                     })
 
-                                                                output_dir = make_output_dir(setting, output_top_dir)
-                                                                if skip_if_exists and (output_dir / 'log.txt').exists():
-                                                                    logger.info(f'Skipping "{output_dir}"')
-                                                                    continue
-                                                                command = make_command(output_dir,
-                                                                                       setting,
-                                                                                       run_mode,
-                                                                                       region,
-                                                                                       deepspeed_stage=deepspeed_stage,
-                                                                                       n_gpus_per_node=n_gpus_per_node)
+                                                                    if seed >= 2:  # for compatibility with older experiments of jpn
+                                                                        setting.update({
+                                                                            'train_random_sampling': True,
+                                                                            'eval_random_sampling': True,
+                                                                            'logic_eval_random_sampling': True,
+                                                                        })
 
-                                                                run_by_engine(
-                                                                    engine,
-                                                                    command,
-                                                                    output_dir,
-                                                                    # delay = i_job * 0.5,
-                                                                    hours=_hours,
-                                                                    force=True,  # assuming that we do not have many jobs
-                                                                    dry_run=dry_run
-                                                                )
-                                                                i_job += 1
+                                                                    output_dir = make_output_dir(setting, output_top_dir)
+                                                                    if skip_if_exists and (output_dir / 'log.txt').exists():
+                                                                        logger.info(f'Skipping "{output_dir}"')
+                                                                        continue
+                                                                    command = make_command(output_dir,
+                                                                                           setting,
+                                                                                           run_mode,
+                                                                                           region,
+                                                                                           deepspeed_stage=deepspeed_stage,
+                                                                                           n_gpus_per_node=n_gpus_per_node)
 
-                                                                if streaming and take_interval_between_jobs:
-                                                                    logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
-                                                                    time.sleep(60 * 10)
+                                                                    run_by_engine(
+                                                                        engine,
+                                                                        command,
+                                                                        output_dir,
+                                                                        # delay = i_job * 0.5,
+                                                                        hours=_hours,
+                                                                        force=True,  # assuming that we do not have many jobs
+                                                                        dry_run=dry_run
+                                                                    )
+                                                                    i_job += 1
 
-                                                            lrate = lrate_org
-                                                            engine.n_resource = n_resouce_org
+                                                                    if streaming and take_interval_between_jobs:
+                                                                        logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
+                                                                        time.sleep(60 * 10)
+
+                                                                lrate = lrate_org
+                                                                engine.n_resource = n_resouce_org
 
     logger.info('------------- ./01.train.py finished !! -----------')
 

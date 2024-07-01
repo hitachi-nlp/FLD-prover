@@ -41,25 +41,29 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-26.sft'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
 
 
     CHECKPOINTS = [
-        # -------------------- NeurIPS ----------------------
+        # ==================== NeurIPS ======================
         # 97,
         # 194,
         # 291,
         # 388,
 
-        # -------------------- LPT ----------------------
+
+        # ==================== LPT ======================
         # 12000
 
-        # -------------------- transfer ----------------------
-        352,
+
+        # ==================== transfer ======================
+        # 352,
+        30,
     ]
 
     PARAMS = [
-        # ------------------------ NeurIPS ------------------------
+        # ======================== NeurIPS ========================
         # 'model_name',
         # 'logic_dataset_uname',
         # 'optimizer',
@@ -67,7 +71,8 @@ def main():
         # 'learning_rate',
         # 'rec_adam_fisher_coef',
 
-        # ------------------------ LPT ------------------------
+
+        # ======================== LPT ========================
         # 'model_name',
         # 'logic_dataset_uname',
         # 'dataset_names',
@@ -75,8 +80,8 @@ def main():
         # 'learning',
         # 'learning_rate',
 
-        # -------------------- transfer ----------------------
 
+        # ==================== transfer ======================
         'model_name',
         'logic_dataset_uname',
         'dataset_names',

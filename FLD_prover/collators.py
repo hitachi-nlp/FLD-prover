@@ -60,12 +60,6 @@ _REMOVE_NAMES = [
 
     # ------------- robust lr -------------
     'statement',
-
-    # ------------- databricks/databricks-dolly-15k -----------
-    'category',
-
-    # ------------- llm-jp/databricks-dolly-15k-ja -----------
-    'category',
 ]
 
 
