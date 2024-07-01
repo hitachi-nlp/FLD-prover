@@ -47,7 +47,6 @@ from datasets import (
     IterableDataset,
     interleave_datasets,
 )
-from trl import SFTConfig, SFTTrainer, DataCollatorForCompletionOnlyLM
 import transformers
 from transformers import (
     CONFIG_MAPPING,
@@ -77,6 +76,7 @@ from FLD_prover.data_processors import (
     RobustLRProcessor,
     ProofWriterProcessor,
 )
+from FLD_prover.sft import build_sft_trainer
 from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, RecAdamTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
@@ -193,20 +193,23 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
-    is_sft_dataset: Optional[bool] = field(
+    do_sft: Optional[bool] = field(
         default=False,
     )
     sft_lang: str = field(
-        default='eng',
+        default=None,
     )
     sft_neftune_noise_alpha: Optional[float] = field(
-        default=5,
+        default=None,
     )
     dataset_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset names separated by ::"}
     )
     dataset_config_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset config names separated by ::"}
+    )
+    dataset_config_load_types: Optional[str] = field(
+        default=None, metadata={"help": "Dataset config load types separated by ::"}
     )
     dataset_take_n_s: Optional[str] = field(
         default=None, metadata={"help": "Dataset take 'n' separated by ::. XXX: Should be 2 x #samples you want, as we additionally filter the dataset, which typically only take aboud a half of that datsaet."}
@@ -239,8 +242,8 @@ class DataTrainingArguments:
     logic_dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    logic_dataset_concatenate_all_configs: bool = field(
-        default=False,
+    logic_dataset_config_load_type: Optional[str] = field(
+        default=None,
     )
     logic_dataset_concatenate_all_splits_into_train: bool = field(
         default=False,
@@ -495,8 +498,8 @@ def load_raw_dataset_by_name(data_args,
                              model_args,
                              dataset_name: str,
                              dataset_config_name: str,
+                             config_load_type: Optional[str] = None,
                              dataset_take_n: int = None,
-                             concatenate_all_configs=False,
                              concatenate_all_splits_into_train=False,
                              slim_pajama_take_ratio='10%'):
     load_dataset_kwargs = {
@@ -520,12 +523,28 @@ def load_raw_dataset_by_name(data_args,
         raw_datasets = DatasetDict(train=train_ds, validation=valid_ds, test=test_ds)
 
     else:
-        if concatenate_all_configs:
-            configs = get_dataset_config_names(dataset_name)
-            logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
+        if config_load_type is None:
+            raw_datasets = load_dataset(
+                dataset_name,
+                dataset_config_name,
+                **load_dataset_kwargs,
+            )
 
+        else:
+            if config_load_type == 'concat_all':
+                config_names = get_dataset_config_names(dataset_name)
+
+            elif config_load_type == 'mmlu_jpn_compatible':
+                config_names = get_dataset_config_names(dataset_name)
+                config_names.remove('all')
+                config_names.remove('auxiliary_train')
+
+            else:
+                raise ValueError(f'{config_load_type}')
+
+            logger.info('For the dataset "%s", we the following datsaet configs %s', dataset_name, str(config_names))
             raw_datasets_list = {}
-            for _dataset_config_name in configs:
+            for _dataset_config_name in config_names:
                 _raw_datasets = load_dataset(
                     dataset_name,
                     _dataset_config_name,
@@ -533,21 +552,14 @@ def load_raw_dataset_by_name(data_args,
                 )
                 raw_datasets_list[_dataset_config_name] = _raw_datasets
 
-            major_datasets = raw_datasets_list[configs[0]]
+            major_datasets = raw_datasets_list[config_names[0]]
             raw_datasets = major_datasets
             split_names = set(major_datasets.keys())
             for split_name in split_names:
                 split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
                 raw_datasets[split_name] = concatenate_datasets(split_datasets)
 
-        else:
-            raw_datasets = load_dataset(
-                dataset_name,
-                dataset_config_name,
-                **load_dataset_kwargs,
-            )
-
-    if concatenate_all_splits_into_train:
+    if concatenate_all_splits_into_train or 'train' not in raw_datasets.keys():
         logger.info('We will concatenate all splits of %s into the training set', dataset_name)
         split_names = set(raw_datasets.keys())
         split_datasets = [raw_datasets[split_name] for split_name in split_names]
@@ -558,19 +570,21 @@ def load_raw_dataset_by_name(data_args,
             raw_datasets[split_name] = take(raw_datasets[split_name], dataset_take_n, False)
 
     if "validation" not in raw_datasets.keys():
-        if "dev" in raw_datasets.keys():
-            raw_datasets["validation"] = raw_datasets["dev"]
+        take_split = 'train' if 'train' in raw_datasets else 'test'
+        if config_load_type is not None:
+            logger.warning('Validation split is not found, we will use 1 example from %s split for temporary implementation of config_load_type=%s', take_split, config_load_type)
+            raw_datasets["validation"] = raw_datasets[take_split].take(1)
         else:
             raw_datasets["validation"] = load_dataset(
                 dataset_name,
                 dataset_config_name,
-                split=f"train[:{data_args.validation_split_percentage}%]",
+                split=f"{take_split}[:{data_args.validation_split_percentage}%]",
                 **load_dataset_kwargs,
             )
-            raw_datasets["train"] = load_dataset(
+            raw_datasets[take_split] = load_dataset(
                 dataset_name,
                 dataset_config_name,
-                split=f"train[{data_args.validation_split_percentage}%:]",
+                split=f"{take_split}[{data_args.validation_split_percentage}%:]",
                 **load_dataset_kwargs,
             )
 
@@ -581,13 +595,13 @@ def load_raw_dataset_by_files(data_args,
                               model_args,
                               train_file: Optional[str],
                               validation_file: Optional[str],
+                              config_load_type: Optional[str],
                               file_type: str,
                               keep_linebreaks: bool,
                               streaming: bool,
-                              concatenate_all_configs=False,
                               concatenate_all_splits_into_train=False):
 
-    if concatenate_all_configs or concatenate_all_splits_into_train:
+    if config_load_type or concatenate_all_splits_into_train:
         raise NotImplementedError()
 
     data_files = {}
@@ -618,16 +632,21 @@ def load_raw_dataset_by_files(data_args,
         )
 
         if "validation" not in raw_datasets.keys():
-            raw_datasets["validation"] = load_dataset(
-                extension,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                **dataset_args,
-            )
-            raw_datasets["train"] = load_dataset(
-                extension,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                **dataset_args,
-            )
+            if config_load_type is not None:
+                logger.warning('Validation split is not found, we will use 1 example from %s split for temporary implementation of config_load_type=%s', take_split, config_load_type)
+                raw_datasets["validation"] = raw_datasets[take_split].take(1)
+            else:
+                take_split = 'train' if 'train' in raw_datasets else 'test'
+                raw_datasets["validation"] = load_dataset(
+                    extension,
+                    split=f"{take_split}[:{data_args.validation_split_percentage}%]",
+                    **dataset_args,
+                )
+                raw_datasets[take_split] = load_dataset(
+                    extension,
+                    split=f"{take_split}[{data_args.validation_split_percentage}%:]",
+                    **dataset_args,
+                )
     else:
         raw_datasets = DatasetDict()
 
@@ -635,12 +654,18 @@ def load_raw_dataset_by_files(data_args,
 
 
 def parse_listed_option(option: str) -> Optional[List[str]]:
-    return [name or None for name in option.split('::')] if option is not None else []
+    def _name(name) -> Optional[str]:
+        if name == 'None':
+            return None
+        else:
+            return name or None
+    return [_name(name) for name in option.split('::')] if option is not None else []
 
 
 def load_raw_datasets(data_args, model_args):
     dataset_names = parse_listed_option(data_args.dataset_names)
     dataset_config_names = parse_listed_option(data_args.dataset_config_names)
+    dataset_config_load_types = parse_listed_option(data_args.dataset_config_load_types)
     dataset_take_n_s = parse_listed_option(data_args.dataset_take_n_s)
     train_files = parse_listed_option(data_args.train_files)
     validation_files = parse_listed_option(data_args.validation_files)
@@ -654,8 +679,9 @@ def load_raw_datasets(data_args, model_args):
                     data_args,
                     model_args,
                     dataset_names[i],
-                    dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
-                    dataset_take_n=int(dataset_take_n_s[i]) if dataset_take_n_s[i] != 'None' else None,
+                    dataset_config_names[i] if dataset_config_names[i] is not None else None,
+                    config_load_type=dataset_config_load_types[i],
+                    dataset_take_n=int(dataset_take_n_s[i]) if dataset_take_n_s[i] is not None else None,
                 )
             )
     else:
@@ -666,6 +692,7 @@ def load_raw_datasets(data_args, model_args):
                     model_args,
                     train_files[i],
                     validation_files[i] if validation_files[i] != 'None' else None,
+                    dataset_config_load_types[i],
                     file_types[i] if file_types[i] != 'None' else 'json',
                     data_args.keep_linebreaks,
                     data_args.streaming,
@@ -879,7 +906,7 @@ def load_logic_raw_datasets(data_args, model_args):
             model_args,
             data_args.logic_dataset_name,
             data_args.logic_dataset_config_name,
-            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
+            config_load_type=data_args.logic_dataset_config_load_type,
             concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
         )
     else:
@@ -888,10 +915,10 @@ def load_logic_raw_datasets(data_args, model_args):
             model_args,
             data_args.logic_train_file,
             data_args.logic_validation_file,
+            data_args.logic_dataset_config_load_type,
             'json',
             data_args.keep_linebreaks,
             False,
-            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
             concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
         )
 
@@ -1209,7 +1236,7 @@ def main():
         trainer.RandomSampler = sampler_monkey_patch
 
     raw_datasets_list = load_raw_datasets(data_args, model_args)
-    if data_args.is_sft_dataset:
+    if data_args.do_sft:
         # SFTTrainer will do the tokenization
         training_args.remove_unused_columns = True
         tokenized_datasets_list = raw_datasets_list
@@ -1242,19 +1269,19 @@ def main():
         })
 
 
-    logic_processed_dataset = logic_raw_datasets
+    logic_processed_datasets = logic_raw_datasets
     for split, dataset in list(logic_raw_datasets.items()):
         _desc = desc + f' on {split} split'
         data_args.log_non_logic_examples = data_args.log_examples
         logic_dataset_processor.log_examples = data_args.log_examples
         with training_args.main_process_first(desc=_desc):
-            logic_processed_dataset[split] = dataset.map(
+            logic_processed_datasets[split] = dataset.map(
                 lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
                 **maybe_logic_preprocess_map_kwargs,
 
             )
     else:
-        logic_processed_dataset = logic_raw_datasets
+        logic_processed_datasets = logic_raw_datasets
 
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
@@ -1262,7 +1289,7 @@ def main():
         train_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["train"] for tokenized_datasets in tokenized_datasets_list],
-            logic_processed_dataset.get("train", None),
+            logic_processed_datasets.get("train", None),
             dataset_probs,
         )
 
@@ -1276,11 +1303,12 @@ def main():
     else:
         train_dataset = None
 
-    if training_args.do_eval or data_args.do_eval_in_outerloop:
+    if (training_args.do_eval or data_args.do_eval_in_outerloop)\
+            and all("validation" in tokenized_datasets for tokenized_datasets in tokenized_datasets_list):
         eval_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["validation"] for tokenized_datasets in tokenized_datasets_list],
-            logic_processed_dataset.get("validation", None),
+            logic_processed_datasets.get("validation", None),
             dataset_probs,
         )
         eval_dataset = take(eval_dataset,
@@ -1305,6 +1333,8 @@ def main():
             return metric.compute(predictions=preds, references=labels)
     else:
         eval_dataset = None
+        preprocess_logits_for_metrics = None
+        compute_metrics = None
 
     # Wr do the FLD preprocessing here after making interleaved datasets,
     # as the current implementation of interleave_datasets() ignores the processing specified on each dataset.
@@ -1387,76 +1417,23 @@ def main():
 
     if data_args.optimizer is None:
 
-        if data_args.is_sft_dataset:
+        if data_args.do_sft:
             if len(dataset_probs) != 1:
                 raise NotImplementedError()
             if dataset_probs[0] < 1.0:
                 raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
+            dataset_names = parse_listed_option(data_args.dataset_names)
+            if len(dataset_names) != 1:
+                raise NotImplementedError('For sft, we currently only support one single dataset.')
 
-            if data_args.sft_lang == 'eng':
-                intro = 'Please answer the question based on the given context.'
-                context_template = '### context'
-                instruction_template = '### question'
-                response_template = '### answer'
-
-            elif data_args.sft_lang == 'jpn':
-                intro = '文脈に基づいて、質問に答えてください｡'
-                context_template = '### 文脈'
-                instruction_template = '### 質問'
-                response_template = '### 回答'
-
-            else:
-                raise ValueError(data_args.sft_lang)
-
-            def formatting_prompts_func(examples):
-                output_texts = []
-
-                def guess_field(candidate_fields: List[str], not_found='raise') -> str:
-                    field = None
-                    for candidate in candidate_fields:
-                        if candidate in examples:
-                            field = candidate
-                            break
-                    if field is None:
-                        msg = f'candidate fields {str(candidate_fields)} not found in the examples'
-                        if not_found == 'raise':
-                            raise ValueError(msg)
-                        elif not_found == 'warning':
-                            logger.warning(msg)
-                        else:
-                            raise ValueError()
-                    return field
-
-                # TODO: https://huggingface.co/docs/trl/sft_trainer#using-tokenids-directly-for-responsetemplate
-                instruction_field = guess_field(['instruction', 'question'])
-                context_field = guess_field(['context'], not_found='warning')
-                response_field = guess_field(['response', 'answer'])
-
-                for i in range(len(examples[instruction_field])):
-                    instruction = examples[instruction_field][i]
-                    context = examples[context_field][i] if context_field is not None else None
-                    response = examples[response_field][i]
-                    if context is not None:
-                        text = '\n\n'.join([intro, instruction_template, instruction, context_template, context, response_template, response]) + tokenizer.eos_token
-                    else:
-                        text = '\n\n'.join([intro, instruction_template, instruction, response_template, response]) + tokenizer.eos_token
-                    output_texts.append(text)
-                return output_texts
-
-            trainer_cls = SFTTrainer
-            trainer_kwargs = {
-                'formatting_func': formatting_prompts_func,
-                'max_seq_length': block_size,
-                'neftune_noise_alpha': data_args.sft_neftune_noise_alpha,
-            }
-
-            collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
-            # collator = RemoveUnusedColumnsCollatorForCompletionOnlyLM(
-            #     # see the link for this "encode": https://discuss.huggingface.co/t/zero-loss-while-finetuning-llama2-usin-sft-trainer-and-the-use-of-collator/63831/2)
-            #     response_template,
-            #     tokenizer=tokenizer,
-            #     return_tensors='pt',
-            # )
+            dataset_name = dataset_names[0]
+            trainer_cls, trainer_kwargs, collator = build_sft_trainer(
+                dataset_name,
+                tokenizer,
+                block_size,
+                sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
+                lang=data_args.sft_lang,
+            )
 
         else:
             trainer_cls = Trainer
@@ -1464,7 +1441,7 @@ def main():
             collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     elif data_args.optimizer == 'rec_adam':
-        if data_args.is_sft_dataset:
+        if data_args.do_sft:
             raise NotImplementedError()
         else:
             trainer_cls = RecAdamTrainer
@@ -1485,7 +1462,7 @@ def main():
         eval_dataset=eval_dataset if training_args.do_eval else None,
         tokenizer=tokenizer,
         data_collator=collator,
-        compute_metrics = compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
+        compute_metrics = compute_metrics if training_args.do_eval and compute_metrics is not None and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
         **trainer_kwargs,
@@ -1512,7 +1489,7 @@ def main():
         trainer.save_state()
 
     # Evaluation
-    if data_args.do_eval_in_outerloop:
+    if data_args.do_eval_in_outerloop and eval_dataset is not None:
         logger.info("*** Evaluate ***")
         metrics = trainer.evaluate()
 

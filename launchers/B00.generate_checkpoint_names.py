@@ -84,6 +84,7 @@ def main():
         # ==================== transfer ======================
         'model_name',
         'logic_dataset_uname',
+        'max_train_samples',
         'dataset_names',
         # 'logic_dataset_prob',
         'surface_is_formula',

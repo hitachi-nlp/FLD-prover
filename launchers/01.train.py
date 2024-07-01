@@ -76,7 +76,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
-    output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft.others')
 
 
 
@@ -126,11 +128,11 @@ def main():
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -233,7 +235,7 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
+        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
@@ -251,67 +253,126 @@ def main():
     # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
     multitask_setting_list = [
 
-        # ------------------------ NeurIPS 2024 -----------------------
+        # ================================================ NeurIPS 2024 ==============================================
 
         # (
         #     1.0,
         #     [],
-        #     False,
         # ),
 
 
-        # ------------------------ LPT -----------------------
+
+
+        # ================================================ LPT ==============================================
 
         # (
         #     0.00,
         #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
         #     ],
-        #     False,
         # ),
 
         # (
         #     0.03,
         #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None)
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
         #     ],
-        #     False,
         # ),
 
 
-        # ------------------------ transfer -----------------------
+
+
+        # ================================================ transfer ==============================================
+
+        # (
+        #     1.0,
+        #     [],
+        # ),
 
         (
-            1.0,
-            [],
-            False,
+            0.0,
+            [
+                (1.0, 'databricks/databricks-dolly-15k', None, None, None)
+            ],
         ),
 
+
+        (
+            0.0,
+            [
+                (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
+            ],
+        ),
+
+
+        (
+            0.0,
+            [
+                (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
+            ],
+        ),
+
+
+        (
+            0.0,
+            [
+                (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
+            ],
+        ),
+
+
+
+        (
+            0.0,
+            [
+                (1.0, 'stanfordnlp/snli', None, None, None)
+            ],
+        ),
+
+        (
+            0.0,
+            [
+                (1.0, 'shunk031/jsnli', None, None, None)
+            ],
+        ),
+
+
+
+        (
+            0.0,
+            [
+                (1.0, 'jhu-cogsci/hans', None, None, None)
+            ],
+        ),
+
+        (
+            0.0,
+            [
+                (1.0, 'hpprc/janli', None, None, None)
+            ],
+        ),
+
+
+        # XXX: Not implemented
         # (
         #     0.0,
         #     [
-        #         (1.0, 'databricks/databricks-dolly-15k', None, None)
+        #         (1.0, 'RobZamp/sick', None, None, None)
         #     ],
-        #     False,
         # ),
 
-
         # (
         #     0.0,
         #     [
-        #         (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None)
+        #         (1.0, 'hpprc/jsick', None, None, None)
         #     ],
-        #     False,
         # ),
 
 
     ]
 
-    # is_sft_dataset = True
-    is_sft_dataset = False
-
-    sft_lang = 'eng'
-    # sft_lang = 'jpn'
+    do_sft = True
+    # do_sft = False
 
 
 
@@ -348,14 +409,16 @@ def main():
         # 'FT.bs-256__step-390.wrmp-200.few_save',   # ALPT
 
         # 'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
+        'FT.bs-128__step-234.wrmp-25',   # SFT, 30000 examples
 
-        'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
+        # 'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
     ]
 
     max_train_samples_args = [
-        10,
-        100,
-        1000,
+        None,
+        # 10,
+        # 100,
+        # 1000,
     ]
 
 
@@ -377,8 +440,8 @@ def main():
         # 1.2e-4,    # LPT-7B, from Pythia
 
         #  -------------------------------- tranfer --------------------------------
-        3e-6,    # ALPT
-        # 2e-5,    # instruction-tuning
+        # 3e-6,    # ALPT
+        2e-5,    # instruction-tuning
     ]
 
     lr_scheduler_type = None
@@ -479,6 +542,8 @@ def main():
         # True,
     ]
 
+    streaming = False
+
     update_parameters_args = [
         'all',
         # 'attention',
@@ -547,10 +612,10 @@ def main():
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default' or logic_dataset_uname.find('proofwriter') >= 0:
-            logic_dataset_concatenate_all_configs = True
+            logic_dataset_config_load_type = 'concat_all'
             logic_dataset_concatenate_all_splits_into_train = True
         else:
-            logic_dataset_concatenate_all_configs = False
+            logic_dataset_config_load_type = None
             logic_dataset_concatenate_all_splits_into_train = False
 
         for surface_is_formula in surface_is_formula_args:
@@ -563,7 +628,7 @@ def main():
                     n_cpus_per_node, n_gpus_per_node, n_total_gpus, gpu_name_for_batch_size = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
                     is_V100 = engine.resource.find('rt_G') >= 0 or engine.resource.find('rt_F') >= 0
 
-                    for logic_dataset_prob, other_datasets, streaming in multitask_setting_list:
+                    for logic_dataset_prob, other_dataset_settings in multitask_setting_list:
                         for learning in learnings:
 
                             for optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef in optimizer_setings:
@@ -656,16 +721,18 @@ def main():
                                                                     )
 
 
-                                                                    other_dataset_probs = [other_dataset[0] for other_dataset in other_datasets]
-                                                                    other_dataset_names = [other_dataset[1] for other_dataset in other_datasets]
-                                                                    other_dataset_config_names = [other_dataset[2] for other_dataset in other_datasets]
-                                                                    other_dataset_take_n_s = [other_dataset[3] for other_dataset in other_datasets]
+                                                                    other_dataset_probs = [other_dataset[0] for other_dataset in other_dataset_settings]
+                                                                    other_dataset_names = [other_dataset[1] for other_dataset in other_dataset_settings]
+                                                                    other_dataset_config_names = [other_dataset[2] for other_dataset in other_dataset_settings]
+                                                                    other_dataset_config_load_types = [other_dataset[3] for other_dataset in other_dataset_settings]
+                                                                    other_dataset_take_n_s = [other_dataset[4] for other_dataset in other_dataset_settings]
                                                                     setting.update(
                                                                         get_dataset_setting(
                                                                             dataset_uname=logic_dataset_uname,
                                                                             top_dirs=DATASETS_DIRS,
                                                                             other_dataset_names=other_dataset_names,
                                                                             other_dataset_config_names=other_dataset_config_names,
+                                                                            other_dataset_config_load_types=other_dataset_config_load_types,
                                                                             other_dataset_take_n_s=other_dataset_take_n_s,
                                                                             other_dataset_probs=other_dataset_probs,
                                                                             use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
@@ -717,15 +784,14 @@ def main():
                                                                     setting.update({
                                                                         'seed': seed,
 
-                                                                        'is_sft_dataset': is_sft_dataset,
-                                                                        'sft_lang': sft_lang,
+                                                                        'do_sft': do_sft,
 
                                                                         'logic_dataset_uname': logic_dataset_uname,
                                                                         'max_train_samples': max_train_samples,
                                                                         # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
                                                                         # 'other_dataset_config_name': other_dataset_config_names,
 
-                                                                        'logic_dataset_concatenate_all_configs': logic_dataset_concatenate_all_configs,
+                                                                        'logic_dataset_config_load_type': logic_dataset_config_load_type,
                                                                         'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
 
                                                                         'resume_from_checkpoint': resume_from_checkpoint,
