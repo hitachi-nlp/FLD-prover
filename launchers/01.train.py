@@ -130,9 +130,9 @@ def main():
 
         ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -235,13 +235,13 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
+        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
     surface_is_formula_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
 
