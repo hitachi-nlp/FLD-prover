@@ -83,8 +83,6 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-26.sft')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-30.debug')
-
 
 
 
@@ -123,10 +121,10 @@ def main():
         # ======================================================== neurips.additional     ========================================================
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -359,7 +357,6 @@ def main():
         # ---- NeurIPS ---------
         'FT.bs-256__step-390.wrmp-200.few_save',
 
-
         # ---- JFLD experiments ----
         # 'LLM_FS.shot-5',
         # 'LLM_FS.shot-100',
@@ -370,6 +367,7 @@ def main():
 
         # ------------------------------ neurip.additional --------------------------------
         # 'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
 
         # ------------------------------ LPT --------------------------------
@@ -449,7 +447,7 @@ def main():
     engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    hours = 24
+    hours = 5
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
@@ -576,7 +574,8 @@ def main():
 
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
-        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default' or logic_dataset_uname.find('proofwriter') >= 0:
+        # if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default' or logic_dataset_uname.find('proofwriter') >= 0:
+        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
             logic_dataset_concatenate_all_configs = True
             logic_dataset_concatenate_all_splits_into_train = True
         else:

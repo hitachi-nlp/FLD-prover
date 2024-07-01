@@ -25,7 +25,6 @@ from FLD_task import load_deduction, serialize
 
 logger = logging.getLogger(__name__)
 
-
 @click.command()
 @click.option('--output_dir', type=str, default=None)
 @click.option('--fld_dataset_name', type=str, default=None)
