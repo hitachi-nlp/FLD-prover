@@ -76,9 +76,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft.others')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft.others')
 
 
 
@@ -130,9 +130,9 @@ def main():
 
         ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -240,8 +240,8 @@ def main():
     ]
 
     surface_is_formula_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
 
@@ -284,73 +284,73 @@ def main():
 
         # ================================================ transfer ==============================================
 
+        (
+            1.0,
+            [],
+        ),
+
         # (
-        #     1.0,
-        #     [],
+        #     0.0,
+        #     [
+        #         (1.0, 'databricks/databricks-dolly-15k', None, None, None)
+        #     ],
         # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'databricks/databricks-dolly-15k', None, None, None)
-            ],
-        ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
+        #     ],
+        # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
+        #     ],
+        # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
-            ],
-        ),
-
-
-        (
-            0.0,
-            [
-                (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
+        #     ],
+        # ),
 
 
 
-        (
-            0.0,
-            [
-                (1.0, 'stanfordnlp/snli', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'stanfordnlp/snli', None, None, None)
+        #     ],
+        # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
+        #     ],
+        # ),
 
 
 
-        (
-            0.0,
-            [
-                (1.0, 'jhu-cogsci/hans', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'jhu-cogsci/hans', None, None, None)
+        #     ],
+        # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'hpprc/janli', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'hpprc/janli', None, None, None)
+        #     ],
+        # ),
 
 
         # XXX: Not implemented
@@ -371,8 +371,8 @@ def main():
 
     ]
 
-    do_sft = True
-    # do_sft = False
+    # do_sft = True
+    do_sft = False
 
 
 
@@ -409,9 +409,9 @@ def main():
         # 'FT.bs-256__step-390.wrmp-200.few_save',   # ALPT
 
         # 'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
-        'FT.bs-128__step-234.wrmp-25',   # SFT, 30000 examples
+        # 'FT.bs-128__step-234.wrmp-25',   # SFT, 30000 examples
 
-        # 'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
+        'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
     ]
 
     max_train_samples_args = [
@@ -431,7 +431,7 @@ def main():
 
     lrates = [
         # 1e-5,
-        # 3e-6,    # the best for ALPT
+        3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -439,9 +439,10 @@ def main():
         # 3e-4,    # LPT-1B, from Pythia
         # 1.2e-4,    # LPT-7B, from Pythia
 
+
         #  -------------------------------- tranfer --------------------------------
         # 3e-6,    # ALPT
-        2e-5,    # instruction-tuning
+        # 2e-5,    # instruction-tuning
     ]
 
     lr_scheduler_type = None
