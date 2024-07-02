@@ -415,10 +415,10 @@ def main():
     ]
 
     max_train_samples_args = [
-        None,
-        # 10,
-        # 100,
-        # 1000,
+        # None,
+        10,
+        100,
+        1000,
     ]
 
 

@@ -42,8 +42,11 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
 
+    # ONLY_SHOW_EXISTING = False
+    ONLY_SHOW_EXISTING = True
 
     CHECKPOINTS = [
         # ==================== NeurIPS ======================
@@ -59,7 +62,8 @@ def main():
 
         # ==================== transfer ======================
         # 352,
-        30,
+        # 30,
+        234,
     ]
 
     PARAMS = [
@@ -104,7 +108,12 @@ def main():
                 for key in PARAMS
             ])
             name = make_name(_settings, sep='__', short=True)
-            print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
+            checkpoint_dir = setting_path.parent / f"checkpoint-{checkpoint}"
+            if ONLY_SHOW_EXISTING:
+                if not checkpoint_dir.exists():
+                    continue
+            # print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
+            print(f"'{name}.chk-{checkpoint}': '" + str(checkpoint_dir) + "',")
 
 
 if __name__ == '__main__':
