@@ -1158,7 +1158,7 @@ def main():
     logger.info('-- [update_parameters="%s"] will update the following parameters --', data_args.update_parameters)
     for name, param in model.named_parameters():
         if name in update_parameter_names:
-            logger.info(name)
+            # logger.info(name)
             param.requires_grad = True
 
     logger.info('-- [update_parameters="%s"] will freeze the following parameters --', data_args.update_parameters)
