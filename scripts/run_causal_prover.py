@@ -1096,8 +1096,9 @@ def main():
         "use_cache": False if training_args.gradient_checkpointing else True,
     }
     config_name = model_args.config_name or model_args.model_name_or_path
+    config_cls = AutoConfig
     if config_name:
-        config = AutoConfig.from_pretrained(config_name, **config_kwargs)
+        config = config_cls.from_pretrained(config_name, **config_kwargs)
     else:
         config = CONFIG_MAPPING[model_args.model_type]()
         logger.warning("You are instantiating a new config instance from scratch.")
@@ -1120,12 +1121,13 @@ def main():
         if model_args.torch_dtype in ["auto", None]
         else getattr(torch, model_args.torch_dtype)
     )
+    model_cls = AutoModelForCausalLM
     if model_args.from_scratch:
-        model = AutoModelForCausalLM.from_config(config, torch_dtype=torch_dtype)
+        model = model_cls.from_config(config, torch_dtype=torch_dtype)
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
     else:
-        model = AutoModelForCausalLM.from_pretrained(
+        model = model_cls.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -1167,7 +1169,8 @@ def main():
             logger.info(name)
             param.requires_grad = False
 
-    model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+    if not model_args.model_name_or_path.find('rwkv') >= 0:
+        model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
@@ -1193,9 +1196,10 @@ def main():
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
-    embedding_size = model.get_input_embeddings().weight.shape[0]
-    if len(tokenizer) > embedding_size:
-        model.resize_token_embeddings(len(tokenizer))
+    if not model_args.model_name_or_path.find('rwkv') >= 0:
+        embedding_size = model.get_input_embeddings().weight.shape[0]
+        if len(tokenizer) > embedding_size:
+            model.resize_token_embeddings(len(tokenizer))
 
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
