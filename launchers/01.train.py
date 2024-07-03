@@ -235,7 +235,7 @@ def main():
 
 
         # ------------------------------------ transfer ------------------------------------
-        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
+        '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
@@ -255,10 +255,10 @@ def main():
 
         # ================================================ NeurIPS 2024 ==============================================
 
-        # (
-        #     1.0,
-        #     [],
-        # ),
+        (
+            1.0,
+            [],
+        ),
 
 
 
@@ -290,70 +290,70 @@ def main():
         # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'databricks/databricks-dolly-15k', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'databricks/databricks-dolly-15k', None, None, None)
+        #     ],
+        # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
-            ],
-        ),
-
-
-
-
-        (
-            0.0,
-            [
-                (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
-            ],
-        ),
-
-        (
-            0.0,
-            [
-                (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
+        #     ],
+        # ),
 
 
 
 
-        (
-            0.0,
-            [
-                (1.0, 'stanfordnlp/snli', None, None, None)
-            ],
-        ),
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
+        #     ],
+        # ),
 
-        (
-            0.0,
-            [
-                (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
-            ],
-        ),
-
-
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
+        #     ],
+        # ),
 
 
-        (
-            0.0,
-            [
-                (1.0, 'jhu-cogsci/hans', None, None, None)
-            ],
-        ),
 
-        (
-            0.0,
-            [
-                (1.0, 'hpprc/janli', None, None, None)
-            ],
-        ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'stanfordnlp/snli', None, None, None)
+        #     ],
+        # ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
+        #     ],
+        # ),
+
+
+
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'jhu-cogsci/hans', None, None, None)
+        #     ],
+        # ),
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'hpprc/janli', None, None, None)
+        #     ],
+        # ),
 
 
 

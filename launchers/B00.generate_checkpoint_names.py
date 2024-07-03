@@ -42,8 +42,8 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
 
     # ONLY_SHOW_EXISTING = False
     ONLY_SHOW_EXISTING = True
@@ -62,8 +62,11 @@ def main():
 
         # ==================== transfer ======================
         # 352,   # FLD(eng,jpn,logical_formula)
-        30,    # few-shot
-        # 234,   # other datasets
+
+        # 30,    # few-shot
+
+        234,   # other datasets
+        78,   # other datasets
     ]
 
     PARAMS = [
