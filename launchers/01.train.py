@@ -66,7 +66,7 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -85,7 +85,7 @@ def main():
 
 
     # =================================== RWKV ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-07-03.RWKV')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-03.RWKV')
 
 
 
@@ -127,30 +127,31 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
 
 
-        # ============================ LPT     ============================
+        # ======================================================== LPT     ========================================================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ALPT
-        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
+        # ('mdl_nm==EleutherAI@pythia-6.9b__lgc_dtst_unm==2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms==cerebras@SlimPajama-627B__lgc_dtst_prb==0.0__lrnng==LPT.bs-2048__step-12000.wrmp-100__lrnng_rt==0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
 
         # logic before PT
-        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm==EleutherAI@pythia-6.9b__lgc_dtst_unm==2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms==None__lgc_dtst_prb==1.0__lrnng==FT.bs-1024__step-2930.wrmp-300__lrnng_rt==3e-05.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        # ============================ transfer     ============================
+        # ======================================================== transfer     ========================================================
+
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -159,9 +160,12 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        # ============================ RWKV     ============================
+
+
+        # ======================================================== RWKV     ========================================================
+
         # ('RWKV/rwkv-6-world-1b6', 'causal', 'EleutherAI/pythia-1b'),
-        ('RWKV/rwkv-6-world-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('RWKV/rwkv-6-world-7b', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
 
@@ -223,11 +227,11 @@ def main():
 
 
         # ------------------------------- 2024-05-03.ablation --------------------------------
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
 
@@ -267,7 +271,7 @@ def main():
 
         # ------------------------------------ transfer ------------------------------------
         # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
     ]
 
     surface_is_formula_args = [
@@ -448,18 +452,18 @@ def main():
 
 
     # ------------------------------- HAIC --------------------------------
-    hours = None
+    # hours = None
 
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    hours = 5
+    hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
