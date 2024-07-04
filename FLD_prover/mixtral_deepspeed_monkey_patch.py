@@ -43,7 +43,10 @@ def moe_forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
 
 def replace_mixtral_moe_with_dense_impl():
     from transformers.models.mixtral.modeling_mixtral import MixtralSparseMoeBlock
-    from transformers.models.mixtral.modeling_mixtral import MixtralBLockSparseTop2MLP
+    try:
+        from transformers.models.mixtral.modeling_mixtral import MixtralBLockSparseTop2MLP
+    except ImportError:
+        from transformers.models.mixtral.modeling_mixtral import MixtralBlockSparseTop2MLP as MixtralBLockSparseTop2MLP
 
     MixtralBLockSparseTop2MLP.forward = mlp_forward
     MixtralSparseMoeBlock.forward = moe_forward

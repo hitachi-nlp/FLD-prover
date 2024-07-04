@@ -620,6 +620,9 @@ def main():
                                                 deepspeed_stage_org = deepspeed_stage
                                                 if model_name.find('rwkv') >= 0 or model_name.find('RWKV') >= 0:
                                                     deepspeed_stage = 'zero2'  # as zero3 somehow hangs
+                                                    preprocessing_num_workers = 4
+                                                else:
+                                                    preprocessing_num_workers = 32
 
                                                 if learning.find('LLM_FS') >= 0:
                                                     if learning == 'LLM_FS.shot-30000':
@@ -662,9 +665,6 @@ def main():
                                                     bf16 = True
 
                                                 for lrate in lrates:
-                                                    lrate_org = lrate
-                                                    # if optimizer == 'rec_adam':
-                                                    #     lrate = lrate * 2
 
                                                     for update_parameters in update_parameters_args:
                                                         for from_scratch in from_scratch_args:
@@ -802,8 +802,7 @@ def main():
                                                                     # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
                                                                     # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
 
-                                                                    # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                    'preprocessing_num_workers': 32,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                    'preprocessing_num_workers': preprocessing_num_workers,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
                                                                     'preprocess_batch_size': 500,
 
                                                                     # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
@@ -850,7 +849,6 @@ def main():
                                                                     logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
                                                                     time.sleep(60 * 10)
 
-                                                    lrate = lrate_org
                                                 deepspeed_stage= deepspeed_stage_org
 
     logger.info('------------- ./01.train.py finished !! -----------')

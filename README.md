@@ -56,6 +56,17 @@ cd ..
 export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
+### To use deepspeed with zero2
+Edit `transformers/integrations/deepspeed.py` as follows:
+```python
+if inference:
+    # only Z3 makes sense for the inference
+    - if not hf_deepspeed_config.is_zero3():
+    -     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
+    + # if not hf_deepspeed_config.is_zero3():
+    + #     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
+```
+
 
 
 
