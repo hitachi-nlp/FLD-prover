@@ -7,9 +7,6 @@ from collections import defaultdict
 import numpy as np
 
 from FLD_task import (
-    load_deduction,
-    serialize,
-    build_metrics,
     log_example,
     log_metrics,
 )
@@ -44,6 +41,7 @@ class Processor(ABC):
                  ignore_pad_token_for_loss=True,
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
+                 augmentation=False,
                  eval_dataset=None,
                  log_examples=False,
                  log_only_first_example=True):
@@ -64,6 +62,7 @@ class Processor(ABC):
         self._ignore_pad_token_for_loss = ignore_pad_token_for_loss
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
+        self._augmentation = augmentation
         self.eval_dataset = eval_dataset
         self.log_examples = log_examples
         self._log_only_first_example = log_only_first_example

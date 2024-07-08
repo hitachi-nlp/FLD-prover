@@ -5,8 +5,10 @@ import random
 from FLD_task import (
     load_deduction,
     serialize,
+    augment_serial,
     build_metrics,
     SerializedDeduction,
+    make_instruction,
 )
 from FLD_task.proof import get_stance_markers
 from FLD_prover.lm_types import LMType
@@ -22,6 +24,15 @@ logger = logging.getLogger()
 class FLDProcessor(Processor):
 
     _warn_on_example_prettify_failure = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._instruction and self._augmentation:
+            raise ValueError('Instruction and augmentation cannot be used together')
+
+        self._augmentation_prompt_fact = True
+        self._augmentation_prompt_stance = True
+        self._augmentation_prompt_CoT = True
 
     def _make_in_out(
         self,
@@ -94,7 +105,7 @@ class FLDProcessor(Processor):
         else:
             raise ValueError(f'Invalid proof_intermediate_steps: {self._proof_intermediate_steps}')
 
-        return serialize(
+        serial = serialize(
             load_deduction(example),
             surface_is_formula=self._surface_is_formula,
             intermediate_steps=intermediate_steps,
@@ -103,3 +114,12 @@ class FLDProcessor(Processor):
             include_max_subproof_for_unknown=not self._no_subproof_for_unknown,
             instruction=self._instruction,
         )
+
+        if self._augmentation:
+            serial = augment_serial(
+                serial,
+                prompt_fact = random.choice([True, False]) if self._augmentation_prompt_fact else False,
+                prompt_stance = random.choice([True, False]) if self._augmentation_prompt_stance else False,
+                prompt_CoT=intermediate_steps,
+            )
+        return serial

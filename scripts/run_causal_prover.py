@@ -370,6 +370,11 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    augmentation: bool = field(
+        default=False,
+        metadata={},
+    )
+
 
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
@@ -793,6 +798,7 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
+        'augmentation': data_args.augmentation,
         # 'log_examples': data_args.log_examples,
     }
 
