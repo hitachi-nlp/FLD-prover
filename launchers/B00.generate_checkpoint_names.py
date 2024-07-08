@@ -42,7 +42,7 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
-    TOP_DIR = './outputs/01.train.py/2024-0628.ALPT_first'
+    # TOP_DIR = './outputs/01.train.py/2024-0628.ALPT_first'
 
 
     # ========================================================== transfer ==========================================================
@@ -50,6 +50,9 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-22.transfer.formula'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer.rec_adam_refactor'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-26.sft'
+
+    # =================================== RWKV ===================================
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-03.RWKV')
 
 
     # ONLY_SHOW_EXISTING = False
@@ -60,10 +63,10 @@ def main():
         # 97,
         # 194,
         # 291,
-        # 388,
+        388,
 
         # -------------------- LPT ----------------------
-        12000,
+        # 12000,
         # 10050,
         # 13200,
         # 2928,
@@ -71,6 +74,10 @@ def main():
         # -------------------- transfer ----------------------
         # 388,
         # 352,
+
+        # -------------------- RWKV ----------------------
+        390,
+
     ]
 
     PARAMS = [
@@ -83,15 +90,14 @@ def main():
         # 'rec_adam_fisher_coef',
 
         # ------------------------ LPT ------------------------
-        'model_name',
-        'logic_dataset_uname',
-        'dataset_names',
-        'logic_dataset_prob',
-        'learning',
-        'learning_rate',
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'dataset_names',
+        # 'logic_dataset_prob',
+        # 'learning',
+        # 'learning_rate',
 
         # -------------------- transfer ----------------------
-
         # 'model_name',
         # 'logic_dataset_uname',
         # 'dataset_names',
@@ -99,6 +105,14 @@ def main():
         # 'surface_is_formula',
         # 'learning',
         # 'learning_rate',
+
+        # ------------------------ RWKV ------------------------
+        'model_name',
+        'logic_dataset_uname',
+        'dataset_names',
+        'logic_dataset_prob',
+        'learning',
+        'learning_rate',
 
     ]
 
