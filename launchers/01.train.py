@@ -447,7 +447,7 @@ def main():
 
 
         #  -------------------------------- tranfer --------------------------------
-        6e-6,    # ALPT
+        6e-6,    # ALPT: FIXME! should be 3e-6
         # 2e-5,    # instruction-tuning
     ]
 
@@ -692,9 +692,6 @@ def main():
                                                         bf16 = True
 
                                                     for lrate in lrates:
-                                                        lrate_org = lrate
-                                                        # if optimizer == 'rec_adam':
-                                                        #     lrate = lrate * 2
 
                                                         for update_parameters in update_parameters_args:
                                                             for from_scratch in from_scratch_args:
@@ -882,7 +879,6 @@ def main():
                                                                         logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
                                                                         time.sleep(60 * 10)
 
-                                                                lrate = lrate_org
                                                                 engine.n_resource = n_resouce_org
 
     logger.info('------------- ./01.train.py finished !! -----------')
