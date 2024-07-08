@@ -42,8 +42,9 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
-
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
 
     # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
@@ -66,9 +67,10 @@ def main():
         # 194,
         # 291,
         388,
+        390,
 
         # ==================== LPT ======================
-        12000
+        # 12000
 
 
         # ==================== transfer ======================
