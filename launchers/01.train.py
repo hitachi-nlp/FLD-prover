@@ -150,10 +150,10 @@ def main():
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ALPT after LPT
-        # ('mdl_nm==EleutherAI@pythia-6.9b__lgc_dtst_unm==2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms==cerebras@SlimPajama-627B__lgc_dtst_prb==0.0__lrnng==LPT.bs-2048__step-12000.wrmp-100__lrnng_rt==0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
+        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
 
         # logic before LPT
-        # ('mdl_nm==EleutherAI@pythia-6.9b__lgc_dtst_unm==2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms==None__lgc_dtst_prb==1.0__lrnng==FT.bs-1024__step-2930.wrmp-300__lrnng_rt==3e-05.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # ======================================================== transfer     ========================================================

@@ -7,6 +7,7 @@ from trl import DataCollatorForCompletionOnlyLM
 _REMOVE_NAMES = [
     # ---- FLD ----
     'depth',
+    'steps',
     'facts',
     'hypothesis',
     'prompts_w_partial_proof',
@@ -27,6 +28,7 @@ _REMOVE_NAMES = [
     'negative_proofs',
     'negative_original_tree_depth',
     'original_tree_depth',
+    'original_tree_steps',
     'num_formula_distractors',
     'num_translation_distractors',
     'num_all_distractors',
