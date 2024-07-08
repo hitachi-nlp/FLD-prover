@@ -42,7 +42,7 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-11.do_cache.pyarrow.node--8.proc-32'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
-    # TOP_DIR = './outputs/01.train.py/2024-0628.ALPT_first'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
 
 
     # ========================================================== transfer ==========================================================
@@ -52,10 +52,10 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-26.sft'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
 
     # =================================== RWKV ===================================
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-03.RWKV')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-03.RWKV')
 
     # ONLY_SHOW_EXISTING = False
     ONLY_SHOW_EXISTING = True
@@ -68,17 +68,17 @@ def main():
         388,
 
         # ==================== LPT ======================
-        # 12000
+        12000
 
 
         # ==================== transfer ======================
         # 352,   # FLD(eng,jpn,logical_formula)
         # 30,    # few-shot
-        234,   # other datasets
-        78,   # other datasets
+        # 234,   # other datasets
+        # 78,   # other datasets
 
         # -------------------- RWKV ----------------------
-        390,
+        # 390,
     ]
 
     PARAMS = [
@@ -92,12 +92,12 @@ def main():
 
 
         # ======================== LPT ========================
-        # 'model_name',
-        # 'logic_dataset_uname',
-        # 'dataset_names',
-        # 'logic_dataset_prob',
-        # 'learning',
-        # 'learning_rate',
+        'model_name',
+        'logic_dataset_uname',
+        'dataset_names',
+        'logic_dataset_prob',
+        'learning',
+        'learning_rate',
 
         # ==================== transfer ======================
         # 'model_name',
