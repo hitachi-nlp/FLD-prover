@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    time.sleep(3600 * 5)
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
 
@@ -81,7 +80,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run')
-    output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
+
+    output_top_dir = Path('./outputs/01.train.py/2024-07-09.ALPT.re_run.scratch')
 
 
     # =================================== tranfer ===================================
@@ -94,6 +95,9 @@ def main():
 
     # =================================== RWKV ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-07-03.RWKV')
+
+
+
 
 
 
@@ -151,13 +155,13 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ALPT after LPT
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
 
         # logic before LPT
-        ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05__augmnttn=False.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05__augmnttn=False.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # ======================================================== transfer     ========================================================
@@ -181,6 +185,10 @@ def main():
         # ('RWKV/rwkv-6-world-7b', 'causal', 'RWKV/rwkv-6-world-7b'),
     ]
 
+    from_scratch_args = [
+        # False,
+        True,
+    ]
 
 
 
@@ -215,13 +223,6 @@ def main():
         './outputs.FLD/00.create_corpus/2024-06-08.LPT',
         './outputs.FLD/00.create_corpus/2024-06-19.transfer',
     ]
-
-
-
-
-
-
-
 
 
     logic_dataset_unames = [
@@ -293,33 +294,43 @@ def main():
         # True,
     ]
 
+    instruction_args = [
+        # False,
+        True,
+    ]
+
+    augmentation_args = [
+        False,
+        # True,
+    ]
 
 
 
 
 
 
-    # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
+
+
     multitask_setting_list = [
-
+        # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
 
-        # (
-        #     1.0,
-        #     [],
-        # ),
+        (
+            1.0,
+            [],
+        ),
 
 
 
 
         # ================================================ LPT ==============================================
 
-        (
-            0.00,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-            ],
-        ),
+        # (
+        #     0.00,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
+        #     ],
+        # ),
 
         # (
         #     0.03,
@@ -469,11 +480,11 @@ def main():
         # =========================== LPT ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
         # 'LPT.bs-2048__step-12000.wrmp-100',
-        'LPT.bs-2048__step-12000.wrmp-1000',
+        # 'LPT.bs-2048__step-12000.wrmp-1000',
 
         # 'LPT.bs-2048__step-13200.wrmp-132',
         # 'FT.bs-512__step-1952.wrmp-200',     # 1M examples ALPT, 4 nodes
-        # 'FT.bs-1024__step-2930.wrmp-300',    # 3M examples ALPT, 8 nodes
+        'FT.bs-1024__step-2930.wrmp-300',    # 3M examples ALPT, 8 nodes
 
 
         # =========================== transfer ===========================
@@ -486,14 +497,13 @@ def main():
         # 'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
     ]
 
+
     max_train_samples_args = [
         None,
         # 10,
         # 100,
         # 1000,
     ]
-
-
 
 
     # deepspeed_stage = 'zero0'   # 1B models can use this
@@ -511,9 +521,9 @@ def main():
         #  -------------------------------- LPT --------------------------------
         # 3e-4,
 
-        # 3e-5,    # ALPT_first.ALPT
+        3e-5,    # ALPT_first.ALPT
 
-        1e-4,    # logic before LPT
+        # 1e-4,    # logic before LPT
 
 
         #  -------------------------------- tranfer --------------------------------
@@ -521,11 +531,14 @@ def main():
         # 2e-5,    # for instruction-tuning
     ]
 
+
     lr_scheduler_type = None
     # lr_scheduler_type = 'cosine'
 
+
     weight_decay = None
     # weight_decay = 0.01   # LPT
+
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
@@ -539,14 +552,6 @@ def main():
     ]
 
 
-    instruction_args = [
-        # False,
-        True,
-    ]
-    augmentation_args = [
-        False,
-        # True,
-    ]
 
 
 
@@ -620,11 +625,6 @@ def main():
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
-
-    from_scratch_args = [
-        False,
-        # True,
-    ]
 
     streaming = False
 
