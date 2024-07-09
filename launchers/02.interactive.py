@@ -43,8 +43,8 @@ def main():
     # checkpoint = 'meta-llama/Meta-Llama-3-70B'
     # gradio_port = 9200
 
-    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06__rc_adm_fshr_cf=300.chk-388'
-    gradio_port = 9200
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06__rc_adm_fshr_cf=300.chk-388'
+    # gradio_port = 9200
 
 
     # ------------------------------------ LPT --------------------------------

@@ -43,9 +43,9 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.ALPT.re_run'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.ALPT.re_run'
 
     # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
@@ -67,12 +67,12 @@ def main():
         # 97,
         # 194,
         # 291,
-        # 388,
-        # 390,
+        388,
+        390,
 
         # ==================== LPT ======================
         # 12000
-        2928,
+        # 2928,
 
 
         # ==================== transfer ======================
@@ -102,6 +102,7 @@ def main():
         'logic_dataset_prob',
         'learning',
         'learning_rate',
+        'rec_adam_fisher_coef',
         'augmentation',
 
         # ==================== transfer ======================

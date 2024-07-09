@@ -75,9 +75,9 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
+    output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
@@ -280,8 +280,10 @@ def main():
 
 
         # ---------------------------------- LPT ------------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
 
         # ------------------------------------ transfer ------------------------------------
@@ -295,13 +297,13 @@ def main():
     ]
 
     instruction_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
     augmentation_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
 
@@ -524,8 +526,12 @@ def main():
         # 3e-5,    # ALPT (scratch)
         # 1e-4,    # PT after ALPT
 
-        # 3e-6,
-        1e-6,
+        3e-6,
+        # 1e-6,
+
+        #  -------------------------------- RWKV --------------------------------
+        # 3e-5,
+        # 1e-4,
 
         #  -------------------------------- tranfer --------------------------------
         # 3e-6,    # for ALPT
@@ -565,8 +571,8 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
