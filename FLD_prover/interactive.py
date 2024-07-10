@@ -125,7 +125,7 @@ def launch(seq2seq_trainer,
             fn=predict,
             inputs=[gr.Textbox(lines=10, placeholder='fact1: Allen is red\nfact2: Allen is blue'),
                     gr.Textbox(lines=1, placeholder='Allen is red'),
-                    gr.Checkbox(value=True, label='Convert to FLD prompt')],
+                    gr.Checkbox(value=False, label='Convert to FLD prompt')],
             outputs=['text'],
         )
         demo.launch(share=True, server_name='0.0.0.0', server_port=gradio_port)

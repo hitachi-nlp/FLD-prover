@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
+    time.sleep(3600)
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
 
@@ -66,7 +67,7 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -83,7 +84,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch')
-    output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
     # =================================== tranfer ===================================
@@ -136,16 +137,16 @@ def main():
 
         # ======================================================== neurips.additional     ========================================================
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -164,7 +165,7 @@ def main():
         # logic before LPT
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-2930.wrmp-300__lrnng_rt=3e-05__augmnttn=False.chk-2928', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-9765.wrmp-300__lrnng_rt=0.0001__rc_adm_fshr_cf=None__augmnttn=False.chk-9765', 'causal', 'meta-llama/Llama-2-7b-hf'), 
+        # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-9765.wrmp-300__lrnng_rt=0.0001__rc_adm_fshr_cf=None__augmnttn=False.chk-9765', 'causal', 'meta-llama/Llama-2-7b-hf'), 
 
 
         # ======================================================== transfer     ========================================================
@@ -273,7 +274,7 @@ def main():
 
         # =================================== neurips.additional ===================================
 
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
@@ -283,7 +284,7 @@ def main():
 
 
         # ---------------------------------- LPT ------------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
@@ -320,11 +321,10 @@ def main():
         # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
 
-        # (
-        #     1.0,
-        #     [],
-        # ),
-
+        (
+            1.0,
+            [],
+        ),
 
 
 
@@ -337,12 +337,12 @@ def main():
         #     ],
         # ),
 
-        (
-            0.03,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-            ],
-        ),
+        # (
+        #     0.03,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
+        #     ],
+        # ),
 
         # (
         #     0.10,
@@ -479,13 +479,13 @@ def main():
         # ============================== neurip.additional ================================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
-        # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
+        'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
 
         # =========================== LPT ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
 
-        'LPT.bs-2048__step-12000.wrmp-100',
+        # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-1000',
         # 'LPT.bs-2048__step-13200.wrmp-132',
 
@@ -521,7 +521,7 @@ def main():
     lrates = [
         #  -------------------------------- Neurips.additional --------------------------------
         # 1e-5,
-        # 3e-6,    # the best for ALPT
+        3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -530,7 +530,7 @@ def main():
         # 3e-5,    # BLPT, 3M examples
         # 1e-4,    # BLPT, 10M examples
 
-        3e-4,    # LPT
+        # 3e-4,    # LPT
         # 1e-4,    # LPT after BLPT
 
         #  -------------------------------- RWKV --------------------------------
@@ -553,11 +553,11 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        (None, None, None),
+        # (None, None, None),
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
+        ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -575,18 +575,18 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    # hours = 12
+    hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    hours = 72
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # hours = 72
 
     # skip_if_exists = False
     skip_if_exists = True
@@ -852,11 +852,6 @@ def main():
                                                                                 batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
                                                                             )
                                                                         )
-                                                                        # if run_mode == 'deepspeed':
-                                                                        #     for max_eval_arg_name in ['logic_eval_max_samples']:
-                                                                        #         max_eval_arg_sample = setting.get(max_eval_arg_name, None)
-                                                                        #         if max_eval_arg_sample is not None and setting['eval_effective_batch_size'] > max_eval_arg_sample:
-                                                                        #             raise ValueError(f'{max_eval_arg_name}={max_eval_arg_sample} should be larger than eval_effective_batch_size={setting["eval_effective_batch_size"]}, as it will lead to exception')
 
                                                                         setting.update(get_model_setting(model_name, from_scratch=from_scratch))
                                                                         setting.update(get_tokenizer_setting(model_name))
@@ -907,19 +902,13 @@ def main():
                                                                             'lr_scheduler_type': lr_scheduler_type,
                                                                             'weight_decay': weight_decay,
 
-                                                                            # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
-                                                                            # 'preprocess_batch_size': 1000,
-
-                                                                            # 'preprocessing_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node / 2)),
-                                                                            # 'preprocess_batch_size': 500,
-
                                                                             # [XXX] may hang???
                                                                             # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
                                                                             # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
                                                                             # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
 
                                                                             # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                            'preprocessing_num_workers': 32,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                            'preprocessing_num_workers': preprocessing_num_workers,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
                                                                             'preprocess_batch_size': 500,
 
                                                                             # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),

@@ -55,6 +55,13 @@ def main():
     # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.03__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
     # gradio_port = 9201
 
+    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388'
+    gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=5000__augmnttn=True.chk-390'
+    # gradio_port = 9201
+
+
 
 
 
@@ -156,7 +163,7 @@ def main():
         _model_name = checkpoint
         lm_type = 'causal'
         proof_sampling = 'all_at_once'
-        model_name_or_path = _model_name
+        model_name_or_path = None
 
     setting = {}
 
@@ -212,7 +219,6 @@ def main():
 
         'proof_sampling': proof_sampling,
 
-        'model_name_or_path': str(model_name_or_path),
         'evaluation_strategy': None,  # should specify None, otherwise --do_eval is forced to be True
 
         'dataloader_num_workers': 0,
@@ -220,6 +226,8 @@ def main():
         'use_auth_token': True,
         'log_examples': True,
     })
+    if model_name_or_path is not None:
+        setting['model_name_or_path'] = str(model_name_or_path)
 
     output_dir = make_output_dir(setting, output_top_dir,
                                  dirname_ignore_params=['model_name_or_path'])
