@@ -44,8 +44,10 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.LPT.zero0.ALPT'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
+    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.ALPT.re_run'
+    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-09.ALPT.re_run.scratch'
+
 
     # ========================================================== transfer ==========================================================
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-19.transfer'
@@ -56,8 +58,16 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.few_shot'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-06-28.sft.others'
 
+
     # =================================== RWKV ===================================
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-03.RWKV')
+
+
+
+
+
+
+
 
     # ONLY_SHOW_EXISTING = False
     ONLY_SHOW_EXISTING = True
@@ -67,12 +77,13 @@ def main():
         # 97,
         # 194,
         # 291,
-        388,
-        390,
+        # 388,
+        # 390,
 
         # ==================== LPT ======================
         # 12000
         # 2928,
+        9765,
 
 
         # ==================== transfer ======================
