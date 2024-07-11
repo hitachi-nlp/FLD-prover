@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    time.sleep(7200)
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
 
@@ -67,7 +66,7 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -76,7 +75,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
+    output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
+
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
 
@@ -141,13 +141,13 @@ def main():
         ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
 
@@ -274,7 +274,7 @@ def main():
 
         # =================================== neurips.additional ===================================
 
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
@@ -284,7 +284,7 @@ def main():
 
 
         # ---------------------------------- LPT ------------------------------------
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
@@ -296,18 +296,18 @@ def main():
     ]
 
     surface_is_formula_args = [
-        False,
-        # True,
-    ]
-
-    instruction_args = [
         # False,
         True,
     ]
 
-    augmentation_args = [
+    instruction_args = [
         False,
         # True,
+    ]
+
+    augmentation_args = [
+        # False,
+        True,
     ]
 
 
@@ -477,9 +477,9 @@ def main():
 
 
         # ============================== neurip.additional ================================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
-        'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
+        # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
 
         # =========================== LPT ===========================
