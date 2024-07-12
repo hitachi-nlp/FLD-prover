@@ -141,8 +141,8 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -555,9 +555,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -575,9 +575,9 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 12

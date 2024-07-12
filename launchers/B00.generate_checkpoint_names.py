@@ -46,8 +46,8 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
 
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch')
-    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
     # ========================================================== transfer ==========================================================
@@ -80,8 +80,8 @@ def main():
         # 390,
 
         # ==================== LPT ======================
-        9765,
-        # 12000
+        # 9765,
+        12000
         # 2928,
 
 
