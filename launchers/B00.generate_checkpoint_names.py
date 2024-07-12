@@ -45,8 +45,9 @@ def main():
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-0628.ALPT_first'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.augmentation'
     # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.steps'
-    # TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-08.ALPT.re_run'
-    TOP_DIR = './outputs.FLD-prover/01.train.py/2024-07-09.ALPT.re_run.scratch'
+
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
     # ========================================================== transfer ==========================================================
@@ -74,16 +75,14 @@ def main():
 
     CHECKPOINTS = [
         # ==================== NeurIPS ======================
-        # 97,
-        # 194,
-        # 291,
+        # 93,
         # 388,
         # 390,
 
         # ==================== LPT ======================
+        9765,
         # 12000
         # 2928,
-        9765,
 
 
         # ==================== transfer ======================
