@@ -32,6 +32,41 @@ logger = logging.getLogger(__name__)
 
 
 
+DATASETS_DIRS = [
+    # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
+    './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
+    './outputs.FLD/00.create_corpus/20230826.jpn',
+    './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
+    './outputs.FLD/00.create_corpus/20230904.jpn',
+    './outputs.FLD/00.create_corpus/20230912.jpn',
+    './outputs.FLD/00.create_corpus/20230916.jpn',
+    # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
+    './outputs.FLD/00.create_corpus/20231010.large_vocab',
+    './outputs.FLD/00.create_corpus/20231012.large_vocab',
+    './outputs.FLD/00.create_corpus/20231021.knowledge',
+    './outputs.FLD/00.create_corpus/20231103.knowledge',
+    './outputs.FLD/00.create_corpus/20231203.jpn',
+    './outputs.FLD/00.create_corpus/20231213.jpn',
+    './outputs.FLD/00.create_corpus/20230120.jpn.large',
+
+    './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
+    './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
+    './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+
+    './outputs.FLD/00.create_corpus/20230122.past_FLD',
+    './outputs.FLD/00.create_corpus/2024-03-29',
+    './outputs.FLD/00.create_corpus/2024-05-03.ablation',
+    './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
+    './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
+    './outputs.FLD/00.create_corpus/2024-06-08.LPT',
+    './outputs.FLD/00.create_corpus/2024-06-19.transfer',
+]
+
+
+
+
+
+
 
 @click.command()
 def main():
@@ -75,7 +110,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
@@ -84,7 +119,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch')
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
+    output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
     # =================================== tranfer ===================================
@@ -142,7 +177,7 @@ def main():
 
 
         # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -162,7 +197,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ALPT after LPT
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
@@ -195,43 +230,11 @@ def main():
     ]
 
     from_scratch_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
 
-
-
-
-    DATASETS_DIRS = [
-        # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
-        './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
-        './outputs.FLD/00.create_corpus/20230826.jpn',
-        './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
-        './outputs.FLD/00.create_corpus/20230904.jpn',
-        './outputs.FLD/00.create_corpus/20230912.jpn',
-        './outputs.FLD/00.create_corpus/20230916.jpn',
-        # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
-        './outputs.FLD/00.create_corpus/20231010.large_vocab',
-        './outputs.FLD/00.create_corpus/20231012.large_vocab',
-        './outputs.FLD/00.create_corpus/20231021.knowledge',
-        './outputs.FLD/00.create_corpus/20231103.knowledge',
-        './outputs.FLD/00.create_corpus/20231203.jpn',
-        './outputs.FLD/00.create_corpus/20231213.jpn',
-        './outputs.FLD/00.create_corpus/20230120.jpn.large',
-
-        './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
-        './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
-        './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
-
-        './outputs.FLD/00.create_corpus/20230122.past_FLD',
-        './outputs.FLD/00.create_corpus/2024-03-29',
-        './outputs.FLD/00.create_corpus/2024-05-03.ablation',
-        './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
-        './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
-        './outputs.FLD/00.create_corpus/2024-06-08.LPT',
-        './outputs.FLD/00.create_corpus/2024-06-19.transfer',
-    ]
 
 
     logic_dataset_unames = [
@@ -307,7 +310,7 @@ def main():
 
     augmentation_args = [
         False,
-        True,
+        # True,
     ]
 
 
@@ -321,21 +324,21 @@ def main():
         # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
 
-        (
-            1.0,
-            [],
-        ),
+        # (
+        #     1.0,
+        #     [],
+        # ),
 
 
 
         # ================================================ LPT ==============================================
 
-        # (
-        #     0.00,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-        #     ],
-        # ),
+        (
+            0.00,
+            [
+                (1.0, 'cerebras/SlimPajama-627B', None, None, None)
+            ],
+        ),
 
         # (
         #     0.03,
@@ -477,7 +480,7 @@ def main():
 
 
         # ============================== neurip.additional ================================
-        'FT.bs-256__step-390.wrmp-200.few_save',
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
         # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
@@ -485,7 +488,7 @@ def main():
         # =========================== LPT ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
 
-        # 'LPT.bs-2048__step-12000.wrmp-100',
+        'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-1000',
         # 'LPT.bs-2048__step-13200.wrmp-132',
 
@@ -521,7 +524,7 @@ def main():
     lrates = [
         #  -------------------------------- Neurips.additional --------------------------------
         # 1e-5,
-        3e-6,    # the best for ALPT
+        # 3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -531,7 +534,7 @@ def main():
         # 1e-4,    # BLPT, 10M examples
 
         # 3e-4,    # LPT
-        # 1e-4,    # LPT after BLPT
+        1e-4,    # LPT after BLPT
 
         #  -------------------------------- RWKV --------------------------------
         # 3e-5,
@@ -553,9 +556,9 @@ def main():
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        # (None, None, None),
+        (None, None, None),
         # ('rec_adam', 1.0, 0),
-        ('rec_adam', 1.0, 300),
+        # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
@@ -577,16 +580,16 @@ def main():
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    hours = 12
+    # hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    # hours = 72
+    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    hours = 72
 
     # skip_if_exists = False
     skip_if_exists = True
