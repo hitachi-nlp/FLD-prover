@@ -186,13 +186,13 @@ def main():
 
 
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
+        # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
         # ('microsoft/Phi-3-small-8k-instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('microsoft/Phi-3-medium-4k-instruct', 'causal', 'meta-llama/Llama-2-13b-hf'),
+        # ('microsoft/Phi-3-medium-4k-instruct', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
         # ======================================================== LPT     ========================================================
@@ -572,9 +572,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -593,8 +593,8 @@ def main():
 
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 12
