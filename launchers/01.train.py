@@ -176,7 +176,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -185,10 +185,10 @@ def main():
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
         # ('microsoft/Phi-3-small-8k-instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -572,9 +572,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -592,9 +592,9 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 12
