@@ -119,7 +119,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch')
-    output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
     # =================================== tranfer ===================================
@@ -134,6 +134,8 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-03.RWKV')
 
 
+    # =================================== ALPT_strong ===================================
+    output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
 
 
 
@@ -200,7 +202,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
-        ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ALPT after LPT
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=cerebras@SlimPajama-627B__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000', 'causal', 'meta-llama/Llama-2-7b-hf')
@@ -235,11 +237,15 @@ def main():
 
         # ('RWKV/rwkv-6-world-1b6', 'causal', 'EleutherAI/pythia-1b'),
         # ('RWKV/rwkv-6-world-7b', 'causal', 'RWKV/rwkv-6-world-7b'),
+
+
+        # ======================================================== ALPT_strong     ========================================================
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
     from_scratch_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
 
@@ -306,10 +312,9 @@ def main():
 
 
         # ---------------------------------- LPT ------------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
-
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
 
         # ------------------------------------ transfer ------------------------------------
@@ -323,8 +328,8 @@ def main():
     ]
 
     augmentation_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
 
@@ -361,13 +366,13 @@ def main():
         #     ],
         # ),
 
-        (
-            0.10,
-            [
-                (1.0, 'cerebras/SlimPajama-627B', None, None)
-            ],
-            False,
-        ),
+        # (
+        #     0.10,
+        #     [
+        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
+        #     ],
+        #     False,
+        # ),
 
 
 
@@ -463,6 +468,23 @@ def main():
         # ),
 
 
+        # ================================================ ALPT_strong ==============================================
+
+        (
+            1.0,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
+            ],
+        ),
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
+        #     ],
+        # ),
+
+
     ]
 
     # do_sft = True
@@ -510,7 +532,7 @@ def main():
 
         # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-1000',
-        'LPT.bs-2048__step-13200.wrmp-132',
+        # 'LPT.bs-2048__step-13200.wrmp-132',
 
 
         # =========================== transfer ===========================
@@ -521,6 +543,13 @@ def main():
         # 'FT.bs-128__step-234.wrmp-25',   # SFT, 30000 examples
 
         # 'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
+
+
+        # =========================== ALPT_strong ===========================
+        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-1170.wrmp-200',   # 300k
+        # 'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
+
     ]
 
 
@@ -538,45 +567,53 @@ def main():
 
 
     lrates = [
-        #  -------------------------------- Neurips.additional --------------------------------
+        #  ================================ Neurips.additional ================================
         # 1e-5,
         # 3e-6,    # the best for ALPT
         # 1e-6,
 
 
-        #  -------------------------------- LPT --------------------------------
-
+        #  ================================ LPT ================================
         # 3e-5,    # BLPT, 3M examples
         # 1e-4,    # BLPT, 10M examples
 
         # 3e-4,    # LPT
-        1e-4,    # LPT after BLPT
+        # 1e-4,    # LPT after BLPT
 
-        #  -------------------------------- RWKV --------------------------------
+
+        #  ================================ RWKV ================================
         # 3e-5,
         # 1e-4,
 
-        #  -------------------------------- tranfer --------------------------------
+
+        #  ================================ tranfer ================================
         # 3e-6,    # for ALPT
         # 2e-5,    # for instruction-tuning
+
+
+        #  ================================ ALPT_strong ================================
+        3e-6,
+        3e-5,
+        # 3e-4,
     ]
 
 
-    lr_scheduler_type = None
-    # lr_scheduler_type = 'cosine'
+    # lr_scheduler_type = None
+    lr_scheduler_type = 'cosine'
 
 
-    weight_decay = None
+    # weight_decay = None # ALPT
     # weight_decay = 0.01   # LPT
+    weight_decay = 0.1   # ALPT
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
-        (None, None, None),
+        # (None, None, None),
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
+        ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -595,17 +632,17 @@ def main():
 
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    # hours = 12
+    hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    hours = 72
+    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
+    # hours = 72
 
     # skip_if_exists = False
     skip_if_exists = True
