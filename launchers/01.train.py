@@ -85,7 +85,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
@@ -101,7 +101,7 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -135,7 +135,7 @@ def main():
 
 
     # =================================== ALPT_strong ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
 
 
 
@@ -175,24 +175,28 @@ def main():
         # ======================================================== neurips.additional     ========================================================
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
+        ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
+
+
+
+        # XXX does not work for now
         # ('microsoft/Phi-3-small-8k-instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Phi-3-medium-4k-instruct', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
@@ -240,7 +244,7 @@ def main():
 
 
         # ======================================================== ALPT_strong     ========================================================
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
     ]
 
     from_scratch_args = [
@@ -308,13 +312,13 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
 
         # ---------------------------------- LPT ------------------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
 
         # ------------------------------------ transfer ------------------------------------
@@ -329,7 +333,7 @@ def main():
 
     augmentation_args = [
         False,
-        True,
+        # True,
     ]
 
 
@@ -343,10 +347,10 @@ def main():
         # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
 
-        # (
-        #     1.0,
-        #     [],
-        # ),
+        (
+            1.0,
+            [],
+        ),
 
 
 
@@ -477,12 +481,12 @@ def main():
         #     ],
         # ),
 
-        (
-            0.5,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
-            ],
-        ),
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
+        #     ],
+        # ),
 
 
     ]
@@ -516,7 +520,7 @@ def main():
 
 
         # ============================== neurip.additional ================================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
         # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
@@ -548,7 +552,7 @@ def main():
         # =========================== ALPT_strong ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-1170.wrmp-200',   # 300k
-        'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
+        # 'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
 
     ]
 
@@ -569,7 +573,7 @@ def main():
     lrates = [
         #  ================================ Neurips.additional ================================
         # 1e-5,
-        # 3e-6,    # the best for ALPT
+        3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -593,27 +597,26 @@ def main():
 
         #  ================================ ALPT_strong ================================
         # 3e-6,
-        3e-5,
+        # 3e-5,
         # 3e-4,
     ]
 
 
-    # lr_scheduler_type = None
-    lr_scheduler_type = 'cosine'
+    lr_scheduler_type = None
+    # lr_scheduler_type = 'cosine'
 
 
-    # weight_decay = None # ALPT
-    # weight_decay = 0.01   # LPT
-    weight_decay = 0.1   # ALPT
+    weight_decay = None # ALPT
+    # weight_decay = 0.1   # ALPT
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]

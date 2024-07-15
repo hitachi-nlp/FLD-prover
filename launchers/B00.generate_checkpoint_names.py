@@ -64,6 +64,9 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-03.RWKV')
 
 
+    # =================================== ALPT_strong ===================================
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-15.ALPT_strong')
+
 
 
 
@@ -93,6 +96,16 @@ def main():
 
         # -------------------- RWKV ----------------------
         # 390,
+
+        # -------------------- ALPT_strong ----------------------
+        # 390,
+        # 780,
+        # 1170,
+
+        # 585,
+        # 1170,
+        # 1755,
+        # 2340,
     ]
 
     PARAMS = [
@@ -132,6 +145,16 @@ def main():
         # 'learning',
         # 'learning_rate',
 
+
+        # ======================== ALPT_strong ========================
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'logic_dataset_prob',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+        # 'augmentation',
     ]
 
     input_dir = Path(TOP_DIR)
