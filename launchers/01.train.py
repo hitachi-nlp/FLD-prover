@@ -328,8 +328,8 @@ def main():
     ]
 
     augmentation_args = [
-        False,
-        # True,
+        # False,
+        True,
     ]
 
 
@@ -592,7 +592,7 @@ def main():
 
 
         #  ================================ ALPT_strong ================================
-        3e-6,
+        # 3e-6,
         3e-5,
         # 3e-4,
     ]
