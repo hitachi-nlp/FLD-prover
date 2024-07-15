@@ -328,7 +328,7 @@ def main():
     ]
 
     augmentation_args = [
-        # False,
+        False,
         True,
     ]
 
@@ -470,19 +470,19 @@ def main():
 
         # ================================================ ALPT_strong ==============================================
 
-        (
-            1.0,
-            [
-                (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
-            ],
-        ),
-
         # (
-        #     0.5,
+        #     1.0,
         #     [
         #         (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
         #     ],
         # ),
+
+        (
+            0.5,
+            [
+                (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
+            ],
+        ),
 
 
     ]
@@ -547,8 +547,8 @@ def main():
 
         # =========================== ALPT_strong ===========================
         # 'FT.bs-256__step-390.wrmp-200.few_save',
-        'FT.bs-256__step-1170.wrmp-200',   # 300k
-        # 'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
+        # 'FT.bs-256__step-1170.wrmp-200',   # 300k
+        'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
 
     ]
 
@@ -632,8 +632,8 @@ def main():
 
 
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 12
