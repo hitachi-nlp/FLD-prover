@@ -300,19 +300,19 @@ def main():
 
         # =================================== neurips.additional ===================================
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # 'hf.hitachi-nlp/FLD.v2__default',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-
-
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/FLD.v2__default',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+
 
 
         # ---------------------------------- LPT ------------------------------------
