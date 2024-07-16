@@ -85,7 +85,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
-    output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
+    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
     # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
@@ -187,11 +187,11 @@ def main():
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
+        # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
 
 
@@ -305,7 +305,7 @@ def main():
         'hf.hitachi-nlp/FLD.v2__default',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
