@@ -72,36 +72,10 @@ DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-17.rec_adam')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-18.rec_adam')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-20.production.additional.additional')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-22.production.llama3')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-23.refine_production')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.additional')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms')
-    # output_top_dir = Path('./outputs/01.train.py/2024-05-03.ablation')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.mistral_tokenizer')
-    # output_top_dir = Path('./outputs/01.train.py/2024-05-08.ref_prob')
-    # output_top_dir = Path('./outputs/01.train.py/2024-4-24.finalize_production.other_llms.tokenizer_unk')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-5-13.large_models')
-    # output_top_dir = Path('./outputs/01.train.py/2024-5-19.flight')
-    # output_top_dir = Path('./outputs/01.train.py/2024-5-22.submission_final')
-
-
 
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -110,7 +84,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
     # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
@@ -187,10 +161,10 @@ def main():
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
 
@@ -220,8 +194,8 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-        ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
 
@@ -308,18 +282,18 @@ def main():
         # 'hf.hitachi-nlp/FLD.v2__default',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
-        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.rule-G_MP',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
 
         # ---------------------------------- LPT ------------------------------------
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
@@ -618,9 +592,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        ('rec_adam', 1.0, 300),
+        # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
+        ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -638,9 +612,9 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
     hours = 12
