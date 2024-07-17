@@ -161,11 +161,11 @@ def main():
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
-        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
+        # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
 
 
@@ -282,7 +282,7 @@ def main():
         # 'hf.hitachi-nlp/FLD.v2__default',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
 
-        'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
+        # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
         '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100',
         '2024-03-29.JSAI_best.no_aug.trnsl-thing.dstrct-0',
@@ -592,9 +592,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
