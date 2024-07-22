@@ -4,6 +4,7 @@ INPUT_DIR=${1}
 
 if [ "${INPUT_DIR}" = "" ]; then
   echo "Specify input directory"
+  exit 1
 fi
 
 find ${INPUT_DIR}/ -type f\

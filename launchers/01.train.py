@@ -60,6 +60,8 @@ DATASETS_DIRS = [
     './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
     './outputs.FLD/00.create_corpus/2024-06-08.LPT',
     './outputs.FLD/00.create_corpus/2024-06-19.transfer',
+
+    './outputs.FLD/00.create_corpus/2024-07-21.neurips_additional',
 ]
 
 
@@ -71,12 +73,11 @@ DATASETS_DIRS = [
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-    time.sleep(3600 * )
 
-
+    # time.sleep(3600 * 5)
 
     # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
+    output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
 
 
     # =================================== LPT ===================================
@@ -110,7 +111,7 @@ def main():
 
 
     # =================================== ALPT_strong ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
+    # output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
 
 
 
@@ -121,8 +122,9 @@ def main():
         # ---------------------------- english      ----------------------------
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -149,17 +151,21 @@ def main():
 
         # ======================================================== neurips.additional     ========================================================
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -292,11 +298,26 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl_sttng-1',
 
 
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-0',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-3-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10.stps-5-5',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-0',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-1-2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-3-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-3',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.stps-5-5',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.voc-100.fixed',
+
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small',
+        '2024-03-29.JSAI_best.no_aug.trnsl-thing.transl-small.trnsl-old',
 
         # ---------------------------------- LPT ------------------------------------
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
 
         # ------------------------------------ transfer ------------------------------------
@@ -311,7 +332,7 @@ def main():
 
     augmentation_args = [
         False,
-        True,
+        # True,
     ]
 
 
@@ -498,7 +519,7 @@ def main():
 
 
         # ============================== neurip.additional ================================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
+        'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
         # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
 
@@ -531,7 +552,7 @@ def main():
         # 'FT.bs-256__step-390.wrmp-200.few_save',
         # 'FT.bs-256__step-1170.wrmp-200',   # 300k
         # 'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
-        'FT.bs-256__step-3906.wrmp-200',   # 1M
+        # 'FT.bs-256__step-3906.wrmp-200',   # 1M
 
     ]
 
@@ -552,7 +573,7 @@ def main():
     lrates = [
         #  ================================ Neurips.additional ================================
         # 1e-5,
-        # 3e-6,    # the best for ALPT
+        3e-6,    # the best for ALPT
         # 1e-6,
 
 
@@ -576,17 +597,17 @@ def main():
 
         #  ================================ ALPT_strong ================================
         # 3e-6,
-        3e-5,
-        3e-4,
+        # 3e-5,
+        # 3e-4,
     ]
 
 
-    # lr_scheduler_type = None
-    lr_scheduler_type = 'cosine'
+    lr_scheduler_type = None
+    # lr_scheduler_type = 'cosine'
 
 
-    # weight_decay = None # ALPT
-    weight_decay = 0.1   # ALPT
+    weight_decay = None # ALPT
+    # weight_decay = 0.1   # ALPT
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
@@ -596,7 +617,8 @@ def main():
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         ('rec_adam', 1.0, 3000),
-        ('rec_adam', 1.0, 10000),
+        # ('rec_adam', 1.0, 5000),
+        # ('rec_adam', 1.0, 10000),
     ]
 
 
@@ -612,12 +634,12 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    hours = 24
+    hours = 12
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
