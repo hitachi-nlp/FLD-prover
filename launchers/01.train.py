@@ -74,6 +74,8 @@ DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
+    time.sleep(3600 * 3)
+
     # =================================== neurips.additional ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional.rebuttal')
@@ -112,7 +114,9 @@ def main():
     # =================================== ALPT_strong ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
 
-    output_top_dir = Path('./outputs/01.train.py/2024-08-05.debug')
+
+    # =================================== ALPT_strong ===================================
+    output_top_dir = Path('./outputs/01.train.py/2024-08-05.ALPT_strong')
 
 
 
@@ -305,7 +309,7 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
-        '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
 
@@ -336,6 +340,7 @@ def main():
 
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.15',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.2',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.2',
 
@@ -349,6 +354,17 @@ def main():
         # ------------------------------------ transfer ------------------------------------
         # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+
+
+        # ------------------------------------ ALPT_strong ------------------------------------
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.15',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.2',
+
     ]
 
     surface_is_formula_args = [

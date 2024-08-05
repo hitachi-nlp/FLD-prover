@@ -1,12 +1,6 @@
 sentencepiece != 0.1.92  # XXX SHOULD BE INSTALLED BEFORE TRANSFORMERS
 
-# transformers==4.34.0
-# transformers==4.36.0
-# transformers==4.35.2
-# transformers==4.37
-# git+https://github.com/huggingface/transformers
-
-
+#
 # tokenizers==v0.13.4.rc3
 # tokenizers==0.14.1
 tokenizers
@@ -52,7 +46,8 @@ git+https://github.com/google-research/bleurt.git
 line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main
 
 
-transformers==4.40.2
+# transformers==4.40.2
+transformers==4.43.4
 accelerate==0.30.0
 deepspeed==0.14.2
 datasets==2.19.1
