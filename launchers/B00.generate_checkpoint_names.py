@@ -34,7 +34,8 @@ def main():
 
 
     # =================================== neurips.additional ===================================
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-06-22.neurip.additional')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-06-22.neurip.additional')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-06-22.neurip.additional.rebuttal')
 
 
     # ================================================================= LPT =================================================================
@@ -65,7 +66,7 @@ def main():
 
 
     # =================================== ALPT_strong ===================================
-    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-15.ALPT_strong')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-15.ALPT_strong')
 
 
 
@@ -79,8 +80,18 @@ def main():
     CHECKPOINTS = [
         # ==================== NeurIPS ======================
         # 93,
-        388,
-        390,
+        # 97,
+        # 194,
+        # 291,
+        # 388,
+        # 390,
+
+        # 244,
+        # 488,
+        # 732,
+        # 976,
+
+        1952,
 
         # ==================== LPT ======================
         # 2928,
@@ -120,6 +131,8 @@ def main():
         'learning',
         'learning_rate',
         'rec_adam_fisher_coef',
+        'weight_decay',
+        'lr_scheduler_type',
 
 
         # ======================== LPT ========================

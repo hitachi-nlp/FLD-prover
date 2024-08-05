@@ -55,14 +55,17 @@ def main():
     # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.03__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
     # gradio_port = 9201
 
-    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388'
-    gradio_port = 9200
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388'
+    # gradio_port = 9200
 
     # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=5000__augmnttn=True.chk-390'
     # gradio_port = 9201
 
+    checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct'
+    gradio_port = 9200
 
-
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B-Instruct__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=300.chk-390'
+    # gradio_port = 8500
 
 
 
@@ -105,12 +108,7 @@ def main():
     # script_type = 'run_prover'
     script_type = 'run_causal_prover'
 
-
     context_len = 2048
-
-    # OK: V100 x 4 + deepspeed 
-    # NG: A100 x 1 + deepspeed
-    # NG: A100 x 1 + vanilla
 
     run_mode = 'vanilla'
     # run_mode = 'torchrun'
@@ -123,8 +121,8 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus = 1  # debug
-        # n_gpus = 4
+        # n_gpus = 1  # debug
+        n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
     elif isinstance(engine, QsubEngine):
         n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
