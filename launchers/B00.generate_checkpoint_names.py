@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict
 import json
+import re
 from collections import OrderedDict
 
 # from logger_setup import setup as setup_logger
@@ -66,11 +67,17 @@ def main():
 
 
     # =================================== ALPT_strong ===================================
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-15.ALPT_strong')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-07-15.ALPT_strong')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-05.ALPT_strong')
 
 
+    # =================================== 2024-08-12.neurips_camera_ready.towards_best_corpora ========================================
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-12.neurips_camera_ready.towards_best_corpora')
 
-
+    # =================================== 2024-08-16.neurips_camera_ready ========================================
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.1')
+    TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.2')
 
 
 
@@ -91,7 +98,7 @@ def main():
         # 732,
         # 976,
 
-        1952,
+        # 1952,
 
         # ==================== LPT ======================
         # 2928,
@@ -121,18 +128,20 @@ def main():
         # 1302,
         # 2604,
         # 3906,
+
+        None,
     ]
 
     PARAMS = [
         # ======================== NeurIPS ========================
-        'model_name',
-        'logic_dataset_uname',
-        'optimizer',
-        'learning',
-        'learning_rate',
-        'rec_adam_fisher_coef',
-        'weight_decay',
-        'lr_scheduler_type',
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+        # 'weight_decay',
+        # 'lr_scheduler_type',
 
 
         # ======================== LPT ========================
@@ -145,6 +154,7 @@ def main():
         # 'rec_adam_fisher_coef',
         # 'augmentation',
 
+
         # ==================== transfer ======================
         # 'model_name',
         # 'logic_dataset_uname',
@@ -153,6 +163,7 @@ def main():
         # 'surface_is_formula',
         # 'learning',
         # 'learning_rate',
+
 
         # ======================== RWKV ========================
         # 'model_name',
@@ -167,29 +178,87 @@ def main():
         # 'model_name',
         # 'logic_dataset_uname',
         # 'optimizer',
-        # 'logic_dataset_prob',
         # 'learning',
         # 'learning_rate',
         # 'rec_adam_fisher_coef',
+        # 'weight_decay',
+        # 'lr_scheduler_type',
         # 'augmentation',
+
+
+        # ======================== ALPT_strong2024-08-16.neurips_camera_ready ========================
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+        # 'weight_decay',
+        # # 'lr_scheduler_type',
+        # 'augmentation',
+        # 'augmentation_prob',
+        # 'surface_is_formula',
+
+
+        # ======================== ALPT_strong2024-08-16.neurips_camera_ready.1 ========================
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+        # 'weight_decay',
+        # # 'lr_scheduler_type',
+        # 'augmentation',
+
+        # ======================== ALPT_strong2024-08-16.neurips_camera_ready.2 ========================
+        'model_name',
+        'logic_dataset_uname',
+        'optimizer',
+        'learning',
+        'learning_rate',
+        'rec_adam_fisher_coef',
+        'weight_decay',
+        # 'lr_scheduler_type',
+        'augmentation',
+        'proof_intermediate_steps',
     ]
+
+
+    ADDITIONAL_PARAMS = []
+
+
+    # raise Exception('do add formula for specific model')
 
     input_dir = Path(TOP_DIR)
     setting_paths = sorted(input_dir.glob('**/*/lab.params.json'))
     for setting_path in setting_paths:
         for checkpoint in CHECKPOINTS:
             settings = json.load(open(str(setting_path)))
+
+            _params = PARAMS
+            for param in ADDITIONAL_PARAMS:
+                if settings.get(param, False):
+                    _params += [param]
+
             _settings = OrderedDict([
-                (key, settings[key])
-                for key in PARAMS
+                (key, settings.get(key, None))
+                for key in _params
             ])
             name = make_name(_settings, sep='__', short=True)
-            checkpoint_dir = setting_path.parent / f"checkpoint-{checkpoint}"
-            if ONLY_SHOW_EXISTING:
-                if not checkpoint_dir.exists():
-                    continue
-            # print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
-            print(f"'{name}.chk-{checkpoint}': '" + str(checkpoint_dir) + "',")
+
+            if checkpoint is None:
+                checkpoint_dirs = setting_path.parent.glob('checkpoint-*')
+            else:
+                checkpoint_dirs = [setting_path.parent / f"checkpoint-{checkpoint}"]
+
+            for checkpoint_dir in checkpoint_dirs:
+                if ONLY_SHOW_EXISTING:
+                    if not checkpoint_dir.exists():
+                        continue
+                _checkpoint = checkpoint if checkpoint is not None else re.search(r'checkpoint-(\d+)', str(checkpoint_dir)).group(1)
+                # print(f"'{name}.chk-{checkpoint}': '" + str(setting_path.parent / f"checkpoint-{checkpoint}',"))
+                print(f"'{name}.chk-{_checkpoint}': '" + str(checkpoint_dir) + "',")
 
 
 if __name__ == '__main__':

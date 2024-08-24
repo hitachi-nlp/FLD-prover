@@ -41,7 +41,9 @@ class Processor(ABC):
                  ignore_pad_token_for_loss=True,
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
+                 prompt_indicate_theorems=False,
                  augmentation=False,
+                 augmentation_prob=1.0,
                  eval_dataset=None,
                  log_examples=False,
                  log_only_first_example=True):
@@ -62,7 +64,9 @@ class Processor(ABC):
         self._ignore_pad_token_for_loss = ignore_pad_token_for_loss
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
+        self._prompt_indicate_theorems = prompt_indicate_theorems
         self._augmentation = augmentation
+        self._augmentation_prob = augmentation_prob
         self.eval_dataset = eval_dataset
         self.log_examples = log_examples
         self._log_only_first_example = log_only_first_example

@@ -10,6 +10,6 @@ fi
 find ${INPUT_DIR}/ -type f\
   | grep "log.*txt\|qsub\.err\|qsub\.out\|zlog\|\.log$"\
   | sort\
-  | ack -l --files-from=- 'Traceback|Killing subprocess|sigkill|Segmentation'
+  | ack -l --files-from=- 'Traceback|Segmentation'
 
   # | ack -l --files-from=- 'Traceback|Kill|Exception|No such file or directory'

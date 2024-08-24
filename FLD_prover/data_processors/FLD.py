@@ -97,29 +97,44 @@ class FLDProcessor(Processor):
 
     def _get_serial(self, example, split: str) -> SerializedDeduction:
         if self._proof_intermediate_steps == 'include':
-            intermediate_steps = True
+            include_intermediate_steps = True
         elif self._proof_intermediate_steps == 'exclude':
-            intermediate_steps = False
+            include_intermediate_steps = False
         elif self._proof_intermediate_steps == 'randomly_include':
-            intermediate_steps = random.choice([True, False])
+            include_intermediate_steps = random.choice([True, False])
         else:
             raise ValueError(f'Invalid proof_intermediate_steps: {self._proof_intermediate_steps}')
 
-        serial = serialize(
-            load_deduction(example),
-            surface_is_formula=self._surface_is_formula,
-            intermediate_steps=intermediate_steps,
-            stepwise=(self._proof_sampling == 'stepwise'),
-            sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
-            include_max_subproof_for_unknown=not self._no_subproof_for_unknown,
-            instruction=self._instruction,
-        )
+        deduction = load_deduction(example)
+
+        def _serialize(instruction=False):
+            return serialize(
+                deduction,
+                surface_is_formula=self._surface_is_formula,
+                intermediate_steps=include_intermediate_steps,
+                stepwise=(self._proof_sampling == 'stepwise'),
+                sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
+                include_max_subproof_for_unknown=not self._no_subproof_for_unknown,
+                instruction=instruction,
+            )
 
         if self._augmentation:
-            serial = augment_serial(
-                serial,
-                prompt_fact = random.choice([True, False]) if self._augmentation_prompt_fact else False,
-                prompt_stance = random.choice([True, False]) if self._augmentation_prompt_stance else False,
-                prompt_CoT=intermediate_steps,
-            )
+            if include_intermediate_steps and random.random() < self._augmentation_prob:
+                serial = _serialize(instruction=self._instruction)
+                serial = augment_serial(
+                    serial,
+                    prompt_fact = random.choice([True, False]) if self._augmentation_prompt_fact else False,
+                    prompt_stance = random.choice([True, False]) if self._augmentation_prompt_stance else False,
+                    prompt_CoT=True,
+                )
+            else:
+                serial = _serialize(instruction=True)
+                # add a marker to differenciate from augmented proof, which is in natural language expressions
+                serial.prompt += ' Use the specific format.'
+        else:
+            serial = _serialize(instruction=self._instruction)
+
+        if self._prompt_indicate_theorems and deduction.theorem_is_used_in_proof:
+            serial.prompt += ' You can take shortcuts in your thought.'
+
         return serial

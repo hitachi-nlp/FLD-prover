@@ -366,6 +366,10 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    prompt_indicate_theorems: bool = field(
+        default=False,
+        metadata={},
+    )
     instruction: bool = field(
         default=False,
         metadata={},
@@ -374,6 +378,11 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    augmentation_prob: float = field(
+        default=1.0,
+        metadata={},
+    )
+
 
 
     source_prefix: Optional[str] = field(
@@ -798,7 +807,9 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
+        'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
         'augmentation': data_args.augmentation,
+        'augmentation_prob': data_args.augmentation_prob,
         # 'log_examples': data_args.log_examples,
     }
 

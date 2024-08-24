@@ -33,35 +33,35 @@ logger = logging.getLogger(__name__)
 
 
 DATASETS_DIRS = [
+
     # './outputs.FLD/00.create_corpus/20230729.case_study_finalize',
-    './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
-    './outputs.FLD/00.create_corpus/20230826.jpn',
-    './outputs.FLD/00.create_corpus/20230901.random_transitive_verbs',
-    './outputs.FLD/00.create_corpus/20230904.jpn',
-    './outputs.FLD/00.create_corpus/20230912.jpn',
-    './outputs.FLD/00.create_corpus/20230916.jpn',
-    # './outputs.FLD/00.create_corpus/20231010.large_vocab.small',
-    './outputs.FLD/00.create_corpus/20231010.large_vocab',
-    './outputs.FLD/00.create_corpus/20231012.large_vocab',
-    './outputs.FLD/00.create_corpus/20231021.knowledge',
-    './outputs.FLD/00.create_corpus/20231103.knowledge',
-    './outputs.FLD/00.create_corpus/20231203.jpn',
-    './outputs.FLD/00.create_corpus/20231213.jpn',
-    './outputs.FLD/00.create_corpus/20230120.jpn.large',
+    # './outputs.FLD/00.create_corpus/20230801.case_study_finalize.fix',
 
-    './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
-    './outputs.FLD/00.create_corpus/2024-01-29.enhance_arguments',
-    './outputs.FLD/00.create_corpus/2024-02-14.translation_speedup',
+    # './outputs.FLD/00.create_corpus/20231203.jpn',
+    # './outputs.FLD/00.create_corpus/20231213.jpn',
+    # './outputs.FLD/00.create_corpus/20230120.jpn.large',
 
-    './outputs.FLD/00.create_corpus/20230122.past_FLD',
+
+    # './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
+    
+
     './outputs.FLD/00.create_corpus/2024-03-29',
-    './outputs.FLD/00.create_corpus/2024-05-03.ablation',
-    './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
-    './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
+    # './outputs.FLD/00.create_corpus/2024-05-03.ablation',
+    # './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
+    # './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
     './outputs.FLD/00.create_corpus/2024-06-08.LPT',
-    './outputs.FLD/00.create_corpus/2024-06-19.transfer',
+    # './outputs.FLD/00.create_corpus/2024-06-19.transfer',
 
-    './outputs.FLD/00.create_corpus/2024-07-21.neurips_additional',
+
+    # './outputs.FLD/00.create_corpus/2024-07-21.neurips_additional',
+    './outputs.FLD/00.create_corpus/2024-08-09.depth_fix',
+
+    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-4288b3b',
+    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-2cab8a2',
+    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2',
+    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18',
+
+    './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora',
 ]
 
 
@@ -74,20 +74,12 @@ DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    time.sleep(3600 * 3)
-
     # =================================== neurips.additional ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional.rebuttal')
 
 
     # =================================== LPT ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.update_libraries')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-17.LPT.zero0')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0'),
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.LPT.zero0.ALPT')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.augmentation')
 
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
     # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
@@ -99,32 +91,25 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
 
 
-    # =================================== tranfer ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-19.transfer.rec_adam_refactor')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.few_shot')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-28.sft.others')
-
-
-    # =================================== RWKV ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-03.RWKV')
-
-
     # =================================== ALPT_strong ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-15.ALPT_strong')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-05.ALPT_strong')
 
 
-    # =================================== ALPT_strong ===================================
-    output_top_dir = Path('./outputs/01.train.py/2024-08-05.ALPT_strong')
+    # =================================== 2024-08-12.neurips_camera_ready.towards_best_corpora ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-12.neurips_camera_ready.towards_best_corpora')
 
+    # =================================== 2024-08-16.neurips_camera_ready ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.1')
+    output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.2')
 
 
 
 
 
     model_settings = [
-        # ---------------------------- english      ----------------------------
+
+        # ============================ english      ============================
 
         # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -145,42 +130,17 @@ def main():
         # see [this paper](https://arxiv.org/abs/2401.16818) for comparison of 1B-class models
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-
-
-        # ---------------------------- japanese     ----------------------------
-
-        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
-
-        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
-
-
-
-        # ======================================================== neurips.additional     ========================================================
-
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Llama-2-70b-hf', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-        # ('Qwen/Qwen1.5-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen1.5-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-
         # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
         # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -188,25 +148,20 @@ def main():
         # ('google/gemma-2-9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('google/gemma-2-27b', 'causal', 'google/gemma-2-27b'),
 
-
-
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-
-
-
         # XXX does not work for now
         # ('microsoft/Phi-3-small-8k-instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('microsoft/Phi-3-medium-4k-instruct', 'causal', 'meta-llama/Llama-2-13b-hf'),
 
 
-        # ======================================================== LPT     ========================================================
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ============================ japanese     ============================
+
+        # ('tokyotech-llm/Swallow-13b-hf', 'causal', 'matsuo-lab/weblab-10b'),
+        # ('tokyotech-llm/Swallow-70b-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+        # ('tokyotech-llm/Swallow-70b-instruct-hf', 'causal', 'tokyotech-llm/Swallow-70b-hf'),
+
+
+        # ============================ LPT     ============================
 
         # ('EleutherAI/pythia-1b', 'causal', 'EleutherAI/pythia-1b'),
         # ('EleutherAI/pythia-6.9b', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -220,43 +175,21 @@ def main():
         # ('mdl_nm=EleutherAI@pythia-6.9b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-1024__step-9765.wrmp-300__lrnng_rt=0.0001__rc_adm_fshr_cf=None__augmnttn=False.chk-9765', 'causal', 'meta-llama/Llama-2-7b-hf'), 
 
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
-
-
-
-        # ======================================================== transfer     ========================================================
-
-        # ('meta-llama/Llama-2-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('tokyotech-llm/Swallow-7b-hf', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__srfc_is_frml=True__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-
-        # ======================================================== RWKV     ========================================================
-
-        # ('RWKV/rwkv-6-world-1b6', 'causal', 'EleutherAI/pythia-1b'),
-        # ('RWKV/rwkv-6-world-7b', 'causal', 'RWKV/rwkv-6-world-7b'),
-
-
         # ======================================================== ALPT_strong     ========================================================
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
+        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+
     ]
 
-    from_scratch_args = [
-        False,
-        # True,
-    ]
+
+
 
 
 
@@ -309,6 +242,7 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/FLD.v2__default',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
         # 'hf.hitachi-nlp/proofwriter_processed_OWA__depth-3ext',
 
@@ -351,34 +285,165 @@ def main():
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
 
 
-        # ------------------------------------ transfer ------------------------------------
-        # '20240419.20230120.jpn.wordnet_repro_w_proposition.reimpl.D3',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
-
-
         # ------------------------------------ ALPT_strong ------------------------------------
 
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.1',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.15',
-        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.2',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15',
         # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.2',
 
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems=0.03',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems=0.05',
+
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.1',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.1.theorems=0.2',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.steps-5',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-v2',
+
+        # 'hf.hitachi-nlp/FLD.v2__default',
+        # '2024-03-29.FLD_v2',
+
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems=0.03.adjust_theorems',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems=0.05.adjust_theorems',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.theorems=0.10.adjust_theorems',
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.4-4',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.5-3',
+
+
+
+        # =================================== 2024-08-09.fix_depth_problem ========================================
+
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing',
+        # '2024-03-29.JSAI_best.no_aug.trnsl-thing.large',
+
+
+
+
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing',
+
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.05',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.10',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15',
+
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-3-4',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-4-4',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-4-5',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-5-3',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-5',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.15.steps-8',
+
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.10',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.25',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.5',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.5.theorems=0.01',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.5.theorems=0.03',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob_in_1=0.5.theorems=0.03.adjust_theorems',
+
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-v2',
+        # '2024-08-09.depth_fix.2024-03-29.JSAI_best.no_aug.trnsl-v3',
+
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2',
+
+        # '2024-08-10.rerun-4288b3b.2024-03-29.FLD_v2',
+        # '2024-08-10.rerun-2cab8a2.2024-03-29.FLD_v2',
+        # '2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2',
+        # '2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18',
+        # '2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18.xcs',
+        # '2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18.large',
+
+
+
+        # =================================== 2024-08-12.neurips_camera_ready.towards_best_corpora ========================================
+
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2',
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.wo_trnsl-v2',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.wo_theorems',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.suppress_dilemma',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.suppress_dilemma.theorems-0.003',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorems-0.0001',
+
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--1.0--0.1',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--1.0--0.01',
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.5--0.1',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.5--0.01',
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.1',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.01',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.1.G_MP-3',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.1.G_MP-10',
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.10--0.1',
+
+
+
+
+        # =================================== 2024-08-16.neurips_camera_ready ========================================
+
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+
+
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.1',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.theorem--0.25--0.1.G_MP-3',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.wo_trnsl-v2',
+        # '2024-08-12.neurips_camera_ready.towards_best_corpora.wo_theorems',
+
+        
+
+
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2',
+        # '2024-08-16.neurips_camera_ready.FLD.small_vocab',
+
+
+        '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0',
+
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.ref_prob-0.05',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.ref_prob-0.20',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.05',
+
+        '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.05.w_flag',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.25.w_flag',
+
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.wo_suppress_if',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.wo_phrase',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.wo_clause',
+
+
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v2',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v2.ref_prob-0.1',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v2.ref_prob-0.1.theorems-0.25',
+
     ]
 
-    surface_is_formula_args = [
-        False,
-        # True,
-    ]
+
 
     augmentation_args = [
         False,
         # True,
     ]
 
+    augmentation_prob_args = [
+        # 0.5,
+        1.0,
+    ]
 
-
+    prompt_indicate_theorems = False
+    # prompt_indicate_theorems = True
 
 
 
@@ -398,129 +463,14 @@ def main():
         # ================================================ LPT ==============================================
 
         # (
-        #     0.00,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-        #     ],
-        # ),
-
-        # (
         #     0.03,
         #     [
         #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
         #     ],
         # ),
 
-        # (
-        #     0.10,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-        #     ],
-        #     False,
-        # ),
-
-
-
-
-        # ================================================ transfer ==============================================
-
-        # (
-        #     1.0,
-        #     [],
-        # ),
-
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'databricks/databricks-dolly-15k', None, None, None)
-        #     ],
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'llm-jp/databricks-dolly-15k-ja', None, None, None)
-        #     ],
-        # ),
-
-
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'cais/mmlu', None, 'mmlu_jpn_compatible', None)
-        #     ],
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'nlp-waseda/JMMLU', None, 'concat_all', None)
-        #     ],
-        # ),
-
-
-
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'stanfordnlp/snli', None, None, None)
-        #     ],
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'shunk031/jsnli', 'with-filtering', None, None)
-        #     ],
-        # ),
-
-
-
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'jhu-cogsci/hans', None, None, None)
-        #     ],
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'hpprc/janli', None, None, None)
-        #     ],
-        # ),
-
-
-
-
-        # XXX: Not implemented
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'RobZamp/sick', None, None, None)
-        #     ],
-        # ),
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'hpprc/jsick', None, None, None)
-        #     ],
-        # ),
-
 
         # ================================================ ALPT_strong ==============================================
-
-        # (
-        #     1.0,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
-        #     ],
-        # ),
 
         # (
         #     0.5,
@@ -546,11 +496,6 @@ def main():
         # 'debug.micro',
         # 'debug.tiny',
 
-
-        # =========================== NeurIPS ===========================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
-
-
         # =========================== JFLD experiments ===========================
         # 'LLM_FS.shot-5',
         # 'LLM_FS.shot-100',
@@ -559,71 +504,37 @@ def main():
         # 'LLM_FS.shot-30000',
         
 
-
-        # ============================== neurip.additional ================================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
-        # 'FT.bs-256__step-390.wrmp-200.many_save',
-        # 'FT.bs-256__step-390.wrmp-200.few_save.debug',
-        # 'FT.bs-128__step-93.wrmp-10',    # hitachi-nlp/proofwriter_processed_OWA__depth-3ext, 1epoch
-
-
         # =========================== LPT ===========================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
-
-
-        # 'FT.bs-512__step-976.wrmp-100',     # 500k examples ALPT, 4 nodes
-        # 'FT.bs-512__step-1952.wrmp-200',     # 1M examples ALPT, 4 nodes
-        # 'FT.bs-1024__step-2930.wrmp-300',    # 3M examples ALPT, 8 nodes
-        # 'FT.bs-1024__step-9765.wrmp-300',    # 10M examples ALPT, 8 nodes
-
-
         # 'LPT.bs-2048__step-12000.wrmp-100',
         # 'LPT.bs-2048__step-12000.wrmp-1000',
         # 'LPT.bs-2048__step-13200.wrmp-132',
 
 
-        # =========================== transfer ===========================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',   # ALPT
-
-        # 'FT.bs-128__step-352.wrmp-35',  # 3 epochs for dolly
-        # 'FT.bs-128__step-78.wrmp-10',    # SFT, 10000 examples
-        # 'FT.bs-128__step-234.wrmp-25',   # SFT, 30000 examples
-
-        # 'FT.bs-64__step-30.wrmp-10',   # few-shot transfer
-
-
         # =========================== ALPT_strong ===========================
-        # 'FT.bs-256__step-390.wrmp-200.few_save',
-        # 'FT.bs-256__step-1170.wrmp-200',   # 300k
-        # 'FT.bs-256__step-2343.wrmp-200',   # 300k + 300k
-        # 'FT.bs-256__step-3906.wrmp-200',   # 1M
+
+        # ---- 100k examples
+        # 'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-379.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-40',
+
+        # ---- 200k examples
+        'FT.bs-256__step-780.wrmp-200',
+
+        # ---- 300k examples
+        # 'FT.bs-768__step-390.wrmp-200',
+
+        # ---- 1M examples
+        # 'FT.bs-256__step-3900.wrmp-200',
+        # 'FT.bs-2560__step-390.wrmp-200',   # with the same step as 100k
+
+        # --- 10M examples
+        # 'FT.bs-1024__step-9765.wrmp-300',
 
     ]
 
-
-    max_train_samples_args = [
-        None,
-        # 10,
-        # 100,
-        # 1000,
-    ]
-
-
-    # deepspeed_stage = 'zero0'   # 1B models can use this
-    # deepspeed_stage = 'zero2'   # 7B can used this, but not that much speedup
-    deepspeed_stage = 'zero3'
 
 
     lrates = [
-        #  ================================ Neurips.additional ================================
-        3e-4,
-
-        # 3e-5,
-        # 1e-5,
-
-        # 3e-6,    # the best for ALPT
-        # 1e-6,
-
 
         #  ================================ LPT ================================
         # 3e-5,    # BLPT, 3M examples
@@ -633,29 +544,16 @@ def main():
         # 1e-4,    # LPT after BLPT
 
 
-        #  ================================ RWKV ================================
-        # 3e-5,
-        # 1e-4,
-
-
-        #  ================================ tranfer ================================
-        # 3e-6,    # for ALPT
-        # 2e-5,    # for instruction-tuning
-
-
         #  ================================ ALPT_strong ================================
-        # 3e-6,
-        # 3e-5,
+        # 3e-6,     # the best on 100k examples
+
+        1e-5,
+        # 3e-5,   # the best on 1M examples
+
+        # 1e-4,
         # 3e-4,
     ]
 
-
-    lr_scheduler_type = None  # better for ALPT
-    # lr_scheduler_type = 'cosine'
-
-
-    weight_decay = None
-    # weight_decay = 0.1
 
 
     # (optimizer, regularization, anneal_target_task_weight, fisher_coef)
@@ -674,7 +572,6 @@ def main():
 
 
 
-
     # ------------------------------- HAIC --------------------------------
     # hours = None
 
@@ -682,12 +579,11 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=12)
-    hours = 12
+    hours = 8
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
@@ -695,8 +591,6 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # hours = 72
 
-    # skip_if_exists = False
-    skip_if_exists = True
 
 
 
@@ -722,6 +616,8 @@ def main():
 
     # ------------------------------------ fixed settings -------------------------------------------
 
+    # skip_if_exists = False
+    skip_if_exists = True
 
     # ------------------------------- ABCI --------------------------------
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -738,11 +634,35 @@ def main():
 
     dry_run = False
 
+    weight_decay_args = [
+        0.0,
+        # 0.01,
+        # 0.1,
+    ]
+
+    proof_intermediate_steps_args = [
+        'randomly_include',   # the best
+        # 'include',
+        # 'exclude',
+    ]
+
+    # deepspeed_stage = 'zero0'   # 1B models can use this
+    # deepspeed_stage = 'zero2'   # 7B can used this, but not that much speedup
+    deepspeed_stage = 'zero3'
+
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
     # take_interval_between_jobs = False
     take_interval_between_jobs = True
+
+    from_scratch_args = [
+        False,
+        # True,
+    ]
+
+    lr_scheduler_type = None  # better than 'cosine' for ALPT
+    # lr_scheduler_type = 'cosine'
 
     streaming = False
 
@@ -757,10 +677,9 @@ def main():
         # 4096,
     ]
 
-    proof_intermediate_steps_args = [
-        # 'include',
-        # 'exclude',
-        'randomly_include',   # the best
+    surface_is_formula_args = [
+        False,
+        # True,
     ]
 
     max_eval_samples = 10000
@@ -803,11 +722,18 @@ def main():
     steps_upper = None
     train_effective_batch_size = None
 
+    max_train_samples_args = [
+        None,
+        # 10,
+        # 100,
+        # 1000,
+    ]
+
     i_job = 0
     for logic_dataset_uname in logic_dataset_unames:
         # if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default' or logic_dataset_uname.find('proofwriter') >= 0:
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
-            logic_dataset_concatenate_all_configs = True
+            logic_dataset_config_load_type = 'concat_all'
             logic_dataset_concatenate_all_splits_into_train = True
         else:
             logic_dataset_config_load_type = None
@@ -836,7 +762,10 @@ def main():
                                                         deepspeed_stage = 'zero2'  # as zero3 somehow hangs
                                                         preprocessing_num_workers = 4
                                                     else:
+                                                        # preprocessing_num_workers = 1
+                                                        # larger value may lead to hangup
                                                         preprocessing_num_workers = 32
+                                                        # preprocessing_num_workers = 10
 
                                                     n_resouce_org = engine.n_resource
                                                     if model_name.find('70b') >= 0 and engine.n_resource < 2:
@@ -884,188 +813,192 @@ def main():
                                                         bf16 = True
 
                                                     for lrate in lrates:
+                                                        for weight_decay in weight_decay_args:
+                                                            for update_parameters in update_parameters_args:
+                                                                for from_scratch in from_scratch_args:
+                                                                    for augmentation in augmentation_args:
+                                                                        for augmentation_prob in augmentation_prob_args:
+                                                                            if augmentation:
+                                                                                instruction = False
+                                                                            else:
+                                                                                instruction = True
 
-                                                        for update_parameters in update_parameters_args:
-                                                            for from_scratch in from_scratch_args:
-                                                                for augmentation in augmentation_args:
-                                                                    if augmentation:
-                                                                        instruction = False
-                                                                    else:
-                                                                        instruction = True
+                                                                            setting = {}
 
-                                                                    setting = {}
+                                                                            setting.update(get_base_setting(base_setting_name))
 
-                                                                    setting.update(get_base_setting(base_setting_name))
+                                                                            setting.update(
+                                                                                get_learning_setting(
+                                                                                    learning,
+                                                                                    epoch=epoch,
+                                                                                    steps_upper=steps_upper,
+                                                                                    warmup_steps=warmup_steps,
+                                                                                    warmup_ratio=warmup_ratio,
+                             
+                                                                                    optimizer=optimizer,
+                                                                                    rec_adam_target_task_weight=rec_adam_target_task_weight,
+                                                                                    rec_adam_fisher_coef=rec_adam_fisher_coef,
 
-                                                                    setting.update(
-                                                                        get_learning_setting(
-                                                                            learning,
-                                                                            epoch=epoch,
-                                                                            steps_upper=steps_upper,
-                                                                            warmup_steps=warmup_steps,
-                                                                            warmup_ratio=warmup_ratio,
-                     
-                                                                            optimizer=optimizer,
-                                                                            rec_adam_target_task_weight=rec_adam_target_task_weight,
-                                                                            rec_adam_fisher_coef=rec_adam_fisher_coef,
+                                                                                    update_parameters=update_parameters,
 
-                                                                            update_parameters=update_parameters,
+                                                                                    train_effective_batch_size=train_effective_batch_size,
+                                                                                    num_evals=num_evals,
+                                                                                    max_eval_samples=max_eval_samples,
+                                                                                    logic_dataset_prob=logic_dataset_prob,
 
-                                                                            train_effective_batch_size=train_effective_batch_size,
-                                                                            num_evals=num_evals,
-                                                                            max_eval_samples=max_eval_samples,
-                                                                            logic_dataset_prob=logic_dataset_prob,
-
-                                                                            n_gpus=n_total_gpus,
-                                                                        )
-                                                                    )
+                                                                                    n_gpus=n_total_gpus,
+                                                                                )
+                                                                            )
 
 
-                                                                    other_dataset_probs = [other_dataset[0] for other_dataset in other_dataset_settings]
-                                                                    other_dataset_names = [other_dataset[1] for other_dataset in other_dataset_settings]
-                                                                    other_dataset_config_names = [other_dataset[2] for other_dataset in other_dataset_settings]
-                                                                    other_dataset_config_load_types = [other_dataset[3] for other_dataset in other_dataset_settings]
-                                                                    other_dataset_take_n_s = [other_dataset[4] for other_dataset in other_dataset_settings]
-                                                                    setting.update(
-                                                                        get_dataset_setting(
-                                                                            dataset_uname=logic_dataset_uname,
-                                                                            top_dirs=DATASETS_DIRS,
-                                                                            other_dataset_names=other_dataset_names,
-                                                                            other_dataset_config_names=other_dataset_config_names,
-                                                                            other_dataset_config_load_types=other_dataset_config_load_types,
-                                                                            other_dataset_take_n_s=other_dataset_take_n_s,
-                                                                            other_dataset_probs=other_dataset_probs,
-                                                                            use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
-                                                                            use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
-                                                                            streaming=streaming,
-                                                                            surface_is_formula=surface_is_formula,
-                                                                            instruction=instruction,
-                                                                            augmentation=augmentation,
-                                                                        )
-                                                                    )
+                                                                            other_dataset_probs = [other_dataset[0] for other_dataset in other_dataset_settings]
+                                                                            other_dataset_names = [other_dataset[1] for other_dataset in other_dataset_settings]
+                                                                            other_dataset_config_names = [other_dataset[2] for other_dataset in other_dataset_settings]
+                                                                            other_dataset_config_load_types = [other_dataset[3] for other_dataset in other_dataset_settings]
+                                                                            other_dataset_take_n_s = [other_dataset[4] for other_dataset in other_dataset_settings]
+                                                                            setting.update(
+                                                                                get_dataset_setting(
+                                                                                    dataset_uname=logic_dataset_uname,
+                                                                                    top_dirs=DATASETS_DIRS,
+                                                                                    other_dataset_names=other_dataset_names,
+                                                                                    other_dataset_config_names=other_dataset_config_names,
+                                                                                    other_dataset_config_load_types=other_dataset_config_load_types,
+                                                                                    other_dataset_take_n_s=other_dataset_take_n_s,
+                                                                                    other_dataset_probs=other_dataset_probs,
+                                                                                    use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
+                                                                                    use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
+                                                                                    streaming=streaming,
+                                                                                    surface_is_formula=surface_is_formula,
+                                                                                    instruction=instruction,
+                                                                                    prompt_indicate_theorems=prompt_indicate_theorems,
+                                                                                    augmentation=augmentation,
+                                                                                    augmentation_prob=augmentation_prob,
 
-                                                                    setting.update(
-                                                                        get_save_eval_step_setting(
-                                                                            max_steps = max_steps or setting['max_steps'],
-                                                                            eval_steps = eval_steps or setting['eval_steps'],
-                                                                            save_model_at_end=save_model_at_end,
-                                                                            save_model_on_eval=save_model_on_eval,
-                                                                        )
-                                                                    )
+                                                                                )
+                                                                            )
 
-                                                                    setting.update(
-                                                                        get_batch_setting(
-                                                                            gpu_name=gpu_name_for_batch_size,
-                                                                            n_gpus=n_total_gpus,
-                                                                            model_name=model_name_for_batch_size,
-                                                                            train_effective_batch_size=setting.get('train_effective_batch_size', None),
-                                                                            batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
-                                                                        )
-                                                                    )
+                                                                            setting.update(
+                                                                                get_save_eval_step_setting(
+                                                                                    max_steps = max_steps or setting['max_steps'],
+                                                                                    eval_steps = eval_steps or setting['eval_steps'],
+                                                                                    save_model_at_end=save_model_at_end,
+                                                                                    save_model_on_eval=save_model_on_eval,
+                                                                                )
+                                                                            )
 
-                                                                    setting.update(get_model_setting(model_name, from_scratch=from_scratch))
-                                                                    setting.update(get_tokenizer_setting(model_name))
-                                                                    setting.update(
-                                                                        get_generation_setting(
-                                                                            generation_max_length=setting.get('max_target_length', None),
-                                                                            generation_max_prompt_length=setting.get('max_prompt_length', None),
-                                                                       ),
-                                                                    )
-                                                                    setting.update({
-                                                                        'do_train': True,
-                                                                        # 'do_eval': True,   # automatically set by evaluation_strategy=step
-                                                                        'do_eval_in_outerloop': False,
-                                                                        'do_predict': False,
-                                                                    })
-                                                                    setting.update({
-                                                                        'seed': seed,
+                                                                            setting.update(
+                                                                                get_batch_setting(
+                                                                                    gpu_name=gpu_name_for_batch_size,
+                                                                                    n_gpus=n_total_gpus,
+                                                                                    model_name=model_name_for_batch_size,
+                                                                                    train_effective_batch_size=setting.get('train_effective_batch_size', None),
+                                                                                    batch_size_per_gpu_factor = 1/2 if fp32 or optimizer == 'rec_adam' else 1.0,
+                                                                                )
+                                                                            )
 
-                                                                        'do_sft': do_sft,
+                                                                            setting.update(get_model_setting(model_name, from_scratch=from_scratch))
+                                                                            setting.update(get_tokenizer_setting(model_name))
+                                                                            setting.update(
+                                                                                get_generation_setting(
+                                                                                    generation_max_length=setting.get('max_target_length', None),
+                                                                                    generation_max_prompt_length=setting.get('max_prompt_length', None),
+                                                                               ),
+                                                                            )
+                                                                            setting.update({
+                                                                                'do_train': True,
+                                                                                # 'do_eval': True,   # automatically set by evaluation_strategy=step
+                                                                                'do_eval_in_outerloop': False,
+                                                                                'do_predict': False,
+                                                                            })
+                                                                            setting.update({
+                                                                                'seed': seed,
 
-                                                                        'logic_dataset_uname': logic_dataset_uname,
-                                                                        'max_train_samples': max_train_samples,
-                                                                        # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
-                                                                        # 'other_dataset_config_name': other_dataset_config_names,
+                                                                                'do_sft': do_sft,
 
-                                                                        'logic_dataset_config_load_type': logic_dataset_config_load_type,
-                                                                        'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
+                                                                                'logic_dataset_uname': logic_dataset_uname,
+                                                                                'max_train_samples': max_train_samples,
+                                                                                # 'other_dataset_name': other_dataset_names,    # should avoid list in the setting
+                                                                                # 'other_dataset_config_name': other_dataset_config_names,
 
-                                                                        'resume_from_checkpoint': resume_from_checkpoint,
+                                                                                'logic_dataset_config_load_type': logic_dataset_config_load_type,
+                                                                                'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
 
-                                                                        'base_setting_name': base_setting_name,
+                                                                                'resume_from_checkpoint': resume_from_checkpoint,
 
-                                                                        'lm_type': lm_type,
-                                                                        'float_precision': float_precision,
-                                                                        'fp16': fp16,
-                                                                        'bf16': bf16,
-                                                                        'deepspeed_stage': deepspeed_stage,
+                                                                                'base_setting_name': base_setting_name,
 
-                                                                        # 'save_total_limit': save_total_limit,
+                                                                                'lm_type': lm_type,
+                                                                                'float_precision': float_precision,
+                                                                                'fp16': fp16,
+                                                                                'bf16': bf16,
+                                                                                'deepspeed_stage': deepspeed_stage,
 
-                                                                        # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
-                                                                        'learning': learning,
-                                                                        'sample_negative_proof': sample_negative_proof,
-                                                                        'proof_intermediate_steps': proof_intermediate_steps,
-                                                                        'no_subproof_for_unknown': no_subproof_for_unknown,
+                                                                                # 'save_total_limit': save_total_limit,
 
-                                                                        'learning_rate': lrate,
-                                                                        'lr_scheduler_type': lr_scheduler_type,
-                                                                        'weight_decay': weight_decay,
+                                                                                # 'trainer_ckpt_for_resume_training': None,  # Specify if you want to resume training
+                                                                                'learning': learning,
+                                                                                'sample_negative_proof': sample_negative_proof,
+                                                                                'proof_intermediate_steps': proof_intermediate_steps,
+                                                                                'no_subproof_for_unknown': no_subproof_for_unknown,
 
-                                                                        # [XXX] may hang???
-                                                                        # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
-                                                                        # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
-                                                                        # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
+                                                                                'learning_rate': lrate,
+                                                                                'lr_scheduler_type': lr_scheduler_type,
+                                                                                'weight_decay': weight_decay,
 
-                                                                        # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                        'preprocessing_num_workers': preprocessing_num_workers,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
-                                                                        'preprocess_batch_size': 500,
+                                                                                # [XXX] may hang???
+                                                                                # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
+                                                                                # 'preprocessing_num_workers': max(1, n_cpus_per_node - 10),
+                                                                                # 'preprocessing_num_workers': max(1, min(32, n_cpus_per_node)),
 
-                                                                        # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
+                                                                                # 'preprocessing_num_workers': 10,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                                'preprocessing_num_workers': preprocessing_num_workers,  # fixすべき．変えるとcache作り直し -> cache sizeが膨れ上がる
+                                                                                'preprocess_batch_size': 500,
 
-                                                                        'preprocess_keep_in_memory': False,
+                                                                                # 'dataloader_num_workers': max(1, int(n_cpus_per_node / n_gpus_per_node)),
 
-                                                                        'ddp_timeout': 3600 * 10,
+                                                                                'preprocess_keep_in_memory': False,
 
-                                                                        'gpu_name_for_batch_size': gpu_name_for_batch_size,
-                                                                        'use_auth_token': True,
-                                                                        'log_examples': True,
-                                                                    })
+                                                                                'ddp_timeout': 3600 * 10,
 
-                                                                    if seed >= 2:  # for compatibility with older experiments of jpn
-                                                                        setting.update({
-                                                                            'train_random_sampling': True,
-                                                                            'eval_random_sampling': True,
-                                                                            'logic_eval_random_sampling': True,
-                                                                        })
+                                                                                'gpu_name_for_batch_size': gpu_name_for_batch_size,
+                                                                                'use_auth_token': True,
+                                                                                'log_examples': True,
+                                                                            })
 
-                                                                    output_dir = make_output_dir(setting, output_top_dir)
-                                                                    if skip_if_exists and (output_dir / 'log.txt').exists():
-                                                                        logger.info(f'Skipping "{output_dir}"')
-                                                                        continue
-                                                                    command = make_command(output_dir,
-                                                                                           setting,
-                                                                                           run_mode,
-                                                                                           region,
-                                                                                           deepspeed_stage=deepspeed_stage,
-                                                                                           n_gpus_per_node=n_gpus_per_node)
+                                                                            if seed >= 2:  # for compatibility with older experiments of jpn
+                                                                                setting.update({
+                                                                                    'train_random_sampling': True,
+                                                                                    'eval_random_sampling': True,
+                                                                                    'logic_eval_random_sampling': True,
+                                                                                })
 
-                                                                    run_by_engine(
-                                                                        engine,
-                                                                        command,
-                                                                        output_dir,
-                                                                        # delay = i_job * 0.5,
-                                                                        hours=_hours,
-                                                                        force=True,  # assuming that we do not have many jobs
-                                                                        dry_run=dry_run
-                                                                    )
-                                                                    i_job += 1
-                                                                    if streaming and take_interval_between_jobs:
-                                                                        logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
-                                                                        time.sleep(60 * 10)
+                                                                            output_dir = make_output_dir(setting, output_top_dir)
+                                                                            if skip_if_exists and (output_dir / 'log.txt').exists():
+                                                                                logger.info(f'Skipping "{output_dir}"')
+                                                                                continue
+                                                                            command = make_command(output_dir,
+                                                                                                   setting,
+                                                                                                   run_mode,
+                                                                                                   region,
+                                                                                                   deepspeed_stage=deepspeed_stage,
+                                                                                                   n_gpus_per_node=n_gpus_per_node)
 
-                                                        engine.n_resource = n_resouce_org
-                                                        deepspeed_stage= deepspeed_stage_org
+                                                                            run_by_engine(
+                                                                                engine,
+                                                                                command,
+                                                                                output_dir,
+                                                                                # delay = i_job * 0.5,
+                                                                                hours=_hours,
+                                                                                force=True,  # assuming that we do not have many jobs
+                                                                                dry_run=dry_run
+                                                                            )
+                                                                            i_job += 1
+                                                                            if streaming and take_interval_between_jobs:
+                                                                                logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
+                                                                                time.sleep(60 * 10)
+
+                                                            engine.n_resource = n_resouce_org
+                                                            deepspeed_stage= deepspeed_stage_org
 
     logger.info('------------- ./01.train.py finished !! -----------')
 
