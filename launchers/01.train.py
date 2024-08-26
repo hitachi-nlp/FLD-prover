@@ -105,10 +105,10 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.1')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.2')
-    output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.3')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.3')
 
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
-    # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
+    output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25.debug')
 
 
 
@@ -187,10 +187,10 @@ def main():
         ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
-        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
     ]
@@ -417,7 +417,8 @@ def main():
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.05',
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15',
 
-        '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems.syllogism',
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag',
 
 
@@ -432,8 +433,8 @@ def main():
 
         # =================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ======================
 
+        'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
-        # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
 
 
@@ -507,10 +508,10 @@ def main():
 
         # =========================== ALPT_strong ===========================
 
-        # 'debug.FT.bs-64__step-10.wrmp-0',
+        'debug.FT.bs-64__step-10.wrmp-0',
 
         # ---- 100k examples
-        'FT.bs-256__step-390.wrmp-200',
+        # 'FT.bs-256__step-390.wrmp-200',
         # 'FT.bs-256__step-379.wrmp-200',   # reduce 3%
         # 'FT.bs-256__step-390.wrmp-40',
 
@@ -574,11 +575,11 @@ def main():
     # ------------------------------- HAIC --------------------------------
     # hours = None
 
-    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)

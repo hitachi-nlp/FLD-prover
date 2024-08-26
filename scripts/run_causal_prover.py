@@ -852,6 +852,7 @@ def _maybe_logic_preprocess(data_args,
     if logic_key not in examples:
         return examples
 
+
     logic_indexes = [i for i in range(len(examples[logic_key]))
                      if examples[logic_key][i] is not None]
     non_logic_indexes = [i for i in range(len(examples[logic_key]))
@@ -868,7 +869,7 @@ def _maybe_logic_preprocess(data_args,
         for key, values in examples.items()
     }
 
-    if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
+    if data_args.log_non_logic_examples and num_non_logic_examples > 0:
         i_example = 0
         logger.info(
             '------------------------------ preprocess_function [non-logic example=%d] ------------------------------', i_example)
@@ -900,7 +901,7 @@ def _maybe_logic_preprocess(data_args,
     else:
         logic_processed = {}
 
-    if mode in "auto_regression":
+    if mode == "auto_regression":
         if num_logic_examples > 0 and num_non_logic_examples > 0:
             processed = {
                 key: torch.concat((logic_processed[key], torch.tensor(
