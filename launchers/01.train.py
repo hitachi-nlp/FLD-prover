@@ -77,6 +77,8 @@ DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
+    time.sleep(3600)
+
     # =================================== neurips.additional ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional.rebuttal')
@@ -191,13 +193,13 @@ def main():
 
         # ======================================================== ALPT_strong     ========================================================
 
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
-        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
     ]
@@ -438,8 +440,9 @@ def main():
 
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
+
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
         '2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
 
@@ -558,7 +561,7 @@ def main():
 
 
         #  ================================ ALPT_strong ================================
-        # 3e-6,
+        3e-6,
         1e-5,     # the best on 100k examples
         # 3e-5,   # the best on 1M examples
 
@@ -572,9 +575,9 @@ def main():
     optimizer_setings = [
         # (None, None, None),
         # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 300),
+        ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
     ]
@@ -591,9 +594,9 @@ def main():
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     hours = 8
 
