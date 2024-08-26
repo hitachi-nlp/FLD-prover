@@ -6,9 +6,6 @@ import logging
 from datasets import load_dataset
 import gradio as gr
 from FLD_task import (
-    load_deduction,
-    serialize,
-    build_metrics,
     prettify_proof_text,
     log_example,
 )

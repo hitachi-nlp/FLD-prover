@@ -29,6 +29,7 @@ class Processor(ABC):
     def __init__(self,
                  lm_type: LMType,
                  tokenizer,
+                 use_original_serial=False,
                  surface_is_formula=False,
                  prompt_prefix='',
                  max_length=1024,
@@ -49,6 +50,7 @@ class Processor(ABC):
                  log_only_first_example=True):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
+        self._use_original_serial = use_original_serial
         self._surface_is_formula = surface_is_formula
         self._prompt_prefix = prompt_prefix
         self._max_length = max_length

@@ -388,9 +388,11 @@ class DataTrainingArguments:
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
+    use_original_serial: bool = field(
+        default=False,
+    )
     surface_is_formula: bool = field(
         default=False,
-        metadata={},
     )
 
     proof_intermediate_steps: str = field(
@@ -797,6 +799,7 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
 
     preprocessor_kwargs = {
         'prompt_prefix': data_args.source_prefix,
+        'use_original_serial': data_args.use_original_serial,
         'surface_is_formula': data_args.surface_is_formula,
         # 'padding': logic_padding,
         'max_length': max_length,

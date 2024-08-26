@@ -38,6 +38,7 @@ _REMOVE_NAMES = [
     'negative_world_assump_label',
     'prompt_serial',
     'proof_serial',
+    'theorem_is_used_in_proof',
 
     # ---- ruletaker ----
     'context',

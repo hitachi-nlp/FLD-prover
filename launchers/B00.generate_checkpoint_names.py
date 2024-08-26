@@ -77,7 +77,8 @@ def main():
     # =================================== 2024-08-16.neurips_camera_ready ========================================
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.1')
-    TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.2')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.2')
+    TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.3')
 
 
 
@@ -225,9 +226,6 @@ def main():
     ]
 
 
-    ADDITIONAL_PARAMS = []
-
-
     # raise Exception('do add formula for specific model')
 
     input_dir = Path(TOP_DIR)
@@ -235,11 +233,12 @@ def main():
     for setting_path in setting_paths:
         for checkpoint in CHECKPOINTS:
             settings = json.load(open(str(setting_path)))
+            _params = PARAMS.copy()
 
-            _params = PARAMS
-            for param in ADDITIONAL_PARAMS:
-                if settings.get(param, False):
-                    _params += [param]
+            if 'prompt_indicate_theorems' in settings and settings['prompt_indicate_theorems'] is True:
+                _params += ['prompt_indicate_theorems']
+            if 'augmentation_prob' in settings and settings['augmentation_prob'] != 1.0:
+                _params += ['augmentation_prob']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))

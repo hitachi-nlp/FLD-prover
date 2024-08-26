@@ -104,4 +104,13 @@ class FLDProcessor(Processor):
 
     def _get_serial(self, example, split: str) -> SerializedDeduction:
         deduction = load_deduction(example)
-        return self._serializor(deduction, split)
+        if self._use_original_serial:
+            serial = SerializedDeduction(
+                prompt=deduction.prompt_serial,
+                proof=deduction.proof_serial,
+                partial_proof=None,
+                next_proof_step=deduction.proof_serial,
+            )
+        else:
+            serial = self._serializor(deduction, split)
+        return serial
