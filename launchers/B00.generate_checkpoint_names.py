@@ -78,7 +78,12 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.1')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.2')
-    TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.3')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.3')
+
+
+    # =================================== 2024-08-26.really_camera_ready ========================================
+    # XXX: REALY CAMERA READY
+    TOP_DIR = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
 
 
 

@@ -101,11 +101,18 @@ def main():
     # =================================== 2024-08-12.neurips_camera_ready.towards_best_corpora ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-08-12.neurips_camera_ready.towards_best_corpora')
 
+
     # =================================== 2024-08-16.neurips_camera_ready ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.1')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.2')
-    output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.3')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.3')
+
+
+    # =================================== 2024-08-26.really_camera_ready ========================================
+    # XXX: REALY CAMERA READY
+    output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
+
 
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25.debug')
@@ -419,7 +426,7 @@ def main():
 
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems',
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems.syllogism',
-        '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems.syllogism.contraposition',
+        # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag.super_theorems.syllogism.contraposition',
         # '2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0.theorem--0.15.w_flag',
 
 
@@ -430,6 +437,10 @@ def main():
 
 
 
+        # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
+        '2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
 
         # =================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ======================
