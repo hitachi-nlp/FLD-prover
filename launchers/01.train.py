@@ -123,12 +123,12 @@ def main():
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
+    output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
 
 
 
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
-    output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
+    # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
 
 
 
@@ -205,7 +205,7 @@ def main():
         # ======================================================== neurips camera ready     ========================================================
 
         # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -215,10 +215,10 @@ def main():
 
 
         # ======================================================== augment     ========================================================
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -477,16 +477,16 @@ def main():
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
         # '2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
 
 
         # =================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ======================
 
-        'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
-        'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
+        # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
+        # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
 
 
@@ -617,9 +617,9 @@ def main():
     # hours = 8
 
 
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     hours = 8
 
