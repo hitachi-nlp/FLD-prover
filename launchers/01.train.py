@@ -459,10 +459,10 @@ def main():
 
         # =================================== 2024-08-30.fix_ref_prob ========================================
 
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
 
@@ -470,8 +470,8 @@ def main():
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
 
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/ruletaker',
+        'hf.hitachi-nlp/PARARULE-Plus',
         # '2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
 
@@ -1095,7 +1095,6 @@ def main():
 
                                                         engine.n_resource = n_resouce_org
                                                         deepspeed_stage= deepspeed_stage_org
-        time.sleep(3600 * 2)
 
     logger.info('------------- ./01.train.py finished !! -----------')
 
