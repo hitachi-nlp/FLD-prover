@@ -27,14 +27,10 @@ class ProofWriterProcessor(Processor):
         split: str,
     ) -> Tuple[str, str, str]:
 
-        if self._proof_intermediate_steps == 'include':
-            include_proof = True
-        elif self._proof_intermediate_steps == 'exclude':
+        if random.random() > self._proof_intermediate_steps_prob:
             include_proof = False
-        elif self._proof_intermediate_steps == 'randomly_include':
-            include_proof = random.choice([True, False])
         else:
-            raise ValueError(f'Invalid proof_intermediate_steps: {self._proof_intermediate_steps}')
+            include_proof = True
 
         facts, hypothesis, gold_proof = self._get_logic(example, 'train', include_proof=include_proof)
         prompt = ' ; '.join([

@@ -35,7 +35,7 @@ class Processor(ABC):
                  max_length=1024,
                  max_prompt_length=1024,
                  ignore_index=-100,
-                 proof_intermediate_steps='include',
+                 proof_intermediate_steps_prob=1.0,
                  proof_sampling='stepwise',
                  sample_negative_proof=False,
                  no_subproof_for_unknown=False,
@@ -43,6 +43,7 @@ class Processor(ABC):
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
                  prompt_indicate_theorems=False,
+                 prompt_emphasize_theorems=False,
                  augmentation=False,
                  augmentation_prob=1.0,
                  eval_dataset=None,
@@ -57,9 +58,7 @@ class Processor(ABC):
         self._max_prompt_length = max_prompt_length
         self._ignore_index = ignore_index
             
-        if proof_intermediate_steps not in ['include', 'exclude', 'randomly_include']:
-            raise ValueError(f"proof_intermediate_steps must be one of ['include', 'exclude', 'randomly_include'], but got {proof_intermediate_steps}")
-        self._proof_intermediate_steps = proof_intermediate_steps
+        self._proof_intermediate_steps_prob = proof_intermediate_steps_prob
         self._proof_sampling = proof_sampling
         self._sample_negative_proof = sample_negative_proof
         self._no_subproof_for_unknown = no_subproof_for_unknown
@@ -67,6 +66,7 @@ class Processor(ABC):
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
         self._prompt_indicate_theorems = prompt_indicate_theorems
+        self._prompt_emphasize_theorems = prompt_emphasize_theorems
         self._augmentation = augmentation
         self._augmentation_prob = augmentation_prob
         self.eval_dataset = eval_dataset

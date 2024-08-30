@@ -185,4 +185,3 @@ def build_rec_adam_sft_trainer(dataset_name: str,
     trainer_kwargs['rec_adam_target_task_weight'] = rec_adam_target_task_weight
     trainer_kwargs['rec_adam_fisher_coef'] = rec_adam_fisher_coef
     return RecAdamSFTTrainer, trainer_kwargs, collator
-

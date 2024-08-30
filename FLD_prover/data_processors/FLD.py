@@ -31,12 +31,13 @@ class FLDProcessor(Processor):
 
         self._serializor = Serializor(
             surface_is_formula=self._surface_is_formula,
-            proof_intermediate_steps=self._proof_intermediate_steps,
+            proof_intermediate_steps_prob=self._proof_intermediate_steps_prob,
             proof_sampling=self._proof_sampling,
             sample_negative_proof=self._sample_negative_proof,
             no_subproof_for_unknown=self._no_subproof_for_unknown,
             instruction=self._instruction,
             prompt_indicate_theorems=self._prompt_indicate_theorems,
+            prompt_emphasize_theorems=self._prompt_emphasize_theorems,
             augmentation=self._augmentation,
             augmentation_prob=self._augmentation_prob,
         )

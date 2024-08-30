@@ -79,16 +79,21 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.1')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.2')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.3')
-
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.4')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.5')
+    # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.6.rec_adam')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
+    
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
-    TOP_DIR = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
+    # TOP_DIR = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
 
 
 
     # ONLY_SHOW_EXISTING = False
     ONLY_SHOW_EXISTING = True
+
 
     CHECKPOINTS = [
         # ==================== NeurIPS ======================
@@ -137,6 +142,7 @@ def main():
 
         None,
     ]
+
 
     PARAMS = [
         # ======================== NeurIPS ========================
@@ -217,18 +223,35 @@ def main():
         # # 'lr_scheduler_type',
         # 'augmentation',
 
+
         # ======================== ALPT_strong2024-08-16.neurips_camera_ready.2 ========================
+        # 'model_name',
+        # 'logic_dataset_uname',
+        # 'optimizer',
+        # 'learning',
+        # 'learning_rate',
+        # 'rec_adam_fisher_coef',
+        # 'weight_decay',
+        # 'augmentation',
+        # 'proof_intermediate_steps',
+
+
+
         'model_name',
         'logic_dataset_uname',
         'optimizer',
         'learning',
         'learning_rate',
         'rec_adam_fisher_coef',
-        'weight_decay',
-        # 'lr_scheduler_type',
+        # 'weight_decay',
         'augmentation',
         'proof_intermediate_steps',
+        'proof_intermediate_steps_prob',
+        'max_grad_norm',
     ]
+
+
+
 
 
     # raise Exception('do add formula for specific model')
@@ -244,6 +267,8 @@ def main():
                 _params += ['prompt_indicate_theorems']
             if 'augmentation_prob' in settings and settings['augmentation_prob'] != 1.0:
                 _params += ['augmentation_prob']
+            if 'prompt_emphasize_theorems' in settings and settings['prompt_emphasize_theorems'] is True:
+                _params += ['prompt_emphasize_theorems']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))

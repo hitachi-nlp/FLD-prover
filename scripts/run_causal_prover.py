@@ -370,6 +370,10 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    prompt_emphasize_theorems: bool = field(
+        default=False,
+        metadata={},
+    )
     instruction: bool = field(
         default=False,
         metadata={},
@@ -397,6 +401,10 @@ class DataTrainingArguments:
 
     proof_intermediate_steps: str = field(
         default='include',
+    )
+
+    proof_intermediate_steps_prob: float = field(
+        default=None,
     )
 
     no_subproof_for_unknown: bool = field(
@@ -797,6 +805,21 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         tokenizer,
     ]
 
+    if data_args.proof_intermediate_steps_prob is not None:
+        logger.info('proof_intermediate_steps_prob=%f is specified. This will take precedence over proof_intermediate_steps=%s',
+                    data_args.proof_intermediate_steps_prob,
+                    data_args.proof_intermediate_steps)
+        proof_intermediate_steps_prob = data_args.proof_intermediate_steps_prob
+    else:
+        if data_args.proof_intermediate_steps == 'include':
+            proof_intermediate_steps_prob = 1.0
+        elif data_args.proof_intermediate_steps == 'exclude':
+            proof_intermediate_steps_prob = 0.0
+        elif data_args.proof_intermediate_steps == 'randomly_include':
+            proof_intermediate_steps_prob = 0.5
+        else:
+            raise ValueError()
+
     preprocessor_kwargs = {
         'prompt_prefix': data_args.source_prefix,
         'use_original_serial': data_args.use_original_serial,
@@ -804,13 +827,14 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         # 'padding': logic_padding,
         'max_length': max_length,
         'max_prompt_length': max_prompt_length,
-        'proof_intermediate_steps': data_args.proof_intermediate_steps,
+        'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
         'proof_sampling': False,
         'sample_negative_proof': False,
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
         'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
+        'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
         'augmentation': data_args.augmentation,
         'augmentation_prob': data_args.augmentation_prob,
         # 'log_examples': data_args.log_examples,
@@ -1458,7 +1482,9 @@ def main():
     else:
         sft_dataset_name = None
 
-    if data_args.optimizer is None:
+    if data_args.optimizer in [None, 'adamw_hf']:
+        if data_args.optimizer is not None:
+            training_args.optim = data_args.optimizer
         if data_args.do_sft:
             trainer_cls, trainer_kwargs, collator = build_sft_trainer(
                 sft_dataset_name,
@@ -1491,7 +1517,7 @@ def main():
             collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     else:
-        raise ValueError(f'Unknown optimizer: {model_args.optimizer}')
+        raise ValueError(f'Unknown optimizer: {data_args.optimizer}')
 
     # Initialize our Trainer
     trainer = trainer_cls(
