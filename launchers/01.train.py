@@ -116,14 +116,13 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob.deepspeed_fix')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
+    output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
 
 
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
-    output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
 
 
 
@@ -204,13 +203,13 @@ def main():
 
         # ======================================================== neurips camera ready     ========================================================
 
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
-        # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
-        # ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('Qwen/Qwen2-7B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('Qwen/Qwen2-72B', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
@@ -466,6 +465,7 @@ def main():
 
         # =================================== 2024-08-30.fix_ref_prob ========================================
 
+        '2024-08-30.FLD.ref_prob-0.20',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
@@ -477,8 +477,8 @@ def main():
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
 
-        'hf.hitachi-nlp/ruletaker',
-        'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
         # '2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
 
@@ -487,9 +487,6 @@ def main():
 
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
-
-
-
 
     ]
 
@@ -500,89 +497,37 @@ def main():
         # 'exclude',
     ]
 
-    proof_intermediate_steps_prob_args = [
-        None,
-        # 0.33,   # 150k
-        # 0.166666,   # 300k
-
-    ]
-
 
 
 
 
     learnings = [
-        # 'debug.ZS',
-        # 'debug.micro',
-        # 'debug.tiny',
-
-        # =========================== JFLD experiments ===========================
-        # 'LLM_FS.shot-5',
-        # 'LLM_FS.shot-100',
-        # 'LLM_FS.shot-1000',
-        # 'LLM_FS.shot-10000',
-        # 'LLM_FS.shot-30000',
-        
-
-        # =========================== LPT ===========================
-        # 'LPT.bs-2048__step-12000.wrmp-100',
-        # 'LPT.bs-2048__step-12000.wrmp-1000',
-        # 'LPT.bs-2048__step-13200.wrmp-132',
-
-
-        # =========================== ALPT_strong ===========================
-
         # 'debug.FT.bs-64__step-10.wrmp-0',
+        # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
+        # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
+        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-379.wrmp-200',   # reduce 3% 
+        # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
+        # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
+        # 'FT.bs-768__step-390.wrmp-200',  # 300k examples
+        # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
+        # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
+    ]
 
-        # ------------------ 25k examples ------------------
-        # 'FT.bs-256__step-98.wrmp-50',
-
-        # ------------------ 50k examples ------------------
-        # 'FT.bs-256__step-195.wrmp-100',
-
-        # ------------------ 100k examples ------------------
-        'FT.bs-256__step-390.wrmp-200',
-        # 'FT.bs-256__step-379.wrmp-200',   # reduce 3%
-        # 'FT.bs-256__step-390.wrmp-40',
-
-        # ------------------ 150k examples ------------------
-        # 'FT.bs-256__step-586.wrmp-200',
-
-        # ------------------ 200k examples ------------------
-        # 'FT.bs-256__step-780.wrmp-200',
-
-        # ------------------ 300k examples ------------------
-        # 'FT.bs-768__step-390.wrmp-200',
-
-        # ------------------ 1M examples ------------------
-        # 'FT.bs-256__step-3900.wrmp-200',
-        # 'FT.bs-2560__step-390.wrmp-200',   # with the same step as 100k
-
-        # ---------- 10M examples ----------
-        # 'FT.bs-1024__step-9765.wrmp-300',
-
+    # XXX: DO SPECIFY WHEN YOU INCREASE THE DATASET SIZE
+    proof_intermediate_steps_prob_args = [
+        None, # 100k
+        # 0.33,   # 150k
+        # 0.166666,   # 300k
     ]
 
 
 
     lrates = [
-
-        #  ================================ LPT ================================
-        # 3e-5,    # BLPT, 3M examples
-        # 1e-4,    # BLPT, 10M examples
-
-        # 3e-4,    # LPT
-        # 1e-4,    # LPT after BLPT
-
-
         #  ================================ ALPT_strong ================================
-        # 3e-6,
         1e-5,     # the best on 100k examples
-        # 3e-5,   # the best on 1M examples
-
-        # 1e-4,
-        # 3e-4,
     ]
+
 
 
 
@@ -590,38 +535,22 @@ def main():
     # as the optimal value differs much from model to model.
     optimizer_setings = [
         ('rec_adam', 1.0, 'auto'),
-
-        # (None, None, None),
-        # ('adamw_hf', None, None),
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
 
+        # (None, None, None),
+        # ('adamw_hf', None, None),
     ]
 
-    # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
 
-
-
-    # ------------------------------- HAIC --------------------------------
-
-    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
-    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
-
-
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
-    # hours = 8
-
-
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 8
+    hours = 12
 
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
@@ -657,6 +586,16 @@ def main():
 
     # skip_if_exists = False
     skip_if_exists = True
+
+
+
+    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
+
+
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
 
     # ------------------------------- ABCI --------------------------------
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)

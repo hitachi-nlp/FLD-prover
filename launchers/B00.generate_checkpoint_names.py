@@ -82,13 +82,17 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.4')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.5')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.6.rec_adam')
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-30.fix_ref_prob')
     
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
-    # TOP_DIR = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-26.really_camera_ready')
 
+
+    # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/00.augment.py.2024-08-25')
 
 
     # ONLY_SHOW_EXISTING = False
