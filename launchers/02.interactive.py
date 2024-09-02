@@ -61,12 +61,14 @@ def main():
     # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=5000__augmnttn=True.chk-390'
     # gradio_port = 9201
 
-    checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct'
-    gradio_port = 9200
+    # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct'
+    # gradio_port = 9200
 
     # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B-Instruct__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=300.chk-390'
     # gradio_port = 8500
 
+    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=None__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-390'
+    gradio_port = 8500
 
 
     instruction = True
@@ -183,7 +185,6 @@ def main():
     )
 
     setting.update(get_model_setting(_model_name))
-
     setting.update(get_tokenizer_setting(_model_name))
 
     setting.update(
@@ -227,8 +228,14 @@ def main():
     if model_name_or_path is not None:
         setting['model_name_or_path'] = str(model_name_or_path)
 
-    output_dir = make_output_dir(setting, output_top_dir,
-                                 dirname_ignore_params=['model_name_or_path'])
+    output_dir = make_output_dir(
+        setting,
+        output_top_dir,
+        dirname_ignore_params=[
+            'model_name_or_path',
+            'model_name',
+        ],
+    )
     command = make_command(output_dir,
                            setting,
                            run_mode,

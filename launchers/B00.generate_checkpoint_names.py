@@ -273,6 +273,9 @@ def main():
                 _params += ['augmentation_prob']
             if 'prompt_emphasize_theorems' in settings and settings['prompt_emphasize_theorems'] is True:
                 _params += ['prompt_emphasize_theorems']
+            if 'block_size' in settings and settings['block_size'] != 2048
+                _params += ['block_size']
+
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))
