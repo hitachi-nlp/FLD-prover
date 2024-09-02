@@ -73,6 +73,12 @@ DATASETS_DIRS = [
 ]
 
 
+OTHER_DATASETS_DIRS = [
+    './outputs.factorized_reasoning',
+]
+
+
+
 
 
 
@@ -168,12 +174,14 @@ def main():
 
 
         # '2024-08-30.FLD.ref_prob-0.20',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
+        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
+
+        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
 
 
 
@@ -202,15 +210,52 @@ def main():
 
 
 
+    multitask_setting_list = [
+        # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
+        # ================================================ NeurIPS 2024 ==============================================
+
+        (
+            1.0,
+            [],
+        ),
+
+        # ================================================ LPT ==============================================
+
+        # (
+        #     0.03,
+        #     [
+        #         (1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)
+        #     ],
+        # ),
+
+
+        # ================================================ ALPT_strong ==============================================
+
+        # (
+        #     0.5,
+        #     [
+        #         (1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)
+        #     ],
+        # ),
+
+
+    ]
+
+    # do_sft = True
+    do_sft = False
+
+
+
+
 
     learnings = [
         # 'debug.FT.bs-64__step-10.wrmp-0',
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
-        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
-        # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
+        'FT.bs-256__step-1172.wrmp-200',  # 300k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
         # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
     ]
@@ -218,11 +263,14 @@ def main():
     proof_intermediate_steps_prob_args = [
         # None,
 
-        0.0,
+        # 0.0,
         # 0.1,
+        0.166666,
         # 0.25,
         # 0.33,
-        # 0.166666,
+
+        # 0.75,
+        # 1.0,
     ]
 
 
@@ -242,11 +290,11 @@ def main():
     # XXX: The fisher coef MUST be tuned for each model,
     # as the optimal value differs much from model to model.
     optimizer_setings = [
-        ('rec_adam', 1.0, 'auto'),
+        # ('rec_adam', 1.0, 'auto'),
 
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
-        # ('rec_adam', 1.0, 1000),
+        ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
 
@@ -340,40 +388,6 @@ def main():
         # 1000,
     ]
 
-
-    multitask_setting_list = [
-        # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
-        # ================================================ NeurIPS 2024 ==============================================
-
-        (
-            1.0,
-            [],
-        ),
-
-        # ================================================ LPT ==============================================
-
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'cerebras/SlimPajama-627B', None, None, None)
-        #     ],
-        # ),
-
-
-        # ================================================ ALPT_strong ==============================================
-
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'DKYoon/SlimPajama-6B', None, None, None)
-        #     ],
-        # ),
-
-
-    ]
-
-    # do_sft = True
-    do_sft = False
 
 
 
@@ -632,6 +646,7 @@ def main():
                 get_dataset_setting(
                     dataset_uname=logic_dataset_uname,
                     top_dirs=DATASETS_DIRS,
+                    other_dataset_top_dirs=OTHER_DATASETS_DIRS,
                     other_dataset_names=other_dataset_names,
                     other_dataset_config_names=other_dataset_config_names,
                     other_dataset_config_load_types=other_dataset_config_load_types,

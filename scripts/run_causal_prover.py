@@ -695,6 +695,9 @@ def load_raw_datasets(data_args, model_args):
     validation_files = parse_listed_option(data_args.validation_files)
     file_types = parse_listed_option(data_args.file_types)
 
+    if len(dataset_names) > 0 and any(len(files) > 0 for files in [train_files, validation_files]):
+        raise NotImplementedError()
+
     raw_datasets_list = []
     if len(dataset_names) > 0:
         for i in range(len(dataset_names)):
