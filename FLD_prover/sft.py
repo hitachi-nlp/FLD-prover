@@ -65,6 +65,9 @@ def build_sft_trainer(dataset_name: str,
         task_type = 'instrution'
         label_maping = None
 
+    elif dataset_name.startswith('FR.'):
+        task_type = 'factorized_reasoning'
+        label_maping = None
     else:
         raise ValueError(dataset_name)
     logger.info('SFT task type is set to %s', task_type)
@@ -91,8 +94,8 @@ def build_sft_trainer(dataset_name: str,
     else:
         raise ValueError(lang)
 
-    def formatting_prompts_func(examples):
-        output_texts = []
+    def make_formatted_texts(examples):
+        formatted_texts = []
 
         def guess_field(candidate_fields: List[str], not_found='raise') -> str:
             field = None
@@ -147,26 +150,31 @@ def build_sft_trainer(dataset_name: str,
                 if label_maping is not None:
                     raise Exception()
 
+            elif task_type == 'factorized_reasoning':
+                instruction = examples['prompt'][i]
+                context = None
+                answer = examples['answer'][i]
+
             else:
                 raise ValueError(task_type)
 
             answer = str(answer)
             if context is not None:
-                text = '\n\n'.join([intro, instruction_template, instruction, context_template, context, response_template, answer]) + tokenizer.eos_token
+                formatted_text = '\n\n'.join([intro, instruction_template, instruction, context_template, context, response_template, answer]) + tokenizer.eos_token
             else:
-                text = '\n\n'.join([intro, instruction_template, instruction, response_template, answer]) + tokenizer.eos_token
+                formatted_text = '\n\n'.join([intro, instruction_template, instruction, response_template, answer]) + tokenizer.eos_token
 
-            output_texts.append(text)
+            formatted_texts.append(formatted_text)
 
             if i == 0:
                 logger.info('Example of the formatted prompt:')
-                logger.info(output_texts[0])
+                logger.info(formatted_texts[0])
 
-        return output_texts
+        return formatted_texts
 
     trainer_cls = SFTTrainer
     trainer_kwargs = {
-        'formatting_func': formatting_prompts_func,
+        'formatting_func': make_formatted_texts,
         'max_seq_length': block_size,
         'neftune_noise_alpha': sft_neftune_noise_alpha,
     }

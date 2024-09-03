@@ -720,7 +720,7 @@ def load_raw_datasets(data_args, model_args):
                     train_files[i],
                     validation_files[i] if validation_files[i] != 'None' else None,
                     dataset_config_load_types[i],
-                    file_types[i] if file_types[i] != 'None' else 'json',
+                    file_types[i] if len(file_types) > i and file_types[i] != 'None' else 'json',
                     data_args.keep_linebreaks,
                     data_args.streaming,
                 )
@@ -969,6 +969,12 @@ def load_logic_raw_datasets(data_args, model_args):
             False,
             concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
         )
+
+    if data_args.logic_dataset_prob == 0.0:
+        # We assume that this script is used for non-logic dataset fine-tuning.
+        logger.info('logic_dataset_prob=0.0 is specified. We will take only 1 example from the logic dataset')
+        for split_name in list(logic_raw_datasets.keys()):
+            logic_raw_datasets[split_name] = take(logic_raw_datasets[split_name], 1, False)
 
     if data_args.logic_dataset_type == 'FLD':
         # load and dump once to normalize the schema from different versions of datasets.

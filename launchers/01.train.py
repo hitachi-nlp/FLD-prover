@@ -5,6 +5,7 @@ import time
 import os
 import json
 from itertools import product
+import random
 
 
 import click
@@ -74,7 +75,7 @@ DATASETS_DIRS = [
 
 
 OTHER_DATASETS_DIRS = [
-    './outputs.factorized_reasoning',
+    './outputs.factorized_reasoning/',
 ]
 
 
@@ -125,6 +126,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob.deepspeed_fix')
     output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
 
 
@@ -143,6 +145,8 @@ def main():
 
     model_settings = [
         # ======================================================== neurips camera ready     ========================================================
+
+        # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
         ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -174,14 +178,15 @@ def main():
 
 
         # '2024-08-30.FLD.ref_prob-0.20',
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
+        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
 
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
 
 
 
@@ -219,6 +224,25 @@ def main():
             [],
         ),
 
+
+        # (
+        #     0.0,
+        #     [
+        #         (1.0, 'FR.2024-09-03.debug', None, None, None)
+        #     ],
+        # ),
+
+
+        # ================================================ ALPT_strong ==============================================
+
+        # (
+        #     0.95,
+        #     [
+        #         (1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)
+        #     ],
+        # ),
+
+
         # ================================================ LPT ==============================================
 
         # (
@@ -227,18 +251,6 @@ def main():
         #         (1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)
         #     ],
         # ),
-
-
-        # ================================================ ALPT_strong ==============================================
-
-        # (
-        #     0.5,
-        #     [
-        #         (1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)
-        #     ],
-        # ),
-
-
     ]
 
     # do_sft = True
@@ -253,9 +265,9 @@ def main():
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
         # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
-        # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
+        'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
-        'FT.bs-256__step-1172.wrmp-200',  # 300k examples
+        # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
         # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
     ]
@@ -265,9 +277,9 @@ def main():
 
         # 0.0,
         # 0.1,
-        0.166666,
+        # 0.166666,
         # 0.25,
-        # 0.33,
+        0.33,
 
         # 0.75,
         # 1.0,
@@ -281,6 +293,7 @@ def main():
 
 
     lrates = [
+        # 3e-6,
         1e-5,     # the best on 100k examples
     ]
 
@@ -290,11 +303,11 @@ def main():
     # XXX: The fisher coef MUST be tuned for each model,
     # as the optimal value differs much from model to model.
     optimizer_setings = [
-        # ('rec_adam', 1.0, 'auto'),
+        ('rec_adam', 1.0, 'auto'),
 
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
-        ('rec_adam', 1.0, 1000),
+        # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
 
@@ -303,11 +316,20 @@ def main():
     ]
 
 
+    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
 
 
-    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
+
+
+
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
     hours = 12
@@ -349,13 +371,6 @@ def main():
 
 
 
-    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
-    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
-
-
-    # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
 
     # ------------------------------- ABCI --------------------------------
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -774,6 +789,7 @@ def main():
                                    run_mode,
                                    region,
                                    deepspeed_stage=deepspeed_stage,
+                                   port=random.randint(29777, 31777),
                                    n_gpus_per_node=n_gpus_per_node)
 
             run_by_engine(

@@ -275,7 +275,10 @@ def main():
                 _params += ['prompt_emphasize_theorems']
             if 'block_size' in settings and settings['block_size'] != 2048:
                 _params += ['block_size']
-
+            if 'dataset_names' in settings and settings['dataset_names']:
+                _params += ['dataset_names']
+            if 'dataset_probs' in settings and settings['dataset_probs']:
+                _params += ['dataset_probs']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))
