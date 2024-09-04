@@ -30,7 +30,6 @@ class Processor(ABC):
                  lm_type: LMType,
                  tokenizer,
                  use_original_serial=False,
-                 surface_is_formula=False,
                  prompt_prefix='',
                  max_length=1024,
                  max_prompt_length=1024,
@@ -46,13 +45,13 @@ class Processor(ABC):
                  prompt_emphasize_theorems=False,
                  augmentation=False,
                  augmentation_prob=1.0,
+                 formula_prob=0.0,
                  eval_dataset=None,
                  log_examples=False,
                  log_only_first_example=True):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
         self._use_original_serial = use_original_serial
-        self._surface_is_formula = surface_is_formula
         self._prompt_prefix = prompt_prefix
         self._max_length = max_length
         self._max_prompt_length = max_prompt_length
@@ -69,6 +68,7 @@ class Processor(ABC):
         self._prompt_emphasize_theorems = prompt_emphasize_theorems
         self._augmentation = augmentation
         self._augmentation_prob = augmentation_prob
+        self._formula_prob = formula_prob
         self.eval_dataset = eval_dataset
         self.log_examples = log_examples
         self._log_only_first_example = log_only_first_example

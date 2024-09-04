@@ -65,9 +65,9 @@ DATASETS_DIRS = [
     # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18',
 
     './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora',
+    './outputs.FLD/00.create_corpus/2024-09-03.toward_camera_ready',
 
     './outputs.FLD-augmentation/00.augment.py/2024-08-25',
-
     # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora/dataset_name=2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
     './outputs.FLD/00.create_corpus/2024-08-30.fix_ref_prob',
@@ -125,8 +125,13 @@ def main():
 
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
     # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob.deepspeed_fix')
-    output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
+    # output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
     # output_top_dir = Path('./outputs/01.train.py/debug')
+
+
+    # =================================== 2024-09-03.toward_camera_ready ========================================
+    output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
+
 
 
 
@@ -148,8 +153,8 @@ def main():
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -183,10 +188,21 @@ def main():
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
-        '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
 
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
+
+
+
+        # ====================================== 2024-09-03.toward_camera_ready ============================
+
+        'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+
+        # '2024-08-30.FLD.ref_prob-0.20',
+        # '2024-09-03.trnsl-thing_person-v2',
+
 
 
 
@@ -204,14 +220,6 @@ def main():
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
     ]
-
-
-    proof_intermediate_steps_args = [
-        'randomly_include',   # the best
-        # 'include',
-        # 'exclude',
-    ]
-
 
 
 
@@ -285,6 +293,11 @@ def main():
         # 1.0,
     ]
 
+    formula_prob_args = [
+        0.0,
+        0.2,
+    ]
+
 
 
     context_len = None
@@ -293,8 +306,8 @@ def main():
 
 
     lrates = [
-        # 3e-6,
-        1e-5,     # the best on 100k examples
+        3e-6,
+        # 1e-5,     # the best on 100k examples
     ]
 
 
@@ -332,7 +345,7 @@ def main():
     engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 12
+    hours = 24
 
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
@@ -453,8 +466,6 @@ def main():
         # 'mlp',
     ]
 
-    surface_is_formula = False
-
     max_eval_samples = 10000
 
     float_precision = 'bf16'
@@ -504,7 +515,6 @@ def main():
         prompt_indicate_theorems_args,
         prompt_emphasize_theorems_args,
         sample_negative_proof_args,
-        proof_intermediate_steps_args,
         proof_intermediate_steps_prob_args,
         no_subproof_for_unknown_args,
         seeds,
@@ -516,6 +526,7 @@ def main():
         from_scratch_args,
         augmentation_args,
         augmentation_prob_args,
+        formula_prob_args,
     )
          
     # iter with hyparas
@@ -527,7 +538,6 @@ def main():
          prompt_indicate_theorems,
          prompt_emphasize_theorems,
          sample_negative_proof,
-         proof_intermediate_steps,
          proof_intermediate_steps_prob,
          no_subproof_for_unknown,
          seed,
@@ -538,7 +548,8 @@ def main():
          update_parameters,
          from_scratch,
          augmentation,
-         augmentation_prob) in hyparas:
+         augmentation_prob,
+         formla_prob) in hyparas:
 
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
             logic_dataset_config_load_type = 'concat_all'
@@ -671,15 +682,14 @@ def main():
                     use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                     streaming=streaming,
                     use_original_serial=use_original_serial,
-                    surface_is_formula=surface_is_formula,
                     instruction=instruction,
                     prompt_indicate_theorems=prompt_indicate_theorems,
                     prompt_emphasize_theorems=prompt_emphasize_theorems,
                     augmentation=augmentation,
                     augmentation_prob=augmentation_prob,
+                    formula_prob=formula_prob,
 
                     sample_negative_proof=sample_negative_proof,
-                    proof_intermediate_steps=proof_intermediate_steps,
                     proof_intermediate_steps_prob=proof_intermediate_steps_prob,
                     no_subproof_for_unknown=no_subproof_for_unknown,
 

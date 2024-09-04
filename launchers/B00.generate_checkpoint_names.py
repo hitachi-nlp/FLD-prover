@@ -83,8 +83,12 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.5')
     # TOP_DIR = Path('./outputs.FLD-prover//01.train.py/2024-08-16.neurips_camera_ready.6.rec_adam')
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-30.fix_ref_prob')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-08-30.fix_ref_prob')
     
+
+    # =================================== 2024-09-03.toward_camera_ready ========================================
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-03.toward_camera_ready')
+
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
@@ -279,6 +283,8 @@ def main():
                 _params += ['dataset_names']
             if 'dataset_probs' in settings and settings['dataset_probs']:
                 _params += ['dataset_probs']
+            if 'formula_prob' in settings and settings['formula_prob'] != 0.0:
+                _params += ['formula_prob']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))
