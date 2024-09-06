@@ -130,9 +130,12 @@ def main():
 
 
     # =================================== 2024-09-03.toward_camera_ready ========================================
-    output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
 
 
+    # =================================== 2024-09-06.llama3 ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-06.llama3')
 
 
     # =================================== 2024-08-26.really_camera_ready ========================================
