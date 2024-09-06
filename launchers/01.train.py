@@ -133,9 +133,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
 
 
+
     # =================================== 2024-09-06.llama3 ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-06.llama3')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-06.llama3')
+
 
 
     # =================================== 2024-08-26.really_camera_ready ========================================
@@ -147,7 +149,9 @@ def main():
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # =================================== 2024-09-06.factorized_reasoning ========================================
+    output_top_dir = Path('./outputs/01.train.py/2024-09-06.factorized_reasoning')
 
 
 
@@ -157,8 +161,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -175,6 +180,9 @@ def main():
         # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
+
+        # ======================================================== 2024-09-06.factorized_reasoning     ========================================================
+        ('mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-1953.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-1953', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -202,11 +210,11 @@ def main():
 
         # ====================================== 2024-09-03.toward_camera_ready ============================
 
-        'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
 
         # '2024-08-30.FLD.ref_prob-0.20',
-        '2024-09-03.trnsl-thing_person-v2',
+        # '2024-09-03.trnsl-thing_person-v2',
 
         # '2024-09-03.trnsl-thing_person-v0',
 
@@ -225,6 +233,9 @@ def main():
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
+        # =================== 2024-09-06.factorized_reasoning ======================
+        'hf.hitachi-nlp/ruletaker',
+
     ]
 
 
@@ -233,18 +244,18 @@ def main():
         # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
 
-        (
-            1.0,
-            [],
-        ),
-
-
         # (
-        #     0.0,
-        #     [
-        #         (1.0, 'FR.2024-09-03.debug', None, None, None)
-        #     ],
+        #     1.0,
+        #     [],
         # ),
+
+
+        (
+            0.0,
+            [
+                (1.0, 'FR.2024-09-06.large_train', None, None, None)
+            ],
+        ),
 
 
         # ================================================ ALPT_strong ==============================================
@@ -267,8 +278,8 @@ def main():
         # ),
     ]
 
-    # do_sft = True
-    do_sft = False
+    do_sft = True
+    # do_sft = False
 
 
 
@@ -276,19 +287,23 @@ def main():
         # 'debug.FT.bs-64__step-10.wrmp-0',
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
-        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
         # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
-        # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
+
+
+        # ========== factoorized reasoning ==========
+        # https://github.com/tatsu-lab/stanford_alpaca
+        'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
     ]
 
     proof_intermediate_steps_prob_args = [
         # 0.0,
         # 0.25,
-        # 0.50,
+        0.50,
         # 0.75,
         # 1.0,
     ]
@@ -323,9 +338,9 @@ def main():
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
-        ('rec_adam', 1.0, 10000),
+        # ('rec_adam', 1.0, 10000),
 
-        # (None, None, None),
+        (None, None, None),
         # ('adamw_hf', None, None),
     ]
 
