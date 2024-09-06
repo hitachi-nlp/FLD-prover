@@ -4,9 +4,10 @@ import random
 
 from FLD_task import (
     load_deduction,
-    serialize,
+    Serializor,
     build_metrics,
     SerializedDeduction,
+    make_instruction,
 )
 from FLD_task.proof import get_stance_markers
 from FLD_prover.lm_types import LMType
@@ -22,6 +23,24 @@ logger = logging.getLogger()
 class FLDProcessor(Processor):
 
     _warn_on_example_prettify_failure = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._instruction and self._augmentation:
+            raise ValueError('Instruction and augmentation cannot be used together')
+
+        self._serializor = Serializor(
+            proof_intermediate_steps_prob=self._proof_intermediate_steps_prob,
+            proof_sampling=self._proof_sampling,
+            sample_negative_proof=self._sample_negative_proof,
+            no_subproof_for_unknown=self._no_subproof_for_unknown,
+            instruction=self._instruction,
+            prompt_indicate_theorems=self._prompt_indicate_theorems,
+            prompt_emphasize_theorems=self._prompt_emphasize_theorems,
+            augmentation=self._augmentation,
+            augmentation_prob=self._augmentation_prob,
+            formula_prob=self._formula_prob,
+        )
 
     def _make_in_out(
         self,
@@ -85,20 +104,14 @@ class FLDProcessor(Processor):
         )
 
     def _get_serial(self, example, split: str) -> SerializedDeduction:
-        if self._proof_intermediate_steps == 'include':
-            intermediate_steps = True
-        elif self._proof_intermediate_steps == 'exclude':
-            intermediate_steps = False
-        elif self._proof_intermediate_steps == 'randomly_include':
-            intermediate_steps = random.choice([True, False])
+        deduction = load_deduction(example)
+        if self._use_original_serial:
+            serial = SerializedDeduction(
+                prompt=deduction.prompt_serial,
+                proof=deduction.proof_serial,
+                partial_proof=None,
+                next_proof_step=deduction.proof_serial,
+            )
         else:
-            raise ValueError(f'Invalid proof_intermediate_steps: {self._proof_intermediate_steps}')
-
-        return serialize(
-            load_deduction(example),
-            intermediate_steps=intermediate_steps,
-            stepwise=(self._proof_sampling == 'stepwise'),
-            sample_negative_proof=self._sample_negative_proof if split == 'train' else False,
-            include_max_subproof_for_unknown=not self._no_subproof_for_unknown,
-            instruction=self._instruction,
-        )
+            serial = self._serializor(deduction, split)
+        return serial

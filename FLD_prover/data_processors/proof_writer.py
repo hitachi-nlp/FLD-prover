@@ -26,7 +26,13 @@ class ProofWriterProcessor(Processor):
         example,
         split: str,
     ) -> Tuple[str, str, str]:
-        facts, hypothesis, gold_proof = self._get_logic(example, 'train')
+
+        if random.random() > self._proof_intermediate_steps_prob:
+            include_proof = False
+        else:
+            include_proof = True
+
+        facts, hypothesis, gold_proof = self._get_logic(example, 'train', include_proof=include_proof)
         prompt = ' ; '.join([
             '$facts$ = ' + facts,
             '$hypothesis$ = ' + hypothesis,
@@ -70,7 +76,10 @@ class ProofWriterProcessor(Processor):
         # }
         return {}
 
-    def _get_logic(self, example, split: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    def _get_logic(self,
+                   example,
+                   split: str,
+                   include_proof=True) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         id_ = example['id']
 
         facts = example['theory']
@@ -85,7 +94,8 @@ class ProofWriterProcessor(Processor):
 
         hypothesis = question['question']
 
-        if question.get('proofsWithIntermediates', None) and len(question['proofsWithIntermediates']) > 0:
+        if include_proof\
+                and question.get('proofsWithIntermediates', None) and len(question['proofsWithIntermediates']) > 0:
             proofs = question['proofsWithIntermediates']
             if id_ in self._proof_cache:
                 proof_idx = self._proof_cache[id_]

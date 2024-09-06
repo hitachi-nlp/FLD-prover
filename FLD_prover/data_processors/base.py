@@ -7,9 +7,6 @@ from collections import defaultdict
 import numpy as np
 
 from FLD_task import (
-    load_deduction,
-    serialize,
-    build_metrics,
     log_example,
     log_metrics,
 )
@@ -32,36 +29,46 @@ class Processor(ABC):
     def __init__(self,
                  lm_type: LMType,
                  tokenizer,
+                 use_original_serial=False,
                  prompt_prefix='',
                  max_length=1024,
                  max_prompt_length=1024,
                  ignore_index=-100,
-                 proof_intermediate_steps='include',
+                 proof_intermediate_steps_prob=1.0,
                  proof_sampling='stepwise',
                  sample_negative_proof=False,
                  no_subproof_for_unknown=False,
                  ignore_pad_token_for_loss=True,
                  include_prompt_for_causal_lm_loss=False,
                  instruction=False,
+                 prompt_indicate_theorems=False,
+                 prompt_emphasize_theorems=False,
+                 augmentation=False,
+                 augmentation_prob=1.0,
+                 formula_prob=0.0,
                  eval_dataset=None,
                  log_examples=False,
                  log_only_first_example=True):
         self._lm_type = lm_type
         self._tokenizer = tokenizer
+        self._use_original_serial = use_original_serial
         self._prompt_prefix = prompt_prefix
         self._max_length = max_length
         self._max_prompt_length = max_prompt_length
         self._ignore_index = ignore_index
             
-        if proof_intermediate_steps not in ['include', 'exclude', 'randomly_include']:
-            raise ValueError(f"proof_intermediate_steps must be one of ['include', 'exclude', 'randomly_include'], but got {proof_intermediate_steps}")
-        self._proof_intermediate_steps = proof_intermediate_steps
+        self._proof_intermediate_steps_prob = proof_intermediate_steps_prob
         self._proof_sampling = proof_sampling
         self._sample_negative_proof = sample_negative_proof
         self._no_subproof_for_unknown = no_subproof_for_unknown
         self._ignore_pad_token_for_loss = ignore_pad_token_for_loss
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
         self._instruction = instruction
+        self._prompt_indicate_theorems = prompt_indicate_theorems
+        self._prompt_emphasize_theorems = prompt_emphasize_theorems
+        self._augmentation = augmentation
+        self._augmentation_prob = augmentation_prob
+        self._formula_prob = formula_prob
         self.eval_dataset = eval_dataset
         self.log_examples = log_examples
         self._log_only_first_example = log_only_first_example
@@ -80,13 +87,16 @@ class Processor(ABC):
         def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
             return prepare_tokenized_inputs(inputs, self._tokenizer, padding, max_length, **kwargs)
 
-        def _mask_labels_by_ignore_index(labels, mask_lengths: Optional[List[int]] = None):
+        def _mask_labels_by_ignore_index(labels,
+                                         attention_mask=None,
+                                         mask_lengths: Optional[List[int]] = None):
             return mask_labels_by_ignore_index(labels,
                                                self._tokenizer.pad_token_id,
                                                mask_id=self._ignore_index,
                                                mask_lengths=mask_lengths,
                                                # mask_pad_tokens = padding == "max_length" and ignore_pad_token_for_loss,
-                                               mask_pad_tokens=self._ignore_pad_token_for_loss)
+                                               mask_pad_tokens=self._ignore_pad_token_for_loss,
+                                               attention_mask=attention_mask)
 
         def _unmask_by_pad_token(tensor):
             return unmask_by_pad_token(tensor, self._tokenizer.pad_token_id, mask_id=self._ignore_index)
@@ -125,7 +135,8 @@ class Processor(ABC):
             if self._lm_type == LMType.SEQ_2_SEQ:
                 forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
                 forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos, self._max_length - self._max_prompt_length)["input_ids"]
-                forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"])
+                forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"],
+                                                                        forward_inputs["attention_mask"])
 
             elif self._lm_type == LMType.CAUSAL:
                 # just for getting length
@@ -154,6 +165,7 @@ class Processor(ABC):
                 forward_inputs["labels"] = _mask_labels_by_ignore_index(
                     forward_inputs["labels"],
                     mask_lengths=prompt_lengths,
+                    attention_mask=forward_inputs["attention_mask"],
                 )
             else:
                 raise NotImplementedError()

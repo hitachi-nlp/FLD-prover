@@ -1,28 +1,23 @@
 sentencepiece != 0.1.92  # XXX SHOULD BE INSTALLED BEFORE TRANSFORMERS
 
-# transformers==4.34.0
-# transformers==4.36.0
-# transformers==4.35.2
-transformers==4.37
-# git+https://github.com/huggingface/transformers
-
-
+#
 # tokenizers==v0.13.4.rc3
 # tokenizers==0.14.1
 tokenizers
 
-accelerate >= 0.21.0
+# accelerate >= 0.21.0
 # accelerate==0.18.0
 
 # deepspeed==0.10.2
-deepspeed==0.10.3
+# deepspeed==0.10.3
 # deepspeed==0.8.3
 
 # peft==0.5.0
 peft==0.4.0
 
-datasets==2.14.5
+# datasets==2.14.5
 # datasets==2.16.1
+# datasets==2.18.0
 # protobuf==3.20.0
 protobuf
 py7zr
@@ -44,7 +39,17 @@ gradio
 tbparse
 scikit-learn
 tiktoken
+zstandard
 
 git+https://github.com/google-research/bleurt.git
 
 line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main
+
+
+# transformers==4.40.2
+transformers==4.43.4
+accelerate==0.30.0
+deepspeed==0.14.2
+datasets==2.19.1
+mpi4py==3.1.6
+trl

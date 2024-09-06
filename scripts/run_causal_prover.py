@@ -47,8 +47,6 @@ from datasets import (
     IterableDataset,
     interleave_datasets,
 )
-
-
 import transformers
 from transformers import (
     CONFIG_MAPPING,
@@ -58,7 +56,6 @@ from transformers import (
     HfArgumentParser,
     Trainer,
     TrainingArguments,
-    default_data_collator,
     is_torch_tpu_available,
     set_seed,
 )
@@ -79,10 +76,11 @@ from FLD_prover.data_processors import (
     RobustLRProcessor,
     ProofWriterProcessor,
 )
-from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, TrainerWithRecAdam
+from FLD_prover.sft import build_sft_trainer, build_rec_adam_sft_trainer
+from FLD_prover.trainer import ForceCallMetricsSeq2SeqTrainer, RecAdamTrainer
 from FLD_prover.tokenizers import load as load_tokenizer
 from FLD_prover.lm_types import LMType
-from FLD_prover.collators import RemoveUnusedColumnsCollator
+from FLD_prover.collators import RemoveUnusedColumnsCollator, RemoveUnusedColumnsCollatorForCompletionOnlyLM
 from FLD_prover.generation import generation_handled
 from FLD_prover.interactive import launch
 from FLD_prover.mixtral_deepspeed_monkey_patch import replace_mixtral_moe_with_dense_impl
@@ -100,8 +98,6 @@ logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
-LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE = True
-
 
 @dataclass
 class ModelArguments:
@@ -117,6 +113,10 @@ class ModelArguments:
             )
         },
     )
+    from_scratch: bool = field(
+        default=False,
+    )
+
     model_type: Optional[str] = field(
         default=None,
         metadata={"help": "If training from scratch, pass a model type from the list: " + ", ".join(MODEL_TYPES)},
@@ -193,11 +193,29 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
+    do_sft: Optional[bool] = field(
+        default=False,
+    )
+    sft_lang: str = field(
+        default=None,
+    )
+    sft_neftune_noise_alpha: Optional[float] = field(
+        default=None,
+    )
+    sft_trainer_dataset_type: Optional[str] = field(
+        default=None,
+    )
     dataset_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset names separated by ::"}
     )
     dataset_config_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset config names separated by ::"}
+    )
+    dataset_config_load_types: Optional[str] = field(
+        default=None, metadata={"help": "Dataset config load types separated by ::"}
+    )
+    dataset_take_n_s: Optional[str] = field(
+        default=None, metadata={"help": "Dataset take 'n' separated by ::. XXX: Should be 2 x #samples you want, as we additionally filter the dataset, which typically only take aboud a half of that datsaet."}
     )
     dataset_probs: Optional[str] = field(
         default=None, metadata={"help": "Dataset probabilities separated by ::"}
@@ -227,8 +245,8 @@ class DataTrainingArguments:
     logic_dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    logic_dataset_concatenate_all_configs: bool = field(
-        default=False,
+    logic_dataset_config_load_type: Optional[str] = field(
+        default=None,
     )
     logic_dataset_concatenate_all_splits_into_train: bool = field(
         default=False,
@@ -317,6 +335,14 @@ class DataTrainingArguments:
             )
         }
     )
+    preprocess_keep_in_memory: bool = field(
+        default=False,
+    )
+    train_sampling_sequential: bool = field(
+        default=True,
+    )
+
+
 
     # logic_eval_padding: Optional[str] = field(
     #     default="longest",
@@ -343,17 +369,44 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
+    prompt_indicate_theorems: bool = field(
+        default=False,
+        metadata={},
+    )
+    prompt_emphasize_theorems: bool = field(
+        default=False,
+        metadata={},
+    )
     instruction: bool = field(
         default=False,
         metadata={},
     )
+    augmentation: bool = field(
+        default=False,
+        metadata={},
+    )
+    augmentation_prob: float = field(
+        default=1.0,
+        metadata={},
+    )
+    formula_prob: float = field(
+        default=0.0,
+    )
+
 
     source_prefix: Optional[str] = field(
         default="", metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
+    use_original_serial: bool = field(
+        default=False,
+    )
 
     proof_intermediate_steps: str = field(
         default='include',
+    )
+
+    proof_intermediate_steps_prob: float = field(
+        default=None,
     )
 
     no_subproof_for_unknown: bool = field(
@@ -410,32 +463,16 @@ class DataTrainingArguments:
         default=None,
     )
 
-    rec_adam_regularization: str = field(
-        default='l2',
-    )
-
-    rec_adam_anneal_type: str = field(
-        default='sigmoid',
-    )
-
     rec_adam_target_task_weight: float = field(
         default=1.0,
     )
 
-    rec_adam_anneal_schedule: str = field(
-        default=None,
-    )
-
-    rec_adam_anneal_t0: int = field(
-        default=0,
-    )
-
-    rec_adam_anneal_tau: int = field(
-        default=0,
-    )
-
     rec_adam_fisher_coef: float = field(
         default=300.0,
+    )
+
+    update_parameters: str = field(
+        default='all',
     )
 
     interactive_mode: str = field(
@@ -487,73 +524,95 @@ def load_raw_dataset_by_name(data_args,
                              model_args,
                              dataset_name: str,
                              dataset_config_name: str,
-                             concatenate_all_configs=False,
-                             concatenate_all_splits_into_train=False):
-    if concatenate_all_configs:
-        configs = get_dataset_config_names(dataset_name)
-        logger.info('We will concatenate all configs of %s: %s', dataset_name, str(configs))
+                             config_load_type: Optional[str] = None,
+                             dataset_take_n: int = None,
+                             concatenate_all_splits_into_train=False,
+                             slim_pajama_take_ratio='10%'):
+    load_dataset_kwargs = {
+        # 'on_bad_lines': 'skip',
+        # 'error_bad_lines': False,
+        'cache_dir': model_args.cache_dir,
+        'streaming': data_args.streaming,
+        'use_auth_token': True if model_args.use_auth_token else None,
+        'num_proc': data_args.preprocessing_num_workers,
+    }
 
-        raw_datasets_list = {}
-        for _dataset_config_name in configs:
-            _raw_datasets = load_dataset(
-                dataset_name,
-                _dataset_config_name,
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
-            )
-            raw_datasets_list[_dataset_config_name] = _raw_datasets
-
-        major_datasets = raw_datasets_list[configs[0]]
-        raw_datasets = major_datasets
-        split_names = set(major_datasets.keys())
-        for split_name in split_names:
-            split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
-            raw_datasets[split_name] = concatenate_datasets(split_datasets)
-
-    else:
-        raw_datasets = load_dataset(
+    if slim_pajama_take_ratio is not None and dataset_name == 'cerebras/SlimPajama-627B':
+        load_dataset_kwargs.update({
+            'split': [f'train[:{slim_pajama_take_ratio}]', 'validation', 'test'],
+        })
+        train_ds, valid_ds, test_ds = load_dataset(
             dataset_name,
             dataset_config_name,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-            streaming=data_args.streaming,
+            **load_dataset_kwargs,
         )
+        raw_datasets = DatasetDict(train=train_ds, validation=valid_ds, test=test_ds)
 
-    if concatenate_all_splits_into_train:
+    else:
+        if config_load_type is None:
+            raw_datasets = load_dataset(
+                dataset_name,
+                dataset_config_name,
+                **load_dataset_kwargs,
+            )
+
+        else:
+            if config_load_type == 'concat_all':
+                config_names = get_dataset_config_names(dataset_name)
+
+            elif config_load_type == 'mmlu_jpn_compatible':
+                config_names = get_dataset_config_names(dataset_name)
+                config_names.remove('all')
+                config_names.remove('auxiliary_train')
+
+            else:
+                raise ValueError(f'{config_load_type}')
+
+            logger.info('For the dataset "%s", we the following datsaet configs %s', dataset_name, str(config_names))
+            raw_datasets_list = {}
+            for _dataset_config_name in config_names:
+                _raw_datasets = load_dataset(
+                    dataset_name,
+                    _dataset_config_name,
+                    **load_dataset_kwargs,
+                )
+                raw_datasets_list[_dataset_config_name] = _raw_datasets
+
+            major_datasets = raw_datasets_list[config_names[0]]
+            raw_datasets = major_datasets
+            split_names = set(major_datasets.keys())
+            for split_name in split_names:
+                split_datasets = [data[split_name] for config, data in raw_datasets_list.items() if split_name in data]
+                raw_datasets[split_name] = concatenate_datasets(split_datasets)
+
+    if concatenate_all_splits_into_train or 'train' not in raw_datasets.keys():
         logger.info('We will concatenate all splits of %s into the training set', dataset_name)
         split_names = set(raw_datasets.keys())
         split_datasets = [raw_datasets[split_name] for split_name in split_names]
         raw_datasets['train'] = concatenate_datasets(split_datasets)
 
+    if dataset_take_n is not None:
+        for split_name in list(raw_datasets.keys()):
+            raw_datasets[split_name] = take(raw_datasets[split_name], dataset_take_n, False)
+
     if "validation" not in raw_datasets.keys():
-        if "dev" in raw_datasets.keys():
-            raw_datasets["validation"] = raw_datasets["dev"]
+        take_split = 'train' if 'train' in raw_datasets else 'test'
+        if config_load_type is not None:
+            logger.warning('Validation split is not found, we will use 1 example from %s split for temporary implementation of config_load_type=%s', take_split, config_load_type)
+            raw_datasets["validation"] = raw_datasets[take_split].take(1)
         else:
             raw_datasets["validation"] = load_dataset(
                 dataset_name,
                 dataset_config_name,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
+                split=f"{take_split}[:{data_args.validation_split_percentage}%]",
+                **load_dataset_kwargs,
             )
-            raw_datasets["train"] = load_dataset(
+            raw_datasets[take_split] = load_dataset(
                 dataset_name,
                 dataset_config_name,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
+                split=f"{take_split}[{data_args.validation_split_percentage}%:]",
+                **load_dataset_kwargs,
             )
-
-    large_dataset_name = 'DKYoon/SlimPajama-6B'
-    if dataset_name == large_dataset_name:
-        max_samples = 2000000  # 1 / 3 of all, about 2B tokens, 300k samples of 4k token block
-        raw_datasets['train'] = take(raw_datasets['train'], max_samples, False)
-        logger.warning('We will only take first %d samples from the training set of %s to save disk',
-                       max_samples,
-                       large_dataset_name)
 
     return raw_datasets
 
@@ -562,13 +621,13 @@ def load_raw_dataset_by_files(data_args,
                               model_args,
                               train_file: Optional[str],
                               validation_file: Optional[str],
+                              config_load_type: Optional[str],
                               file_type: str,
                               keep_linebreaks: bool,
                               streaming: bool,
-                              concatenate_all_configs=False,
                               concatenate_all_splits_into_train=False):
 
-    if concatenate_all_configs or concatenate_all_splits_into_train:
+    if config_load_type or concatenate_all_splits_into_train:
         raise NotImplementedError()
 
     data_files = {}
@@ -583,35 +642,37 @@ def load_raw_dataset_by_files(data_args,
         extension = "text"
         dataset_args["keep_linebreaks"] = keep_linebreaks
 
+    dataset_args.update({
+        'data_files': data_files,
+        'streaming': data_args.streaming,
+        'use_auth_token': True if model_args.use_auth_token else None,
+        'cache_dir': model_args.cache_dir,
+        # 'on_bad_lines': 'skip',
+        # 'error_bad_lines': False,
+    })
+
     if len(data_files) > 0:
         raw_datasets = load_dataset(
             extension,
-            data_files=data_files,
-            cache_dir=model_args.cache_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
-            streaming=data_args.streaming,
             **dataset_args,
         )
 
         if "validation" not in raw_datasets.keys():
-            raw_datasets["validation"] = load_dataset(
-                extension,
-                data_files=data_files,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
-                **dataset_args,
-            )
-            raw_datasets["train"] = load_dataset(
-                extension,
-                data_files=data_files,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                use_auth_token=True if model_args.use_auth_token else None,
-                streaming=data_args.streaming,
-                **dataset_args,
-            )
+            if config_load_type is not None:
+                logger.warning('Validation split is not found, we will use 1 example from %s split for temporary implementation of config_load_type=%s', take_split, config_load_type)
+                raw_datasets["validation"] = raw_datasets[take_split].take(1)
+            else:
+                take_split = 'train' if 'train' in raw_datasets else 'test'
+                raw_datasets["validation"] = load_dataset(
+                    extension,
+                    split=f"{take_split}[:{data_args.validation_split_percentage}%]",
+                    **dataset_args,
+                )
+                raw_datasets[take_split] = load_dataset(
+                    extension,
+                    split=f"{take_split}[{data_args.validation_split_percentage}%:]",
+                    **dataset_args,
+                )
     else:
         raw_datasets = DatasetDict()
 
@@ -619,15 +680,25 @@ def load_raw_dataset_by_files(data_args,
 
 
 def parse_listed_option(option: str) -> Optional[List[str]]:
-    return [name or None for name in option.split('::')] if option is not None else []
+    def _name(name) -> Optional[str]:
+        if name == 'None':
+            return None
+        else:
+            return name or None
+    return [_name(name) for name in option.split('::')] if option is not None else []
 
 
 def load_raw_datasets(data_args, model_args):
     dataset_names = parse_listed_option(data_args.dataset_names)
     dataset_config_names = parse_listed_option(data_args.dataset_config_names)
+    dataset_config_load_types = parse_listed_option(data_args.dataset_config_load_types)
+    dataset_take_n_s = parse_listed_option(data_args.dataset_take_n_s)
     train_files = parse_listed_option(data_args.train_files)
     validation_files = parse_listed_option(data_args.validation_files)
     file_types = parse_listed_option(data_args.file_types)
+
+    if len(dataset_names) > 0 and any(len(files) > 0 for files in [train_files, validation_files]):
+        raise NotImplementedError()
 
     raw_datasets_list = []
     if len(dataset_names) > 0:
@@ -637,7 +708,9 @@ def load_raw_datasets(data_args, model_args):
                     data_args,
                     model_args,
                     dataset_names[i],
-                    dataset_config_names[i] if dataset_config_names[i] != 'None' else None,
+                    dataset_config_names[i] if dataset_config_names[i] is not None else None,
+                    config_load_type=dataset_config_load_types[i],
+                    dataset_take_n=int(dataset_take_n_s[i]) if dataset_take_n_s[i] is not None else None,
                 )
             )
     else:
@@ -648,7 +721,8 @@ def load_raw_datasets(data_args, model_args):
                     model_args,
                     train_files[i],
                     validation_files[i] if validation_files[i] != 'None' else None,
-                    file_types[i] if file_types[i] != 'None' else 'json',
+                    dataset_config_load_types[i],
+                    file_types[i] if len(file_types) > i and file_types[i] != 'None' else 'json',
                     data_args.keep_linebreaks,
                     data_args.streaming,
                 )
@@ -667,14 +741,13 @@ def tokenize_datasets(training_args,
         tokenized_datasets_list = []
 
         for raw_datasets in raw_datasets_list:
-            if training_args.do_train:
+            if training_args.do_train and raw_datasets["train"].features is not None:
                 column_names = list(raw_datasets["train"].features)
-            elif training_args.do_eval or data_args.do_eval_in_outerloop:
+            elif (training_args.do_eval or data_args.do_eval_in_outerloop) and raw_datasets["validation"].features is not None:
                 column_names = list(raw_datasets["validation"].features)
             else:
-                column_names = None
-            text_column_name = data_args.text_column_name\
-                or ("text" if "text" in column_names else column_names[0]) if column_names is not None else None
+                column_names = ['text']
+            text_column_name = data_args.text_column_name or ("text" if "text" in column_names else column_names[0])
 
             # since this will be pickled to avoid _LazyModule error in Hasher force logger loading before tokenize_function
             tok_logger = transformers.utils.logging.get_logger("transformers.tokenization_utils_base")
@@ -694,10 +767,14 @@ def tokenize_datasets(training_args,
             dataset_map_kwargs = {
                 'batched': True,
                 'batch_size': data_args.preprocess_batch_size,
-                'num_proc': data_args.preprocessing_num_workers,
-                'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
-                'desc': desc,
             }
+            if not data_args.streaming:
+                dataset_map_kwargs.update({
+                    'num_proc': data_args.preprocessing_num_workers,
+                    'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                    'keep_in_memory': data_args.preprocess_keep_in_memory,
+                    'desc': desc,
+                })
 
             with training_args.main_process_first(desc=desc):
                 # avoid long text, which make tokenizer too slow
@@ -733,17 +810,38 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         tokenizer,
     ]
 
+    if data_args.proof_intermediate_steps_prob is not None:
+        logger.info('proof_intermediate_steps_prob=%f is specified. This will take precedence over proof_intermediate_steps=%s',
+                    data_args.proof_intermediate_steps_prob,
+                    data_args.proof_intermediate_steps)
+        proof_intermediate_steps_prob = data_args.proof_intermediate_steps_prob
+    else:
+        if data_args.proof_intermediate_steps == 'include':
+            proof_intermediate_steps_prob = 1.0
+        elif data_args.proof_intermediate_steps == 'exclude':
+            proof_intermediate_steps_prob = 0.0
+        elif data_args.proof_intermediate_steps == 'randomly_include':
+            proof_intermediate_steps_prob = 0.5
+        else:
+            raise ValueError()
+
     preprocessor_kwargs = {
         'prompt_prefix': data_args.source_prefix,
+        'use_original_serial': data_args.use_original_serial,
+        'formula_prob': data_args.formula_prob,
         # 'padding': logic_padding,
         'max_length': max_length,
         'max_prompt_length': max_prompt_length,
-        'proof_intermediate_steps': data_args.proof_intermediate_steps,
+        'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
         'proof_sampling': False,
         'sample_negative_proof': False,
         'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
+        'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
+        'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
+        'augmentation': data_args.augmentation,
+        'augmentation_prob': data_args.augmentation_prob,
         # 'log_examples': data_args.log_examples,
     }
 
@@ -783,6 +881,7 @@ def _maybe_logic_preprocess(data_args,
     if logic_key not in examples:
         return examples
 
+
     logic_indexes = [i for i in range(len(examples[logic_key]))
                      if examples[logic_key][i] is not None]
     non_logic_indexes = [i for i in range(len(examples[logic_key]))
@@ -799,7 +898,7 @@ def _maybe_logic_preprocess(data_args,
         for key, values in examples.items()
     }
 
-    if data_args.log_non_logic_examples and len(non_logic_examples) > 0:
+    if data_args.log_non_logic_examples and num_non_logic_examples > 0:
         i_example = 0
         logger.info(
             '------------------------------ preprocess_function [non-logic example=%d] ------------------------------', i_example)
@@ -831,7 +930,7 @@ def _maybe_logic_preprocess(data_args,
     else:
         logic_processed = {}
 
-    if mode in "auto_regression":
+    if mode == "auto_regression":
         if num_logic_examples > 0 and num_non_logic_examples > 0:
             processed = {
                 key: torch.concat((logic_processed[key], torch.tensor(
@@ -857,7 +956,7 @@ def load_logic_raw_datasets(data_args, model_args):
             model_args,
             data_args.logic_dataset_name,
             data_args.logic_dataset_config_name,
-            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
+            config_load_type=data_args.logic_dataset_config_load_type,
             concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
         )
     else:
@@ -866,22 +965,35 @@ def load_logic_raw_datasets(data_args, model_args):
             model_args,
             data_args.logic_train_file,
             data_args.logic_validation_file,
+            data_args.logic_dataset_config_load_type,
             'json',
             data_args.keep_linebreaks,
             False,
-            concatenate_all_configs=data_args.logic_dataset_concatenate_all_configs,
             concatenate_all_splits_into_train=data_args.logic_dataset_concatenate_all_splits_into_train,
         )
 
+    if data_args.logic_dataset_prob == 0.0:
+        # We assume that this script is used for non-logic dataset fine-tuning.
+        logger.info('logic_dataset_prob=0.0 is specified. We will take only 1 example from the logic dataset')
+        for split_name in list(logic_raw_datasets.keys()):
+            logic_raw_datasets[split_name] = take(logic_raw_datasets[split_name], 1, False)
+
     if data_args.logic_dataset_type == 'FLD':
         # load and dump once to normalize the schema from different versions of datasets.
+        dataset_map_kwargs = {}
+        if not data_args.streaming:
+            dataset_map_kwargs.update({
+                'num_proc': data_args.preprocessing_num_workers,
+                'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+                'keep_in_memory': data_args.preprocess_keep_in_memory,
+                'desc': '[logic dataset] mapping schema',
+            })
+
         logic_raw_datasets = logic_raw_datasets.map(
             FLD_map_schema,
             batched=True,
             batch_size=data_args.preprocess_batch_size,
-            num_proc=data_args.preprocessing_num_workers,
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc="[logic dataset] mapping schema",
+            **dataset_map_kwargs,
         )
 
     logic_raw_datasets = logic_raw_datasets.filter(lambda x: x is not None)
@@ -983,7 +1095,7 @@ def setup_seq2seq_trainer_class(klass,
 
 def main():
     logging.getLogger().handlers.clear()
-    setup_logger(do_stderr=True, level=logging.INFO)
+    setup_logger(do_stderr=True, level=logging.INFO, clear_other_handlers=True)
     logging.getLogger('absl').setLevel(logging.WARNING)
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
@@ -1011,15 +1123,10 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     if training_args.dataloader_num_workers > 1:
-        logger.critical(training_args.dataloader_num_workers)
         raise ValueError('dataloader_num_workers > 0 leads to sigkill during evaluation (generation of proofs) (but I don\'t know why)')
 
     if training_args.should_log:
         transformers.utils.logging.set_verbosity_info()
-
-    if training_args.remove_unused_columns:
-        raise ValueError(
-            'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
 
     log_level = training_args.get_process_log_level()
     logger.setLevel(log_level)
@@ -1027,6 +1134,9 @@ def main():
     transformers.utils.logging.set_verbosity(log_level)
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
+    logging.getLogger().handlers.clear()
+    setup_logger(do_stderr=True, level=logging.INFO, clear_other_handlers=True)
+
 
     # Log on each process the small summary:
     logger.warning(
@@ -1058,10 +1168,12 @@ def main():
         "revision": model_args.model_revision,
         "use_auth_token": True if model_args.use_auth_token else None,
         "trust_remote_code": True,
+        "use_cache": False if training_args.gradient_checkpointing else True,
     }
     config_name = model_args.config_name or model_args.model_name_or_path
+    config_cls = AutoConfig
     if config_name:
-        config = AutoConfig.from_pretrained(config_name, **config_kwargs)
+        config = config_cls.from_pretrained(config_name, **config_kwargs)
     else:
         config = CONFIG_MAPPING[model_args.model_type]()
         logger.warning("You are instantiating a new config instance from scratch.")
@@ -1079,13 +1191,18 @@ def main():
         trust_remote_code=True,
     )
 
-    if model_args.model_name_or_path:
-        torch_dtype = (
-            model_args.torch_dtype
-            if model_args.torch_dtype in ["auto", None]
-            else getattr(torch, model_args.torch_dtype)
-        )
-        model = AutoModelForCausalLM.from_pretrained(
+    torch_dtype = (
+        model_args.torch_dtype
+        if model_args.torch_dtype in ["auto", None]
+        else getattr(torch, model_args.torch_dtype)
+    )
+    model_cls = AutoModelForCausalLM
+    if model_args.from_scratch:
+        model = model_cls.from_config(config, torch_dtype=torch_dtype)
+        n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
+        logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
+    else:
+        model = model_cls.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -1096,12 +1213,39 @@ def main():
             low_cpu_mem_usage=model_args.low_cpu_mem_usage,
             trust_remote_code=True,
         )
-    else:
-        model = AutoModelForCausalLM.from_config(config)
-        n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
-        logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
-    model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+    update_parameter_names = []
+    if data_args.update_parameters == 'all':
+        update_parameter_names = [name for name, params in model.named_parameters()]
+    else:
+        model.enable_input_require_grads()
+        model.gradient_checkpointing_enable()
+        if data_args.update_parameters == 'attention':
+            # model.norm.weiht is somwhow needed, otherwise exception
+            update_parameter_names = [name for name, params in model.named_parameters()
+                                      if 'attn' in name or 'model.norm.weight' in name]  
+        elif data_args.update_parameters == 'mlp':
+            update_parameter_names = [name for name, params in model.named_parameters()
+                                      if 'mlp' in name or 'model.norm.weight' in name]
+        else:
+            raise ValueError(data_args.update_parameters)
+    freeze_parameter_names = [name for name, params in model.named_parameters()
+                              if name not in update_parameter_names]
+
+    logger.info('-- [update_parameters="%s"] will update the following parameters --', data_args.update_parameters)
+    for name, param in model.named_parameters():
+        if name in update_parameter_names:
+            # logger.info(name)
+            param.requires_grad = True
+
+    logger.info('-- [update_parameters="%s"] will freeze the following parameters --', data_args.update_parameters)
+    for name, param in model.named_parameters():
+        if name in freeze_parameter_names:
+            logger.info(name)
+            param.requires_grad = False
+
+    if not model_args.model_name_or_path.find('rwkv') >= 0:
+        model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
 
     if model_args.lora:
         # taken from [Quicktour](https://huggingface.co/docs/peft/quicktour)
@@ -1127,9 +1271,10 @@ def main():
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
-    embedding_size = model.get_input_embeddings().weight.shape[0]
-    if len(tokenizer) > embedding_size:
-        model.resize_token_embeddings(len(tokenizer))
+    if not model_args.model_name_or_path.find('rwkv') >= 0:
+        embedding_size = model.get_input_embeddings().weight.shape[0]
+        if len(tokenizer) > embedding_size:
+            model.resize_token_embeddings(len(tokenizer))
 
     if data_args.block_size is None:
         block_size = tokenizer.model_max_length
@@ -1143,12 +1288,28 @@ def main():
             )
             raise ValueError(msg)
 
+    if data_args.train_sampling_sequential:
+        # [Slower training time per batch for increasing dataset size ](https://github.com/huggingface/transformers/issues/8818#issuecomment-1474785374)
+        import transformers.trainer as trainer
+        from transformers.trainer import SequentialSampler
+        def sampler_monkey_patch(dataset):
+            return SequentialSampler(dataset)
+        trainer.RandomSampler = sampler_monkey_patch
+
     raw_datasets_list = load_raw_datasets(data_args, model_args)
-    tokenized_datasets_list = tokenize_datasets(training_args,
-                                                data_args,
-                                                raw_datasets_list,
-                                                tokenizer,
-                                                block_size)
+    if data_args.do_sft:
+        # SFTTrainer will do the tokenization
+        training_args.remove_unused_columns = True
+        tokenized_datasets_list = raw_datasets_list
+    else:
+        if training_args.remove_unused_columns:
+            raise ValueError(
+                'remove_unused_columns=True is not allowed because we transform dataset instances on-the-fly for augmentation.')
+        tokenized_datasets_list = tokenize_datasets(training_args,
+                                                    data_args,
+                                                    raw_datasets_list,
+                                                    tokenizer,
+                                                    block_size)
 
     logic_dataset_processor = make_logic_data_processor(data_args, tokenizer, block_size, block_size)
     data_args.log_non_logic_examples = True
@@ -1159,25 +1320,29 @@ def main():
     maybe_logic_preprocess_map_kwargs = {
         'batched': True,
         'batch_size': data_args.preprocess_batch_size,
-        'load_from_cache_file': not data_args.overwrite_cache,
-        'num_proc': data_args.preprocessing_num_workers,
     }
+    if not data_args.streaming:
+        maybe_logic_preprocess_map_kwargs.update({
+            'num_proc': data_args.preprocessing_num_workers,
+            'load_from_cache_file': None if data_args.streaming else not data_args.overwrite_cache,
+            'keep_in_memory': data_args.preprocess_keep_in_memory,
+            'desc': desc,
+        })
 
-    if LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
-        logic_processed_dataset = logic_raw_datasets
-        for split, dataset in list(logic_raw_datasets.items()):
-            _desc = desc + f' on {split} split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                logic_processed_dataset[split] = dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
-                    **maybe_logic_preprocess_map_kwargs,
 
-                )
+    logic_processed_datasets = logic_raw_datasets
+    for split, dataset in list(logic_raw_datasets.items()):
+        _desc = desc + f' on {split} split'
+        data_args.log_non_logic_examples = data_args.log_examples
+        logic_dataset_processor.log_examples = data_args.log_examples
+        with training_args.main_process_first(desc=_desc):
+            logic_processed_datasets[split] = dataset.map(
+                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                **maybe_logic_preprocess_map_kwargs,
+
+            )
     else:
-        logic_processed_dataset = logic_raw_datasets
+        logic_processed_datasets = logic_raw_datasets
 
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
@@ -1185,7 +1350,7 @@ def main():
         train_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["train"] for tokenized_datasets in tokenized_datasets_list],
-            logic_processed_dataset.get("train", None),
+            logic_processed_datasets.get("train", None),
             dataset_probs,
         )
 
@@ -1199,11 +1364,12 @@ def main():
     else:
         train_dataset = None
 
-    if training_args.do_eval or data_args.do_eval_in_outerloop:
+    if (training_args.do_eval or data_args.do_eval_in_outerloop)\
+            and all("validation" in tokenized_datasets for tokenized_datasets in tokenized_datasets_list):
         eval_dataset = make_interleave_datasets(
             data_args,
             [tokenized_datasets["validation"] for tokenized_datasets in tokenized_datasets_list],
-            logic_processed_dataset.get("validation", None),
+            logic_processed_datasets.get("validation", None),
             dataset_probs,
         )
         eval_dataset = take(eval_dataset,
@@ -1228,33 +1394,13 @@ def main():
             return metric.compute(predictions=preds, references=labels)
     else:
         eval_dataset = None
+        preprocess_logits_for_metrics = None
+        compute_metrics = None
 
     # Wr do the FLD preprocessing here after making interleaved datasets,
     # as the current implementation of interleave_datasets() ignores the processing specified on each dataset.
 
     desc = "[logic + non-logic interleaved dataset] _maybe_logic_preprocess()"
-
-    if not LOGIC_DATA_PROCESSING_BEFORE_INTERLEAVE:
-        if train_dataset:
-            _desc = desc + ' on train split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                train_dataset = train_dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
-                    **maybe_logic_preprocess_map_kwargs,
-                )
-        if eval_dataset:
-            _desc = desc + ' on eval split'
-            data_args.log_non_logic_examples = data_args.log_examples
-            logic_dataset_processor.log_examples = data_args.log_examples
-            with training_args.main_process_first(desc=_desc):
-                eval_dataset = eval_dataset.map(
-                    lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
-                    desc=_desc,
-                    **maybe_logic_preprocess_map_kwargs,
-                )
 
     generation_config, generation_handle_args, generation_handled_kwargs = make_generation_settings(
         data_args, tokenizer, model, config
@@ -1292,9 +1438,12 @@ def main():
                                                          logic_eval_dataset_processor,
                                                          examples,
                                                          'generation'),
-                desc=_desc,
                 **maybe_logic_preprocess_map_kwargs,
             )
+
+        if data_args.logic_dataset_prob == 0.0:
+            # we do not train on logic dataset, the inference on logic eval dataset will be too slow.
+            logic_eval_dataset = logic_eval_dataset.take(1)
     else:
         logic_eval_dataset = None
 
@@ -1305,7 +1454,6 @@ def main():
                                 data_args,
                                 generation_handle_args,
                                 generation_handled_kwargs)
-    collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     def _build_logic_seq2seq_trainer(other_trainer: Optional[Trainer] = None,
                                      do_compute_metrics=True):
@@ -1313,7 +1461,7 @@ def main():
             model,
             other=other_trainer,
             args=training_args,
-            data_collator=collator,
+            data_collator=RemoveUnusedColumnsCollator(return_tensors='pt'),
             train_dataset=None,
             eval_dataset=logic_eval_dataset,
             tokenizer=tokenizer,
@@ -1332,23 +1480,58 @@ def main():
                 metric_key_prefix="logic_eval"
             )
 
-    if data_args.optimizer is None:
-        trainer_cls = Trainer
-        trainer_kwargs = {}
+
+    if data_args.do_sft:
+        if data_args.sft_trainer_dataset_type is not None:
+            sft_trainer_dataset_type = data_args.sft_trainer_dataset_type
+        else:
+            if len(dataset_probs) != 1:
+                raise NotImplementedError('len(dataset_probs) must be 1 for sft, but got %d' % len(dataset_probs))
+            if dataset_probs[0] < 1.0:
+                raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
+            dataset_names = parse_listed_option(data_args.dataset_names)
+            if len(dataset_names) != 1:
+                raise NotImplementedError('len(dataset_names) must be 1 for sft, but got %d' % len(dataset_names))
+            sft_trainer_dataset_type = dataset_names[0]
+    else:
+        sft_trainer_dataset_type = None
+
+    if data_args.optimizer in [None, 'adamw_hf']:
+        if data_args.optimizer is not None:
+            training_args.optim = data_args.optimizer
+        if data_args.do_sft:
+            trainer_cls, trainer_kwargs, collator = build_sft_trainer(
+                sft_trainer_dataset_type,
+                tokenizer,
+                block_size,
+                sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
+                lang=data_args.sft_lang,
+            )
+
+        else:
+            trainer_cls = Trainer
+            trainer_kwargs = {}
+            collator = RemoveUnusedColumnsCollator(return_tensors='pt')
+
     elif data_args.optimizer == 'rec_adam':
-        trainer_cls = TrainerWithRecAdam
-        trainer_kwargs = {
-            'rec_adam_regularization': data_args.rec_adam_regularization,
-            'rec_adam_anneal_type': data_args.rec_adam_anneal_type,
-            'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
-            'rec_adam_anneal_schedule': data_args.rec_adam_anneal_schedule,
-            'rec_adam_anneal_t0': data_args.rec_adam_anneal_t0,
-            'rec_adam_anneal_tau': data_args.rec_adam_anneal_tau,
-            'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
-        }
+        if data_args.do_sft:
+            trainer_cls, trainer_kwargs, collator = build_rec_adam_sft_trainer(
+                sft_trainer_dataset_type,
+                tokenizer,
+                block_size,
+                sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
+                lang=data_args.sft_lang,
+            )
+        else:
+            trainer_cls = RecAdamTrainer
+            trainer_kwargs = {
+                'rec_adam_target_task_weight': data_args.rec_adam_target_task_weight,
+                'rec_adam_fisher_coef': data_args.rec_adam_fisher_coef,
+            }
+            collator = RemoveUnusedColumnsCollator(return_tensors='pt')
 
     else:
-        raise ValueError(f'Unknown optimizer: {model_args.optimizer}')
+        raise ValueError(f'Unknown optimizer: {data_args.optimizer}')
 
     # Initialize our Trainer
     trainer = trainer_cls(
@@ -1358,7 +1541,7 @@ def main():
         eval_dataset=eval_dataset if training_args.do_eval else None,
         tokenizer=tokenizer,
         data_collator=collator,
-        compute_metrics = compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
+        compute_metrics = compute_metrics if training_args.do_eval and compute_metrics is not None and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available() else None,
         **trainer_kwargs,
@@ -1385,7 +1568,7 @@ def main():
         trainer.save_state()
 
     # Evaluation
-    if data_args.do_eval_in_outerloop:
+    if data_args.do_eval_in_outerloop and eval_dataset is not None:
         logger.info("*** Evaluate ***")
         metrics = trainer.evaluate()
 

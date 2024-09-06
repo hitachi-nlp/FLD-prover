@@ -14,7 +14,7 @@ from FLD_user_shared_settings import (
     get_base_setting,
     get_dataset_setting,
     get_batch_setting,
-    get_qsub_gpu_setting,
+    get_qsub_cpu_gpu_setting,
     get_generation_setting,
     get_model_setting,
     get_tokenizer_setting,
@@ -29,68 +29,92 @@ logger = logging.getLogger(__name__)
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-
     output_top_dir = Path('./outputs/02.interactive.py')
 
     # ---------------------------------- 2023-07-27.compare_models.large_steps ------------------------------------
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide')
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
-    # checkpoint = Path('./outputs/01.train.py/2023-07-27.compare_models.large_steps/dtst_nm=20230718.case_study.D3.dist-mixture.num_dist-wide.transl_vol_log10.adj_verb_noun_equal')
 
-    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.fix.rerun/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20230802.case_study_finalize.steps-20000/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20230807.all_at_once/dtst_nm=20230729.case_study_finalize.D8')
-
-    # checkpoint = Path('./outputs/01.train.py/20231010.run_causal_prover.large_models.save_models/dtst_nm=20230729.case_study_finalize.D3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/FLD_prf_evl_gnrtn_nm_bms=1/blck_sz=2000/dtst_nm=wikitext/gnrtn_nm_bms=1/gnrtn_tp_k=10/instrctn=True')
-    # checkpoint = Path('./outputs/01.train.py/20231021.knowledge/dtst_nm=20231021.knowledge.D3.complex-0.3.w_knowledge')
-    # checkpoint = Path('./outputs/01.train.py/20231103.knowledge')
-
-    # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
-
-    # checkpoint = ('TinyLlama/TinyLlama-1.1B-Chat-v0.6', 'causal', 'all_at_once')
-    # checkpoint = ('TinyLlama/TinyLlama-1.1B-intermediate-step-1195k-token-2.5T', 'causal', 'all_at_once')
-
-    # best model on the basis of lm-eval
-    # checkpoint = Path('./outputs/01.train.py/2023-12-12.logical_circuit/FLD_dtst_nm=20231103.knowledge.D3.knowledge_factor-5.0/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-10000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=10000/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-10000')
-
-
-    # checkpoint = Path('./outputs/01.train.py/20240127.logical_cirtuit.llama2/dtst_nm=20231012.D3.large_vocab.smpl_stncs.cntx_shffls-3.trnsl_vrnts-3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=1.0/blck_sz=2000/dtst_nm=None/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-5000/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=5000/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=None/othr_dtst_nm=None/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=False/trn_effctv_btch_sz=64/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=1000/wght_dcy=0.0/checkpoint-5000/')
-
-    # checkpoint = ('meta-llama/Llama-2-7b-hf', 'causal', 'all_at_once')
+    # checkpoint = 'meta-llama/Meta-Llama-3-8B'
     # gradio_port = 9200
 
-    checkpoint = Path('outputs/01.train.py/2024-02-14.translation_speedup/dtst_nm=2024-02-14.translation_speedup.translation-v3/bs_cnfg_nm=default/chckpnt_nm=None/FLD_dtst_prb=0.5/blck_sz=2000/dtst_cnfg_nms=None/dtst_nms=DKYoon@SlimPajama-6B/dtst_prbs=1.0/evl_effctv_btch_sz=256/gnrtn_d_smpl=False/gnrtn_mx_lngth=None/gnrtn_mx_nw_tkns=None/gnrtn_nm_bms=None/gnrtn_rpttn_pnlty=None/gnrtn_tmprtr=1.0/gnrtn_tp_k=None/instrctn=True/lrnng=FT.step-1250__bs-256/lrnng_rt=1e-05/lr=False/lr_schdlr_typ=linear/mx_stps=1250/mdl_nm_or_pth=meta-llama@Llama-2-7b-hf/n_sbprf_fr_unknwn=True/nm_trn_epchs=None/othr_dtst_cnfg_nm=@None@/othr_dtst_nm=@DKYoon@SlimPajama-6B@/prf_smplng=all_at_once/smpl_ngtv_prf=False/sv_ttl_lmt=1/sd=0/strmng=True/trn_effctv_btch_sz=256/us_tst_as_trn=False/us_tst_as_vl=True/wrmp_stps=125/wght_dcy=0.0')
-    gradio_port = 9201
+    # checkpoint = 'lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__prf_intrmdt_stps=randomly_include__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=6e-06__rc_adm_annl_schdl=immediately_from_beginning__rc_adm_fshr_cf=3000.chk-388'
+    # gradio_port = 9200
 
-    # script_type = 'run_prover'
-    script_type = 'run_causal_prover'
+
+    # checkpoint = 'meta-llama/Meta-Llama-3-70B'
+    # gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.ref_prob=0.20.theorems-0.1__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06__rc_adm_fshr_cf=300.chk-388'
+    # gradio_port = 9200
+
+
+    # ------------------------------------ LPT --------------------------------
+
+    # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.0__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
+    # gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=EleutherAI@pythia-1b__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=DarqueDante@SlimPajama-62B-Text-1of6__lgc_dtst_prb=0.03__lrnng=LPT.bs-2048__step-12000.wrmp-100__lrnng_rt=0.0003.chk-12000'
+    # gradio_port = 9201
+
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=6e-06.chk-388'
+    # gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-8B__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing.large__dtst_nms=None__lgc_dtst_prb=1.0__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=5000__augmnttn=True.chk-390'
+    # gradio_port = 9201
+
+    # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct'
+    # gradio_port = 9200
+
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B-Instruct__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=300.chk-390'
+    # gradio_port = 8500
+
+    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=None__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-390'
+    gradio_port = 8500
+
 
     instruction = True
-
-    # https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-955k-token-2T
     generation_do_sample = False
     generation_temperature = 1.0
     generation_top_k = 10
-    # generation_repetition_penalty = 1.5  # XXX must tune for each model
     generation_repetition_penalty = 1.2  # XXX must tune for each model
     generation_max_length = 2000
     generation_max_new_tokens = 300
     generation_timeout = 60 * 5
-
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
 
 
-    # -------------- MEMORY REQUIREMENTS ---------------
-    # OK: V100 x 4 + deepspeed 
-    # NG: A100 x 1 + deepspeed
-    # NG: A100 x 1 + vanilla
 
-    # run_mode = 'vanilla'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # ------------------------------------------- MEMORY REQUIREMENTS --------------------------------------------
+
+    # script_type = 'run_prover'
+    script_type = 'run_causal_prover'
+
+    context_len = 2048
+
+    run_mode = 'vanilla'
     # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    # run_mode = 'deepspeed'
     
     engine = SubprocessEngine()
     # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
@@ -99,11 +123,12 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # XXX only for weblab
 
     if isinstance(engine, SubprocessEngine):
-        n_gpus = 1  # debug
-        # n_gpus = 4
+        # n_gpus = 1  # debug
+        n_gpus = 4
         # n_gpus = None  # specify this when running through QsubEngine
     elif isinstance(engine, QsubEngine):
         n_gpus, gpu_name_for_batch_size = get_qsub_gpu_setting(engine, run_mode)
+        _, n_gpus, _, _ = get_qsub_cpu_gpu_setting(engine, context_len, run_mode)
 
     hours = 12
 
@@ -132,13 +157,13 @@ def main():
         else:
             lab_setting = {}
 
-        hf_model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
-        lm_type = lab_setting.get('lm_type', 'causal')
-        proof_sampling = lab_setting.get('proof_sampling', 'all_at_once')
+        _model_name = json.load(open(str(checkpoint_dir / 'config.json')))['_name_or_path']
         model_name_or_path = checkpoint_dir
     else:
-        hf_model_name, lm_type, proof_sampling = checkpoint
-        model_name_or_path = hf_model_name
+        _model_name = checkpoint
+        lm_type = 'causal'
+        proof_sampling = 'all_at_once'
+        model_name_or_path = None
 
     setting = {}
 
@@ -159,9 +184,8 @@ def main():
         )
     )
 
-    setting.update(get_model_setting(hf_model_name))
-
-    setting.update(get_tokenizer_setting(hf_model_name))
+    setting.update(get_model_setting(_model_name))
+    setting.update(get_tokenizer_setting(_model_name))
 
     setting.update(
         get_generation_setting(
@@ -190,11 +214,10 @@ def main():
         'base_setting_name': base_setting_name,
 
         'lm_type': lm_type,
-        'fp16': hf_model_name.find('t5-') < 0 and hf_model_name.find('rinna/japanese-gpt2-medium') < 0,
+        'fp16': _model_name.find('t5-') < 0 and _model_name.find('rinna/japanese-gpt2-medium') < 0,
 
         'proof_sampling': proof_sampling,
 
-        'model_name_or_path': str(model_name_or_path),
         'evaluation_strategy': None,  # should specify None, otherwise --do_eval is forced to be True
 
         'dataloader_num_workers': 0,
@@ -202,13 +225,22 @@ def main():
         'use_auth_token': True,
         'log_examples': True,
     })
+    if model_name_or_path is not None:
+        setting['model_name_or_path'] = str(model_name_or_path)
 
-    output_dir = make_output_dir(setting, output_top_dir,
-                                 dirname_ignore_params=['model_name_or_path'])
-    command = make_command(script_type,
-                           output_dir,
+    output_dir = make_output_dir(
+        setting,
+        output_top_dir,
+        dirname_ignore_params=[
+            'model_name_or_path',
+            'model_name',
+        ],
+    )
+    command = make_command(output_dir,
                            setting,
                            run_mode,
+                           engine.region,
+                           script_type=script_type,
                            n_gpus_per_node=n_gpus)
 
     run_by_engine(

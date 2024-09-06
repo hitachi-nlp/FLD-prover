@@ -41,7 +41,7 @@ pip install --upgrade pip
 
 # Install pytorch. This is just an example with CUDA 11.8.,
 # and users have to install torch respecting THEIR OWN CUDA versions.
-pip install torch==2.0.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
 
 # Install other packages
 pip install -r ./requirements/requirements.txt
@@ -54,6 +54,17 @@ pip install -e .
 cd ..
 
 export PYTHONPATH=`pwd -P`:$PYTHONPATH
+```
+
+### To use deepspeed with zero2
+Edit `transformers/integrations/deepspeed.py` as follows:
+```python
+if inference:
+    # only Z3 makes sense for the inference
+    - if not hf_deepspeed_config.is_zero3():
+    -     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
+    + # if not hf_deepspeed_config.is_zero3():
+    + #     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
 ```
 
 

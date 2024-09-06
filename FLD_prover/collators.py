@@ -1,10 +1,13 @@
-from typing import Optional
+from typing import Optional, Dict
+
 from transformers import DataCollatorForSeq2Seq, default_data_collator
+from trl import DataCollatorForCompletionOnlyLM
 
 # taken from data_processing.preprocess_function
 _REMOVE_NAMES = [
     # ---- FLD ----
     'depth',
+    'steps',
     'facts',
     'hypothesis',
     'prompts_w_partial_proof',
@@ -25,6 +28,7 @@ _REMOVE_NAMES = [
     'negative_proofs',
     'negative_original_tree_depth',
     'original_tree_depth',
+    'original_tree_steps',
     'num_formula_distractors',
     'num_translation_distractors',
     'num_all_distractors',
@@ -34,6 +38,7 @@ _REMOVE_NAMES = [
     'negative_world_assump_label',
     'prompt_serial',
     'proof_serial',
+    'theorem_is_used_in_proof',
 
     # ---- ruletaker ----
     'context',
@@ -61,14 +66,13 @@ _REMOVE_NAMES = [
 ]
 
 
-class RemoveUnusedColumnsCollatorForSeq2Seq(DataCollatorForSeq2Seq):
-
-    def __call__(self, features, return_tensors=None):
-        for feature in features:
-            for remove_name in _REMOVE_NAMES:
-                if remove_name in feature:
-                    feature.pop(remove_name, None)
-        return super().__call__(features, return_tensors=return_tensors)
+def _remove_features(features: Dict) -> Dict:
+    features_removed = features.copy()
+    for feature in features_removed:
+        for remove_name in _REMOVE_NAMES:
+            if remove_name in feature:
+                feature.pop(remove_name, None)
+    return features_removed
 
 
 class RemoveUnusedColumnsCollator:
@@ -80,9 +84,19 @@ class RemoveUnusedColumnsCollator:
         self.return_tensors = return_tensors
 
     def __call__(self, features, return_tensors=None):
-        for feature in features:
-            for remove_name in _REMOVE_NAMES:
-                if remove_name in feature:
-                    feature.pop(remove_name, None)
-        return default_data_collator(features,
+        return default_data_collator(_remove_features(features),
                                      return_tensors=return_tensors or self.return_tensors)
+
+
+class RemoveUnusedColumnsCollatorForCompletionOnlyLM(RemoveUnusedColumnsCollator):
+
+    def __init__(self,
+                 response_template,
+                 tokenizer=None,
+                 return_tensors: Optional[str] = None):
+        super().__init__(return_tensors=return_tensors)
+        self._collator_for_completion = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+
+    def __call__(self, features, return_tensors=None):
+        # import pudb; pudb.set_trace()
+        return self._collator_for_completion(_remove_features(features))
