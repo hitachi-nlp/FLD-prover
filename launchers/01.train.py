@@ -144,7 +144,7 @@ def main():
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
 
-
+    # output_top_dir = Path('./outputs/01.train.py/debug')
 
 
 
@@ -153,8 +153,10 @@ def main():
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -201,8 +203,9 @@ def main():
         # 'hf.hitachi-nlp/PARARULE-Plus',
 
         # '2024-08-30.FLD.ref_prob-0.20',
-        # '2024-09-03.trnsl-thing_person-v2',
+        '2024-09-03.trnsl-thing_person-v2',
 
+        # '2024-09-03.trnsl-thing_person-v0',
 
 
 
@@ -266,36 +269,30 @@ def main():
 
 
 
-
-
     learnings = [
         # 'debug.FT.bs-64__step-10.wrmp-0',
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
-        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
-        'FT.bs-256__step-586.wrmp-200',  # 150k examples
+        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
+        # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
         # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
     ]
 
     proof_intermediate_steps_prob_args = [
-        # None,
-
         # 0.0,
-        # 0.1,
-        # 0.166666,
         # 0.25,
-        0.33,
-
+        # 0.50,
         # 0.75,
         # 1.0,
     ]
 
     formula_prob_args = [
         0.0,
-        0.2,
+        # 0.2,
     ]
 
 
@@ -316,36 +313,39 @@ def main():
     # XXX: The fisher coef MUST be tuned for each model,
     # as the optimal value differs much from model to model.
     optimizer_setings = [
-        ('rec_adam', 1.0, 'auto'),
+        # ('rec_adam', 1.0, 'auto'),
 
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
         # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
+        ('rec_adam', 1.0, 10000),
 
         # (None, None, None),
         # ('adamw_hf', None, None),
     ]
 
 
+
+
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
+    # hours = 24
 
 
-    # run_mode = 'vanilla'
-    # run_mode = 'torchrun'
-    run_mode = 'deepspeed'
+    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=4)
+    hours = 12
 
 
-
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    hours = 24
+    # hours = 12
 
 
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
@@ -355,6 +355,10 @@ def main():
     # hours = 72
 
 
+
+    # run_mode = 'vanilla'
+    # run_mode = 'torchrun'
+    run_mode = 'deepspeed'
 
 
 
@@ -403,8 +407,8 @@ def main():
     ]
 
     max_grad_norm_args = [
-        0.5,
-        # 1.0,
+        # 0.5,
+        1.0,
         # 3.0,
     ]
 
@@ -549,7 +553,7 @@ def main():
          from_scratch,
          augmentation,
          augmentation_prob,
-         formla_prob) in hyparas:
+         formula_prob) in hyparas:
 
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
             logic_dataset_config_load_type = 'concat_all'
@@ -678,6 +682,7 @@ def main():
                     other_dataset_config_load_types=other_dataset_config_load_types,
                     other_dataset_take_n_s=other_dataset_take_n_s,
                     other_dataset_probs=other_dataset_probs,
+                    do_sft=do_sft,
                     use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
                     use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                     streaming=streaming,
@@ -692,6 +697,7 @@ def main():
                     sample_negative_proof=sample_negative_proof,
                     proof_intermediate_steps_prob=proof_intermediate_steps_prob,
                     no_subproof_for_unknown=no_subproof_for_unknown,
+
 
 
                 )
@@ -733,8 +739,6 @@ def main():
             })
             setting.update({
                 'seed': seed,
-
-                'do_sft': do_sft,
 
                 'logic_dataset_uname': logic_dataset_uname,
                 'max_train_samples': max_train_samples,

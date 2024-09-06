@@ -30,50 +30,50 @@ class RecAdamSFTTrainer(SFTTrainer):
                                             rec_adam_fisher_coef=self._rec_adam_fisher_coef)
 
 
-def build_sft_trainer(dataset_name: str,
+def build_sft_trainer(dataset_type: str,
                       tokenizer,
                       block_size: int,
                       lang: Optional[str] = None,
                       sft_neftune_noise_alpha=None):
 
-    if dataset_name in ['jhu-cogsci/hans', 'hpprc/janli']:
+    if dataset_type in ['jhu-cogsci/hans', 'hpprc/janli']:
         task_type = 'two_choice_nli'
         label_maping = {
             0: 'entailment',
             1: 'not entailment',
         }
 
-    elif dataset_name in ['RobZamp/sick', 'hpprc/jsick',
+    elif dataset_type in ['RobZamp/sick', 'hpprc/jsick',
                           'stanfordnlp/snli', 'shunk031/jsnli']:
         task_type = 'three_choice_nli'
 
-        if dataset_name in ['RobZamp/sick', 'hpprc/jsick'] :
+        if dataset_type in ['RobZamp/sick', 'hpprc/jsick'] :
             # TODO: we have to implement preprocessing for this dataset, as they are not in the usual format
             # see here: https://huggingface.co/datasets/RobZamp/sick
             raise NotImplementedError()
-        elif dataset_name in ['stanfordnlp/snli', 'shunk031/jsnli']:
+        elif dataset_type in ['stanfordnlp/snli', 'shunk031/jsnli']:
             label_maping = {
                 0: 'entailment',
                 1: 'neutral',
                 2: 'contradiction',
             }
 
-    elif dataset_name in ['cais/mmlu',
+    elif dataset_type in ['cais/mmlu',
                           'nlp-waseda/JMMLU',
                           'databricks/databricks-dolly-15k',
                           'llm-jp/databricks-dolly-15k-ja']:
         task_type = 'instrution'
         label_maping = None
 
-    elif dataset_name.startswith('FR.'):
+    elif dataset_type == 'FR':
         task_type = 'factorized_reasoning'
         label_maping = None
     else:
-        raise ValueError(dataset_name)
+        raise ValueError(dataset_type)
     logger.info('SFT task type is set to %s', task_type)
 
     if lang is None:
-        if dataset_name in ['hpprc/janli', 'hpprc/jsick', 'llm-jp/databricks-dolly-15k-ja']:
+        if dataset_type in ['hpprc/janli', 'hpprc/jsick', 'llm-jp/databricks-dolly-15k-ja']:
             lang = 'jpn'
         else:
             lang = 'eng'
@@ -182,14 +182,14 @@ def build_sft_trainer(dataset_name: str,
     return trainer_cls, trainer_kwargs, collator
 
 
-def build_rec_adam_sft_trainer(dataset_name: str,
+def build_rec_adam_sft_trainer(dataset_type: str,
                                tokenizer,
                                block_size: int,
                                lang: Optional[str] = None,
                                rec_adam_target_task_weight=1.0,
                                rec_adam_fisher_coef=3000,
                                sft_neftune_noise_alpha=None):
-    _, trainer_kwargs, collator = build_sft_trainer(dataset_name, tokenizer, block_size, lang, sft_neftune_noise_alpha)
+    _, trainer_kwargs, collator = build_sft_trainer(dataset_type, tokenizer, block_size, lang, sft_neftune_noise_alpha)
     trainer_kwargs['rec_adam_target_task_weight'] = rec_adam_target_task_weight
     trainer_kwargs['rec_adam_fisher_coef'] = rec_adam_fisher_coef
     return RecAdamSFTTrainer, trainer_kwargs, collator

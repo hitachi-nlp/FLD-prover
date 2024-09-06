@@ -202,6 +202,9 @@ class DataTrainingArguments:
     sft_neftune_noise_alpha: Optional[float] = field(
         default=None,
     )
+    sft_trainer_dataset_type: Optional[str] = field(
+        default=None,
+    )
     dataset_names: Optional[str] = field(
         default=None, metadata={"help": "Dataset names separated by ::"}
     )
@@ -1479,23 +1482,26 @@ def main():
 
 
     if data_args.do_sft:
-        if len(dataset_probs) != 1:
-            raise NotImplementedError()
-        if dataset_probs[0] < 1.0:
-            raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
-        dataset_names = parse_listed_option(data_args.dataset_names)
-        if len(dataset_names) != 1:
-            raise NotImplementedError('For sft, we currently only support one single dataset.')
-        sft_dataset_name = dataset_names[0]
+        if data_args.sft_trainer_dataset_type is not None:
+            sft_trainer_dataset_type = data_args.sft_trainer_dataset_type
+        else:
+            if len(dataset_probs) != 1:
+                raise NotImplementedError('len(dataset_probs) must be 1 for sft, but got %d' % len(dataset_probs))
+            if dataset_probs[0] < 1.0:
+                raise NotImplementedError('For sft, we currently only support non-logic dataset only training.')
+            dataset_names = parse_listed_option(data_args.dataset_names)
+            if len(dataset_names) != 1:
+                raise NotImplementedError('len(dataset_names) must be 1 for sft, but got %d' % len(dataset_names))
+            sft_trainer_dataset_type = dataset_names[0]
     else:
-        sft_dataset_name = None
+        sft_trainer_dataset_type = None
 
     if data_args.optimizer in [None, 'adamw_hf']:
         if data_args.optimizer is not None:
             training_args.optim = data_args.optimizer
         if data_args.do_sft:
             trainer_cls, trainer_kwargs, collator = build_sft_trainer(
-                sft_dataset_name,
+                sft_trainer_dataset_type,
                 tokenizer,
                 block_size,
                 sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
@@ -1510,7 +1516,7 @@ def main():
     elif data_args.optimizer == 'rec_adam':
         if data_args.do_sft:
             trainer_cls, trainer_kwargs, collator = build_rec_adam_sft_trainer(
-                sft_dataset_name,
+                sft_trainer_dataset_type,
                 tokenizer,
                 block_size,
                 sft_neftune_noise_alpha=data_args.sft_neftune_noise_alpha,
