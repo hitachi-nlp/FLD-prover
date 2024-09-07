@@ -130,7 +130,7 @@ def main():
 
 
     # =================================== 2024-09-03.toward_camera_ready ========================================
-    output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
 
 
 
@@ -147,15 +147,20 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
 
+    # =================================== 2024-09-06.ABCI_debug ========================================
+    output_top_dir = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
+
+
+
 
     model_settings = [
         # ======================================================== neurips camera ready     ========================================================
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -203,7 +208,7 @@ def main():
         # 'hf.hitachi-nlp/PARARULE-Plus',
 
         # '2024-08-30.FLD.ref_prob-0.20',
-        '2024-09-03.trnsl-thing_person-v2',
+        # '2024-09-03.trnsl-thing_person-v2',
 
         # '2024-09-03.trnsl-thing_person-v0',
 
@@ -270,10 +275,10 @@ def main():
 
 
     learnings = [
-        # 'debug.FT.bs-64__step-10.wrmp-0',
+        'debug.FT.bs-64__step-10.wrmp-0',
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
-        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
@@ -285,7 +290,7 @@ def main():
     proof_intermediate_steps_prob_args = [
         # 0.0,
         # 0.25,
-        # 0.50,
+        0.50,
         # 0.75,
         # 1.0,
     ]
@@ -327,39 +332,25 @@ def main():
     ]
 
 
-
-
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
     # hours = 24
 
 
-    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=4)
-    hours = 12
-
-
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=8)
-    # hours = 12
-
-
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=1)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
-    # hours = 72
-
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
+    hours = 5
 
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
+
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
 
@@ -383,20 +374,9 @@ def main():
 
     # ------------------------------------ fixed settings -------------------------------------------
 
-    # skip_if_exists = False
-    skip_if_exists = True
 
 
 
-
-    # ------------------------------- ABCI --------------------------------
-    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
     dry_run = False
 
@@ -472,8 +452,6 @@ def main():
 
     max_eval_samples = 10000
 
-    float_precision = 'bf16'
-
     save_model_on_eval = True
     save_model_at_end = False
 
@@ -509,6 +487,15 @@ def main():
     warmup_steps = None
     steps_upper = None
     train_effective_batch_size = None
+
+    if engine.region == 'ABCI':
+        float_precision = 'fp16'
+    elif engine.region == 'haic':
+        float_precision = 'bf16'
+    else:
+        raise ValueError()
+
+    fix_precision = False
 
     hyparas = product(
         logic_dataset_unames,
@@ -614,7 +601,7 @@ def main():
                          or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
                     )
             )
-            if should_force_fp32 and float_precision in ['fp16', 'bf16']:
+            if fix_precision and should_force_fp32 and float_precision in ['fp16', 'bf16']:
                 logger.warning(f'Forcing to use fp32 for {model_name}.')
                 fp32 = True
                 fp16 = False
