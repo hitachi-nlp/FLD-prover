@@ -7,8 +7,6 @@ export PYTHONPATH=`pwd -P`:$PROJECTS/qsub-launcher:$PROJECTS/FLD/FLD-task/:$PROJ
 
 # check if hostname is like "es*.abci.local"
 if [[ `hostname` =~ "es.*.abci.local" ]]; then
-    HF_CACHE=`readlink -f ./outputs/hf_cache`
-
     module load cuda/11.8/11.8.0 cudnn/9.2/9.2.1
 
     source ${PROJECTS}/spack/share/spack/setup-env.sh  # load spack
@@ -16,7 +14,6 @@ if [[ `hostname` =~ "es.*.abci.local" ]]; then
 
 elif [[ `hostname` =~ "haicl" ]]; then
 
-    HF_CACHE=`readlink -f ./outputs.lustre/hf_cache`
 
     source /etc/profile.d/modules.sh
     module load cuda12.1.105_cudnn8.9.7_nccl2.18.3 openmpi-4.1.6
@@ -26,6 +23,7 @@ else
 fi
 
 
+HF_CACHE=`readlink -f ./outputs.lustre/hf_cache`
 export HF_DATASETS_CACHE="${HF_CACHE}/hf_datatset_cache"
 export HF_HOME="${HF_CACHE}/transformers_cache"
 export TRANSFORMERS_CACHE="${HF_CACHE}/transformers_cache"
