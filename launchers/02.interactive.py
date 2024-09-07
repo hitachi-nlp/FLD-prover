@@ -67,8 +67,13 @@ def main():
     # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3-70B-Instruct__lgc_dtst_unm=2024-03-29.JSAI_best.no_aug.trnsl-thing__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200.few_save__lrnng_rt=3e-06__rc_adm_fshr_cf=300.chk-390'
     # gradio_port = 8500
 
-    checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=None__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-390'
-    gradio_port = 8500
+    # checkpoint = 'mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=None__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-390'
+    # gradio_port = 8500
+
+    checkpoint = 'mdl_nm=mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-1953.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-1953__lgc_dtst_unm=hf.hitachi-nlp@ruletaker__optmzr=None__lrnng=FT.bs-128__step-94.wrmp-20__lrnng_rt=3e-05__rc_adm_fshr_cf=None__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=1.0__prmpt_indct_thrms=True__dtst_prbs=1.0.chk-100'
+    gradio_port = 9500
+
+
 
 
     instruction = True
@@ -77,7 +82,7 @@ def main():
     generation_top_k = 10
     generation_repetition_penalty = 1.2  # XXX must tune for each model
     generation_max_length = 2000
-    generation_max_new_tokens = 300
+    generation_max_new_tokens = 1000
     generation_timeout = 60 * 5
     interactive_mode = 'gradio'
     # interactive_mode = 'console'
