@@ -14,14 +14,14 @@ export SENTENCE_TRANSFORMERS_HOME="${HF_CACHE}/sentence_transformers_cache"
 
 
 # check if hostname is like "es*.abci.local"
-if [[ `hostname` =~ "es.*.abci.local" ]]; then
+if [[ `hostname` =~ "es.*.abci.local|g[0-9]*" ]]; then
+
     module load cuda/11.8/11.8.0 cudnn/9.2/9.2.1
 
     source ${PROJECTS}/spack/share/spack/setup-env.sh  # load spack
     spack load openmpi@4.1.4 ^cuda@11.8.0
 
-elif [[ `hostname` =~ "haicl" ]]; then
-
+elif [[ `hostname` =~ "haicl|haicxh" ]]; then
 
     source /etc/profile.d/modules.sh
     module load cuda12.1.105_cudnn8.9.7_nccl2.18.3 openmpi-4.1.6
