@@ -147,8 +147,14 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/debug')
 
 
-    # =================================== 2024-09-06.ABCI_debug ========================================
-    output_top_dir = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
+    # =================================== 2024-09-08.ALPT_strong ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-08.ALPT_strong')
+
+
+    # =================================== 2024-09-08.factorized_reasoning ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
+
 
 
 
@@ -158,7 +164,7 @@ def main():
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
         # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -177,6 +183,14 @@ def main():
         # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
+
+        # =================================== 2024-09-08.ALPT_strong ========================================
+        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+
+        # =================================== 2024-09-08.factorized_reasoning ========================================
+        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -204,7 +218,7 @@ def main():
 
         # ====================================== 2024-09-03.toward_camera_ready ============================
 
-        'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
 
         # '2024-08-30.FLD.ref_prob-0.20',
@@ -227,46 +241,34 @@ def main():
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
+
+
+        # =================================== 2024-09-08.ALPT_strong ========================================
+        '2024-09-03.trnsl-thing_person-v0',
+
+
+        # =================================== 2024-09-08.factorized_reasoning ========================================
+
     ]
 
 
 
     multitask_setting_list = [
-        # [datasetライブラリで大規模データセットを扱う]($PROJECTS/NLP/LLM.md)
         # ================================================ NeurIPS 2024 ==============================================
-
-        (
-            1.0,
-            [],
-        ),
-
-
-        # (
-        #     0.0,
-        #     [
-        #         (1.0, 'FR.2024-09-03.debug', None, None, None)
-        #     ],
-        # ),
-
+        (1.0, []),
 
         # ================================================ ALPT_strong ==============================================
-
-        # (
-        #     0.95,
-        #     [
-        #         (1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)
-        #     ],
-        # ),
-
+        # (0.95, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
 
         # ================================================ LPT ==============================================
+        # (0.03, [(1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)]),
 
-        # (
-        #     0.03,
-        #     [
-        #         (1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)
-        #     ],
-        # ),
+        # ============================================ factorized_reasoning ========================================
+
+        # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
     ]
 
     # do_sft = True
@@ -275,25 +277,41 @@ def main():
 
 
     learnings = [
-        'debug.FT.bs-64__step-10.wrmp-0',
+        # 'debug.FT.bs-64__step-10.wrmp-0',
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
         # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
-        # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
+        'FT.bs-256__step-1953.wrmp-200',  # 500k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
         # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
+
+
+        # ========== factoorized reasoning ==========
+        # https://github.com/tatsu-lab/stanford_alpaca
+        # 'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
     ]
 
     proof_intermediate_steps_prob_args = [
         # 0.0,
         # 0.25,
-        0.50,
-        # 0.75,
+        # 0.50,
+        0.75,
         # 1.0,
     ]
+
+    augmentation_args = [
+        # False,
+        True,
+    ]
+
+    augmentation_prob_args = [
+        0.5,
+        # 1.0,
+    ]
+
 
     formula_prob_args = [
         0.0,
@@ -308,8 +326,8 @@ def main():
 
 
     lrates = [
-        3e-6,
-        # 1e-5,     # the best on 100k examples
+        # 3e-6,
+        1e-5,
     ]
 
 
@@ -318,17 +336,15 @@ def main():
     # XXX: The fisher coef MUST be tuned for each model,
     # as the optimal value differs much from model to model.
     optimizer_setings = [
-        # ('rec_adam', 1.0, 'auto'),
-
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),
-        # ('rec_adam', 1.0, 3000),
+        ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
-        ('rec_adam', 1.0, 10000),
+        # ('rec_adam', 1.0, 10000),
 
         # (None, None, None),
-        # ('adamw_hf', None, None),
+        # ('rec_adam', 1.0, 'auto'),
     ]
 
 
@@ -339,9 +355,8 @@ def main():
 
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
-    hours = 5
+    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
+    hours = 24
 
 
     # run_mode = 'vanilla'
@@ -412,16 +427,6 @@ def main():
     prompt_emphasize_theorems_args = [
         False,
         # True,
-    ]
-
-    augmentation_args = [
-        False,
-        # True,
-    ]
-
-    augmentation_prob_args = [
-        # 0.5,
-        1.0,
     ]
 
     # deepspeed_stage = 'zero0'   # 1B models can use this
