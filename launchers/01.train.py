@@ -154,6 +154,11 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-09-06.factorized_reasoning')
 
 
+    # =================================== 2024-09-06.ABCI_debug ========================================
+    output_top_dir = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
+
+
+
 
     model_settings = [
         # ======================================================== neurips camera ready     ========================================================
@@ -214,6 +219,7 @@ def main():
         'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # '2024-08-30.FLD.ref_prob-0.20',
+        # '2024-09-03.trnsl-thing_person-v2',
 
         # '2024-09-03.trnsl-thing_person-v0',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
@@ -350,8 +356,6 @@ def main():
     ]
 
 
-
-
     # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
     # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
@@ -377,12 +381,19 @@ def main():
     # engine = QsubEngine('haic', 'xhn_l.large', n_resource=8)
     # hours = 72
 
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)
+    # hours = 5
 
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
+
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
 
@@ -406,20 +417,9 @@ def main():
 
     # ------------------------------------ fixed settings -------------------------------------------
 
-    # skip_if_exists = False
-    skip_if_exists = True
 
 
 
-
-    # ------------------------------- ABCI --------------------------------
-    # engine = QsubEngine('ABCI', 'rt_G.small', n_resource=1)
-    # engine = QsubEngine('ABCI', 'rt_G.large', n_resource=1)
-
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)   # <= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=2)   # >= 10B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)   # 70B model
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)   # 70B model
 
     dry_run = False
 
@@ -495,8 +495,6 @@ def main():
 
     max_eval_samples = 10000
 
-    float_precision = 'bf16'
-
     save_model_on_eval = True
     save_model_at_end = False
 
@@ -532,6 +530,15 @@ def main():
     warmup_steps = None
     steps_upper = None
     train_effective_batch_size = None
+
+    if engine.region == 'ABCI':
+        float_precision = 'fp16'
+    elif engine.region == 'haic':
+        float_precision = 'bf16'
+    else:
+        raise ValueError()
+
+    fix_precision = False
 
     hyparas = product(
         logic_dataset_unames,
@@ -637,7 +644,7 @@ def main():
                          or os.path.exists(model_name + '/config.json') and json.load(open(model_name + '/config.json')).get('_name_or_path', '').find('llama') >= 0)
                     )
             )
-            if should_force_fp32 and float_precision in ['fp16', 'bf16']:
+            if fix_precision and should_force_fp32 and float_precision in ['fp16', 'bf16']:
                 logger.warning(f'Forcing to use fp32 for {model_name}.')
                 fp32 = True
                 fp16 = False

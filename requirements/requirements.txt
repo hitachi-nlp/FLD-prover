@@ -48,7 +48,8 @@ line_profiling@git+https://github.com/hitachi-nlp/line-profiling.git@main
 
 # transformers==4.40.2
 transformers==4.43.4
-accelerate==0.30.0
+# accelerate==0.30.0
+accelerate==0.34.2
 deepspeed==0.14.2
 datasets==2.19.1
 mpi4py==3.1.6
