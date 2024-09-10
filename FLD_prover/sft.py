@@ -25,9 +25,9 @@ class RecAdamSFTTrainer(SFTTrainer):
 
 
     def create_optimizer(self):
-        return build_optimizer_from_trainer(self,
-                                            rec_adam_target_task_weight=self._rec_adam_target_task_weight,
-                                            rec_adam_fisher_coef=self._rec_adam_fisher_coef)
+        self.optimizer = build_optimizer_from_trainer(self,
+                                                      rec_adam_target_task_weight=self._rec_adam_target_task_weight,
+                                                      rec_adam_fisher_coef=self._rec_adam_fisher_coef)
 
 
 def build_sft_trainer(dataset_type: str,

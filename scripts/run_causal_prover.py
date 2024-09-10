@@ -1534,6 +1534,7 @@ def main():
         raise ValueError(f'Unknown optimizer: {data_args.optimizer}')
 
     # Initialize our Trainer
+    from pprint import pprint
     trainer = trainer_cls(
         model=model,
         args=training_args,

@@ -134,6 +134,11 @@ def main():
 
 
 
+    # =================================== 2024-09-06.llama3 ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
+
+
 
     # =================================== 2024-08-26.really_camera_ready ========================================
     # XXX: REALY CAMERA READY
@@ -144,12 +149,14 @@ def main():
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
 
-    # output_top_dir = Path('./outputs/01.train.py/debug')
+
+    # =================================== 2024-09-06.factorized_reasoning ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-06.factorized_reasoning')
 
 
     # =================================== 2024-09-08.ALPT_strong ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-08.ALPT_strong')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-08.ALPT_strong')
 
 
     # =================================== 2024-09-08.factorized_reasoning ========================================
@@ -165,8 +172,9 @@ def main():
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -184,9 +192,13 @@ def main():
         # ('meta-llama/Meta-Llama-3.1-70B-Instruct', 'causal', 'meta-llama/Llama-2-70b-hf'),
 
 
+        # ======================================================== 2024-09-06.factorized_reasoning     ========================================================
+        # ('mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-1953.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-1953', 'causal', 'meta-llama/Llama-2-7b-hf'),
+
+
         # =================================== 2024-09-08.ALPT_strong ========================================
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # =================================== 2024-09-08.factorized_reasoning ========================================
@@ -210,6 +222,7 @@ def main():
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.05.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
 
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
@@ -220,11 +233,15 @@ def main():
 
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
-
         # '2024-08-30.FLD.ref_prob-0.20',
         # '2024-09-03.trnsl-thing_person-v2',
 
-        # '2024-09-03.trnsl-thing_person-v0',
+        '2024-09-03.trnsl-thing_person-v0',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
+        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.05.theorem-G_MP.syllogism.contraposition.interchangeability',
+
+        # '2024-09-03.trnsl-thing_person-v2',
 
 
 
@@ -242,9 +259,12 @@ def main():
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
 
+        # =================== 2024-09-06.factorized_reasoning ======================
+        # 'hf.hitachi-nlp/ruletaker',
+
 
         # =================================== 2024-09-08.ALPT_strong ========================================
-        '2024-09-03.trnsl-thing_person-v0',
+        # '2024-09-03.trnsl-thing_person-v0',
 
 
         # =================================== 2024-09-08.factorized_reasoning ========================================
@@ -276,18 +296,20 @@ def main():
 
 
 
+
     learnings = [
         # 'debug.FT.bs-64__step-10.wrmp-0',
+
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
-        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
-        'FT.bs-256__step-1953.wrmp-200',  # 500k examples
+        # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
-        # 'FT.bs-1024__step-9765.wrmp-300',  # 10M examples
 
+        # 'FT.bs-240__step-417.wrmp-200',  # 100k examples, for middle2 x 5
 
         # ========== factoorized reasoning ==========
         # https://github.com/tatsu-lab/stanford_alpaca
@@ -297,14 +319,14 @@ def main():
     proof_intermediate_steps_prob_args = [
         # 0.0,
         # 0.25,
-        # 0.50,
-        0.75,
+        0.50,
+        # 0.75,
         # 1.0,
     ]
 
     augmentation_args = [
-        # False,
-        True,
+        False,
+        # True,
     ]
 
     augmentation_prob_args = [
@@ -312,16 +334,10 @@ def main():
         # 1.0,
     ]
 
-
     formula_prob_args = [
         0.0,
         # 0.2,
     ]
-
-
-
-    context_len = None
-    # context_len = 3000
 
 
 
@@ -345,27 +361,42 @@ def main():
 
         # (None, None, None),
         # ('rec_adam', 1.0, 'auto'),
+        # ('adamw_hf', None, None),
     ]
 
 
-    # engine = SubprocessEngine('haic', 'xhn_s.small', n_resource=1)
+
+
     # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
-    # engine = SubprocessEngine('haic', 'xhn_s.large', n_resource=1)
-    # hours = 24
 
 
+    # ===========================- HAIC: 7B models ====================================
+    engine = QsubEngine('haic', 'xhn_s.small', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.middle', n_resource=2)
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
+
+
+    # ============================== HAIC: 70B models =================================
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=4)   # rec_adamだと，cpu_offloadしても乗らない．
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=5)    # batch_sizeが240になってしまう．rec_adam + cpu_offload無しでは乗らなかった．
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=6)    # batch_sizeが192になってしまう．
+
+
+    # ============================== ABCI =================================
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
-    hours = 24
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
 
+
+
+
+    hours = 12
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
     run_mode = 'deepspeed'
 
-
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
@@ -487,6 +518,8 @@ def main():
 
     epoch = None
 
+    context_len = None
+    # context_len = 3000
 
     warmup_ratio = None
     warmup_steps = None
@@ -774,6 +807,8 @@ def main():
 
                 'ddp_timeout': 3600 * 10,
 
+                # '_n_gpu': n_total_gpus,
+
                 'gpu_name_for_batch_size': gpu_name_for_batch_size,
                 'use_auth_token': True,
                 'log_examples': True,
@@ -796,6 +831,7 @@ def main():
                                    region,
                                    deepspeed_stage=deepspeed_stage,
                                    port=random.randint(29777, 31777),
+                                   n_total_gpus=n_total_gpus,
                                    n_gpus_per_node=n_gpus_per_node)
 
             run_by_engine(
