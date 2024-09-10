@@ -92,7 +92,8 @@ def main():
 
     # =================================== 2024-09-06.llama3 ========================================
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-03.toward_camera_ready')
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3.node--1')
 
 
     # =================================== 2024-08-26.really_camera_ready ========================================
