@@ -17,8 +17,6 @@ export SENTENCE_TRANSFORMERS_HOME="${HF_CACHE}/sentence_transformers_cache"
 if [[ `hostname` =~ "es.*.abci.local|g[0-9]*" ]]; then
 
     module load cuda/11.8/11.8.0 cudnn/9.2/9.2.1
-
-    source ${PROJECTS}/spack/share/spack/setup-env.sh  # load spack
     spack load openmpi@4.1.4 ^cuda@11.8.0
 
 elif [[ `hostname` =~ "haicl|haicxh" ]]; then

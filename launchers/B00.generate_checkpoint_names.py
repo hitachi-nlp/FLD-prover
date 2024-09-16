@@ -107,6 +107,22 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/00.augment.py.2024-08-25')
 
 
+    # =================================== 2024-09-08.ALPT_strong ========================================
+    # TOP_DIR = Path('./outputs/01.train.py/2024-09-06.ABCI_debug')
+    # TOP_DIR = Path('./outputs/01.train.py/2024-09-08.ALPT_strong')
+#     TOP_DIR = Path('./outputs/01.train.py/2024-09-10.ALPT_strong.fix_rec_adam')
+
+
+    # =================================== 2024-09-08.factorized_reasoning ========================================
+    # TOP_DIR = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
+    # TOP_DIR = Path('./outputs/01.train.py/2024-09-10.factorized_reasoning.fix_rec_adam')
+
+
+
+
+
+
+
     # ONLY_SHOW_EXISTING = False
     ONLY_SHOW_EXISTING = True
 
