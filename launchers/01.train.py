@@ -71,6 +71,7 @@ DATASETS_DIRS = [
     # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora/dataset_name=2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
     './outputs.FLD/00.create_corpus/2024-08-30.fix_ref_prob',
+    './outputs.FLD/00.create_corpus/2024-09-16.fix_negation',
 ]
 
 
@@ -137,7 +138,8 @@ def main():
     # =================================== 2024-09-06.llama3 ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
     # output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-16.fix_negation')
 
 
 
@@ -168,7 +170,7 @@ def main():
 
     # =================================== 2024-09-08.factorized_reasoning ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-10.factorized_reasoning.fix_rec_adam')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-10.factorized_reasoning.fix_rec_adam')
 
 
 
@@ -187,7 +189,7 @@ def main():
         # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
@@ -212,7 +214,7 @@ def main():
 
         # =================================== 2024-09-08.ALPT_strong ========================================
         # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
         # =================================== 2024-09-08.factorized_reasoning ========================================
@@ -265,7 +267,17 @@ def main():
         # '2024-09-03.trnsl-thing_person-v0.trnsl-small',
 
 
-        '2024-09-03.trnsl-thing_person-v2',
+        # '2024-09-03.trnsl-thing_person-v2',
+
+
+
+
+        # ==================================== 2024-09-16.fix_negation ========================================
+        # '2024-09-16.PLD.neg-0.10',
+        # '2024-09-16.PLD.neg-0.20',
+        # '2024-09-16.PLD.neg-0.10.theorems-0.30',
+        # '2024-09-16.PLD.neg-0.10.theorems-all',
+        '2024-09-16.FLD.neg-0.10',
 
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
@@ -295,19 +307,19 @@ def main():
 
 
         # =================================== 2024-09-08.factorized_reasoning ========================================
-        'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/ruletaker',
 
     ]
 
 
     proof_intermediate_steps_prob_args = [
-        0.0,
-        0.15,
-        0.30,
-        # 0.50,
-        0.65,
-        0.80,
-        1.0,
+        # 0.0,
+        # 0.15,
+        # 0.30,
+        0.50,
+        # 0.65,
+        # 0.80,
+        # 1.0,
     ]
 
 
@@ -322,7 +334,7 @@ def main():
 
     multitask_setting_list = [
         # ================================================ NeurIPS 2024 ==============================================
-        # (1.0, []),
+        (1.0, []),
 
         # ================================================ ALPT_strong ==============================================
         # (0.95, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
@@ -335,8 +347,8 @@ def main():
         # ============================================ factorized_reasoning ========================================
         # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
         # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
-        (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
-        (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
     ]
 
     # do_sft = True
@@ -369,7 +381,7 @@ def main():
 
 
         # ========== factoorized reasoning ==========
-        'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
+        # 'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
     ]
 
 
@@ -398,7 +410,7 @@ def main():
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
 
-        (None, None, None),
+        # (None, None, None),
         # ('adamw_hf', None, None),
         # ('rec_adam', 1.0, 'auto'),
     ]
@@ -424,7 +436,7 @@ def main():
 
     # ============================== ABCI =================================
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
