@@ -39,6 +39,7 @@ class FLDProcessor(Processor):
             prompt_emphasize_theorems=self._prompt_emphasize_theorems,
             augmentation=self._augmentation,
             augmentation_prob=self._augmentation_prob,
+            paraphrase_contradiction=self._paraphrase_contradiction,
             formula_prob=self._formula_prob,
         )
 

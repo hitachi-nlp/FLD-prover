@@ -389,6 +389,10 @@ class DataTrainingArguments:
         default=1.0,
         metadata={},
     )
+    paraphrase_contradiction: bool = field(
+        default=False,
+        metadata={},
+    )
     formula_prob: float = field(
         default=0.0,
     )
@@ -842,6 +846,7 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
         'augmentation': data_args.augmentation,
         'augmentation_prob': data_args.augmentation_prob,
+        'paraphrase_contradiction': data_args.paraphrase_contradiction,
         # 'log_examples': data_args.log_examples,
     }
 

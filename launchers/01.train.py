@@ -136,7 +136,8 @@ def main():
 
     # =================================== 2024-09-06.llama3 ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
 
 
 
@@ -229,20 +230,29 @@ def main():
 
 
 
+
         # ====================================== 2024-09-03.toward_camera_ready ============================
 
         # 'hf.hitachi-nlp/ruletaker',
         # 'hf.hitachi-nlp/PARARULE-Plus',
+
+
         # '2024-08-30.FLD.ref_prob-0.20',
-        # '2024-09-03.trnsl-thing_person-v2',
 
         '2024-09-03.trnsl-thing_person-v0',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
         # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.05.theorem-G_MP.syllogism.contraposition.interchangeability',
 
-        # '2024-09-03.trnsl-thing_person-v2',
 
+        # '2024-09-03.trnsl-thing_person-v0.rule-G_MP',
+        # '2024-09-03.trnsl-thing_person-v0.voc-100',
+        # '2024-09-03.trnsl-thing_person-v0.dstrct-0',
+        # '2024-09-03.trnsl-thing_person-v0.stps-3-0',
+        # '2024-09-03.trnsl-thing_person-v0.trnsl-small',
+
+
+        '2024-09-03.trnsl-thing_person-v2',
 
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
@@ -253,23 +263,46 @@ def main():
 
 
 
+
         # =================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ======================
 
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
         # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
 
 
+
         # =================== 2024-09-06.factorized_reasoning ======================
         # 'hf.hitachi-nlp/ruletaker',
+
 
 
         # =================================== 2024-09-08.ALPT_strong ========================================
         # '2024-09-03.trnsl-thing_person-v0',
 
 
+
         # =================================== 2024-09-08.factorized_reasoning ========================================
 
     ]
+
+
+    proof_intermediate_steps_prob_args = [
+        0.0,
+        0.15,
+        0.30,
+        # 0.50,
+        0.65,
+        0.80,
+        1.0,
+    ]
+
+
+    paraphrase_contradiction_args = [
+        False,
+        # True,
+    ]
+
+
 
 
 
@@ -279,6 +312,8 @@ def main():
 
         # ================================================ ALPT_strong ==============================================
         # (0.95, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
+        # (0.80, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
+        # (0.60, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
 
         # ================================================ LPT ==============================================
         # (0.03, [(1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)]),
@@ -298,52 +333,45 @@ def main():
 
 
     learnings = [
+
         # 'debug.FT.bs-64__step-10.wrmp-0',
 
         # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
+
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
+
         'FT.bs-256__step-390.wrmp-200',  # 100k examples
-        # 'FT.bs-256__step-586.wrmp-200',  # 150k examples
+
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
+        # 'FT.bs-512__step-390.wrmp-200',  # 200k examples with same step size as 100k examples
+
+        # 'FT.bs-256__step-586.wrmp-200',    # 150k examples
+
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
+
         # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
+
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
 
         # 'FT.bs-240__step-417.wrmp-200',  # 100k examples, for middle2 x 5
+
 
         # ========== factoorized reasoning ==========
         # https://github.com/tatsu-lab/stanford_alpaca
         # 'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
     ]
 
-    proof_intermediate_steps_prob_args = [
-        # 0.0,
-        # 0.25,
-        0.50,
-        # 0.75,
-        # 1.0,
-    ]
 
-    augmentation_args = [
-        False,
-        # True,
-    ]
 
-    augmentation_prob_args = [
-        0.5,
-        # 1.0,
-    ]
 
-    formula_prob_args = [
-        0.0,
-        # 0.2,
-    ]
 
 
 
     lrates = [
         # 3e-6,
+        # 5e-6,
         1e-5,
+        # 3e-5,
     ]
 
 
@@ -354,7 +382,7 @@ def main():
     optimizer_setings = [
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
-        # ('rec_adam', 1.0, 1000),
+        # ('rec_adam', 1.0, 1000),   # will lead to degredation on MMLU
         ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
@@ -371,9 +399,10 @@ def main():
 
 
     # ===========================- HAIC: 7B models ====================================
-    engine = QsubEngine('haic', 'xhn_s.small', n_resource=4)
-    # engine = QsubEngine('haic', 'xhn_s.middle', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)
+    # engine = QsubEngine('haic', 'xhn_s.small', n_resource=4)   # この設定でたくさん投げると，低速化したジョブがあった．ノード間の帯域が足りなくなった？
+    # engine = QsubEngine('haic', 'xhn_s.middle', n_resource=2)   # slower than xhn_s.middle2 x 1
+    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)   # 3.5 - 4.5 hours
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)   # 3.5 - 4.5 hours
 
 
     # ============================== HAIC: 70B models =================================
@@ -389,7 +418,13 @@ def main():
 
 
 
-    hours = 12
+    hours = 7
+
+
+
+
+
+
 
     # run_mode = 'vanilla'
     # run_mode = 'torchrun'
@@ -426,6 +461,17 @@ def main():
 
     dry_run = False
 
+    augmentation_args = [
+        False,
+        # True,
+    ]
+
+    augmentation_prob_args = [
+        0.5,
+        # 1.0,
+    ]
+
+
     weight_decay_args = [
         0.0,
         # 0.01,
@@ -448,8 +494,6 @@ def main():
 
 
 
-
-
     prompt_indicate_theorems_args = [
         # False,
         True,
@@ -458,6 +502,11 @@ def main():
     prompt_emphasize_theorems_args = [
         False,
         # True,
+    ]
+
+    formula_prob_args = [
+        0.0,
+        # 0.2,  # あらゆるベンチマークで下がる．
     ]
 
     # deepspeed_stage = 'zero0'   # 1B models can use this
@@ -555,6 +604,7 @@ def main():
         from_scratch_args,
         augmentation_args,
         augmentation_prob_args,
+        paraphrase_contradiction_args,
         formula_prob_args,
     )
          
@@ -578,6 +628,7 @@ def main():
          from_scratch,
          augmentation,
          augmentation_prob,
+         paraphrase_contradiction,
          formula_prob) in hyparas:
 
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
@@ -717,6 +768,7 @@ def main():
                     prompt_emphasize_theorems=prompt_emphasize_theorems,
                     augmentation=augmentation,
                     augmentation_prob=augmentation_prob,
+                    paraphrase_contradiction=paraphrase_contradiction,
                     formula_prob=formula_prob,
 
                     sample_negative_proof=sample_negative_proof,

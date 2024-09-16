@@ -88,12 +88,14 @@ def main():
 
     # =================================== 2024-09-03.toward_camera_ready ========================================
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-03.toward_camera_ready')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-10.fix_rec_adam')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-12.camera_ready')
 
 
     # =================================== 2024-09-06.llama3 ========================================
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-03.toward_camera_ready')
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3')
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3.node--1')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-06.llama3.node--1')
 
 
     # =================================== 2024-08-26.really_camera_ready ========================================
@@ -268,8 +270,7 @@ def main():
 
 
 
-    # raise Exception('do add formula for specific model')
-
+    print(f'# ================================================================= {TOP_DIR} =================================================================')
     input_dir = Path(TOP_DIR)
     setting_paths = sorted(input_dir.glob('**/*/lab.params.json'))
     for setting_path in setting_paths:
@@ -287,10 +288,14 @@ def main():
                 _params += ['block_size']
             if 'dataset_names' in settings and settings['dataset_names']:
                 _params += ['dataset_names']
+            if 'logic_dataset_prob' in settings and settings['logic_dataset_prob'] != 1.0:
+                _params += ['logic_dataset_prob']
             if 'dataset_probs' in settings and settings['dataset_probs']:
                 _params += ['dataset_probs']
             if 'formula_prob' in settings and settings['formula_prob'] != 0.0:
                 _params += ['formula_prob']
+            if 'paraphrase_contradiction' in settings and settings['paraphrase_contradiction'] is True:
+                _params += ['paraphrase_contradiction']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))

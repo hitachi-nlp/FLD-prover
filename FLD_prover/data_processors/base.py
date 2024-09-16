@@ -45,6 +45,7 @@ class Processor(ABC):
                  prompt_emphasize_theorems=False,
                  augmentation=False,
                  augmentation_prob=1.0,
+                 paraphrase_contradiction=False,
                  formula_prob=0.0,
                  eval_dataset=None,
                  log_examples=False,
@@ -68,6 +69,7 @@ class Processor(ABC):
         self._prompt_emphasize_theorems = prompt_emphasize_theorems
         self._augmentation = augmentation
         self._augmentation_prob = augmentation_prob
+        self._paraphrase_contradiction = paraphrase_contradiction
         self._formula_prob = formula_prob
         self.eval_dataset = eval_dataset
         self.log_examples = log_examples
