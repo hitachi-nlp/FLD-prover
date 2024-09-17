@@ -80,8 +80,8 @@ class Processor(ABC):
         examples,
         mode: str,
         padding='longest',
+        tokenize=True,
     )  -> Dict[str, List[Any]]:
-
 
         def _prepare_tokenized_targets(targets, max_length, **kwargs):
             return prepare_tokenized_targets(targets, self._tokenizer, padding, max_length, **kwargs)
@@ -128,70 +128,71 @@ class Processor(ABC):
         # without this additional token, we can not accurately calculate the prompt length
         # as the token
         forward_inputs: Dict[str, Any] = {}
-        if mode == 'auto_regression':
-            _proof_steps_w_eos = [step + f' {self._tokenizer.eos_token}' for step in proof_steps]
+        if tokenize:
+            if mode == 'auto_regression':
+                _proof_steps_w_eos = [step + f' {self._tokenizer.eos_token}' for step in proof_steps]
 
-            if any(_targets is None for _targets in proof_steps):
-                raise ValueError()
+                if any(_targets is None for _targets in proof_steps):
+                    raise ValueError()
 
-            if self._lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
-                forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos, self._max_length - self._max_prompt_length)["input_ids"]
-                forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"],
-                                                                        forward_inputs["attention_mask"])
+                if self._lm_type == LMType.SEQ_2_SEQ:
+                    forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
+                    forward_inputs["labels"] = _prepare_tokenized_targets(_proof_steps_w_eos, self._max_length - self._max_prompt_length)["input_ids"]
+                    forward_inputs["labels"] = _mask_labels_by_ignore_index(forward_inputs["labels"],
+                                                                            forward_inputs["attention_mask"])
 
-            elif self._lm_type == LMType.CAUSAL:
-                # just for getting length
-                _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
+                elif self._lm_type == LMType.CAUSAL:
+                    # just for getting length
+                    _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
 
-                if self._include_prompt_for_causal_lm_loss:
-                    prompt_lengths = None
-                else:
-                    prompt_ids = [
-                        _prepare_tokenized_inputs(
-                            [prompt],
-                            self._max_length,
-                            padding='longest',
-                            return_length=True,
-                            # add_special_tokens=False,
-                        )
-                        for prompt in _prompts
-                    ]
-                    prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
+                    if self._include_prompt_for_causal_lm_loss:
+                        prompt_lengths = None
+                    else:
+                        prompt_ids = [
+                            _prepare_tokenized_inputs(
+                                [prompt],
+                                self._max_length,
+                                padding='longest',
+                                return_length=True,
+                                # add_special_tokens=False,
+                            )
+                            for prompt in _prompts
+                        ]
+                        prompt_lengths = [_promt_ids['length'][0] for _promt_ids in prompt_ids]
 
-                inputs_with_targets = [f'{prompt}{proof_step}'
-                                       for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
-                forward_inputs.update(_prepare_tokenized_inputs(inputs_with_targets, self._max_length))
-                forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
+                    inputs_with_targets = [f'{prompt}{proof_step}'
+                                           for prompt, proof_step in zip(_prompts, _proof_steps_w_eos)]
+                    forward_inputs.update(_prepare_tokenized_inputs(inputs_with_targets, self._max_length))
+                    forward_inputs["labels"] = forward_inputs['input_ids'].detach().clone()
 
-                forward_inputs["labels"] = _mask_labels_by_ignore_index(
-                    forward_inputs["labels"],
-                    mask_lengths=prompt_lengths,
-                    attention_mask=forward_inputs["attention_mask"],
-                )
-            else:
-                raise NotImplementedError()
-
-        elif mode == 'generation':
-            if self._lm_type == LMType.SEQ_2_SEQ:
-                forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
-
-            elif self._lm_type == LMType.CAUSAL:
-                _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
-
-                # def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
-                forward_inputs.update(
-                    _prepare_tokenized_inputs(
-                        _prompts,
-                        self._max_prompt_length,
+                    forward_inputs["labels"] = _mask_labels_by_ignore_index(
+                        forward_inputs["labels"],
+                        mask_lengths=prompt_lengths,
+                        attention_mask=forward_inputs["attention_mask"],
                     )
-                )
+                else:
+                    raise NotImplementedError()
+
+            elif mode == 'generation':
+                if self._lm_type == LMType.SEQ_2_SEQ:
+                    forward_inputs.update(_prepare_tokenized_inputs(prompts_w_partial_proof, self._max_prompt_length))
+
+                elif self._lm_type == LMType.CAUSAL:
+                    _prompts = [prompt + CAUSAL_LM_END_OF_PROMPT for prompt in prompts_w_partial_proof]
+
+                    # def _prepare_tokenized_inputs(inputs, max_length, padding=padding, **kwargs):
+                    forward_inputs.update(
+                        _prepare_tokenized_inputs(
+                            _prompts,
+                            self._max_prompt_length,
+                        )
+                    )
+
+                else:
+                    raise NotImplementedError()
 
             else:
-                raise NotImplementedError()
-
-        else:
-            raise ValueError()
+                raise ValueError()
 
         forward_inputs['prompts_w_partial_proof'] = prompts_w_partial_proof
         forward_inputs['proof_step'] = proof_steps
@@ -201,7 +202,7 @@ class Processor(ABC):
         if 'token_type_ids' in forward_inputs:
             forward_inputs.pop('token_type_ids', None)
 
-        if self.log_examples:
+        if tokenize and self.log_examples:
             inputs_decoded = self._tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['input_ids']))
             if 'labels' in forward_inputs:
                 labels_decoded = self._tokenizer.batch_decode(_unmask_by_pad_token(forward_inputs['labels']))

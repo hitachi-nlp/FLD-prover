@@ -23,7 +23,6 @@ class RecAdamSFTTrainer(SFTTrainer):
         self._rec_adam_target_task_weight = rec_adam_target_task_weight
         self._rec_adam_fisher_coef = rec_adam_fisher_coef
 
-
     def create_optimizer(self):
         self.optimizer = build_optimizer_from_trainer(self,
                                                       rec_adam_target_task_weight=self._rec_adam_target_task_weight,
@@ -68,6 +67,7 @@ def build_sft_trainer(dataset_type: str,
     elif dataset_type == 'FR':
         task_type = 'factorized_reasoning'
         label_maping = None
+
     else:
         raise ValueError(dataset_type)
     logger.info('SFT task type is set to %s', task_type)
@@ -114,6 +114,8 @@ def build_sft_trainer(dataset_type: str,
             return field
 
         for i in range(len(list(examples.values())[0])):
+            logic_dataset_key = 'proofs_formula'
+            _task_type = 'logic' if logic_dataset_key in examples and examples[logic_dataset_key][i] is not None else task_type
 
             def guess_value(candidate_fields: List[str], not_found='raise') -> Optional[str]:
                 field = guess_field(candidate_fields, not_found=not_found)
@@ -122,7 +124,12 @@ def build_sft_trainer(dataset_type: str,
                 else:
                     return examples[field][i]
 
-            if task_type in ['two_choice_nli', 'three_choice_nli']:
+            if _task_type == 'logic':
+                instruction = examples['prompts_w_partial_proof'][i]
+                context = None
+                answer = examples['gold_proof'][i]
+
+            elif _task_type in ['two_choice_nli', 'three_choice_nli']:
                 premise = guess_value(['premise'])
                 hypothesis = guess_value(['hypothesis'])
                 label = guess_value(['label'])
@@ -143,20 +150,20 @@ def build_sft_trainer(dataset_type: str,
                 else:
                     answer = label
 
-            elif task_type == 'instrution':
+            elif _task_type == 'instrution':
                 instruction = guess_value(['instruction', 'question'])
                 context = guess_value(['context'], not_found='warning')
                 answer = guess_value(['response', 'answer'])
                 if label_maping is not None:
                     raise Exception()
 
-            elif task_type == 'factorized_reasoning':
+            elif _task_type == 'factorized_reasoning':
                 instruction = examples['prompt'][i]
                 context = None
                 answer = examples['answer'][i]
 
             else:
-                raise ValueError(task_type)
+                raise ValueError(_task_type)
 
             answer = str(answer)
             if context is not None:
@@ -166,9 +173,9 @@ def build_sft_trainer(dataset_type: str,
 
             formatted_texts.append(formatted_text)
 
-            if i == 0:
-                logger.info('Example of the formatted prompt:')
-                logger.info(formatted_texts[0])
+            if i < 100:
+                logger.info('--------------------- sft trainer input output text [%d] (up to 100) ---------------------', i)
+                logger.info(formatted_text)
 
         return formatted_texts
 

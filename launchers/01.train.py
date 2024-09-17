@@ -137,7 +137,7 @@ def main():
     # =================================== 2024-09-06.llama3 ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
     # output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
 
 
 
@@ -150,9 +150,6 @@ def main():
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
 
-
-    # =================================== 2024-09-06.factorized_reasoning ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-09-06.factorized_reasoning')
 
 
 
@@ -168,7 +165,8 @@ def main():
 
     # =================================== 2024-09-08.factorized_reasoning ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-10.factorized_reasoning.fix_rec_adam')
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-16.factorized_reasoning.fix_rec_adam')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-17.factorized_reasoning')
 
 
 
@@ -212,13 +210,12 @@ def main():
 
         # =================================== 2024-09-08.ALPT_strong ========================================
         # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
 
-        # =================================== 2024-09-08.factorized_reasoning ========================================
-        # ('meta-llama/Meta-Llama-3-8B-Instruct', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-1953.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=1000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=0.5__prmpt_indct_thrms=True.chk-1953', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # =================================== 2024-09-16.factorized_reasoning.fix_rec_adam ========================================
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('mdl_nm=meta-llama@Meta-Llama-3.1-8B-Instruct__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=3000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=1.0__prmpt_indct_thrms=True__augmnttn_prb=0.5.chk-390', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -267,7 +264,7 @@ def main():
         # '2024-09-03.trnsl-thing_person-v0.trnsl-small',
 
 
-        '2024-09-03.trnsl-thing_person-v2',
+        # '2024-09-03.trnsl-thing_person-v2',
 
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
@@ -297,19 +294,20 @@ def main():
 
 
         # =================================== 2024-09-08.factorized_reasoning ========================================
-        'hf.hitachi-nlp/ruletaker',
+        # 'hf.hitachi-nlp/ruletaker',
+        '2024-09-03.trnsl-thing_person-v0',
 
     ]
 
 
     proof_intermediate_steps_prob_args = [
-        0.0,
-        0.15,
-        0.30,
-        # 0.50,
-        0.65,
-        0.80,
-        1.0,
+        # 0.0,
+        # 0.15,
+        # 0.30,
+        0.50,
+        # 0.65,
+        # 0.80,
+        # 1.0,
     ]
 
 
@@ -323,22 +321,28 @@ def main():
 
 
     multitask_setting_list = [
+
         # ================================================ NeurIPS 2024 ==============================================
-        # (1.0, []),
+        (1.0, []),
+
 
         # ================================================ ALPT_strong ==============================================
         # (0.95, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
         # (0.80, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
         # (0.60, [(1.0, 'hf.DKYoon/SlimPajama-6B', None, None, None)]),
 
+
         # ================================================ LPT ==============================================
         # (0.03, [(1.0, 'hf.cerebras/SlimPajama-627B', None, None, None)]),
+
 
         # ============================================ factorized_reasoning ========================================
         # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
         # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
-        (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
-        (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
+
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
+        # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
+        # (0.25, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
     ]
 
     # do_sft = True
@@ -355,7 +359,7 @@ def main():
 
         # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
 
-        'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-512__step-390.wrmp-200',  # 200k examples with same step size as 100k examples
 
@@ -371,7 +375,11 @@ def main():
 
 
         # ========== factoorized reasoning ==========
-        'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
+
+        # 'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
+        # 'FT.bs-128__step-117.wrmp-20',   # (4k examples x 3 epochs) * 1.25
+        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
+
     ]
 
 
@@ -400,7 +408,7 @@ def main():
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
 
-        (None, None, None),
+        # (None, None, None),
         # ('adamw_hf', None, None),
         # ('rec_adam', 1.0, 'auto'),
     ]
@@ -415,7 +423,7 @@ def main():
     # engine = QsubEngine('haic', 'xhn_s.small', n_resource=4)   # この設定でたくさん投げると，低速化したジョブがあった．ノード間の帯域が足りなくなった？
     # engine = QsubEngine('haic', 'xhn_s.middle', n_resource=2)   # slower than xhn_s.middle2 x 1
     engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)   # 3.5 - 4.5 hours
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)   # 3.5 - 4.5 hours
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
 
 
     # ============================== HAIC: 70B models =================================
@@ -426,7 +434,7 @@ def main():
 
     # ============================== ABCI =================================
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
-    engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
+    # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
@@ -446,8 +454,8 @@ def main():
     run_mode = 'deepspeed'
 
 
-    # skip_if_exists = False
-    skip_if_exists = True
+    skip_if_exists = False
+    # skip_if_exists = True
 
 
 

@@ -869,7 +869,8 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
 def _maybe_logic_preprocess(data_args,
                             logic_data_processor,
                             examples,
-                            mode):
+                            mode,
+                            tokenize=True):
     if data_args.logic_dataset_type == 'FLD':
         logic_key = 'hypothesis'
     elif data_args.logic_dataset_type == 'rule_taker':
@@ -930,6 +931,7 @@ def _maybe_logic_preprocess(data_args,
             logic_examples,
             logic_preproc_mode,
             padding=logic_padding,
+            tokenize=tokenize,
         )
         logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
     else:
@@ -1342,12 +1344,16 @@ def main():
         logic_dataset_processor.log_examples = data_args.log_examples
         with training_args.main_process_first(desc=_desc):
             logic_processed_datasets[split] = dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                lambda examples: _maybe_logic_preprocess(
+                    data_args,
+                    logic_dataset_processor,
+                    examples,
+                    'generation' if data_args.do_sft else 'auto_regression',  # "generation" to get prompt and proof to be processed by SFTTrainer
+                    tokenize = not data_args.do_sft,  # SFTTrainer will do the tokenization
+                ),
                 **maybe_logic_preprocess_map_kwargs,
 
             )
-    else:
-        logic_processed_datasets = logic_raw_datasets
 
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
