@@ -114,7 +114,7 @@ def build_sft_trainer(dataset_type: str,
             return field
 
         for i in range(len(list(examples.values())[0])):
-            logic_dataset_key = 'proofs_formula'
+            logic_dataset_key = 'prompts_w_partial_proof'
             _task_type = 'logic' if logic_dataset_key in examples and examples[logic_dataset_key][i] is not None else task_type
 
             def guess_value(candidate_fields: List[str], not_found='raise') -> Optional[str]:

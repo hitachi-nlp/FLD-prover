@@ -116,7 +116,7 @@ def main():
     # =================================== 2024-09-08.factorized_reasoning ========================================
     # TOP_DIR = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
     # TOP_DIR = Path('./outputs/01.train.py/2024-09-16.factorized_reasoning.fix_rec_adam')
-    TOP_DIR = Path('./outputs/01.train.py/2024-09-17.factorized_reasoning')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-18.factorized_reasoning')
 
 
 

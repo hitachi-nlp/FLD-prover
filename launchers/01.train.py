@@ -166,7 +166,7 @@ def main():
     # =================================== 2024-09-08.factorized_reasoning ========================================
     # output_top_dir = Path('./outputs/01.train.py/2024-09-08.factorized_reasoning')
     # output_top_dir = Path('./outputs/01.train.py/2024-09-16.factorized_reasoning.fix_rec_adam')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-17.factorized_reasoning')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-18.factorized_reasoning')
 
 
 
@@ -214,8 +214,8 @@ def main():
 
 
         # =================================== 2024-09-16.factorized_reasoning.fix_rec_adam ========================================
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('mdl_nm=meta-llama@Meta-Llama-3.1-8B-Instruct__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=3000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=1.0__prmpt_indct_thrms=True__augmnttn_prb=0.5.chk-390', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('mdl_nm=meta-llama@Meta-Llama-3.1-8B__lgc_dtst_unm=2024-09-03.trnsl-thing_person-v0__optmzr=rec_adam__lrnng=FT.bs-256__step-390.wrmp-200__lrnng_rt=1e-05__rc_adm_fshr_cf=3000__augmnttn=False__prf_intrmdt_stps=randomly_include__prf_intrmdt_stps_prb=0.5__mx_grd_nrm=1.0__prmpt_indct_thrms=True__augmnttn_prb=0.5.chk-390', 'causal', 'meta-llama/Llama-2-7b-hf'),
 
     ]
 
@@ -311,11 +311,6 @@ def main():
     ]
 
 
-    paraphrase_contradiction_args = [
-        False,
-        # True,
-    ]
-
 
 
 
@@ -323,7 +318,7 @@ def main():
     multitask_setting_list = [
 
         # ================================================ NeurIPS 2024 ==============================================
-        (1.0, []),
+        # (1.0, []),
 
 
         # ================================================ ALPT_strong ==============================================
@@ -337,16 +332,16 @@ def main():
 
 
         # ============================================ factorized_reasoning ========================================
-        # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
-        # (0.0, [(1.0, 'FR.2024-09-03.debug', None, None, None)]),
+        # (1.0, []),
 
         # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=cot', None, None, None)]),
         # (0.0, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
-        # (0.25, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
+
+        (0.25, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
     ]
 
-    # do_sft = True
-    do_sft = False
+    do_sft = True
+    # do_sft = False
 
 
 
@@ -377,7 +372,8 @@ def main():
         # ========== factoorized reasoning ==========
 
         # 'FT.bs-128__step-94.wrmp-20',  # 4k examples x 3 epochs
-        # 'FT.bs-128__step-117.wrmp-20',   # (4k examples x 3 epochs) * 1.25
+        'FT.bs-128__step-117.wrmp-20',   # (4k examples x 3 epochs) * 1.25
+
         # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
 
     ]
@@ -404,11 +400,11 @@ def main():
         # ('rec_adam', 1.0, 0),
         # ('rec_adam', 1.0, 300),
         # ('rec_adam', 1.0, 1000),   # will lead to degredation on MMLU
-        ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 3000),
         # ('rec_adam', 1.0, 5000),
         # ('rec_adam', 1.0, 10000),
 
-        # (None, None, None),
+        (None, None, None),
         # ('adamw_hf', None, None),
         # ('rec_adam', 1.0, 'auto'),
     ]
@@ -441,7 +437,7 @@ def main():
 
 
 
-    hours = 7
+    hours = 2
 
 
 
@@ -485,13 +481,14 @@ def main():
 
     dry_run = False
 
-    augmentation_args = [
-        False,
-        # True,
-    ]
+    # augmentation_args = [
+    #     False,
+    #     # True,
+    # ]
 
     augmentation_prob_args = [
-        0.5,
+        0.0,
+        # 0.5,
         # 1.0,
     ]
 
@@ -502,12 +499,16 @@ def main():
         # 0.1,
     ]
 
-    max_grad_norm_args = [
-        # 0.5,
-        1.0,
-        # 3.0,
-    ]
+    # max_grad_norm_args = [
+    #     # 0.5,
+    #     1.0,
+    #     # 3.0,
+    # ]
 
+    # paraphrase_contradiction_args = [
+    #     False,
+    #     # True,
+    # ]
 
     max_train_samples_args = [
         None,
@@ -518,10 +519,10 @@ def main():
 
 
 
-    prompt_indicate_theorems_args = [
-        # False,
-        True,
-    ]
+    # prompt_indicate_theorems_args = [
+    #     # False,
+    #     True,
+    # ]
 
     prompt_emphasize_theorems_args = [
         False,
@@ -553,11 +554,11 @@ def main():
 
     streaming = False
 
-    update_parameters_args = [
-        'all',
-        # 'attention',
-        # 'mlp',
-    ]
+    # update_parameters_args = [
+    #     'all',
+    #     # 'attention',
+    #     # 'mlp',
+    # ]
 
     max_eval_samples = 10000
 
@@ -584,10 +585,10 @@ def main():
         False,    # better for 'all_at_once'
     ]
 
-    no_subproof_for_unknown_args = [
-        True,   # better
-        # False,
-    ]
+    # no_subproof_for_unknown_args = [
+    #     True,   # better
+    #     # False,
+    # ]
 
     epoch = None
 
@@ -614,21 +615,21 @@ def main():
         multitask_setting_list,
         learnings,
         optimizer_setings,
-        prompt_indicate_theorems_args,
+        # prompt_indicate_theorems_args,
         prompt_emphasize_theorems_args,
         sample_negative_proof_args,
         proof_intermediate_steps_prob_args,
-        no_subproof_for_unknown_args,
+        # no_subproof_for_unknown_args,
         seeds,
         model_settings,
         lrates,
         weight_decay_args,
-        max_grad_norm_args,
-        update_parameters_args,
+        # max_grad_norm_args,
+        # update_parameters_args,
         from_scratch_args,
-        augmentation_args,
+        # augmentation_args,
         augmentation_prob_args,
-        paraphrase_contradiction_args,
+        # paraphrase_contradiction_args,
         formula_prob_args,
     )
          
@@ -638,21 +639,21 @@ def main():
          (logic_dataset_prob, other_dataset_settings),
          learning,
          (optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef),
-         prompt_indicate_theorems,
+         # prompt_indicate_theorems,
          prompt_emphasize_theorems,
          sample_negative_proof,
          proof_intermediate_steps_prob,
-         no_subproof_for_unknown,
+         # no_subproof_for_unknown,
          seed,
          (model_name, lm_type, model_name_for_batch_size),
          lrate,
          weight_decay,
-         max_grad_norm,
-         update_parameters,
+         # max_grad_norm,
+         # update_parameters,
          from_scratch,
-         augmentation,
+         # augmentation,
          augmentation_prob,
-         paraphrase_contradiction,
+         # paraphrase_contradiction,
          formula_prob) in hyparas:
 
         if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
@@ -732,7 +733,8 @@ def main():
                 fp16 = False
                 bf16 = True
 
-            if augmentation:
+            # if augmentation:
+            if augmentation_prob > 0:
                 instruction = False
             else:
                 instruction = True
@@ -751,11 +753,11 @@ def main():
 
                     model_name=model_name,
                     optimizer=optimizer,
-                    max_grad_norm=max_grad_norm,
+                    # max_grad_norm=max_grad_norm,
                     rec_adam_target_task_weight=rec_adam_target_task_weight,
                     rec_adam_fisher_coef=rec_adam_fisher_coef,
 
-                    update_parameters=update_parameters,
+                    # update_parameters=update_parameters,
 
                     train_effective_batch_size=train_effective_batch_size,
                     num_evals=num_evals,
@@ -788,16 +790,16 @@ def main():
                     streaming=streaming,
                     use_original_serial=use_original_serial,
                     instruction=instruction,
-                    prompt_indicate_theorems=prompt_indicate_theorems,
+                    # prompt_indicate_theorems=prompt_indicate_theorems,
                     prompt_emphasize_theorems=prompt_emphasize_theorems,
-                    augmentation=augmentation,
+                    # augmentation=augmentation,
                     augmentation_prob=augmentation_prob,
-                    paraphrase_contradiction=paraphrase_contradiction,
+                    # paraphrase_contradiction=paraphrase_contradiction,
                     formula_prob=formula_prob,
 
                     sample_negative_proof=sample_negative_proof,
                     proof_intermediate_steps_prob=proof_intermediate_steps_prob,
-                    no_subproof_for_unknown=no_subproof_for_unknown,
+                    # no_subproof_for_unknown=no_subproof_for_unknown,
 
 
 
@@ -908,6 +910,7 @@ def main():
                                    deepspeed_stage=deepspeed_stage,
                                    port=random.randint(29777, 31777),
                                    n_gpus_per_node=n_gpus_per_node)
+            # logger.critical(str(output_dir))
 
             run_by_engine(
                 engine,
