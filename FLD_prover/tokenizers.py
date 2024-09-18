@@ -47,6 +47,10 @@ def load(name: str,
     elif name.find('phi-2') >= 0:
         tokenizer.pad_token = tokenizer.unk_token
 
+    elif name.find('Meta-Llama-3-8B-Instruct') >= 0 or name.find('Meta-Llama-3.1-8B-Instruct') >= 0:
+        # https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/discussions/101#664071f29e6f865ec6388150
+        tokenizer.pad_token = '<|end_of_text|>'
+
     else:
 
         # PAD_TOKEN = '[PAD]'

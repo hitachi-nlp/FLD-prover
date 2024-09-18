@@ -369,10 +369,10 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
-    prompt_indicate_theorems: bool = field(
-        default=False,
-        metadata={},
-    )
+    # prompt_indicate_theorems: bool = field(
+    #     default=False,
+    #     metadata={},
+    # )
     prompt_emphasize_theorems: bool = field(
         default=False,
         metadata={},
@@ -381,12 +381,12 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
-    augmentation: bool = field(
-        default=False,
-        metadata={},
-    )
+    # augmentation: bool = field(
+    #     default=False,
+    #     metadata={},
+    # )
     augmentation_prob: float = field(
-        default=1.0,
+        default=0.0,
         metadata={},
     )
     paraphrase_contradiction: bool = field(
@@ -405,15 +405,18 @@ class DataTrainingArguments:
         default=False,
     )
 
-    proof_intermediate_steps: str = field(
-        default='include',
-    )
+    # proof_intermediate_steps: str = field(
+    #     default='include',
+    # )
 
     proof_intermediate_steps_prob: float = field(
-        default=None,
+        default=0.0,
     )
 
-    no_subproof_for_unknown: bool = field(
+    # no_subproof_for_unknown: bool = field(
+    #     default=False,
+    # )
+    include_subproof_for_unknown: bool = field(
         default=False,
     )
 
@@ -814,20 +817,20 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         tokenizer,
     ]
 
-    if data_args.proof_intermediate_steps_prob is not None:
-        logger.info('proof_intermediate_steps_prob=%f is specified. This will take precedence over proof_intermediate_steps=%s',
-                    data_args.proof_intermediate_steps_prob,
-                    data_args.proof_intermediate_steps)
-        proof_intermediate_steps_prob = data_args.proof_intermediate_steps_prob
-    else:
-        if data_args.proof_intermediate_steps == 'include':
-            proof_intermediate_steps_prob = 1.0
-        elif data_args.proof_intermediate_steps == 'exclude':
-            proof_intermediate_steps_prob = 0.0
-        elif data_args.proof_intermediate_steps == 'randomly_include':
-            proof_intermediate_steps_prob = 0.5
-        else:
-            raise ValueError()
+    # if data_args.proof_intermediate_steps_prob is not None:
+    #     logger.info('proof_intermediate_steps_prob=%f is specified. This will take precedence over proof_intermediate_steps=%s',
+    #                 data_args.proof_intermediate_steps_prob,
+    #                 data_args.proof_intermediate_steps)
+    #     proof_intermediate_steps_prob = data_args.proof_intermediate_steps_prob
+    # else:
+    #     if data_args.proof_intermediate_steps == 'include':
+    #         proof_intermediate_steps_prob = 1.0
+    #     elif data_args.proof_intermediate_steps == 'exclude':
+    #         proof_intermediate_steps_prob = 0.0
+    #     elif data_args.proof_intermediate_steps == 'randomly_include':
+    #         proof_intermediate_steps_prob = 0.5
+    #     else:
+    #         raise ValueError()
 
     preprocessor_kwargs = {
         'prompt_prefix': data_args.source_prefix,
@@ -836,15 +839,17 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         # 'padding': logic_padding,
         'max_length': max_length,
         'max_prompt_length': max_prompt_length,
-        'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
+        # 'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
+        'proof_intermediate_steps_prob': data_args.proof_intermediate_steps_prob,
         'proof_sampling': False,
         'sample_negative_proof': False,
-        'no_subproof_for_unknown': data_args.no_subproof_for_unknown,
+        'no_subproof_for_unknown': not data_args.include_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
         'instruction': data_args.instruction,
-        'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
+        # 'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
+        'prompt_indicate_theorems': True,
         'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
-        'augmentation': data_args.augmentation,
+        'augmentation': data_args.augmentation_prob > 0.0,
         'augmentation_prob': data_args.augmentation_prob,
         'paraphrase_contradiction': data_args.paraphrase_contradiction,
         # 'log_examples': data_args.log_examples,
@@ -869,7 +874,8 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
 def _maybe_logic_preprocess(data_args,
                             logic_data_processor,
                             examples,
-                            mode):
+                            mode,
+                            tokenize=True):
     if data_args.logic_dataset_type == 'FLD':
         logic_key = 'hypothesis'
     elif data_args.logic_dataset_type == 'rule_taker':
@@ -930,6 +936,7 @@ def _maybe_logic_preprocess(data_args,
             logic_examples,
             logic_preproc_mode,
             padding=logic_padding,
+            tokenize=tokenize,
         )
         logic_data_processor.log_examples = False  # only log once, as too much logs break the stream, leading to sigkill
     else:
@@ -1342,7 +1349,13 @@ def main():
         logic_dataset_processor.log_examples = data_args.log_examples
         with training_args.main_process_first(desc=_desc):
             logic_processed_datasets[split] = dataset.map(
-                lambda examples: _maybe_logic_preprocess(data_args, logic_dataset_processor, examples, 'auto_regression'),
+                lambda examples: _maybe_logic_preprocess(
+                    data_args,
+                    logic_dataset_processor,
+                    examples,
+                    'generation' if data_args.do_sft else 'auto_regression',  # "generation" to get prompt and proof to be processed by SFTTrainer
+                    tokenize = not data_args.do_sft,  # SFTTrainer will do the tokenization
+                ),
                 **maybe_logic_preprocess_map_kwargs,
 
             )
