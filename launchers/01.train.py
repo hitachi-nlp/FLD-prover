@@ -90,6 +90,8 @@ OTHER_DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
+
+
     # =================================== neurips.additional ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional.rebuttal')
@@ -272,12 +274,17 @@ def main():
 
 
 
-        # ==================================== 2024-09-16.fix_negation ========================================
+        # ================================== 2024-09-16.fix_negation ========================================
+        '2024-09-16.FLD.neg-0.10',
+        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old',
+        # '2024-09-16.PLD.neg-0.10.theorems-0.00',
+        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old.vocab-5000',
+
         # '2024-09-16.PLD.neg-0.10',
         # '2024-09-16.PLD.neg-0.20',
         # '2024-09-16.PLD.neg-0.10.theorems-0.30',
         # '2024-09-16.PLD.neg-0.10.theorems-all',
-        '2024-09-16.FLD.neg-0.10',
+
 
 
         # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
@@ -443,7 +450,7 @@ def main():
 
 
 
-    hours = 7
+    hours = 6
 
 
 

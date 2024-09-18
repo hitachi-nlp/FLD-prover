@@ -1346,8 +1346,6 @@ def main():
                 **maybe_logic_preprocess_map_kwargs,
 
             )
-    else:
-        logic_processed_datasets = logic_raw_datasets
 
     dataset_probs = [float(opt) for opt in parse_listed_option(data_args.dataset_probs)]
 
