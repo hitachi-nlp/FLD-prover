@@ -8,7 +8,6 @@ import torch
 from torch.utils.data import DataLoader
 from torch import nn
 from transformers import Seq2SeqTrainer, Trainer
-from transformers.deepspeed import deepspeed_init, is_deepspeed_zero3_enabled
 from transformers.trainer import Trainer
 from transformers.utils import (
     is_torch_tpu_available,

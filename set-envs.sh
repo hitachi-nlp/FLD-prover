@@ -12,7 +12,6 @@ export SENTENCE_TRANSFORMERS_HOME="${HF_CACHE}/sentence_transformers_cache"
 
 
 
-
 # check if hostname is like "es*.abci.local"
 if [[ `hostname` =~ "es.*.abci.local|g[0-9]*" ]]; then
 

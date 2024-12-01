@@ -64,14 +64,15 @@ DATASETS_DIRS = [
     # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2',
     # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18',
 
-    './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora',
-    './outputs.FLD/00.create_corpus/2024-09-03.toward_camera_ready',
+    # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora',
+    # './outputs.FLD/00.create_corpus/2024-09-03.toward_camera_ready',
 
     './outputs.FLD-augmentation/00.augment.py/2024-08-25',
     # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora/dataset_name=2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
-    './outputs.FLD/00.create_corpus/2024-08-30.fix_ref_prob',
-    './outputs.FLD/00.create_corpus/2024-09-16.fix_negation',
+    # './outputs.FLD/00.create_corpus/2024-08-30.fix_ref_prob',
+    # './outputs.FLD/00.create_corpus/2024-09-16.fix_negation',
+    './outputs.FLD/00.create_corpus/2024-09-18.fix_negation',
 ]
 
 
@@ -89,8 +90,6 @@ OTHER_DATASETS_DIRS = [
 @click.command()
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
-
-
 
     # =================================== neurips.additional ===================================
     # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
@@ -138,10 +137,8 @@ def main():
 
 
     # =================================== 2024-09-06.llama3 ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
-    # output_top_dir = Path('./outputs/01.train.py/2024-09-10.fix_rec_adam')
     # output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-16.fix_negation')
+    output_top_dir = Path('./outputs/01.train.py/2024-09-18.fix_negation')
 
 
 
@@ -187,11 +184,8 @@ def main():
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Meta-Llama-3-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3-70B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-
-        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -275,9 +269,9 @@ def main():
 
 
         # ================================== 2024-09-16.fix_negation ========================================
-        '2024-09-16.FLD.neg-0.10',
-        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old',
+        # '2024-09-16.FLD.neg-0.10',
         # '2024-09-16.PLD.neg-0.10.theorems-0.00',
+        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old',
         # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old.vocab-5000',
 
         # '2024-09-16.PLD.neg-0.10',
@@ -316,6 +310,211 @@ def main():
         # 'hf.hitachi-nlp/ruletaker',
         # '2024-09-03.trnsl-thing_person-v0',
 
+
+
+
+
+
+
+        # ================================== 2024-09-18.fix_negation ========================================
+        # '2024-09-18.FLD.neg-0.10',
+
+        # '2024-09-18.PLD.neg-0.10.theorems-0.00.trnsl-old.vocab-5000',
+        # '2024-09-18.PLD.neg-0.10.theorems-0.00.trnsl-old',
+        # '2024-09-18.PLD.neg-0.10.theorems-0.00',
+
+        # '2024-09-18.PLD.neg-0.10',
+
+        # '2024-09-18.PLD.neg-0.10.theorems-0.30',
+        # '2024-09-18.PLD.neg-0.10.theorems-all',
+        # '2024-09-18.PLD.neg-0.10.ref_prob-0.10',
+
+        # '2024-09-18.PLD.neg-0.10.theorems-0.30.theorems-all',
+        # '2024-09-18.PLD.neg-0.15',
+        # '2024-09-18.PLD.neg-0.15.theorems-0.30.theorems-all',
+
+
+        # ================================== main ========================================
+
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        # 'hf.hitachi-nlp/ruletaker',
+
+        # '2024-09-18.FLD.neg-0.10',
+        # '2024-09-18.PLD.neg-0.20',
+
+        # ================================== ablation ========================================
+        # '2024-09-18.PLD.neg-0.20.voc-100',
+        # '2024-09-18.PLD.neg-0.20.dstrct-0',
+        # '2024-09-18.PLD.neg-0.20.stps-3-0',
+        # '2024-09-18.PLD.neg-0.20.rule-G_MP',
+        # '2024-09-18.PLD.neg-0.20.trnsl-small',
+
+
+
+        # ================================== 2024-09-30.hybrid ========================================
+
+        # ------------------------------- best set ----------------------------
+
+        # '2024-09-18.FLD.neg-0.10',
+        # '2024-09-18.PLD.neg-0.20',
+
+
+        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20__2024-09-18.FLD.neg-0.10',
+        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20=0.25__2024-09-18.FLD.neg-0.10=0.75',
+        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20=0.75__2024-09-18.FLD.neg-0.10=0.25',
+
+
+        # '2024-09-30.hybrid__PLD_v2=0.25__PLD_v0=0.50__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v2=0.50__PLD_v0=0.25__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v2=0.37__PLD_v0=0.37__FLD=0.25',
+
+
+        # '2024-09-30.hybrid__PLD_v2=0.25__FLD=0.75',
+        # '2024-09-30.hybrid__PLD_v2=0.50__FLD=0.50',
+        # '2024-09-30.hybrid__PLD_v2=0.75__FLD=0.25',
+
+
+        # '2024-09-18.FLD.neg-0.20',
+
+        # '2024-09-18.PLD.neg-0.20.trnsl-v2.theorems-all',
+        # '2024-09-18.PLD.neg-0.20.trnsl-v2.theorems-all.theorems-0.3',
+
+        # '2024-09-30.hybrid__PLD_v2=0.17__PLD_v0=0.33__FLD=0.50',
+
+        
+
+        # '2024-09-18.PLD.neg-0.10',
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.50__FLD=0.50',
+
+        # '2024-09-18.PLD.neg-0.10.trnsl-v2',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
+
+
+        # '2024-09-30.hybrid__PLD_v2=0.50__FLD=0.50',
+        # '2024-09-30.hybrid__PLD_v2=0.45__PLD_v0=0.10__FLD=0.45',
+        # '2024-09-30.hybrid__PLD_v2=0.40__PLD_v0=0.10__FLD=0.50',
+
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.15=0.50__FLD=0.50',
+
+
+
+
+
+        # --------------- rerun with large fisher --------------
+
+        # '2024-09-18.FLD.neg-0.10.other_seed',
+        # '2024-09-18.FLD.neg-0.10.theorems',
+        # '2024-09-18.FLD.neg-0.10.theorems.theorems-0.3',
+        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all',
+        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all.theorems-0.3',
+        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all.theorems-0.3.voc-large',
+        # '2024-09-18.FLD.neg-0.10.voc-large',
+
+
+        # '2024-09-18.PLD.neg-0.10',
+        # '2024-09-18.PLD.neg-0.10.theorems-0.30',
+        # '2024-09-18.PLD.neg-0.10.theorems-all',
+        # '2024-09-18.PLD.neg-0.10.theorems-0.30.theorems-all',
+        # '2024-09-18.PLD.neg-0.20',
+
+
+        # '2024-09-18.PLD.neg-0.10.trnsl-v2',
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.25__FLD=0.75',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.75__FLD=0.25',
+
+        # '2024-09-18.PLD.neg-0.10.trnsl-v2.theorems-all.theorems-0.3',
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.25__FLD=0.75',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.50__FLD=0.50',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.75__FLD=0.25',
+
+
+
+
+
+
+
+        # ===================================== camera ready ========================================
+
+
+        # 'hf.hitachi-nlp/PARARULE-Plus',
+        'hf.hitachi-nlp/ruletaker',
+
+        # '2024-09-18.FLD.neg-0.10.other_seed',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.90',
+
+
+        # '2024-09-18.PLD.neg-0.20.voc-100',
+        # '2024-09-18.PLD.neg-0.20.dstrct-0',
+        # '2024-09-18.PLD.neg-0.20.stps-1-0',
+        # '2024-09-18.PLD.neg-0.20.stps-3-0',
+        # '2024-09-18.PLD.neg-0.20.rule-G_MP',
+        # '2024-09-18.PLD.neg-0.20.trnsl-small',
+        # '2024-09-18.PLD.neg-0.20.trnsl-small.trnsl-old',
+
+
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.rules-G_MP=0.90',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.voc-100=0.90',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.dstrct-0=0.90',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.stps-3-0=0.90',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.stps-1-0=0.90',
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.trnsl-small.trnsl-old=0.90',
+
+
+        # ------------------------------- not best set ----------------------------
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.75__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.25__FLD=0.75',
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.10__FLD=0.90',
+
+        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems=0.40__FLD=0.50',
+        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.25__FLD_theorems_voc-large=0.25__FLD=0.50',
+        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.40__FLD=0.50',
+
+        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.40__FLD_voc-large=0.50',
+        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.90',
+
+        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.40__FLD_voc-large=0.50',
+
+
+
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.rule-G_MP',
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.voc-100',
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.dstrct-0',
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.stps-3-0',
+        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.trnsl-small',
+
+
+        # '2024-09-30.hybrid__PLD_v0.theorems-0.3=0.50__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v0.theorems-0.3.theorems-all=0.50__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v0.theorems-all=0.50__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v2=0.50__PLD_v0=0.25__FLD=0.25.theorems-all',
+        # '2024-09-30.hybrid__PLD_v2=0.37__PLD_v0=0.37__FLD=0.25.theorems-all',
+
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all=0.75__FLD=0.25',
+        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.75__FLD=0.25',
+        # '2024-09-18.PLD.neg-0.10.trnsl-v2.theorems-all',
+
+
+    ]
+
+
+
+    # XXX: 1つだと，揺らぎで結果の解釈が全くできない．3つくらい回すこと．
+    seeds = [
+        # 0,
+        # 1,
+        2,
+        3,
+        4,
+        # 5,
+        # 6,
+        # 7,
     ]
 
 
@@ -323,13 +522,20 @@ def main():
         # 0.0,
         # 0.15,
         # 0.30,
+        # 0.40,
         0.50,
-        # 0.65,
+        # 0.60,
+        # 0.70,
         # 0.80,
         # 1.0,
     ]
 
-
+    augmentation_prob_args = [
+        0.0,
+        # 0.25,
+        # 0.5,
+        # 1.0,
+    ]
 
 
 
@@ -359,25 +565,23 @@ def main():
         # (0.25, [(1.0, 'FR.2024-09-08.with_cot.generator=factorized', None, None, None)]),
     ]
 
-    do_sft = True
-    # do_sft = False
-
+    # do_sft = True
+    do_sft = False
 
 
 
     learnings = [
-
         # 'debug.FT.bs-64__step-10.wrmp-0',
 
-        # 'FT.bs-256__step-98.wrmp-50',  # 25k examples
 
-        # 'FT.bs-256__step-195.wrmp-100',  # 50k examples
+        # 'FT.bs-264__step-380.wrmp-200',  # 100k examples, 3 nodes
+        'FT.bs-256__step-390.wrmp-200',  # 100k examples, 4 nodes
 
-        # 'FT.bs-256__step-390.wrmp-200',  # 100k examples
+        # 'FT.bs-256__step-586.wrmp-200',    # 150k examples
+
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-512__step-390.wrmp-200',  # 200k examples with same step size as 100k examples
 
-        # 'FT.bs-256__step-586.wrmp-200',    # 150k examples
 
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
 
@@ -402,47 +606,36 @@ def main():
 
 
     lrates = [
-        # 3e-6,
+        # 2e-5,
+        # 1e-5,
         # 5e-6,
-        1e-5,
-        # 3e-5,
+        3e-6,
     ]
 
 
-
-
-    # XXX: The fisher coef MUST be tuned for each model,
-    # as the optimal value differs much from model to model.
     optimizer_setings = [
         # ('rec_adam', 1.0, 0),
+        # ('rec_adam', 1.0, 100),
         # ('rec_adam', 1.0, 300),
-        # ('rec_adam', 1.0, 1000),   # will lead to degredation on MMLU
+        # ('rec_adam', 1.0, 1000),
+        ('rec_adam', 1.0, 2000),
         # ('rec_adam', 1.0, 3000),
+        # ('rec_adam', 1.0, 4000),
+        # ('rec_adam', 1.0, 4500),
         # ('rec_adam', 1.0, 5000),
-        # ('rec_adam', 1.0, 10000),
 
+        # ('rec_adam', 1.0, 5000),
         # (None, None, None),
-        # ('adamw_hf', None, None),
-        # ('rec_adam', 1.0, 'auto'),
     ]
-
 
 
 
     # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
 
-
-    # ===========================- HAIC: 7B models ====================================
-    # engine = QsubEngine('haic', 'xhn_s.small', n_resource=4)   # この設定でたくさん投げると，低速化したジョブがあった．ノード間の帯域が足りなくなった？
-    # engine = QsubEngine('haic', 'xhn_s.middle', n_resource=2)   # slower than xhn_s.middle2 x 1
-    engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=1)   # 3.5 - 4.5 hours
+    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
-
-
-    # ============================== HAIC: 70B models =================================
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=4)   # rec_adamだと，cpu_offloadしても乗らない．
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=5)    # batch_sizeが240になってしまう．rec_adam + cpu_offload無しでは乗らなかった．
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=6)    # batch_sizeが192になってしまう．
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
 
 
     # ============================== ABCI =================================
@@ -452,10 +645,7 @@ def main():
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
-
-
-    hours = 6
-
+    hours = 5
 
 
 
@@ -467,8 +657,8 @@ def main():
     run_mode = 'deepspeed'
 
 
-    skip_if_exists = False
-    # skip_if_exists = True
+    # skip_if_exists = False
+    skip_if_exists = True
 
 
 
@@ -503,10 +693,10 @@ def main():
     #     # True,
     # ]
 
-    augmentation_prob_args = [
-        0.0,
-        # 0.5,
-        # 1.0,
+
+    max_train_samples_args = [
+        None,
+        # 100000,
     ]
 
 
@@ -526,13 +716,6 @@ def main():
     #     False,
     #     # True,
     # ]
-
-    max_train_samples_args = [
-        None,
-        # 10,
-        # 100,
-        # 1000,
-    ]
 
 
 
@@ -582,11 +765,6 @@ def main():
     save_model_on_eval = True
     save_model_at_end = False
 
-    seeds = [
-        0,
-        # 1,
-        # 2,
-    ]
 
     base_setting_name = 'default'
 
@@ -673,12 +851,15 @@ def main():
          # paraphrase_contradiction,
          formula_prob) in hyparas:
 
-        if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
-            logic_dataset_config_load_type = 'concat_all'
-            logic_dataset_concatenate_all_splits_into_train = True
-        else:
-            logic_dataset_config_load_type = None
-            logic_dataset_concatenate_all_splits_into_train = False
+        # if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
+        #     logic_dataset_config_load_type = 'concat_all'
+        #     logic_dataset_concatenate_all_splits_into_train = True
+        # else:
+        #     logic_dataset_config_load_type = None
+        #     logic_dataset_concatenate_all_splits_into_train = False
+
+        logic_dataset_config_load_type = None
+        logic_dataset_concatenate_all_splits_into_train = False
 
         if context_len is not None:
             _context_len = context_len
@@ -703,7 +884,7 @@ def main():
                 # preprocessing_num_workers = 1
                 # larger value may lead to hangup
                 # preprocessing_num_workers = 32
-                preprocessing_num_workers = 10
+                preprocessing_num_workers = 1
 
             n_resouce_org = engine.n_resource
             if model_name.find('70b') >= 0 and engine.n_resource < 2:

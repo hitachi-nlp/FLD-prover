@@ -31,6 +31,7 @@ from typing import Optional, Dict, List, Any, Union, Tuple, Any
 import readline
 import warnings
 import datetime
+import socket
 
 import numpy as np
 import deepspeed
@@ -1112,6 +1113,9 @@ def main():
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
     warnings.filterwarnings("ignore", message="is incompatible with gradient checkpointing. Setting")
     replace_mixtral_moe_with_dense_impl()
+
+    import socket
+    logger.info('Hostname: %s', socket.gethostname())
 
     # Is this OK? without this magic code, the preprocessing of logic dataset with multiprocess will hang up,
     # possibly because of the torch.where operation used in the processing.

@@ -90,7 +90,8 @@ def main():
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-03.toward_camera_ready')
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-10.fix_rec_adam')
     # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-12.camera_ready')
-    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-16.fix_negation')
+    # TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-16.fix_negation')
+    TOP_DIR = Path('./outputs.FLD-prover/01.train.py/2024-09-18.fix_negation')
 
 
     # =================================== 2024-09-06.llama3 ========================================
@@ -293,6 +294,8 @@ def main():
             settings = json.load(open(str(setting_path)))
             _params = PARAMS.copy()
 
+            if 'seed' in settings and settings['seed'] != 0:
+                _params += ['seed']
             if 'prompt_indicate_theorems' in settings and settings['prompt_indicate_theorems'] is True:
                 _params += ['prompt_indicate_theorems']
             if 'augmentation_prob' in settings and settings['augmentation_prob'] != 1.0:
@@ -311,6 +314,8 @@ def main():
                 _params += ['formula_prob']
             if 'paraphrase_contradiction' in settings and settings['paraphrase_contradiction'] is True:
                 _params += ['paraphrase_contradiction']
+            if 'max_train_samples' in settings and settings['max_train_samples'] is not None:
+                _params += ['max_train_samples']
 
             _settings = OrderedDict([
                 (key, settings.get(key, None))
