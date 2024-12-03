@@ -47,26 +47,6 @@ DATASETS_DIRS = [
 
     # './outputs.FLD/00.create_corpus/20230120.jpn.punipuni',
     
-
-    # './outputs.FLD/00.create_corpus/2024-03-29',
-    # './outputs.FLD/00.create_corpus/2024-05-03.ablation',
-    # './outputs.FLD/00.create_corpus/2024-05-08.ref_prob',
-    # './outputs.FLD/00.create_corpus/2024-05-19.ablation_with_theorems/',
-    # './outputs.FLD/00.create_corpus/2024-06-08.LPT',
-    # './outputs.FLD/00.create_corpus/2024-06-19.transfer',
-
-
-    # './outputs.FLD/00.create_corpus/2024-07-21.neurips_additional',
-    # './outputs.FLD/00.create_corpus/2024-08-09.depth_fix',
-
-    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-4288b3b',
-    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-2cab8a2',
-    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2',
-    # './outputs.FLD/00.create_corpus/2024-08-10.rerun-618e7c3.2024-03-29.FLD_v2.proc-18',
-
-    # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora',
-    # './outputs.FLD/00.create_corpus/2024-09-03.toward_camera_ready',
-
     './outputs.FLD-augmentation/00.augment.py/2024-08-25',
     # './outputs.FLD/00.create_corpus/2024-08-12.neurips_camera_ready.towards_best_corpora/dataset_name=2024-08-16.neurips_camera_ready.FLD.small_vocab',
 
@@ -91,71 +71,13 @@ OTHER_DATASETS_DIRS = [
 def main():
     setup_logger(level=logging.INFO, clear_other_handlers=True)
 
-    # =================================== neurips.additional ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional')
-    # output_top_dir = Path('./outputs/01.train.py/2024-06-22.neurip.additional.rebuttal')
 
-
-    # =================================== LPT ===================================
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT_first')
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.steps')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run')
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-08.ALPT.re_run.LPT')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch')
-    # output_top_dir = Path('./outputs/01.train.py/2024-07-09.BLPT.re_run.scratch.PT')
-
-
-    # =================================== ALPT_strong ===================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-05.ALPT_strong')
-
-
-    # =================================== 2024-08-12.neurips_camera_ready.towards_best_corpora ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-12.neurips_camera_ready.towards_best_corpora')
-
-
-    # =================================== 2024-08-16.neurips_camera_ready ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.1')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.2')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.3')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.4')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.5')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.6.rec_adam')
-
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-16.neurips_camera_ready.7.proof_intermediate_steps_prob.deepspeed_fix')
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-30.fix_ref_prob')
-    # output_top_dir = Path('./outputs/01.train.py/debug')
-
-
-    # =================================== 2024-09-03.toward_camera_ready ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-09-03.toward_camera_ready')
-
-
-
-    # =================================== 2024-09-06.llama3 ========================================
-    # output_top_dir = Path('./outputs/01.train.py/2024-09-12.camera_ready')
-    output_top_dir = Path('./outputs/01.train.py/2024-09-18.fix_negation')
-
-
-
-    # =================================== 2024-08-26.really_camera_ready ========================================
-    # XXX: REALY CAMERA READY
-    # output_top_dir = Path('./outputs/01.train.py/2024-08-26.really_camera_ready')
-
+    # ====================================== NeurIPS_2024 camera ready ========================================
+    # output_top_dir = Path('./outputs/01.train.py/2024-09-18.fix_negation')
 
 
     # =================================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ========================================
     # output_top_dir = Path('./outputs/01.train.py/00.augment.py.2024-08-25')
-
-
-
-
-
-
 
 
     # =================================== 2024-09-08.ALPT_strong ========================================
@@ -171,6 +93,7 @@ def main():
     # output_top_dir = Path('./outputs/01.train.py/2024-09-18.factorized_reasoning')
 
 
+    output_top_dir = Path('./outputs/01.train.py/2024-12-02.refactor_before_NeurIPS_2024_release')
 
 
 
@@ -180,7 +103,7 @@ def main():
 
 
     model_settings = [
-        # ======================================================== neurips camera ready     ========================================================
+        # ======================================================== NeurIPS_2024 camera ready     ========================================================
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
@@ -224,236 +147,14 @@ def main():
 
     logic_dataset_unames = [
 
-        # =================================== 2024-08-30.fix_ref_prob ========================================
+        # ===================================== NeurIPS_2024 camera ready ========================================
 
-
-        # '2024-08-30.FLD.ref_prob-0.20',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.05.theorem-G_MP.syllogism.contraposition.interchangeability',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-all',
-
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.066.theorem-G_MP',
-
-
-
-
-        # ====================================== 2024-09-03.toward_camera_ready ============================
-
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-
-
-        # '2024-08-30.FLD.ref_prob-0.20',
-
-        # '2024-09-03.trnsl-thing_person-v0',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.20.theorem-G_MP.syllogism.contraposition.interchangeability',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.13.theorem-G_MP.syllogism.contraposition.interchangeability',
-        # '2024-08-30.trnsl-thing_person-v0.ref_prob-0.05.theorem-G_MP.syllogism.contraposition.interchangeability',
-
-
-        # '2024-09-03.trnsl-thing_person-v0.rule-G_MP',
-        # '2024-09-03.trnsl-thing_person-v0.voc-100',
-        # '2024-09-03.trnsl-thing_person-v0.dstrct-0',
-        # '2024-09-03.trnsl-thing_person-v0.stps-3-0',
-        # '2024-09-03.trnsl-thing_person-v0.trnsl-small',
-
-
-        # '2024-09-03.trnsl-thing_person-v2',
-
-
-
-
-        # ================================== 2024-09-16.fix_negation ========================================
-        # '2024-09-16.FLD.neg-0.10',
-        # '2024-09-16.PLD.neg-0.10.theorems-0.00',
-        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old',
-        # '2024-09-16.PLD.neg-0.10.theorems-0.00.trnsl-old.vocab-5000',
-
-        # '2024-09-16.PLD.neg-0.10',
-        # '2024-09-16.PLD.neg-0.20',
-        # '2024-09-16.PLD.neg-0.10.theorems-0.30',
-        # '2024-09-16.PLD.neg-0.10.theorems-all',
-
-
-        # ====================================== ./outputs/01.train.py/2024-08-26.really_camera_ready ============================
-
-        # 'hf.hitachi-nlp/ruletaker',
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        # '2024-08-16.neurips_camera_ready.FLD.small_vocab',
-
-
-
-
-        # =================== ./outputs.FLD-augmentation/00.augment.py/2024-08-25 ======================
-
-        # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=False__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
-        # 'AUG__2024-08-09.depth_fix.2024-03-29.FLD_v2.trnsl-thing_person-v0__augmnttn=True__augmnttn_prb=0.5__llm_nm=hf.TechxGenus@Mistral-Large-Instruct-2407-AWQ__prf_intrmdt_stps=randomly_include',
-
-
-
-        # =================== 2024-09-06.factorized_reasoning ======================
-        # 'hf.hitachi-nlp/ruletaker',
-
-
-
-        # =================================== 2024-09-08.ALPT_strong ========================================
-        # '2024-09-03.trnsl-thing_person-v0',
-
-
-
-        # =================================== 2024-09-08.factorized_reasoning ========================================
-        # 'hf.hitachi-nlp/ruletaker',
-        # '2024-09-03.trnsl-thing_person-v0',
-
-
-
-
-
-
-
-        # ================================== 2024-09-18.fix_negation ========================================
-        # '2024-09-18.FLD.neg-0.10',
-
-        # '2024-09-18.PLD.neg-0.10.theorems-0.00.trnsl-old.vocab-5000',
-        # '2024-09-18.PLD.neg-0.10.theorems-0.00.trnsl-old',
-        # '2024-09-18.PLD.neg-0.10.theorems-0.00',
-
-        # '2024-09-18.PLD.neg-0.10',
-
-        # '2024-09-18.PLD.neg-0.10.theorems-0.30',
-        # '2024-09-18.PLD.neg-0.10.theorems-all',
-        # '2024-09-18.PLD.neg-0.10.ref_prob-0.10',
-
-        # '2024-09-18.PLD.neg-0.10.theorems-0.30.theorems-all',
-        # '2024-09-18.PLD.neg-0.15',
-        # '2024-09-18.PLD.neg-0.15.theorems-0.30.theorems-all',
-
-
-        # ================================== main ========================================
 
         # 'hf.hitachi-nlp/PARARULE-Plus',
         # 'hf.hitachi-nlp/ruletaker',
-
-        # '2024-09-18.FLD.neg-0.10',
-        # '2024-09-18.PLD.neg-0.20',
-
-        # ================================== ablation ========================================
-        # '2024-09-18.PLD.neg-0.20.voc-100',
-        # '2024-09-18.PLD.neg-0.20.dstrct-0',
-        # '2024-09-18.PLD.neg-0.20.stps-3-0',
-        # '2024-09-18.PLD.neg-0.20.rule-G_MP',
-        # '2024-09-18.PLD.neg-0.20.trnsl-small',
-
-
-
-        # ================================== 2024-09-30.hybrid ========================================
-
-        # ------------------------------- best set ----------------------------
-
-        # '2024-09-18.FLD.neg-0.10',
-        # '2024-09-18.PLD.neg-0.20',
-
-
-        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20__2024-09-18.FLD.neg-0.10',
-        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20=0.25__2024-09-18.FLD.neg-0.10=0.75',
-        # '2024-09-30.hybrid__2024-09-18.PLD.neg-0.20=0.75__2024-09-18.FLD.neg-0.10=0.25',
-
-
-        # '2024-09-30.hybrid__PLD_v2=0.25__PLD_v0=0.50__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v2=0.50__PLD_v0=0.25__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v2=0.37__PLD_v0=0.37__FLD=0.25',
-
-
-        # '2024-09-30.hybrid__PLD_v2=0.25__FLD=0.75',
-        # '2024-09-30.hybrid__PLD_v2=0.50__FLD=0.50',
-        # '2024-09-30.hybrid__PLD_v2=0.75__FLD=0.25',
-
-
-        # '2024-09-18.FLD.neg-0.20',
-
-        # '2024-09-18.PLD.neg-0.20.trnsl-v2.theorems-all',
-        # '2024-09-18.PLD.neg-0.20.trnsl-v2.theorems-all.theorems-0.3',
-
-        # '2024-09-30.hybrid__PLD_v2=0.17__PLD_v0=0.33__FLD=0.50',
-
-        
-
-        # '2024-09-18.PLD.neg-0.10',
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.50__FLD=0.50',
-
-        # '2024-09-18.PLD.neg-0.10.trnsl-v2',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
-
-
-        # '2024-09-30.hybrid__PLD_v2=0.50__FLD=0.50',
-        # '2024-09-30.hybrid__PLD_v2=0.45__PLD_v0=0.10__FLD=0.45',
-        # '2024-09-30.hybrid__PLD_v2=0.40__PLD_v0=0.10__FLD=0.50',
-
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.15=0.50__FLD=0.50',
-
-
-
-
-
-        # --------------- rerun with large fisher --------------
-
         # '2024-09-18.FLD.neg-0.10.other_seed',
-        # '2024-09-18.FLD.neg-0.10.theorems',
-        # '2024-09-18.FLD.neg-0.10.theorems.theorems-0.3',
-        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all',
-        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all.theorems-0.3',
-        # '2024-09-18.FLD.neg-0.10.theorems.theorems-all.theorems-0.3.voc-large',
-        # '2024-09-18.FLD.neg-0.10.voc-large',
+        '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.90',
 
-
-        # '2024-09-18.PLD.neg-0.10',
-        # '2024-09-18.PLD.neg-0.10.theorems-0.30',
-        # '2024-09-18.PLD.neg-0.10.theorems-all',
-        # '2024-09-18.PLD.neg-0.10.theorems-0.30.theorems-all',
-        # '2024-09-18.PLD.neg-0.20',
-
-
-        # '2024-09-18.PLD.neg-0.10.trnsl-v2',
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.25__FLD=0.75',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.75__FLD=0.25',
-
-        # '2024-09-18.PLD.neg-0.10.trnsl-v2.theorems-all.theorems-0.3',
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.25__FLD=0.75',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.50__FLD=0.50',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.75__FLD=0.25',
-
-
-
-
-
-
-
-        # ===================================== camera ready ========================================
-
-
-        # 'hf.hitachi-nlp/PARARULE-Plus',
-        'hf.hitachi-nlp/ruletaker',
-
-        # '2024-09-18.FLD.neg-0.10.other_seed',
-        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.90',
-
-
-        # '2024-09-18.PLD.neg-0.20.voc-100',
-        # '2024-09-18.PLD.neg-0.20.dstrct-0',
-        # '2024-09-18.PLD.neg-0.20.stps-1-0',
-        # '2024-09-18.PLD.neg-0.20.stps-3-0',
-        # '2024-09-18.PLD.neg-0.20.rule-G_MP',
-        # '2024-09-18.PLD.neg-0.20.trnsl-small',
-        # '2024-09-18.PLD.neg-0.20.trnsl-small.trnsl-old',
 
 
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.rules-G_MP=0.90',
@@ -462,43 +163,6 @@ def main():
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.stps-3-0=0.90',
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.stps-1-0=0.90',
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.trnsl-small.trnsl-old=0.90',
-
-
-        # ------------------------------- not best set ----------------------------
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.75__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.50__FLD=0.50',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.25__FLD=0.75',
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10=0.10__FLD=0.90',
-
-        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems=0.40__FLD=0.50',
-        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.25__FLD_theorems_voc-large=0.25__FLD=0.50',
-        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.40__FLD=0.50',
-
-        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.40__FLD_voc-large=0.50',
-        # '2024-10-20.hybrid__PLD_v2.neg-0.10=0.10__FLD_theorems_voc-large=0.90',
-
-        # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.40__FLD_voc-large=0.50',
-
-
-
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.rule-G_MP',
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.voc-100',
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.dstrct-0',
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.stps-3-0',
-        # '2024-09-30.hybrid__PLD_v0.neg-0.10=0.75__FLD=0.25.trnsl-small',
-
-
-        # '2024-09-30.hybrid__PLD_v0.theorems-0.3=0.50__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v0.theorems-0.3.theorems-all=0.50__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v0.theorems-all=0.50__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v2=0.50__PLD_v0=0.25__FLD=0.25.theorems-all',
-        # '2024-09-30.hybrid__PLD_v2=0.37__PLD_v0=0.37__FLD=0.25.theorems-all',
-
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all=0.75__FLD=0.25',
-        # '2024-09-30.hybrid__PLD_v2.neg-0.10.theorems-all.thelrems-0.3=0.75__FLD=0.25',
-        # '2024-09-18.PLD.neg-0.10.trnsl-v2.theorems-all',
 
 
     ]
@@ -582,14 +246,11 @@ def main():
         # 'FT.bs-256__step-780.wrmp-200',  # 200k examples
         # 'FT.bs-512__step-390.wrmp-200',  # 200k examples with same step size as 100k examples
 
-
         # 'FT.bs-256__step-1172.wrmp-200',  # 300k examples
 
         # 'FT.bs-256__step-1953.wrmp-200',  # 500k examples
 
         # 'FT.bs-256__step-3900.wrmp-200',  # 1M examples
-
-        # 'FT.bs-240__step-417.wrmp-200',  # 100k examples, for middle2 x 5
 
 
         # ========== factoorized reasoning ==========
@@ -614,35 +275,29 @@ def main():
 
 
     optimizer_setings = [
-        # ('rec_adam', 1.0, 0),
-        # ('rec_adam', 1.0, 100),
-        # ('rec_adam', 1.0, 300),
-        # ('rec_adam', 1.0, 1000),
-        ('rec_adam', 1.0, 2000),
-        # ('rec_adam', 1.0, 3000),
-        # ('rec_adam', 1.0, 4000),
-        # ('rec_adam', 1.0, 4500),
-        # ('rec_adam', 1.0, 5000),
+        # ('rec_adam', 0),
+        # ('rec_adam', 100),
+        # ('rec_adam', 300),
+        # ('rec_adam', 1000),
+        ('rec_adam', 2000),
+        # ('rec_adam', 3000),
+        # ('rec_adam', 4000),
+        # ('rec_adam', 4500),
+        # ('rec_adam', 5000),
 
-        # ('rec_adam', 1.0, 5000),
-        # (None, None, None),
+        # ('rec_adam', 5000),
+        # (None, None),
     ]
 
 
 
-    # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
+    engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
 
-    # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=6)
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
-    engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
+    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
 
-
-    # ============================== ABCI =================================
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=1)
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=16)
-    # engine = QsubEngine('ABCI', 'rt_F', n_resource=32)
 
 
     hours = 5
@@ -686,12 +341,7 @@ def main():
 
 
 
-    dry_run = False
-
-    # augmentation_args = [
-    #     False,
-    #     # True,
-    # ]
+    dry_run = True
 
 
     max_train_samples_args = [
@@ -700,39 +350,10 @@ def main():
     ]
 
 
-    weight_decay_args = [
-        0.0,
-        # 0.01,
-        # 0.1,
-    ]
-
-    # max_grad_norm_args = [
-    #     # 0.5,
-    #     1.0,
-    #     # 3.0,
-    # ]
-
-    # paraphrase_contradiction_args = [
+    # prompt_emphasize_theorems_args = [
     #     False,
     #     # True,
     # ]
-
-
-
-    # prompt_indicate_theorems_args = [
-    #     # False,
-    #     True,
-    # ]
-
-    prompt_emphasize_theorems_args = [
-        False,
-        # True,
-    ]
-
-    formula_prob_args = [
-        0.0,
-        # 0.2,  # あらゆるベンチマークで下がる．
-    ]
 
     # deepspeed_stage = 'zero0'   # 1B models can use this
     # deepspeed_stage = 'zero2'   # 7B can used this, but not that much speedup
@@ -741,8 +362,6 @@ def main():
     resume_from_checkpoint = None
     # resume_from_checkpoint = './outputs/01.train.py/checkpoint.2024-02-18'
 
-    # take_interval_between_jobs = False
-    take_interval_between_jobs = True
 
     from_scratch_args = [
         False,
@@ -753,18 +372,12 @@ def main():
     # lr_scheduler_type = 'cosine'
 
     streaming = False
-
-    # update_parameters_args = [
-    #     'all',
-    #     # 'attention',
-    #     # 'mlp',
-    # ]
+    take_interval_between_jobs_if_streaming = True
 
     max_eval_samples = 10000
 
     save_model_on_eval = True
     save_model_at_end = False
-
 
     base_setting_name = 'default'
 
@@ -779,11 +392,6 @@ def main():
         # True,
         False,    # better for 'all_at_once'
     ]
-
-    # no_subproof_for_unknown_args = [
-    #     True,   # better
-    #     # False,
-    # ]
 
     epoch = None
 
@@ -810,22 +418,14 @@ def main():
         multitask_setting_list,
         learnings,
         optimizer_setings,
-        # prompt_indicate_theorems_args,
-        prompt_emphasize_theorems_args,
+        # prompt_emphasize_theorems_args,
         sample_negative_proof_args,
         proof_intermediate_steps_prob_args,
-        # no_subproof_for_unknown_args,
         seeds,
         model_settings,
         lrates,
-        weight_decay_args,
-        # max_grad_norm_args,
-        # update_parameters_args,
         from_scratch_args,
-        # augmentation_args,
         augmentation_prob_args,
-        # paraphrase_contradiction_args,
-        formula_prob_args,
     )
          
     # iter with hyparas
@@ -833,30 +433,16 @@ def main():
          max_train_samples,
          (logic_dataset_prob, other_dataset_settings),
          learning,
-         (optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef),
-         # prompt_indicate_theorems,
-         prompt_emphasize_theorems,
+         # (optimizer, rec_adam_target_task_weight, rec_adam_fisher_coef),
+         (optimizer, rec_adam_fisher_coef),
+         # prompt_emphasize_theorems,
          sample_negative_proof,
          proof_intermediate_steps_prob,
-         # no_subproof_for_unknown,
          seed,
          (model_name, lm_type, model_name_for_batch_size),
          lrate,
-         weight_decay,
-         # max_grad_norm,
-         # update_parameters,
          from_scratch,
-         # augmentation,
-         augmentation_prob,
-         # paraphrase_contradiction,
-         formula_prob) in hyparas:
-
-        # if logic_dataset_uname == 'hf.hitachi-nlp/FLD.v2__default':
-        #     logic_dataset_config_load_type = 'concat_all'
-        #     logic_dataset_concatenate_all_splits_into_train = True
-        # else:
-        #     logic_dataset_config_load_type = None
-        #     logic_dataset_concatenate_all_splits_into_train = False
+         augmentation_prob) in hyparas:
 
         logic_dataset_config_load_type = None
         logic_dataset_concatenate_all_splits_into_train = False
@@ -933,9 +519,9 @@ def main():
 
             # if augmentation:
             if augmentation_prob > 0:
-                instruction = False
+                no_instruction = True
             else:
-                instruction = True
+                no_instruction = False
 
             setting = {}
 
@@ -952,7 +538,7 @@ def main():
                     model_name=model_name,
                     optimizer=optimizer,
                     # max_grad_norm=max_grad_norm,
-                    rec_adam_target_task_weight=rec_adam_target_task_weight,
+                    # rec_adam_target_task_weight=rec_adam_target_task_weight,
                     rec_adam_fisher_coef=rec_adam_fisher_coef,
 
                     # update_parameters=update_parameters,
@@ -987,20 +573,12 @@ def main():
                     use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                     streaming=streaming,
                     use_original_serial=use_original_serial,
-                    instruction=instruction,
-                    # prompt_indicate_theorems=prompt_indicate_theorems,
-                    prompt_emphasize_theorems=prompt_emphasize_theorems,
-                    # augmentation=augmentation,
+                    no_instruction=no_instruction,
+                    # prompt_emphasize_theorems=prompt_emphasize_theorems,
                     augmentation_prob=augmentation_prob,
-                    # paraphrase_contradiction=paraphrase_contradiction,
-                    formula_prob=formula_prob,
 
                     sample_negative_proof=sample_negative_proof,
                     proof_intermediate_steps_prob=proof_intermediate_steps_prob,
-                    # no_subproof_for_unknown=no_subproof_for_unknown,
-
-
-
                 )
             )
 
@@ -1066,7 +644,6 @@ def main():
 
                 'learning_rate': lrate,
                 'lr_scheduler_type': lr_scheduler_type,
-                'weight_decay': weight_decay,
 
                 # [XXX] may hang???
                 # 'preprocessing_num_workers': max(1, max(16, int(n_cpus_per_node / n_gpus_per_node))),
@@ -1108,7 +685,6 @@ def main():
                                    deepspeed_stage=deepspeed_stage,
                                    port=random.randint(29777, 31777),
                                    n_gpus_per_node=n_gpus_per_node)
-            # logger.critical(str(output_dir))
 
             run_by_engine(
                 engine,
@@ -1118,7 +694,7 @@ def main():
                 force=True,  # assuming that we do not have many jobs
                 dry_run=dry_run
             )
-            if streaming and take_interval_between_jobs:
+            if streaming and take_interval_between_jobs_if_streaming:
                 logger.info('sleep for a wihle to avoid "Too many requests" exception for huggingface hub')
                 time.sleep(60 * 10)
 

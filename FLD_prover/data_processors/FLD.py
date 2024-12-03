@@ -26,15 +26,13 @@ class FLDProcessor(Processor):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self._instruction and self._augmentation:
-            raise ValueError('Instruction and augmentation cannot be used together')
 
         self._serializor = Serializor(
             proof_intermediate_steps_prob=self._proof_intermediate_steps_prob,
             proof_sampling=self._proof_sampling,
             sample_negative_proof=self._sample_negative_proof,
             no_subproof_for_unknown=self._no_subproof_for_unknown,
-            instruction=self._instruction,
+            no_instruction=self._no_instruction,
             prompt_indicate_theorems=self._prompt_indicate_theorems,
             prompt_emphasize_theorems=self._prompt_emphasize_theorems,
             augmentation=self._augmentation,
@@ -50,7 +48,7 @@ class FLDProcessor(Processor):
     ) -> Tuple[str, str, str]:
 
         serial = self._get_serial(example, split)
-        prompt_with_partial_proof = self._prompt_prefix + serial.prompt + (serial.partial_proof or '')
+        prompt_with_partial_proof = serial.prompt + (serial.partial_proof or '')
         next_proof_step = serial.next_proof_step
         gold_proof = serial.proof
 

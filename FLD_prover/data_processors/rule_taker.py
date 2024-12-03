@@ -27,7 +27,7 @@ class RuleTakerProcessor(Processor):
             '$hypothesis$ = ' + hypothesis,
             '$proof$ = '
         ])
-        prompt_with_partial_proof = self._prompt_prefix + prompt
+        prompt_with_partial_proof = prompt
         next_proof_step = gold_proof
 
         return prompt_with_partial_proof, next_proof_step, gold_proof

@@ -378,7 +378,7 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
-    instruction: bool = field(
+    no_instruction: bool = field(
         default=False,
         metadata={},
     )
@@ -395,7 +395,7 @@ class DataTrainingArguments:
         metadata={},
     )
     formula_prob: float = field(
-        default=0.0,
+        default=0.0,  # > 0.0 leads to significant performance degradation
     )
 
 
@@ -842,13 +842,13 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         'max_prompt_length': max_prompt_length,
         # 'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
         'proof_intermediate_steps_prob': data_args.proof_intermediate_steps_prob,
-        'proof_sampling': False,
+        'proof_sampling': 'all_at_once',
         'sample_negative_proof': False,
         'no_subproof_for_unknown': not data_args.include_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
-        'instruction': data_args.instruction,
+        'no_instruction': data_args.no_instruction,
         # 'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
-        'prompt_indicate_theorems': True,
+        # 'prompt_indicate_theorems': True,
         'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
         'augmentation': data_args.augmentation_prob > 0.0,
         'augmentation_prob': data_args.augmentation_prob,
