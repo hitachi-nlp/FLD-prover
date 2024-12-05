@@ -40,7 +40,7 @@ class Processor(ABC):
                  no_subproof_for_unknown=False,
                  ignore_pad_token_for_loss=True,
                  include_prompt_for_causal_lm_loss=False,
-                 instruction=False,
+                 no_instruction=False,
                  prompt_indicate_theorems=False,
                  prompt_emphasize_theorems=False,
                  augmentation=False,
@@ -64,7 +64,7 @@ class Processor(ABC):
         self._no_subproof_for_unknown = no_subproof_for_unknown
         self._ignore_pad_token_for_loss = ignore_pad_token_for_loss
         self._include_prompt_for_causal_lm_loss = include_prompt_for_causal_lm_loss
-        self._instruction = instruction
+        self._no_instruction = no_instruction
         self._prompt_indicate_theorems = prompt_indicate_theorems
         self._prompt_emphasize_theorems = prompt_emphasize_theorems
         self._augmentation = augmentation
@@ -112,6 +112,7 @@ class Processor(ABC):
         gold_proofs: List[str] = []
         for i_example, example in enumerate(unbatched_examples):
             prompt_w_partial_proof, next_proof_step, gold_proof = self._make_in_out(example, mode)
+            prompt_w_partial_proof = self._prompt_prefix + prompt_w_partial_proof
 
             prompts_w_partial_proof.append(prompt_w_partial_proof)
             proof_steps.append(next_proof_step)

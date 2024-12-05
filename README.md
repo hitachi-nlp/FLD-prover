@@ -1,18 +1,20 @@
 # FLD-Prover
-This repository includes the code to train and evaluate language models on FLD corpora.  
+This repository includes the code to train and evaluate large language models on FLD corpora.  
 
 See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about the whole FLD project.
 
 
 
 
-## Releases (READ CAREFULLY to determine which branch suits you)
-* **`NLP_2024_KOBE_BEEF`** branch (2024-01-24) 
+## Release Branches (READ CAREFULLY to determine which branch suits you)
+* **(New!)** `NeurIPS_2024` branch (2024-12)
+    - We released the code for training LLMs.
+* `NLP_2024_KOBE_BEEF` branch (2024-01-24) 
     - Release at NLP (言語処理学会) 2024.
-    - **We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.**
+    - We made it possible to [Fine-tune LLMs](#fine-tune-llms), including both English and Japanese models.
     - Minor update on the proof generation strategy: For examples with the UNKNOWN label, we now generate only the label. Previously, in addition to the label, we also generated a subproof, which was somewhat unreasonable since this subproof could not be distinguished from the noise proofs yielded by the distractors. This change in strategy might slightly affect performance.
-    - **This branch might not be compatible with the older branches of relevant repositories.**
-* **`main`** branch (2023-08-22)
+    - This branch might not be compatible with the older branches of relevant repositories.
+* `main` branch (2023-08-22)
     - Initial release at ICML 2023.
     - Note that the prover implemented in this repository is slightly different from the one used in the original ICML paper, as follows:
         * The model used in the paper is the step-wise prover of [the previous study](https://github.com/princeton-nlp/NLProofS), which comes with the code for the proof verifier. For simplicity and ease of use, we have implemented a simpler prover.
@@ -21,17 +23,8 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 
 
-## Other Framework
-FLD training is also accessible through a logical reasoning framework called [LogiTorch/logitorch](https://github.com/LogiTorch/logitorch).
-Specifically, LogiTorch enables the training of an "all-at-once prover that generates an entire logical proof at once.
-This prover differs from the original stepwise prover used in the paper and delivers slightly better performance.
-
-
-
-
 ## Installation
 The code has been tested on Python 3.11.5
-
 
 ```console
 # [!] First, prepare CUDA libraries and set correct environmental variables,
@@ -49,223 +42,105 @@ pip install -r ./requirements/requirements.txt
 # Additional package for data preprocessing.
 git clone https://github.com/hitachi-nlp/FLD-task.git
 cd FLD-task
-git checkout NLP_2024_KOBE_BEEF
+git checkout <taget branch>
 pip install -e .
 cd ..
 
 export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ```
 
-### To use deepspeed with zero2
-Edit `transformers/integrations/deepspeed.py` as follows:
-```python
-if inference:
-    # only Z3 makes sense for the inference
-    - if not hf_deepspeed_config.is_zero3():
-    -     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
-    + # if not hf_deepspeed_config.is_zero3():
-    + #     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
-```
 
 
 
+## How to Train LLMs
 
-## Fine-tune T5
-To train and evaluate the T5-based prover, which was used in the ICML paper:
+### Using Your own Script
+[Our training script](#using_our_script) is becoming a bit complicated, so it could be better to use your own script, roughly as follows:
+1. Prepare the corpus.
+    * You can simply use the released version of [FLDx2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLDx2).
+    * (Optional) Or, you can create your own corpus by [FLD-generator](https://github.com/hitachi-nlp/FLD-generator).
+2. Modify your training script as follows:
+    * Use `prompt_serial` field of the corpus for LLM's input, and `proof_serial` for the output.
+    * DO MASK the LLM's input, meaning that we do not use the input for loss computation, similarly to supervised fine-tuning. This prevents LLMs from memorizing unknown facts included in the corpus.
+    * Use [Rcall Adam Optimizer](https://github.com/hitachi-nlp/rec-adam) to, again, prevent LLMs from memorizing unknown facts.
+
+For the other details, please refer to our paper.
+
+### Using Our Script
+The training script is `./scripts/run_causal_prover.py`.
+
+To train Llama-3.1-8B on [FLDx2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLDx2), run the following command:
 ```console
-python ./scripts/run_prover.py \
-    --dataset_name hitachi-nlp/FLD.v2 \
-    --dataset_config_name default \
-    --model_name_or_path t5-base \
-    --output_dir outputs/ \
-    --logging_dir outputs/tensorboard/ \
-    --file_type json \
-    --predict_with_generate True \
-    --remove_unused_columns False \
-    --do_train True \
-    --do_eval True \
-    --do_predict False \
+python ./scripts/run_causal_prover.py \
+    --output_dir {output_dir} \
+    --logging_dir {log_dir} \
+    --model_name_or_path meta-llama/Meta-Llama-3.1-8B \
+    --logic_dataset_name hitachi-nlp/FLDx2 \
+    --use_original_serial True \
+    --proof_intermediate_steps_prob 0.5 \
     --seed 0 \
-    --max_grad_norm 0.5 \
-    --max_steps 20000 \
-    --gradient_accumulation_steps 16 \
-    --max_eval_samples 500 \
-    --proof_sampling stepwise \
-    --learning_rate 0.0001 \
-    --warmup_steps 1000 \
-    --source_prefix "Solve FLD task: " \
-    --generation_num_beams 10 \
-    --generation_top_k 10 \
-    --generation_max_proof_steps 20 \
-    --max_source_length 1700 \
-    --max_target_length 100 \
+    --learning_rate 2e-05 \
+    --warmup_steps 200 \
+    --max_steps 390 \
+    --eval_steps 390 \
+    --optimizer rec_adam \
+    --rec_adam_fisher_coef 4000 \
+    --per_device_train_batch_size 4 \
+    --per_device_eval_batch_size 4 \
+    --gradient_accumulation_steps 8 \
+    --gradient_checkpointing True \
+    --max_eval_samples 10000 \
+    --block_size 2048 \
     --logging_strategy steps \
-    --logging_steps 25 \
+    --logging_steps 5 \
     --overwrite_output_dir True \
-    --log_generation True \
-    --sample_negative_proof True \
-    --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 1 \
-    --dataloader_num_workers 0     \
     --log_examples True \
+    --logic_dataset_prob 1.0 \
+    --logic_eval_max_samples 100 \
+    --remove_unused_columns False \
+    --streaming False \
     --evaluation_strategy steps \
-    --save_strategy steps  \
-    --max_predict_samples 1000 \
-    --eval_steps 5000 \
-    --padding longest
+    --save_model_at_end False \
+    --save_only_model True \
+    --save_steps 390 \
+    --save_strategy steps \
+    --save_total_limit 2 \
+    --generation_temperature 1.0 \
+    --generation_max_prompt_length 1300 \
+    --generation_timeout 7200 \
+    --evaluation_timeout 36000 \
+    --do_train True \
+    --do_predict False \
+    --fp16 False \
+    --bf16 True \
+    --preprocessing_num_workers 1 \
+    --preprocess_batch_size 500 \
+    --ddp_timeout 36000 \
+    --use_auth_token True
 ```
-Note that we use **FLD** corpus hosted by [🤗 huggingface hub](https://huggingface.co/datasets/hitachi-nlp/FLD.v2).
-If you want to use **FLD★**, specify `--dataset_config_name star`.
 
-
-If you have the datasets on your local filesystem, swap the `--dataset_name` option to the following:
+If you use huggingface's deepspeed integration, you can modify the command as something like as follows, depending on your environment:
 ```console
-    --train_file ./data/FLD.v2/FLD.v2/train.jsonl \
-    --validation_file ./data/FLD.v2/FLD.v2/valid.jsonl \
-    --test_file ./data/FLD.v2/FLD.v2/test.jsonl \
+deepspeed \
+    --master_addr {hostname} \
+    --master_port {port} \
+    --hostfile {hostfile} \
+    --no_ssh_check \
+    --launcher OpenMPI \
+    --launcher_args "-mca coll ^hcoll --oversubscribe" \
+    ./scripts/run_causal_prover.py \
+    --deepspeed ds_config/ds_config_zero3_wo_optimizer_offload.json \
+    {other_options}
+```
+
+Additionally, if you have corpora on your local filesystem, swap the `--logic_dataset_name` option to the following:
+```console
+    --logic_train_file {train_jsonl_path} \
+    --logic_validation_file {validation_jsonl_path} \
+    --logic_test_file {test_jsonl_path} \
 ```
 
 After launching the script, you can check the results by tensorboard as:
 ```console
-tensorboard --port 6006 --logdir ./outputs/tensorboard/
+tensorboard --port <your_port> --logdir ./outputs/tensorboard/
 ```
-
-
-## Fine-tune LLMs
-LLMs are mostly encoder-only models, which can be trained by the other script as follows.
-
-Training English model on FLD:
-```console
-python ./scripts/run_causal_prover.py  \
-    --FLD_dataset_name hitachi-nlp/FLD.v2 \
-    --FLD_dataset_config_name default \
-    --model_name_or_path TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
-    --output_dir outputs/ \
-    --logging_dir outputs/tensorboard/ \
-    --seed 0  \
-    --max_grad_norm 0.5   \
-    --max_steps 70  \
-    --gradient_accumulation_steps 4  \
-    --max_eval_samples 150  \
-    --learning_rate 1e-05  \
-    --warmup_steps 21  \
-    --max_target_length 2000  \
-    --logging_strategy steps  \
-    --logging_steps 1  \
-    --overwrite_output_dir True  \
-    --no_subproof_for_unknown True  \
-    --per_device_train_batch_size 1  \
-    --per_device_eval_batch_size 1  \
-    --dataloader_num_workers 0  \
-    --log_examples True  \
-    --max_train_samples 5  \
-    --FLD_dataset_prob 1.0  \
-    --FLD_max_eval_samples 150  \
-    --eval_steps 70  \
-    --remove_unused_columns False  \
-    --instruction False  \
-    --streaming False    \
-    --evaluation_strategy steps  \
-    --save_strategy no  \
-    --save_model_at_end False  \
-    --gradient_checkpointing True  \
-    --block_size 2000  \
-    --FLD_proof_eval_padding longest   \
-    --generation_do_sample False  \
-    --generation_temperature 1.0     \
-    --generation_timeout 7200  \
-    --evaluation_timeout 36000  \
-    --do_train True  \
-    --do_eval_in_outerloop False  \
-    --do_predict False  \
-    --fp16 True  \
-    --lr_scheduler_type linear  \
-    --weight_decay 0.0  \
-    --lora False  \
-    --use_auth_token
-```
-
-Training Japanese model on JFLD:
-```console
-python ./scripts/run_causal_prover.py  \
-    --FLD_dataset_name hitachi-nlp/JFLD_BCCWJ \
-    --FLD_dataset_config_name D3 \
-    --model_name_or_path rinna/japanese-gpt-neox-3.6b \
-    --output_dir outputs/ \
-    --logging_dir outputs/tensorboard/ \
-    --seed 0  \
-    --max_grad_norm 0.5   \
-    --max_steps 70  \
-    --gradient_accumulation_steps 4  \
-    --max_eval_samples 150  \
-    --learning_rate 1e-05  \
-    --warmup_steps 21  \
-    --max_target_length 2000  \
-    --logging_strategy steps  \
-    --logging_steps 1  \
-    --overwrite_output_dir True  \
-    --no_subproof_for_unknown True  \
-    --per_device_train_batch_size 1  \
-    --per_device_eval_batch_size 1  \
-    --dataloader_num_workers 0  \
-    --log_examples True  \
-    --max_train_samples 5  \
-    --FLD_dataset_prob 1.0  \
-    --FLD_max_eval_samples 150  \
-    --eval_steps 70  \
-    --remove_unused_columns False  \
-    --instruction False  \
-    --streaming False    \
-    --evaluation_strategy steps  \
-    --save_strategy no  \
-    --save_model_at_end False  \
-    --gradient_checkpointing True  \
-    --block_size 2000  \
-    --FLD_proof_eval_padding longest   \
-    --generation_do_sample False  \
-    --generation_temperature 1.0     \
-    --generation_timeout 7200  \
-    --evaluation_timeout 36000  \
-    --do_train True  \
-    --do_eval_in_outerloop False  \
-    --do_predict False  \
-    --fp16 True  \
-    --lr_scheduler_type linear  \
-    --weight_decay 0.0  \
-    --lora False  \
-    --use_auth_token
-```
-
-
-If you have the datasets on your local filesystem, swap the `--FLD_dataset_name` option to the following:
-```console
-    --FLD_train_file ./data/FLD.v2/FLD.v2/train.jsonl \
-    --FLD_validation_file ./data/FLD.v2/FLD.v2/valid.jsonl \
-```
-
-After launching the script, you can check the results by tensorboard as:
-```console
-tensorboard --port 6006 --logdir ./outputs/tensorboard/
-```
-
-
-
-
-## Performance and the metrics
-The T5-based prover trained after 20000 steps on each corpus should perform as follows:
-
-| corpus           | extr_stps.D-all.proof_accuracy | strct.D-all.proof_accuracy | D-all.answer_accuracy |
-|------------------|--------------------------------|-----------------------------|-----------------------|
-| **FLD** (FLD.3)  | 85.2                           | 75.8                        | 91.6                  |
-| **FLD★**(FLD.4)   | 60.6                           |44.4                        | 72.2                  |
-
-As seen above, we have defined the two types of metrics:
-* `strict` (shown as `strct.*`. used in the paper.)
-    * Do not allow any logical step generated by the model that is extra to the gold proof. Note that such a step can be logically valid because there are distractors that can lead to some valid logical steps irrelevant to the gold proof.
-* `extra_steps` (shown as `extr_stps.*`)
-    * Allows such extra steps.
-
-The difference in the two metrics is the most noticeable for a dataset instance with an `unknown` label, on which the `strict` metric allows the model to output only `__UNKNOWN__` marker while the `extra_steps` metric allows the model to output some logical steps to investigate whether the hypothesis can be (dis-) proved or not.
-
-We think both metrics have their Pros/Cons and both are OK for use as long as they are not contaminated.
-Note that the previous studies have used the metric colse to `extra_steps` regarding the `unknown` labels.

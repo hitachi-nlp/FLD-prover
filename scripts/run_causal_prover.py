@@ -270,7 +270,7 @@ class DataTrainingArguments:
             )
         },
     )
-    train_random_sampling: bool = field(
+    train_no_sampling: bool = field(
         default=False,
         metadata={
             "help": (
@@ -297,7 +297,7 @@ class DataTrainingArguments:
             )
         },
     )
-    eval_random_sampling: bool = field(
+    eval_no_sampling: bool = field(
         default=False,
         metadata={
             "help": (
@@ -310,7 +310,7 @@ class DataTrainingArguments:
     logic_eval_max_samples: Optional[int] = field(
         default=None,
     )
-    logic_eval_random_sampling: bool = field(
+    logic_eval_no_sampling: bool = field(
         default=False,
     )
 
@@ -378,7 +378,7 @@ class DataTrainingArguments:
         default=False,
         metadata={},
     )
-    instruction: bool = field(
+    no_instruction: bool = field(
         default=False,
         metadata={},
     )
@@ -395,7 +395,7 @@ class DataTrainingArguments:
         metadata={},
     )
     formula_prob: float = field(
-        default=0.0,
+        default=0.0,  # > 0.0 leads to significant performance degradation
     )
 
 
@@ -842,13 +842,13 @@ def make_logic_data_processor(data_args, tokenizer, max_length, max_prompt_lengt
         'max_prompt_length': max_prompt_length,
         # 'proof_intermediate_steps_prob': proof_intermediate_steps_prob,
         'proof_intermediate_steps_prob': data_args.proof_intermediate_steps_prob,
-        'proof_sampling': False,
+        'proof_sampling': 'all_at_once',
         'sample_negative_proof': False,
         'no_subproof_for_unknown': not data_args.include_subproof_for_unknown,
         'include_prompt_for_causal_lm_loss': data_args.include_prompt_for_causal_lm_loss,
-        'instruction': data_args.instruction,
+        'no_instruction': data_args.no_instruction,
         # 'prompt_indicate_theorems': data_args.prompt_indicate_theorems,
-        'prompt_indicate_theorems': True,
+        # 'prompt_indicate_theorems': True,
         'prompt_emphasize_theorems': data_args.prompt_emphasize_theorems,
         'augmentation': data_args.augmentation_prob > 0.0,
         'augmentation_prob': data_args.augmentation_prob,
@@ -1380,7 +1380,7 @@ def main():
         if data_args.max_train_samples is not None:
             train_dataset = take(train_dataset,
                                  data_args.max_train_samples,
-                                 data_args.train_random_sampling)
+                                 not data_args.train_no_sampling)
     else:
         train_dataset = None
 
@@ -1394,7 +1394,7 @@ def main():
         )
         eval_dataset = take(eval_dataset,
                             data_args.max_eval_samples,
-                            data_args.eval_random_sampling)
+                            not data_args.eval_no_sampling)
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
@@ -1439,7 +1439,7 @@ def main():
         if data_args.logic_eval_max_samples is not None:
             logic_eval_dataset = take(logic_eval_dataset,
                                       data_args.logic_eval_max_samples,
-                                      data_args.logic_eval_random_sampling)
+                                      not data_args.logic_eval_no_sampling)
 
         data_args.log_non_logic_examples = data_args.log_examples
         logic_eval_dataset_processor.log_examples = data_args.log_examples

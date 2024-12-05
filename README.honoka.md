@@ -38,3 +38,15 @@ $ export PYTHONPATH=./FLD-user-shared-settings:$PYTHONPATH
     ```
 * references
     * [README.haic.md](https://gitlab.rdck.intra.hitachi.co.jp/industrial-fm/deepspeed-huggingface/-/blob/main/README.haic.md)
+
+### To use deepspeed with "zero2"
+Edit `transformers/integrations/deepspeed.py` as follows:
+```python
+if inference:
+    # only Z3 makes sense for the inference
+    - if not hf_deepspeed_config.is_zero3():
+    -     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
+    + # if not hf_deepspeed_config.is_zero3():
+    + #     raise ValueError("ZeRO inference only makes sense with ZeRO Stage 3 - please adjust your config")
+```
+
