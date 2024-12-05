@@ -55,7 +55,7 @@ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ## How to Train LLMs
 
 ### Using Your own Script
-[Our training script](#using_our_script) is becoming a bit complicated, so it could be better to use your own script, roughly as follows:
+[Our training script](#using-our-script) is becoming a bit complicated, so it could be better to use your own script, roughly as follows:
 1. Prepare the corpus.
     * You can simply use the released version of [FLDx2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLDx2).
     * (Optional) Or, you can create your own corpus by [FLD-generator](https://github.com/hitachi-nlp/FLD-generator).
@@ -142,5 +142,5 @@ Additionally, if you have corpora on your local filesystem, swap the `--logic_da
 
 After launching the script, you can check the results by tensorboard as:
 ```console
-tensorboard --port <your_port> --logdir ./outputs/tensorboard/
+tensorboard --port {your_port} --logdir ./outputs/tensorboard/
 ```
