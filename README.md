@@ -6,7 +6,7 @@ See [the entry-point repository](https://github.com/hitachi-nlp/FLD.git) about t
 
 
 
-## Releases (READ CAREFULLY to determine which branch suits you)
+## Release Branches (READ CAREFULLY to determine which branch suits you)
 * **(New!)** `NeurIPS_2024` branch (2024-12)
     - We released the code for training LLMs.
 * `NLP_2024_KOBE_BEEF` branch (2024-01-24) 
@@ -57,7 +57,7 @@ export PYTHONPATH=`pwd -P`:$PYTHONPATH
 ### Using Your own Script
 [Our training script](#using_our_script) is becoming a bit complicated, so it could be better to use your own script, roughly as follows:
 1. Prepare the corpus.
-    * You can simply use the released version of [FLD2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLD2).
+    * You can simply use the released version of [FLDx2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLDx2).
     * (Optional) Or, you can create your own corpus by [FLD-generator](https://github.com/hitachi-nlp/FLD-generator).
 2. Modify your training script as follows:
     * Use `prompt_serial` field of the corpus for LLM's input, and `proof_serial` for the output.
@@ -69,13 +69,13 @@ For the other details, please refer to our paper.
 ### Using Our Script
 The training script is `./scripts/run_causal_prover.py`.
 
-To train Llama-3.1-8B on [FLD2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLD2), run the following command:
+To train Llama-3.1-8B on [FLDx2 (FLD Diverse) 🤗](https://huggingface.co/datasets/hitachi-nlp/FLDx2), run the following command:
 ```console
 python ./scripts/run_causal_prover.py \
     --output_dir {output_dir} \
     --logging_dir {log_dir} \
     --model_name_or_path meta-llama/Meta-Llama-3.1-8B \
-    --logic_dataset_name hitachi-nlp/FLD2 \
+    --logic_dataset_name hitachi-nlp/FLDx2 \
     --use_original_serial True \
     --proof_intermediate_steps_prob 0.5 \
     --seed 0 \
