@@ -107,8 +107,8 @@ def main():
 
         # ('TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T', 'causal', 'cyberagent/open-calm-3b'),
 
-        # ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
-        ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
+        ('meta-llama/Meta-Llama-3.1-8B', 'causal', 'meta-llama/Llama-2-7b-hf'),
+        # ('meta-llama/Meta-Llama-3.1-70B', 'causal', 'meta-llama/Llama-2-70b-hf'),
         
         # ('mistralai/Mistral-7B-v0.1', 'causal', 'meta-llama/Llama-2-7b-hf'),
         # ('mistralai/Mixtral-8x7B-v0.1', 'causal', 'meta-llama/Llama-2-70b-hf'),
@@ -156,7 +156,6 @@ def main():
         '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15=0.90',
 
 
-
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.rules-G_MP=0.90',
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.voc-100=0.90',
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.dstrct-0=0.90',
@@ -165,7 +164,12 @@ def main():
         # '2024-10-23.hybrid__PLD_v2.neg-0.10=0.10__2024-09-18.FLD.neg-0.10.voc-large.theorems-0.15.trnsl-small.trnsl-old=0.90',
 
 
+        # 'hf.MorishT/FLD2',
+
     ]
+
+    use_original_serial = True
+    # use_original_serial = False
 
 
 
@@ -174,8 +178,8 @@ def main():
         # 0,
         # 1,
         2,
-        3,
-        4,
+        # 3,
+        # 4,
         # 5,
         # 6,
         # 7,
@@ -267,10 +271,10 @@ def main():
 
 
     lrates = [
-        # 2e-5,
+        2e-5,
         # 1e-5,
         # 5e-6,
-        3e-6,
+        # 3e-6,
     ]
 
 
@@ -279,9 +283,9 @@ def main():
         # ('rec_adam', 100),
         # ('rec_adam', 300),
         # ('rec_adam', 1000),
-        ('rec_adam', 2000),
+        # ('rec_adam', 2000),
         # ('rec_adam', 3000),
-        # ('rec_adam', 4000),
+        ('rec_adam', 4000),
         # ('rec_adam', 4500),
         # ('rec_adam', 5000),
 
@@ -291,10 +295,10 @@ def main():
 
 
 
-    engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
+    # engine = SubprocessEngine('haic', 'xhn_s.middle', n_resource=1)
 
     # engine = QsubEngine('haic', 'xhn_s.middle2', n_resource=2)
-    # engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
+    engine = QsubEngine('haic', 'xhn_s.large', n_resource=1)
     # engine = QsubEngine('haic', 'xhn_s.large', n_resource=4)
 
     # engine = QsubEngine('ABCI', 'rt_F', n_resource=8)    # ~ H100 x 8
@@ -445,16 +449,16 @@ def main():
          augmentation_prob) in hyparas:
 
         logic_dataset_config_load_type = None
-        logic_dataset_concatenate_all_splits_into_train = False
+        # logic_dataset_concatenate_all_splits_into_train = False
 
         if context_len is not None:
             _context_len = context_len
         else:
             if logic_dataset_uname.find('AUG') >= 0:
-                use_original_serial = True
+                _use_original_serial = True
                 _context_len = 3000
             else:
-                use_original_serial = False
+                _use_original_serial = use_original_serial if use_original_serial is not None else False
                 _context_len = 2048
 
 
@@ -572,7 +576,7 @@ def main():
                     use_test_as_val=setting.get('use_test_as_val', use_test_as_val),
                     use_test_as_train=setting.get('use_test_as_train', use_test_as_train),
                     streaming=streaming,
-                    use_original_serial=use_original_serial,
+                    use_original_serial=_use_original_serial,
                     no_instruction=no_instruction,
                     # prompt_emphasize_theorems=prompt_emphasize_theorems,
                     augmentation_prob=augmentation_prob,
@@ -613,7 +617,7 @@ def main():
             setting.update({
                 'do_train': True,
                 # 'do_eval': True,   # automatically set by evaluation_strategy=step
-                'do_eval_in_outerloop': False,
+                # 'do_eval_in_outerloop': False,
                 'do_predict': False,
             })
             setting.update({
@@ -625,7 +629,7 @@ def main():
                 # 'other_dataset_config_name': other_dataset_config_names,
 
                 'logic_dataset_config_load_type': logic_dataset_config_load_type,
-                'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
+                # 'logic_dataset_concatenate_all_splits_into_train': logic_dataset_concatenate_all_splits_into_train,
 
                 'resume_from_checkpoint': resume_from_checkpoint,
 
@@ -667,11 +671,11 @@ def main():
                 'log_examples': True,
             })
 
-            if seed >= 2:  # for compatibility with older experiments of jpn
+            if seed == 0:
                 setting.update({
-                    'train_random_sampling': True,
-                    'eval_random_sampling': True,
-                    'logic_eval_random_sampling': True,
+                    'train_no_sampling': True,
+                    'eval_no_sampling': True,
+                    'logic_eval_no_sampling': True,
                 })
 
             output_dir = make_output_dir(setting, output_top_dir)
